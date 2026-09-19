@@ -1,30 +1,33 @@
 {
-    "schemaVersion": 1,
-    "id": "myfirstmod",
-    "version": "${version}",
-    "name": "My First Mod",
-    "description": "A cleaner Minecraft main menu.",
-    "authors": ["Qynl"],
-    "contact": {
-        "sources": "https://github.com/Qynl/MyFirstMod"
-    },
-    "license": "MIT",
-    "environment": "client",
-    "entrypoints": {
-        "client": [
-            "dev.qynl.myfirstmod.MyFirstModClient"
-        ]
-    },
-    "mixins": [
-        {
-            "config": "myfirstmod.mixins.json",
-            "environment": "client"
-        }
+  "schemaVersion": 1,
+  "id": "myfirstmod",
+  "version": "${version}",
+  "name": "The Null Warden",
+  "description": "A handcrafted Ancient City boss encounter built around the Null Warden, its realm, and the Nullblade.",
+  "authors": ["Qynl"],
+  "contact": {
+    "sources": "https://github.com/Qynl/MyFirstMod"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.qynl.myfirstmod.MyFirstMod"
     ],
-    "depends": {
-        "fabricloader": ">=0.19.5",
-        "minecraft": "~1.21.1",
-        "java": ">=21",
-        "fabric-api": "*"
+    "client": [
+      "dev.qynl.myfirstmod.MyFirstModClient"
+    ]
+  },
+  "mixins": [
+    {
+      "config": "myfirstmod.mixins.json",
+      "environment": "client"
     }
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
 }
