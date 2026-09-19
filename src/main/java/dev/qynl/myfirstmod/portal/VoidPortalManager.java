@@ -76,6 +76,7 @@ public final class VoidPortalManager {
         }
 
         RETURN_POINTS.put(player.getUuid(), player.getBlockPos());
+        RETURN_POINTS.put(player.getUuid(), player.getBlockPos());
         ServerWorld target = server.getWorld(NULL_REALM);
         if (target == null) return;
         player.teleport(target, 0.5, 82, 0.5, player.getYaw(), player.getPitch());
@@ -91,9 +92,10 @@ public final class VoidPortalManager {
 
     public static void returnPlayer(ServerPlayerEntity player) {
         ServerWorld overworld = player.getServer().getOverworld();
-        BlockPos spawn = player.getSpawnPointPosition();
+        BlockPos spawn = RETURN_POINTS.getOrDefault(player.getUuid(), player.getSpawnPointPosition());
         if (spawn == null) spawn = overworld.getSpawnPos();
         player.teleport(overworld, spawn.getX() + 0.5, spawn.getY() + 1.0, spawn.getZ() + 0.5, player.getYaw(), player.getPitch());
+        RETURN_POINTS.remove(player.getUuid());
         player.sendMessage(Text.literal("The gate closes behind you."), true);
     }
 }
