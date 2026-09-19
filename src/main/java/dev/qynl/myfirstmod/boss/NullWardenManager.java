@@ -56,6 +56,7 @@ public final class NullWardenManager {
         NullWardenState data = saved(world);
         ArenaState a = new ArenaState();
         a.participants.addAll(data.participants);
+        a.eligiblePlayers.addAll(data.eligiblePlayers);
         a.rewardedPlayers.addAll(data.rewardedPlayers);
         a.echoes.addAll(data.echoes);
         a.defeated = data.defeated;
@@ -103,12 +104,14 @@ public final class NullWardenManager {
         data.bossUuid = a.boss == null ? a.bossUuid : a.boss.getUuid();
         data.participants.clear();
         data.participants.addAll(a.participants);
+        data.eligiblePlayers.clear();
+        data.eligiblePlayers.addAll(a.eligiblePlayers);
         data.rewardedPlayers.clear();
         data.rewardedPlayers.addAll(a.rewardedPlayers);
         data.echoes.clear();
         data.echoes.addAll(a.echoes);
         data.defeated = a.defeated;
-        data.rewarded = a.rewardedPlayers.containsAll(a.participants);
+        data.rewarded = a.rewardedPlayers.containsAll(a.eligiblePlayers);
         data.returnPortalBuilt = a.returnPortalBuilt;
         data.phase = a.phase;
         data.activePylons = a.activePylons;
@@ -119,6 +122,7 @@ public final class NullWardenManager {
         NullWardenState data = saved(world);
         data.bossUuid = null;
         data.participants.clear();
+        data.eligiblePlayers.clear();
         data.rewardedPlayers.clear();
         data.echoes.clear();
         data.defeated = false;
@@ -197,8 +201,10 @@ public final class NullWardenManager {
         a.nextAttackTick = 40;
         a.idleTicks = 0;
         a.victoryTicks = 0;
+        a.targetRotation = 0;
         a.defeated = false;
         a.rewardedPlayers.clear();
+        a.eligiblePlayers.clear();
         a.returnPortalBuilt = false;
         a.joinTicks.clear();
 
@@ -242,7 +248,6 @@ public final class NullWardenManager {
         }
 
         a.ticks++;
-
         updateEligibility(a);
 
         if (a.intro > 0) {
@@ -490,9 +495,8 @@ public final class NullWardenManager {
             }
             case VOID_RAIN -> {
                 for (ServerPlayerEntity p : activePlayers(world, a)) {
-                    double radius = 2.75;
                     ring(world, p.getX(), p.getY() + .1, p.getZ(),
-                            radius, ParticleTypes.EXPLOSION, 40);
+                            2.75, ParticleTypes.EXPLOSION, 40);
                     p.damage(world.getDamageSources().mobAttack(a.boss), 10);
                 }
             }
