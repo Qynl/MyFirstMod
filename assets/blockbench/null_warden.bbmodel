@@ -1,0 +1,1171 @@
+{
+  "meta": {
+    "format_version": "4.10",
+    "model_format": "free",
+    "box_uv": true
+  },
+  "name": "Null Warden",
+  "resolution": {
+    "width": 128,
+    "height": 128
+  },
+  "elements": [
+    {
+      "id": "torso",
+      "name": "Torso",
+      "from": [
+        -7,
+        4,
+        -4
+      ],
+      "to": [
+        7,
+        22,
+        4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            14,
+            18
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            14,
+            18
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            8,
+            18
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            8,
+            18
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            14,
+            8
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            14,
+            8
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "chest",
+      "name": "Chest Plate",
+      "from": [
+        -8,
+        4,
+        -6
+      ],
+      "to": [
+        8,
+        15,
+        -4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            72,
+            16,
+            11
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            0,
+            72,
+            16,
+            11
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            72,
+            2,
+            11
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            72,
+            2,
+            11
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            72,
+            16,
+            2
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            72,
+            16,
+            2
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "core",
+      "name": "Null Core",
+      "from": [
+        -4,
+        8,
+        -7
+      ],
+      "to": [
+        4,
+        16,
+        -5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            60,
+            8,
+            8
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            0,
+            60,
+            8,
+            8
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            60,
+            2,
+            8
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            60,
+            2,
+            8
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            60,
+            8,
+            2
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            60,
+            8,
+            2
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "head",
+      "name": "Head",
+      "from": [
+        -5,
+        -7,
+        -5
+      ],
+      "to": [
+        5,
+        2,
+        5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            52,
+            0,
+            10,
+            9
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            52,
+            0,
+            10,
+            9
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            52,
+            0,
+            10,
+            9
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            52,
+            0,
+            10,
+            9
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            52,
+            0,
+            10,
+            10
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            52,
+            0,
+            10,
+            10
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "jaw",
+      "name": "Jaw",
+      "from": [
+        -4,
+        2,
+        -5
+      ],
+      "to": [
+        4,
+        6,
+        5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            76,
+            0,
+            8,
+            4
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            76,
+            0,
+            8,
+            4
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            76,
+            0,
+            10,
+            4
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            76,
+            0,
+            10,
+            4
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            76,
+            0,
+            8,
+            10
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            76,
+            0,
+            8,
+            10
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "left_horn",
+      "name": "Left Horn",
+      "from": [
+        4,
+        -14,
+        -2
+      ],
+      "to": [
+        6,
+        -2,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            52,
+            35,
+            2,
+            12
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            52,
+            35,
+            2,
+            12
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            52,
+            35,
+            4,
+            12
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            52,
+            35,
+            4,
+            12
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            52,
+            35,
+            2,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            52,
+            35,
+            2,
+            4
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "right_horn",
+      "name": "Right Horn",
+      "from": [
+        -6,
+        -14,
+        -2
+      ],
+      "to": [
+        -4,
+        -2,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            52,
+            35,
+            2,
+            12
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            52,
+            35,
+            2,
+            12
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            52,
+            35,
+            4,
+            12
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            52,
+            35,
+            4,
+            12
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            52,
+            35,
+            2,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            52,
+            35,
+            2,
+            4
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "left_arm",
+      "name": "Left Arm",
+      "from": [
+        8,
+        -1,
+        -3
+      ],
+      "to": [
+        14,
+        14,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            68,
+            48,
+            6,
+            15
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            68,
+            48,
+            6,
+            15
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            68,
+            48,
+            6,
+            15
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            68,
+            48,
+            6,
+            15
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            68,
+            48,
+            6,
+            6
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            68,
+            48,
+            6,
+            6
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "right_arm",
+      "name": "Right Arm",
+      "from": [
+        -14,
+        -1,
+        -3
+      ],
+      "to": [
+        -8,
+        14,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            68,
+            48,
+            6,
+            15
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            68,
+            48,
+            6,
+            15
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            68,
+            48,
+            6,
+            15
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            68,
+            48,
+            6,
+            15
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            68,
+            48,
+            6,
+            6
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            68,
+            48,
+            6,
+            6
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "left_leg",
+      "name": "Left Leg",
+      "from": [
+        1,
+        14,
+        -4
+      ],
+      "to": [
+        8,
+        31,
+        4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            38,
+            7,
+            17
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            0,
+            38,
+            7,
+            17
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            38,
+            8,
+            17
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            38,
+            8,
+            17
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            38,
+            7,
+            8
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            38,
+            7,
+            8
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "right_leg",
+      "name": "Right Leg",
+      "from": [
+        -8,
+        14,
+        -4
+      ],
+      "to": [
+        -1,
+        31,
+        4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            38,
+            7,
+            17
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            0,
+            38,
+            7,
+            17
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            0,
+            38,
+            8,
+            17
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            0,
+            38,
+            8,
+            17
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            0,
+            38,
+            7,
+            8
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            0,
+            38,
+            7,
+            8
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "back_spine",
+      "name": "Back Spine",
+      "from": [
+        -2,
+        3,
+        4
+      ],
+      "to": [
+        2,
+        19,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            32,
+            82,
+            4,
+            15
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            32,
+            82,
+            4,
+            15
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            32,
+            82,
+            4,
+            15
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            32,
+            82,
+            4,
+            15
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            32,
+            82,
+            4,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            32,
+            82,
+            4,
+            4
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "crown",
+      "name": "Crown",
+      "from": [
+        -2,
+        -21,
+        -2
+      ],
+      "to": [
+        2,
+        -10,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            96,
+            0,
+            4,
+            11
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            96,
+            0,
+            4,
+            11
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            96,
+            0,
+            4,
+            11
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            96,
+            0,
+            4,
+            11
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            96,
+            0,
+            4,
+            4
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            96,
+            0,
+            4,
+            4
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "shard_left",
+      "name": "Floating Shard Left",
+      "from": [
+        -12,
+        1,
+        0
+      ],
+      "to": [
+        -8,
+        8,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            116,
+            0,
+            4,
+            7
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            116,
+            0,
+            4,
+            7
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            116,
+            0,
+            2,
+            7
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            116,
+            0,
+            2,
+            7
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            116,
+            0,
+            4,
+            2
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            116,
+            0,
+            4,
+            2
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "shard_right",
+      "name": "Floating Shard Right",
+      "from": [
+        8,
+        1,
+        0
+      ],
+      "to": [
+        12,
+        8,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            116,
+            10,
+            4,
+            7
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            116,
+            10,
+            4,
+            7
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            116,
+            10,
+            2,
+            7
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            116,
+            10,
+            2,
+            7
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            116,
+            10,
+            4,
+            2
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            116,
+            10,
+            4,
+            2
+          ],
+          "texture": 0
+        }
+      }
+    },
+    {
+      "id": "chest_spine",
+      "name": "Chest Spine",
+      "from": [
+        -2,
+        5,
+        4
+      ],
+      "to": [
+        2,
+        19,
+        7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            100,
+            26,
+            4,
+            14
+          ],
+          "texture": 0
+        },
+        "south": {
+          "uv": [
+            100,
+            26,
+            4,
+            14
+          ],
+          "texture": 0
+        },
+        "east": {
+          "uv": [
+            100,
+            26,
+            3,
+            14
+          ],
+          "texture": 0
+        },
+        "west": {
+          "uv": [
+            100,
+            26,
+            3,
+            14
+          ],
+          "texture": 0
+        },
+        "up": {
+          "uv": [
+            100,
+            26,
+            4,
+            3
+          ],
+          "texture": 0
+        },
+        "down": {
+          "uv": [
+            100,
+            26,
+            4,
+            3
+          ],
+          "texture": 0
+        }
+      }
+    }
+  ],
+  "outliner": [
+    {
+      "uuid": "root",
+      "name": "Null Warden",
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "children": [
+        "torso",
+        "head",
+        "left_arm",
+        "right_arm",
+        "left_leg",
+        "right_leg",
+        "back_spine",
+        "crown",
+        "shard_left",
+        "shard_right",
+        "chest_spine"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "path": "null_warden.png",
+      "name": "null_warden.png",
+      "folder": "",
+      "namespace": "",
+      "id": "nullwardentexture",
+      "particle": false,
+      "render_mode": "normal",
+      "visible": true,
+      "internal": false
+    }
+  ]
+}
