@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TrialRulesTest {
     @Test void tiersAreBounded() {
         assertEquals(0,TrialRules.tier(-10));assertEquals(5,TrialRules.tier(200));
+        assertEquals(5,TrialRules.nextTier(Integer.MAX_VALUE));
         assertEquals(1,TrialRules.nextTier(0));assertEquals(5,TrialRules.nextTier(5));
     }
     @Test void waveCountsHaveASensibleCap() {

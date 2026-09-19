@@ -76,7 +76,7 @@ def main():
             connection.command(prefix+'forceload add 0 0 0 160')
             connection.command(prefix+'forceload add 256 256 288 288')
             connection.command(prefix+'place feature myfirstmod:realm_ruins 264 100 264')
-            connection.command(prefix+'place feature myfirstmod:realm_flora 280 100 280')
+            connection.command(prefix+'place feature myfirstmod:realm_vault 280 100 280')
             connection.command(prefix+'setblock 8 81 30 myfirstmod:echo_altar')
             connection.command(prefix+'setblock 21 81 152 myfirstmod:resonance_core')
             connection.command(prefix+'summon myfirstmod:rift_sentinel 8 120 152')

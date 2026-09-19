@@ -1,10 +1,22 @@
-# The Null Warden — Resonance update
+# The Null Warden — Echoes update (1.2.0)
 
 A Minecraft **1.21.1 / Fabric / Java 21** exploration and boss mod.
 
 The Null Realm now has its own noise terrain and three custom biomes, an arrival sanctuary, procedural ruin courts, two realm enemies, a four-phase guardian, and a repeatable post-boss progression loop.
 
-> **Development build, not a tested release.** Resource tests pass; this change has not yet been compiled or playtested in Minecraft. See [validation and playtest checklist](docs/TESTING.md). Back up existing worlds. Use a fresh test world to see the new terrain: already-generated End-style chunks do not regenerate automatically.
+> **Development build.** CI compiles the mod and runs automated checks, including a dedicated-server worldgen smoke test. Visual presentation, combat balance, and multiplayer still require hands-on playtesting; see [validation scope](docs/TESTING.md). Back up existing worlds. Use a fresh test world for the complete terrain update: existing chunks never regenerate automatically.
+
+## New in 1.2 — Echoes
+
+- **Replayable Warden rituals:** offer an Echo Sigil at the altar near the arena. Challenge levels increase through three rematches, with reactivating pylon pairs and shorter recovery windows. Original attack warning times remain intact.
+- **Five court challenge tiers:** party boss bars, intermissions, final-wave captains, and three different oaths—not only health scaling.
+- **Sunken archive vaults:** another dungeon floor, a real staircase, pillars, and a separate treasure cache.
+- **Expedition journal:** a vanilla book interface with live statistics, mechanics, crafting help, and remembered court coordinates/cooldowns. Reopen it to refresh.
+- **Multi-route compass:** sneak-use cycles the arena, sanctuary, and nearest ready court you have discovered.
+- **New equipment:** Echo Sigils, Warden Crests, and a projectile-deflecting Rift Aegis.
+- **Persistent reward mailboxes:** an offline participant's boss loot is retained even if another group starts a new ritual.
+
+See [full 1.2 changelog](docs/CHANGELOG.md).
 
 ## Your expedition
 
@@ -14,8 +26,10 @@ The Null Realm now has its own noise terrain and three custom biomes, an arrival
 4. Receive a **Resonance Compass**. Its custom animated needle points toward the Warden arena; holding it shows distance. Follow the lit causeway or explore first.
 5. Discover ruin courts and use their **Resonance Cores** to opt into three-wave trials.
 6. Approach the arena in Survival or Adventure to awaken the Null Warden.
-7. Claim the blade and heart, then return to the courts: defeating the boss unlocks harder **Ascended Trials** globally in that realm.
+7. Claim the blade and heart, then return to the courts: defeating the boss permanently unlocks **Ascended Trials** globally in that realm.
 8. Forge a Resonance Matrix and awaken your Nullblade at a smithing table.
+9. Sneak-use a core to attempt your next challenge tier. Gather Echo Sigils from tier 2+ completions, vaults, or crafting.
+10. Offer a sigil at the **Echo Altar (8, 81, 30)**. Rematch victories award Warden Crests for the Rift Aegis.
 
 ## A realm of its own
 
@@ -27,7 +41,7 @@ The dimension no longer uses the End's noise settings or biome.
 | **Prism Wastes** | Pale calcite surfaces, amethyst formations, violet fog, floating motes |
 | **Cinder Steps** | Dark basalt terraces, ash, fractured spires |
 
-Seeded terrain combines layered ridges with smaller three-dimensional fractures. Procedural decoration places three small ruin layouts: an enclosed **reliquary**, an open **observatory**, and a divided **archive**. These are code-generated, chunk-contained features, not copied vanilla structure templates. Courts contain a loot cache and an opt-in trial core. They do not currently integrate with `/locate structure`.
+Seeded terrain combines layered ridges with smaller three-dimensional fractures. Procedural decoration places three ruin layouts: an enclosed **reliquary**, an open **observatory**, and a two-storey **archive** with a sunken treasure vault. These are code-generated, chunk-contained features, not copied vanilla structure templates. Courts contain a loot cache and an opt-in trial core. They do not currently integrate with `/locate structure`.
 
 The sanctuary includes a nearby introductory court and a lit approach to the arena. Exploration features are excluded from the protected central approach. Sanctuary construction happens once per world; arena resets rebuild the combat footprint. Do not build a permanent base inside that footprint.
 
@@ -79,22 +93,42 @@ Craft a **Resonance Matrix** from eight Resonant Shards surrounding an amethyst 
 
 The smithing transform carries the base stack's applicable components forward, including enchantments. The awakened blade has **12 attack damage**, 4,096 durability, a full-charge 24-damage/eight-block Soul Rend, up to three hearts of healing, shorter Rend cooldown, and eight-block Riftstep.
 
-Boss rewards are delivered once per eligible participant: **Nullblade, Heart, four shards, 500 XP**. A full inventory drops the rewards instead of deleting them.
+First-encounter rewards are **four shards and 500 XP** per eligible participant. Each player's first victory also grants **Nullblade and Heart**, including newcomers winning their first rematch. Rematches grant **a Warden Crest, eight shards, and 350 XP**. Reward mailboxes are independent of the active fight: offline winners receive their queued rewards when alive in the realm again. A full inventory drops items instead of deleting them.
+
+### Rift Aegis
+
+Craft a **shield + Warden Crest + Resonance Matrix**. Use the Aegis to reflect visible hostile-owned projectiles in the forward hemisphere within five blocks, directing them along your aim, and gain resistance II for three seconds. It has a 12-second cooldown and consumes two of its 768 durability per activation. This is a timed parry artifact, not a hold-to-block vanilla shield.
 
 ## After the boss
 
 Courts remain useful after victory:
 
-- Three waves with short breathers; difficulty scales with enrolled players.
-- Nearby eligible players enroll at activation; only enrolled survivors still at the court receive completion rewards.
-- Ordinary courts award two shards and 50 XP per player.
-- Ascended courts add enemies, increase their health, and award four shards and 120 XP.
-- A completed court recharges after five minutes of world time.
-- Abandoning a trial for 30 seconds resets it. Interrupted trials do not resume after a server restart; their guardians are cleaned up when loaded. Cooldowns persist.
-- Ruin caches and occasional mob drops provide additional shards and expedition supplies.
-- An advancement path tracks entry, the heart, gathering resonance, and awakening the blade.
+| Tier | Waves | Shards / player | XP / player |
+| --- | --- | --- | --- |
+| 0 (before boss) | 3 | 2 | 50 |
+| 1 | 4 | 4 | 100 |
+| 2 | 5 | 6 | 150 |
+| 3 | 5 | 8 | 200 |
+| 4 | 5 | 10 | 250 |
+| 5 | 5 | 12 | 300 |
 
-A replacement compass can be crafted with a compass and an echo shard. Use it once to bind its lodestone component; its custom needle already tracks the arena while in the realm.
+Use a core normally for tier 1 after the boss; **sneak-use** to attempt the activating player's next tier, capped at five. Tier 2+ also grants one Echo Sigil per eligible survivor.
+
+The selected court/tier has one oath:
+
+- **Fracture:** fixed circles erupt after two seconds. Move out; overlapping circles do not multiply damage.
+- **Siphon:** two visible wards slowly heal enemies. Sneak within their circles for two seconds to ground each ward.
+- **Pursuit:** faster hunters. Every ascended court ends with a tougher, named captain.
+
+Nearby eligible players enroll at activation; late arrivals receive no completion loot. One enrollment per player prevents overlapping court farming. A party boss bar shows wave, remaining enemies, tier, and oath. Waves have five-second intermissions. Completed courts recharge for five minutes; abandoned courts reset after 30 seconds, and all trials have a ten-minute maximum duration. Interrupted trials reset on server restart rather than resuming with stale guardians.
+
+The Echo Altar has a three-minute ritual cooldown. Rematch health scales up through challenge level three, recovery becomes shorter, and different pylon pairs reactivate at phase changes. Failed rematches restore the cleared realm state—no free automatic boss respawn and no loss of ascended court access.
+
+### Journal and routes
+
+The sanctuary gives you a **Null Expedition** book. Reopen it to refresh statistics and the most recent known court coordinates. A replacement is crafted from a book and amethyst shard. Discover biomes by visiting; discover courts by interacting with their cores. Each player's saved court list keeps the 128 most recent discoveries, and the journal shows the latest twelve.
+
+A replacement compass uses a compass and echo shard. Sneak-use selects a destination; ordinary use refreshes the selected route. Court mode chooses the nearest discovered court whose cooldown has expired at the time you use the compass. It is not an omniscient dungeon locator or a live activity tracker.
 
 ## Build and validation
 
@@ -102,13 +136,18 @@ A replacement compass can be crafted with a compass and an echo shard. Use it on
 # Java 21 must be installed; the Gradle 8.12 wrapper is included.
 ./gradlew build
 
+# Unit tests (also included in build):
+./gradlew test
+
 # Fast data/resource checks, Python 3 only:
 python3 -m unittest discover -s tests -v
 ```
 
 Windows: `gradlew.bat build`. Output: `build/libs/`.
 
-CI runs resource tests and the Loom build for main/arena branch pushes and pull requests. A successful CI build is still not a substitute for the dedicated-server and multiplayer playtests in [docs/TESTING.md](docs/TESTING.md).
+CI runs resource tests, JUnit balancing tests, the Loom build, and a real dedicated-server smoke test for main/arena pushes and pull requests. It uploads the installable JAR separately from test reports. Download the `Null-Warden-<commit>` artifact from a successful [Actions run](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml).
+
+The smoke test boots Fabric, generates realm chunks, places a ruin and an explicit archive vault, spawns both realm mobs, saves, and shuts down cleanly. It is not a combat bot or a visual/multiplayer test. The smoke-test script owns the disposable `run/ci-smoke` world and overwrites `run/server.properties`/`eula.txt`; never point it at a production server.
 
 Original pixel textures and worldgen resources are reproducible:
 

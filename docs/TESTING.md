@@ -1,13 +1,16 @@
 # Validation / release gate
 
-## Run in this workspace
+## Automated validation
 
-- `python3 -m unittest discover -s tests -v`: **8 passing tests**.
+- Local Python resource suite: **11 passing tests**.
 - `git diff --check`: clean.
-- `./gradlew build --no-daemon`: **blocked** — no Java executable / JAVA_HOME in the sandbox.
-- Attempts to download Java/Gradle and contact Fabric Maven failed with TLS/network errors. Official wrapper files were obtainable via GitHub's API.
+- Java builds run in **GitHub Actions** because this workspace has no Java installation.
+- CI compiles main/client sources, runs **ten JUnit tests**, creates the remapped JAR, and executes `scripts/ci_server_smoke.py`.
+- The smoke test launches a real Fabric dedicated server, loads the custom dimension codecs, generates chunks, places a ruin and forced archive vault, spawns both realm mobs, saves, and shuts down. Logs and JUnit reports are uploaded as `Validation-<commit>`; the mod is in `Null-Warden-<commit>`.
 
-The Python tests check JSON parsing, custom worldgen references, biome feature stages, item translations, model/texture references, compass frames/PNG headers, 1.21.1 resource paths, smithing contracts, and deterministic regeneration. They **do not compile Java, run Minecraft's codecs, verify gameplay, or benchmark worldgen**.
+Check the final Actions run for the exact revision under test. Compilation is not a playtest, and the smoke test does not simulate a connected player or a complete boss/trial encounter.
+
+The initial CI attempt caught a Warden attribute API mismatch. The first dedicated-server test then caught two dimension-codec issues that JSON-only tests cannot detect. Both are corrected; regression assertions were added for the dimension fields.
 
 ## Required before release
 
@@ -66,4 +69,17 @@ The Python tests check JSON parsing, custom worldgen references, biome feature s
 
 ## Deliberate limits
 
-This is a substantial development iteration, not a finished expansion. The new mobs use vanilla model rigs; courts are small procedural layouts, not sprawling jigsaw dungeons; cinematics preserve the player's camera rather than providing scripted camera rails. The Warden remains a one-time realm boss; replayability currently comes from repeatable courts and weapon progression. No runtime performance or balance claims are made until the checklist is exercised.
+This is a substantial development iteration, not a finished expansion. The new mobs use vanilla model rigs; courts are small procedural layouts, not sprawling jigsaw dungeons; cinematics preserve the player's camera rather than providing scripted camera rails. The Warden now supports opt-in ritual rematches, but there is no scripted free-camera cutscene system or sprawling jigsaw structure network. No runtime performance or balance claims are made until the checklist is exercised.
+
+## Echoes-specific regression checklist
+
+- [ ] Load a 1.1 save backup. Verify the altar appears once, pending first-victory rewards migrate, and unrelated builds remain intact.
+- [ ] Offer a sigil before first victory / in Peaceful / during another fight: no item consumption or duplicate boss.
+- [ ] Win or abandon a rematch, restart at each phase, and verify cleared-realm progression remains unlocked.
+- [ ] Have one eligible player disconnect before victory. Start another ritual; the absent player's previous reward must still arrive on re-entry.
+- [ ] Attempt tiers 1–5, including mixed-progress parties. Check wave count, shard/XP rewards, sigils, and the captain.
+- [ ] Test overlapping Fracture circles, paused empty courts, Siphon grounding duration, and Pursuit speed.
+- [ ] Open and reopen a journal in either hand and outside the realm. Check translated page layout and updated player-specific values.
+- [ ] Discover multiple courts. Cycle compass routes, put the nearest court on cooldown, and refresh the route.
+- [ ] Reflect skeleton arrows with the Aegis. Player-owned projectiles, projectiles behind the player, and projectiles behind walls must not be reflected.
+- [ ] Enter an archive vault naturally. Walk the entire staircase both ways; check overhead clearance and loot.

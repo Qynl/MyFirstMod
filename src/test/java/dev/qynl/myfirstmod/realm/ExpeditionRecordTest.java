@@ -1,0 +1,43 @@
+package dev.qynl.myfirstmod.realm;
+
+import net.minecraft.nbt.NbtCompound;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class ExpeditionRecordTest {
+    @Test void progressAndRewardMailboxRoundTrip() {
+        ExpeditionRecord record=new ExpeditionRecord();
+        record.trials=17;record.highestTier=4;record.victories=3;
+        record.pendingNormal=1;record.pendingEcho=2;
+        record.biomes.add("myfirstmod:hushed_grove");record.discoverCourt(-71234567L);
+        ExpeditionRecord restored=ExpeditionRecord.read(record.write());
+        assertEquals(17,restored.trials);assertEquals(4,restored.highestTier);
+        assertEquals(3,restored.victories);assertEquals(1,restored.pendingNormal);assertEquals(2,restored.pendingEcho);
+        assertEquals(record.biomes,restored.biomes);assertEquals(record.courts,restored.courts);
+    }
+    @Test void malformedCountersCannotEscapeLimits() {
+        NbtCompound nbt=new NbtCompound();
+        nbt.putInt("Trials",-4);nbt.putInt("Tier",100);nbt.putInt("Victories",-10);
+        nbt.putInt("PendingNormal",Integer.MAX_VALUE);nbt.putInt("PendingEcho",-1);
+        ExpeditionRecord record=ExpeditionRecord.read(nbt);
+        assertEquals(0,record.trials);assertEquals(5,record.highestTier);assertEquals(0,record.victories);
+        assertEquals(64,record.pendingNormal);assertEquals(0,record.pendingEcho);
+    }
+    @Test void discoveryStorageKeepsNewest128Courts() {
+        ExpeditionRecord record=new ExpeditionRecord();
+        for(long i=0;i<200;i++) record.discoverCourt(i);
+        assertEquals(128,record.courts.size());assertFalse(record.courts.contains(0L));
+        assertTrue(record.courts.contains(199L));assertTrue(record.courts.contains(72L));
+    }
+    @Test void discoveringAnExistingCourtDoesNotEvictAnother() {
+        ExpeditionRecord record=new ExpeditionRecord();
+        for(long i=0;i<128;i++) record.discoverCourt(i);
+        record.discoverCourt(7L);
+        assertEquals(128,record.courts.size());assertTrue(record.courts.contains(0L));
+    }
+    @Test void oldSavesDefaultToAnEmptyMailbox() {
+        ExpeditionRecord record=ExpeditionRecord.read(new NbtCompound());
+        assertEquals(0,record.pendingNormal);assertEquals(0,record.pendingEcho);
+        assertTrue(record.courts.isEmpty());assertTrue(record.biomes.isEmpty());
+    }
+}

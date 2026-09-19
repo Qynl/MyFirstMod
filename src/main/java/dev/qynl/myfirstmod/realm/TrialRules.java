@@ -11,6 +11,6 @@ public final class TrialRules {
     public static float healthMultiplier(int tier) { return 1 + .2f*tier(tier); }
     public static int shards(int tier) { return 2+2*tier(tier); }
     public static int experience(int tier) { return 50+50*tier(tier); }
-    public static int nextTier(int best) { return Math.min(5,Math.max(1,best+1)); }
+    public static int nextTier(int best) { return Math.min(5,tier(best)+1); }
     public static int oath(long position,int tier) { return Math.floorMod(Long.hashCode(position)+tier,3); }
 }

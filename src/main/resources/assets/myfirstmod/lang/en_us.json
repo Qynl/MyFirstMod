@@ -89,5 +89,6 @@
   "journal.myfirstmod.endgame": "THE ECHO RITUAL\n\nOffer an Echo Sigil at 8, 81, 30 after victory. Tier 2+ courts and vaults grant sigils.\n\nRematches award crests. Craft a crest, shield, and Matrix into the projectile-deflecting Rift Aegis.",
   "journal.myfirstmod.courts": "KNOWN COURTS\n\n%s",
   "message.myfirstmod.reward_mail": "EXPEDITION REWARDS // %s victories claimed: %s shards, %s Warden Crests, and experience.",
-  "message.myfirstmod.first_relics": "First victory: the Nullblade and Heart of the Null are yours."
+  "message.myfirstmod.first_relics": "First victory: the Nullblade and Heart of the Null are yours.",
+  "boss.myfirstmod.echo_title": "WARDEN ECHO · CHALLENGE %s"
 }

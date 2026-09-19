@@ -123,6 +123,13 @@ public final class NullWardenManager {
         a.rematch = data.rematch;
         a.rewardsQueued = data.rewardsQueued;
         if(a.defeated && !a.rewardsQueued) {
+            var progress=dev.qynl.myfirstmod.realm.RealmState.get(world);
+            progress.bossClears=Math.max(1,progress.bossClears);
+            for(UUID id:a.rewardedPlayers) {
+                var record=progress.expedition(id);
+                record.victories=Math.max(1,record.victories);
+            }
+            progress.markDirty();
             Set<UUID> pending=new HashSet<>(a.eligiblePlayers);pending.removeAll(a.rewardedPlayers);
             dev.qynl.myfirstmod.realm.ExpeditionRewards.enqueue(world,pending,a.rematch);
             a.rewardsQueued=true;data.rewardsQueued=true;data.dirty();
@@ -172,6 +179,10 @@ public final class NullWardenManager {
             var player=world.getServer().getPlayerManager().getPlayer(id);
             if(player!=null && player.getServerWorld()==world) a.bar.addPlayer(player);
         }
+    }
+
+    private static net.minecraft.text.MutableText bossTitle(ArenaState a) {
+        return a.rematch?Text.translatable("boss.myfirstmod.echo_title",a.challengeTier):Text.literal("THE NULL WARDEN");
     }
 
     private static ServerBossBar createBar() {
@@ -275,7 +286,7 @@ public final class NullWardenManager {
 
         a.boss.setHealth(maxHealth);
         a.boss.refreshPositionAndAngles(.5, 83, .5, 180, 0);
-        a.boss.setCustomName(Text.literal("THE NULL WARDEN"));
+        a.boss.setCustomName(bossTitle(a));
         a.boss.setCustomNameVisible(false);
         a.boss.setAiDisabled(true);
         a.boss.setInvulnerable(true);
@@ -543,9 +554,9 @@ public final class NullWardenManager {
                         100.0 * a.attackWindup / Math.max(1, a.attack.windup)), false);
 
         if (a.bar != null && a.attack != Attack.NONE && a.attackWindup % 5 == 0) {
-            a.bar.setName(Text.literal("THE NULL WARDEN  //  " + a.attack.name));
+            a.bar.setName(bossTitle(a).append("  //  " + a.attack.name));
         } else if (a.bar != null && a.attack == Attack.NONE) {
-            a.bar.setName(Text.literal("THE NULL WARDEN  //  " + phaseName(a.phase)));
+            a.bar.setName(bossTitle(a).append("  //  " + phaseName(a.phase)));
         }
 
         float health = a.boss.getHealth() / a.boss.getMaxHealth();
@@ -1246,6 +1257,8 @@ public final class NullWardenManager {
     }
 
     private static void phaseShift(ServerWorld world, ArenaState a) {
+        for(int i=0;i<PYLONS.length;i++) world.setBlockState(PYLONS[i].up(11),
+                (a.activePylons & (1<<i))!=0?Blocks.SEA_LANTERN.getDefaultState():Blocks.AIR.getDefaultState());
         if (a.bar != null) {
             a.bar.setColor(switch (a.phase) {
                 case 2 -> ServerBossBar.Color.PINK;
@@ -1267,6 +1280,7 @@ public final class NullWardenManager {
             case 3 -> "Phase 3: ground the pylon pulse, then dodge the Warden's marked attacks.";
             default -> "Phase 4: cleanse the final pylon. Its inner pocket shields sneaking players from pulses.";
         };
+        if(a.rematch) rule="Echo ritual: a new pylon pair is active. Ground both before striking.";
         for (ServerPlayerEntity p : participants(world, a)) {
             p.sendMessage(Text.literal("NULL WARDEN // " + phaseName(a.phase)), true);
             p.sendMessage(Text.literal("The pylons are feeding it. Sneak beside each one to cleanse it."), false);

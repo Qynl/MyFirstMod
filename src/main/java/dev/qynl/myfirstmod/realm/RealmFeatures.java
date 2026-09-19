@@ -22,6 +22,7 @@ public final class RealmFeatures {
     public static void register() {
         Registry.register(Registries.FEATURE, Identifier.of(MyFirstMod.MOD_ID, "realm_ruins"), new Ruins());
         Registry.register(Registries.FEATURE, Identifier.of(MyFirstMod.MOD_ID, "realm_flora"), new Flora());
+        Registry.register(Registries.FEATURE, Identifier.of(MyFirstMod.MOD_ID, "realm_vault"), new Ruins(2));
     }
 
     private static void place(StructureWorldAccess world, BlockPos pos, Block block) {
@@ -39,12 +40,14 @@ public final class RealmFeatures {
     }
 
     private static final class Ruins extends Feature<DefaultFeatureConfig> {
-        Ruins() { super(DefaultFeatureConfig.CODEC); }
+        private final int forcedStyle;
+        Ruins() { this(-1); }
+        Ruins(int forcedStyle) { super(DefaultFeatureConfig.CODEC);this.forcedStyle=forcedStyle; }
         @Override public boolean generate(FeatureContext<DefaultFeatureConfig> context) {
             var world = context.getWorld();
             BlockPos p = center(context);
             if (reserved(p) || p.getY() < 20 || p.getY() > 180) return false;
-            int style = context.getRandom().nextInt(3);
+            int style = forcedStyle>=0?forcedStyle:context.getRandom().nextInt(3);
             Block wall = style == 0 ? Blocks.DEEPSLATE_TILES : style == 1 ? Blocks.POLISHED_BASALT : Blocks.POLISHED_BLACKSTONE_BRICKS;
             // Reliquary, open observatory, and buried archive share an accessible trial court.
             for (int x = -6; x <= 6; x++) for (int z = -6; z <= 6; z++) {
@@ -115,7 +118,10 @@ public final class RealmFeatures {
             if (reserved(p)) return false;
             var world = context.getWorld();
             int height = 3 + context.getRandom().nextInt(7);
-            boolean crystal = world.getBlockState(p.down()).isOf(Blocks.CALCITE);
+            var surface=world.getBlockState(p.down());
+            // Decoration must not grow through a trial core or on an archive roof.
+            if(!surface.isOf(Blocks.CALCITE) && !surface.isOf(Blocks.SCULK) && !surface.isOf(Blocks.SMOOTH_BASALT)) return false;
+            boolean crystal = surface.isOf(Blocks.CALCITE);
             boolean grove = world.getBlockState(p.down()).isOf(Blocks.SCULK);
             for (int y=0;y<height;y++) {
                 place(world,p.up(y),crystal ? Blocks.AMETHYST_BLOCK : Blocks.BASALT);

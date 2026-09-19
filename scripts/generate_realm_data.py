@@ -31,3 +31,5 @@ p.write_text(json.dumps(d,indent=2)+'\n')
 for name,chance in [('realm_ruins',12),('realm_flora',1)]:
     put('worldgen/configured_feature/'+name+'.json',{'type':'myfirstmod:'+name,'config':{}})
     put('worldgen/placed_feature/'+name+'.json',{'feature':'myfirstmod:'+name,'placement':[{'type':'minecraft:rarity_filter','chance':chance},{'type':'minecraft:in_square'},{'type':'minecraft:heightmap','heightmap':'WORLD_SURFACE_WG'},{'type':'minecraft:biome'}]})
+
+put('worldgen/configured_feature/realm_vault.json',{'type':'myfirstmod:realm_vault','config':{}})
