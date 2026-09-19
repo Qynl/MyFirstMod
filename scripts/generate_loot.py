@@ -26,5 +26,14 @@ for name,parent,icon,title,description,criteria in [
     advancement={'display':display,'criteria':criteria}
     if parent:advancement['parent']='myfirstmod:'+parent
     put('advancement/'+name+'.json',advancement)
-for name,item in [('arena_compass','minecraft:echo_shard'),('resonance_matrix','myfirstmod:resonant_shard')]:
-    put('advancement/recipes/'+name+'.json',{'criteria':{'has_item':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':[item]}]}}},'rewards':{'recipes':['myfirstmod:'+name]}})
+for name,ingredient in [('arena_compass','minecraft:echo_shard'),('resonance_matrix','myfirstmod:resonant_shard')]:
+    put('advancement/recipes/'+name+'.json',{'criteria':{'has_item':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':[ingredient]}]}}},'rewards':{'recipes':['myfirstmod:'+name]}})
+
+put('recipe/echo_sigil.json',{'type':'minecraft:crafting_shaped','category':'misc','pattern':[' S ','SES',' S '],'key':{'S':{'item':'myfirstmod:resonant_shard'},'E':{'item':'minecraft:echo_shard'}},'result':{'id':'myfirstmod:echo_sigil','count':1}})
+put('recipe/rift_aegis.json',{'type':'minecraft:crafting_shapeless','category':'equipment','ingredients':[{'item':'minecraft:shield'},{'item':'myfirstmod:warden_crest'},{'item':'myfirstmod:resonance_matrix'}],'result':{'id':'myfirstmod:rift_aegis','count':1}})
+put('recipe/expedition_journal.json',{'type':'minecraft:crafting_shapeless','category':'misc','ingredients':[{'item':'minecraft:book'},{'item':'minecraft:amethyst_shard'}],'result':{'id':'minecraft:written_book','count':1,'components':{'minecraft:custom_data':{'NullJournal':True},'minecraft:written_book_content':{'title':'Null Expedition','author':'The Threshold Archive','pages':['{"text":"Open this journal to read your expedition progress."}']}}}})
+for name,ingredient in [('echo_sigil','myfirstmod:resonant_shard'),('rift_aegis','myfirstmod:warden_crest'),('expedition_journal','myfirstmod:arena_compass')]:
+    put('advancement/recipes/'+name+'.json',{'criteria':{'has_item':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':[ingredient]}]}}},'rewards':{'recipes':['myfirstmod:'+name]}})
+put('advancement/echo_victory.json',{'parent':'myfirstmod:claim_heart','display':{'icon':{'id':'myfirstmod:warden_crest'},'title':{'text':'The Second Silence'},'description':{'text':'Defeat an echo of the Warden and claim its crest.'},'frame':'challenge','show_toast':True,'announce_to_chat':True,'hidden':False},'criteria':{'crest':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':['myfirstmod:warden_crest']}]}}}})
+
+put('loot_table/chests/vault_cache.json',{'type':'minecraft:chest','pools':[{'rolls':1,'entries':[item('myfirstmod:echo_sigil')]},{'rolls':{'type':'minecraft:uniform','min':2,'max':4},'entries':[item('myfirstmod:resonant_shard',{'type':'minecraft:uniform','min':2,'max':4},4),item('minecraft:diamond',{'type':'minecraft:uniform','min':1,'max':3},2),item('minecraft:echo_shard',2,3),item('minecraft:enchanted_golden_apple',1,1)]}]})

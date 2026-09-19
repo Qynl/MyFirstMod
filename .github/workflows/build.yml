@@ -6,9 +6,17 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -33,20 +41,39 @@ jobs:
           set -o pipefail
           ./gradlew build --no-daemon --console=plain 2>&1 | tee ci-build.log
 
+      - name: Dedicated server smoke test
+        timeout-minutes: 10
+        run: python3 scripts/ci_server_smoke.py
+
       - name: Report build diagnostics
         if: failure()
         run: |
           python3 - <<'PYCODE'
           from pathlib import Path
-          p = Path('ci-build.log')
-          if p.exists():
-              text = '\n'.join(p.read_text().splitlines()[-120:])
-              escaped = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-              print(f'::error title=Build diagnostics::{escaped}')
+          for filename in ['ci-build.log', 'build/ci/server-smoke.log']:
+              p = Path(filename)
+              if p.exists():
+                  text = '\n'.join(p.read_text().splitlines()[-120:])
+                  escaped = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+                  print(f'::error title={filename}::{escaped}')
           PYCODE
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: MyFirstMod
-          path: build/libs/*.jar
+          name: Null-Warden-${{ github.sha }}
+          path: |
+            build/libs/*.jar
+            !build/libs/*-sources.jar
+          if-no-files-found: error
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Validation-${{ github.sha }}
+          path: |
+            ci-build.log
+            build/ci/server-smoke.log
+            build/reports/tests/
+          retention-days: 14

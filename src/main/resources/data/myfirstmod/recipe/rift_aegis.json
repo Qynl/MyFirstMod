@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "minecraft:shield"
+    },
+    {
+      "item": "myfirstmod:warden_crest"
+    },
+    {
+      "item": "myfirstmod:resonance_matrix"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:rift_aegis",
+    "count": 1
+  }
+}

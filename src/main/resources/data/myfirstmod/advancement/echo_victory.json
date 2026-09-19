@@ -1,0 +1,32 @@
+{
+  "parent": "myfirstmod:claim_heart",
+  "display": {
+    "icon": {
+      "id": "myfirstmod:warden_crest"
+    },
+    "title": {
+      "text": "The Second Silence"
+    },
+    "description": {
+      "text": "Defeat an echo of the Warden and claim its crest."
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "crest": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:warden_crest"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

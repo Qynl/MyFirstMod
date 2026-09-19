@@ -18,7 +18,7 @@ public final class RealmExpedition {
     public static final BlockPos ARRIVAL=new BlockPos(0,81,160);
     public static void prepare(ServerWorld world) {
         RealmState state=RealmState.get(world);
-        if(state.sanctuaryBuilt) return;
+        if(state.sanctuaryBuilt) {prepareAltar(world,state);return;}
         NullWardenManager.prepareArena(world);
         // Lit, railed causeway: entry is always safe regardless of the seed's local terrain.
         for(int z=23;z<=170;z++) for(int x=-3;x<=3;x++) {
@@ -49,7 +49,22 @@ public final class RealmExpedition {
             for(int y=81;y<=84;y++) put(world,new BlockPos(x,y,z),Blocks.AIR);
         }
         put(world,new BlockPos(21,81,152),ModBlocks.RESONANCE_CORE);
-        state.sanctuaryBuilt=true;state.markDirty();
+        state.sanctuaryBuilt=true;
+        prepareAltar(world,state);
+        state.markDirty();
+    }
+    private static void prepareAltar(ServerWorld world,RealmState state) {
+        if(state.contentVersion>=2) return;
+        for(int x=4;x<=12;x++) for(int z=26;z<=34;z++) {
+            put(world,new BlockPos(x,80,z),Blocks.CHISELED_DEEPSLATE);
+            for(int y=81;y<=86;y++) put(world,new BlockPos(x,y,z),Blocks.AIR);
+        }
+        for(int x:new int[]{4,12}) for(int z:new int[]{26,34}) {
+            for(int y=81;y<85;y++) put(world,new BlockPos(x,y,z),Blocks.CRYING_OBSIDIAN);
+            put(world,new BlockPos(x,85,z),Blocks.SOUL_LANTERN);
+        }
+        put(world,new BlockPos(8,81,30),ModBlocks.ECHO_ALTAR);
+        state.contentVersion=2;state.markDirty();
     }
     private static void put(ServerWorld world,BlockPos pos,Block block) {
         world.setBlockState(pos,block.getDefaultState(),Block.NOTIFY_LISTENERS);
@@ -58,6 +73,7 @@ public final class RealmExpedition {
         boolean hasCompass=false;
         for(int i=0;i<player.getInventory().size();i++) if(player.getInventory().getStack(i).isOf(ModItems.ARENA_COMPASS)) hasCompass=true;
         if(!hasCompass) player.getInventory().offerOrDrop(ArenaCompassItem.create());
+        ExpeditionJournal.give(player);
         player.sendMessage(Text.translatable("message.myfirstmod.welcome"),false);
         player.sendMessage(Text.translatable("message.myfirstmod.expedition_hint"),false);
     }
@@ -66,6 +82,18 @@ public final class RealmExpedition {
         if(world==null || world.getTime()%20!=0) return;
         for(ServerPlayerEntity p:world.getPlayers()) {
             if(p.isSpectator() || !p.isAlive()) continue;
+            if(p.age % 100 == 0) {
+                var state=RealmState.get(world);
+                world.getBiome(p.getBlockPos()).getKey().ifPresent(key -> {
+                    if(key.getValue().getNamespace().equals("myfirstmod")
+                            && state.expedition(p.getUuid()).biomes.add(key.getValue().toString())) {
+                        state.markDirty();
+                        p.sendMessage(Text.translatable("message.myfirstmod.biome_discovered",
+                                Text.translatable("biome.myfirstmod."+key.getValue().getPath())),false);
+                        if(!p.isCreative()) p.addExperience(25);
+                    }
+                });
+            }
             if(p.squaredDistanceTo(.5,81,.5)<20*20) NullWardenManager.approachArena(world,p);
             // A quiet arrival refuge: suppress naturally spawned hostiles, never trial mobs.
             if(p.squaredDistanceTo(ARRIVAL.toCenterPos())<14*14) {

@@ -65,3 +65,12 @@ d['textures'].update(blade='myfirstmod:block/nullsteel',edge='myfirstmod:block/n
 put(Path('models/item/nullblade.json'),d)
 d['textures']['core']='myfirstmod:block/ascended_core'
 put(Path('models/item/ascended_nullblade.json'),d)
+
+# Endgame artifacts: a ritual seal, fractured crown, and reflective aegis.
+sprite('echo_sigil',[([(16,1),(30,16),(16,31),(2,16)],(48,39,76)), ([(16,4),(27,16),(16,28),(5,16)],(137,110,190)), ([(16,8),(23,16),(16,24),(9,16)],(31,47,68)), ([(15,6),(18,6),(18,26),(15,26)],(165,250,226)), ([(6,15),(26,15),(26,18),(6,18)],(165,250,226))])
+sprite('warden_crest',[([(3,7),(10,13),(16,2),(22,13),(29,7),(25,26),(7,26)],(70,46,84)), ([(5,10),(11,17),(16,6),(21,17),(27,10),(23,23),(9,23)],(241,201,126)), ([(16,13),(20,20),(16,26),(12,20)],(115,252,220))])
+sprite('rift_aegis',[([(4,4),(16,1),(28,4),(26,23),(16,31),(6,23)],(41,32,64)), ([(6,6),(16,4),(26,6),(24,22),(16,28),(8,22)],(149,119,202)), ([(9,8),(16,6),(23,8),(21,21),(16,25),(11,21)],(31,70,83)), ([(16,9),(20,16),(16,23),(12,16)],(164,255,229))])
+for name in ['echo_sigil','warden_crest','rift_aegis']:
+    put(Path('models/item/'+name+'.json'),{'parent':'minecraft:item/generated','textures':{'layer0':'myfirstmod:item/'+name}})
+put(Path('blockstates/echo_altar.json'),{'variants':{'':{'model':'myfirstmod:block/echo_altar'}}})
+put(Path('models/block/echo_altar.json'),{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/ascended_core'}})

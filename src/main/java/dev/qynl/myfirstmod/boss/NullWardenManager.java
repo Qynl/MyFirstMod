@@ -56,7 +56,38 @@ public final class NullWardenManager {
         if (!boss.getUuid().equals(saved(world).bossUuid)) boss.discard();
         else if (arena != null) restoreActor(world,arena,boss);
     }
-    public static boolean isDefeated(ServerWorld world) { return saved(world).defeated; }
+    public static boolean isDefeated(ServerWorld world) { return saved(world).everDefeated || saved(world).defeated; }
+    public static net.minecraft.util.ActionResult interactAltar(ServerPlayerEntity player,BlockPos pos) {
+        ServerWorld world=player.getServerWorld();
+        if(!world.getRegistryKey().equals(dev.qynl.myfirstmod.portal.VoidPortalManager.NULL_REALM)
+                || !world.getBlockState(pos).isOf(dev.qynl.myfirstmod.block.ModBlocks.ECHO_ALTAR))
+            return net.minecraft.util.ActionResult.PASS;
+        if(player.isCreative() || player.isSpectator() || world.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)
+            return altarMessage(player,"message.myfirstmod.trial_survival");
+        if(!isDefeated(world)) return altarMessage(player,"message.myfirstmod.altar_locked");
+        ArenaState a=getArena(world);
+        if(a.boss!=null || a.awaitingBossTicks>0 || !a.defeated) return altarMessage(player,"message.myfirstmod.altar_busy");
+        var state=dev.qynl.myfirstmod.realm.RealmState.get(world);
+        long wait=state.rematchReadyAt-world.getTime();
+        if(wait>0) return altarMessage(player,"message.myfirstmod.trial_cooldown",(wait+19)/20);
+        if(!player.getMainHandStack().isOf(ModItems.ECHO_SIGIL)) return altarMessage(player,"message.myfirstmod.altar_sigil");
+        a.rematch=true;
+        a.challengeTier=Math.min(3,Math.max(1,state.bossClears));
+        a.participants.clear();a.participants.add(player.getUuid());
+        for(var ally:world.getPlayers()) if(!ally.isCreative() && !ally.isSpectator()
+                && ally.squaredDistanceTo(.5,81,.5)<34*34) a.participants.add(ally.getUuid());
+        start(world,player,a);
+        if(a.boss!=null && a.boss.isAlive()) {
+            player.getMainHandStack().decrement(1);
+            state.rematchReadyAt=world.getTime()+3600;state.markDirty();
+            return altarMessage(player,"message.myfirstmod.rematch_begin",a.challengeTier);
+        }
+        return net.minecraft.util.ActionResult.FAIL;
+    }
+    private static net.minecraft.util.ActionResult altarMessage(ServerPlayerEntity player,String key,Object... args) {
+        player.sendMessage(Text.translatable(key,args),false);
+        return net.minecraft.util.ActionResult.SUCCESS;
+    }
     public static void prepareArena(ServerWorld world) { buildArena(world); }
     public static void approachArena(ServerWorld world, ServerPlayerEntity player) {
         if (player.isCreative() || player.isSpectator() || world.getDifficulty() == net.minecraft.world.Difficulty.PEACEFUL) return;
@@ -89,6 +120,8 @@ public final class NullWardenManager {
         a.rewardedPlayers.addAll(data.rewardedPlayers);
         a.echoes.addAll(data.echoes);
         a.defeated = data.defeated;
+        a.rematch = data.rematch;
+        a.challengeTier = data.challengeTier;
         a.phase = Math.max(1, data.phase);
         a.activePylons = data.activePylons;
         a.cleansedPylons = data.cleansedPylons;
@@ -157,6 +190,8 @@ public final class NullWardenManager {
         data.echoes.clear();
         data.echoes.addAll(a.echoes);
         data.defeated = a.defeated;
+        data.rematch = a.rematch;
+        data.challengeTier = a.challengeTier;
         data.rewarded = a.rewardedPlayers.containsAll(a.eligiblePlayers);
         data.returnPortalBuilt = a.returnPortalBuilt;
         data.phase = a.phase;
@@ -225,7 +260,7 @@ public final class NullWardenManager {
         var speed = a.boss.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
         long nearby = world.getPlayers().stream().filter(p -> !p.isCreative() && !p.isSpectator()
                 && p.squaredDistanceTo(.5,81,.5) < 34*34).count();
-        float maxHealth = 500 + 180 * Math.min(3, Math.max(0, nearby - 1));
+        float maxHealth = (500 + 180 * Math.min(3, Math.max(0, nearby - 1))) * (1 + .25f*a.challengeTier);
         if (hp != null) hp.setBaseValue(maxHealth);
         if (damage != null) damage.setBaseValue(18);
         if (speed != null) speed.setBaseValue(.38);
@@ -514,7 +549,7 @@ public final class NullWardenManager {
             a.attackTarget = null;
             a.attackX = a.attackY = a.attackZ = 0;
             a.attackWindup = 0;
-            a.activePylons = ((1 << phase) - 1) & ~a.cleansedPylons;
+            a.activePylons = a.rematch ? (phase==2?3:phase==3?5:10) : ((1 << phase) - 1) & ~a.cleansedPylons;
             a.pylonProgress = new int[4];
             a.hazardTicks = 0;
             a.hazardPattern = -1;
@@ -999,8 +1034,9 @@ public final class NullWardenManager {
             case 3 -> 8;
             default -> 6;
         };
-        a.nextAttackTick = a.ticks + a.attack.windup + a.attack.recovery + phaseDelay;
-        a.recoveryTicks = a.attack.recovery + phaseDelay;
+        int recovery = Math.max(45,a.attack.recovery - a.challengeTier*8) + phaseDelay;
+        a.nextAttackTick = a.ticks + a.attack.windup + recovery;
+        a.recoveryTicks = recovery;
 
         for (ServerPlayerEntity p : participants(world, a))
             p.sendMessage(Text.literal("NULL WARDEN // " + a.attack.name), true);
@@ -1260,6 +1296,11 @@ public final class NullWardenManager {
     private static void finish(ServerWorld world, ArenaState a) {
         if (a.defeated) return;
         a.defeated = true;
+        saved(world).everDefeated = true;
+        var expeditionState=dev.qynl.myfirstmod.realm.RealmState.get(world);
+        expeditionState.bossClears++;
+        expeditionState.rematchReadyAt=world.getTime()+3600;
+        expeditionState.markDirty();
         a.attack = Attack.NONE;
         a.attackTarget = null;
         a.attackX = a.attackY = a.attackZ = 0;
@@ -1304,13 +1345,18 @@ public final class NullWardenManager {
     private static void rewardIfEligible(ServerPlayerEntity p, ArenaState a) {
         if (!a.eligiblePlayers.contains(p.getUuid())) return;
         if (!a.rewardedPlayers.add(p.getUuid())) return;
-        p.getInventory().offerOrDrop(new ItemStack(ModItems.NULLBLADE));
-        p.getInventory().offerOrDrop(new ItemStack(ModItems.NULL_RELIC));
-        p.sendMessage(Text.literal("THE NULL WARDEN HAS FALLEN"), false);
-        p.getInventory().offerOrDrop(new ItemStack(ModItems.RESONANT_SHARD, 4));
-        p.addExperience(500);
-        p.sendMessage(Text.translatable("message.myfirstmod.victory_rewards"), false);
-        p.sendMessage(Text.translatable("message.myfirstmod.after_victory"), false);
+        var state=dev.qynl.myfirstmod.realm.RealmState.get(p.getServerWorld());
+        var record=state.expedition(p.getUuid());
+        if(record.victories==0) {
+            p.getInventory().offerOrDrop(new ItemStack(ModItems.NULLBLADE));
+            p.getInventory().offerOrDrop(new ItemStack(ModItems.NULL_RELIC));
+        }
+        record.victories++;state.markDirty();
+        p.getInventory().offerOrDrop(new ItemStack(ModItems.RESONANT_SHARD,a.rematch?8:4));
+        if(a.rematch) p.getInventory().offerOrDrop(new ItemStack(ModItems.WARDEN_CREST));
+        p.addExperience(a.rematch?350:500);
+        p.sendMessage(Text.translatable(a.rematch?"message.myfirstmod.rematch_rewards":"message.myfirstmod.victory_rewards"),false);
+        p.sendMessage(Text.translatable("message.myfirstmod.after_victory"),false);
     }
 
     private static void reset(ServerWorld world, ArenaState a) {
@@ -1331,7 +1377,9 @@ public final class NullWardenManager {
         a.eligiblePlayers.clear();
         a.joinTicks.clear();
         a.echoes.clear();
-        a.defeated = false;
+        a.defeated = saved(world).everDefeated;
+        a.rematch = false;
+        a.challengeTier = 0;
         a.returnPortalBuilt = false;
         a.phase = 1;
         a.transitionTicks = 0;
@@ -1341,6 +1389,8 @@ public final class NullWardenManager {
         a.attack = Attack.NONE;
         a.attackTarget = null;
         a.attackStep = 0;
+        if(a.defeated) buildReturnPortal(world,a);
+        persist(world,a);
     }
 
     private static void cleanup(ServerWorld world, ArenaState a) {
@@ -1730,6 +1780,7 @@ public final class NullWardenManager {
         double attackX, attackY, attackZ;
         UUID attackTarget;
         Attack attack = Attack.NONE;
-        boolean defeated, returnPortalBuilt;
+        boolean defeated, returnPortalBuilt, rematch;
+        int challengeTier;
     }
 }

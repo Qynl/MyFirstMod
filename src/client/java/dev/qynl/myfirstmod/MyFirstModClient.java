@@ -40,7 +40,8 @@ public class MyFirstModClient implements ClientModInitializer {
                     if (entity == null) return 0;
                     if (!entity.getWorld().getRegistryKey().equals(dev.qynl.myfirstmod.portal.VoidPortalManager.NULL_REALM))
                         return (entity.age % 64) / 64f;
-                    double bearing = Math.atan2(entity.getX(), -entity.getZ()) - Math.toRadians(entity.getYaw());
+                    var target = dev.qynl.myfirstmod.item.ArenaCompassItem.target(stack);
+                    double bearing = Math.atan2(entity.getX()-target.getX(), target.getZ()-entity.getZ()) - Math.toRadians(entity.getYaw());
                     return (float) ((bearing / (Math.PI * 2) % 1 + 1) % 1);
                 });
     }

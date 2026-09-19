@@ -20,5 +20,8 @@ public final class ModBlocks {
             new Block(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1, 3600000)
                     .luminance(state -> 9)));
 
+    public static final Block ECHO_ALTAR = Registry.register(Registries.BLOCK,
+            Identifier.of(MyFirstMod.MOD_ID, "echo_altar"),
+            new Block(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(state -> 12)));
     public static void register() {}
 }

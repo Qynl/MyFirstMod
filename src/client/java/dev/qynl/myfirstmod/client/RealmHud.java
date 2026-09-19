@@ -23,8 +23,11 @@ public final class RealmHud {
             draw.fill(8,8,204,47,0xD0101725);
             draw.fill(8,8,10,47,0xFF77E8E4);
             draw.drawTextWithShadow(client.textRenderer,Text.translatable("hud.myfirstmod.compass"),18,16,0xA3F4EC);
+            var stack=player.getMainHandStack().isOf(ModItems.ARENA_COMPASS)?player.getMainHandStack():player.getOffHandStack();
+            var target=dev.qynl.myfirstmod.item.ArenaCompassItem.target(stack);
             Text destination=client.world.getRegistryKey().equals(VoidPortalManager.NULL_REALM)
-                    ? Text.translatable("message.myfirstmod.compass_distance",(int)Math.hypot(player.getX(),player.getZ()))
+                    ? Text.translatable("message.myfirstmod.route",Text.translatable("route.myfirstmod."+dev.qynl.myfirstmod.item.ArenaCompassItem.mode(stack)),
+                        (int)Math.hypot(player.getX()-target.getX(),player.getZ()-target.getZ()))
                     : Text.translatable("message.myfirstmod.compass_dormant");
             draw.drawTextWithShadow(client.textRenderer,destination,18,32,0xD0CFDF);
         }

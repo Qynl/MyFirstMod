@@ -17,5 +17,8 @@ public final class ModItems {
     public static final Item ARENA_COMPASS=register("arena_compass",new ArenaCompassItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
     public static final Item RESONANT_SHARD=register("resonant_shard",new Item(new Item.Settings().fireproof().rarity(Rarity.UNCOMMON)));
     public static final Item RESONANCE_MATRIX=register("resonance_matrix",new Item(new Item.Settings().fireproof().rarity(Rarity.RARE)));
+    public static final Item ECHO_SIGIL=register("echo_sigil",new Item(new Item.Settings().maxCount(16).fireproof().rarity(Rarity.RARE)));
+    public static final Item WARDEN_CREST=register("warden_crest",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
+    public static final Item RIFT_AEGIS=register("rift_aegis",new RiftAegisItem(new Item.Settings().maxDamage(768).fireproof().rarity(Rarity.EPIC)));
     public static void register() {}
 }

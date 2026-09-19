@@ -73,7 +73,38 @@ public final class RealmFeatures {
             place(world,chest,Blocks.CHEST);
             LootableInventory.setLootTable(world,context.getRandom(),chest,
                     RegistryKey.of(RegistryKeys.LOOT_TABLE,Identifier.of(MyFirstMod.MOD_ID,"chests/realm_cache")));
+            if(style==2) buildVault(world,p,context);
             return true;
+        }
+        private void buildVault(StructureWorldAccess world,BlockPos p,FeatureContext<DefaultFeatureConfig> context) {
+            // A second, sunken archive storey. All writes remain inside this feature's chunk.
+            for(int x=-6;x<=6;x++) for(int z=-6;z<=6;z++) {
+                place(world,p.add(x,-10,z),Blocks.DEEPSLATE_TILES);
+                for(int y=-9;y<=-2;y++) {
+                    boolean wall=Math.abs(x)==6 || Math.abs(z)==6;
+                    place(world,p.add(x,y,z),wall?Blocks.DEEPSLATE_BRICKS:Blocks.AIR);
+                }
+            }
+            for(int x:new int[]{-2,2}) for(int z:new int[]{-3,3}) {
+                for(int y=-9;y<=-3;y++) place(world,p.add(x,y,z),Blocks.CHISELED_DEEPSLATE);
+                place(world,p.add(x,-2,z),Blocks.SOUL_LANTERN);
+            }
+            // A real staircase rather than a lethal drop or a ladder with no support.
+            for(int z=-4;z<=4;z++) {
+                int y=z-5;
+                for(int x=-5;x<=-4;x++) {
+                    for(int clear=1;clear<=3;clear++) place(world,p.add(x,y+clear,z),Blocks.AIR);
+                    world.setBlockState(p.add(x,y,z),Blocks.DEEPSLATE_BRICK_STAIRS.getDefaultState()
+                            .with(net.minecraft.block.StairsBlock.FACING,net.minecraft.util.math.Direction.SOUTH),Block.NOTIFY_LISTENERS);
+                }
+            }
+            BlockPos treasure=p.add(4,-9,-4);
+            place(world,treasure,Blocks.CHEST);
+            LootableInventory.setLootTable(world,context.getRandom(),treasure,
+                    RegistryKey.of(RegistryKeys.LOOT_TABLE,Identifier.of(MyFirstMod.MOD_ID,"chests/vault_cache")));
+            place(world,p.add(0,-9,0),Blocks.CRYING_OBSIDIAN);
+            place(world,p.add(0,-8,0),Blocks.AMETHYST_BLOCK);
+            place(world,p.add(0,-7,0),Blocks.SEA_LANTERN);
         }
     }
 
