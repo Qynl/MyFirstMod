@@ -271,6 +271,21 @@ public final class NullWardenManager {
                     a.boss.getX(), a.boss.getY() + 1.0, a.boss.getZ(),
                     3, 1.1, 1.4, 1.1, 0.015);
         }
+        // Late phases visibly destabilize the arena. The effect is intentionally
+        // sparse: the room should feel like it is failing, not like it is full of fog.
+        if (a.phase >= 3 && a.ticks % (a.phase == 4 ? 8 : 14) == 0) {
+            double radius = a.phase == 4
+                    ? 6.0 + Math.sin(a.ticks * 0.08) * 2.0
+                    : 10.0 + Math.sin(a.ticks * 0.045) * 1.5;
+            ring(world, .5, 80.18, .5, radius,
+                    a.phase == 4 ? ParticleTypes.REVERSE_PORTAL : ParticleTypes.SCULK_SOUL,
+                    a.phase == 4 ? 56 : 40);
+            if (a.phase == 4 && a.ticks % 40 == 0) {
+                world.playSound(null, CENTER, SoundEvents.BLOCK_SCULK_SHRIEKER_SHRIEK,
+                        SoundCategory.HOSTILE, .45f, .75f);
+            }
+        }
+
         // Ritual pathways continuously connect the boss to every active pylon.
         if (a.ticks % 3 == 0 && a.activePylons != 0) {
             for (int i = 0; i < 4; i++) {
@@ -1035,6 +1050,14 @@ public final class NullWardenManager {
     }
 
     private static void phaseShift(ServerWorld world, ArenaState a) {
+        if (a.bar != null) {
+            a.bar.setColor(switch (a.phase) {
+                case 2 -> ServerBossBar.Color.PINK;
+                case 3 -> ServerBossBar.Color.PURPLE;
+                default -> ServerBossBar.Color.RED;
+            });
+        }
+
         world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_ROAR,
                 SoundCategory.HOSTILE, 3.5f, .45f);
         world.spawnParticles(ParticleTypes.EXPLOSION,
