@@ -302,6 +302,114 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         core.pivotZ = -1.0f - Math.max(0.0f, pulse) * 0.16f;
         eyeSlit.pivotZ = -0.02f - Math.max(0.0f, fastPulse) * 0.03f;
 
+        // The server drives the encounter state through the entity data tracker.
+        // These poses are intentionally readable at a glance, so every attack has
+        // a distinct silhouette before its hit resolves.
+        int attack = entity.getVisualAttack();
+        float charge = entity.getVisualAttackProgress();
+        float impact = 1.0f - charge;
+        float phaseHeat = (phase - 1.0f) / 3.0f;
+
+        if (phase >= 2.0f) {
+            torso.pitch -= phaseHeat * 0.045f;
+            shoulderLeft.pitch += phaseHeat * 0.035f;
+            shoulderRight.pitch += phaseHeat * 0.035f;
+        }
+
+        switch (attack) {
+            case 1 -> { // VOID CLEAVE: huge one-sided wind-up.
+                torso.yaw += -0.16f * charge;
+                shoulderLeft.pitch += -1.05f * charge;
+                forearmLeft.pitch += -0.55f * charge;
+                leftArm.roll += 0.18f * charge;
+                shoulderRight.pitch += 0.18f * charge;
+                head.yaw += -0.10f * charge;
+                if (impact > 0.72f) {
+                    torso.yaw += 0.22f * impact;
+                    shoulderLeft.pitch += 1.35f * impact;
+                    forearmLeft.pitch += 0.85f * impact;
+                }
+            }
+            case 2 -> { // SCULK RING: body opens around the core.
+                shoulderLeft.pitch -= 0.55f * charge;
+                shoulderRight.pitch -= 0.55f * charge;
+                forearmLeft.roll -= 0.30f * charge;
+                forearmRight.roll += 0.30f * charge;
+                chestPlate.pitch -= 0.10f * charge;
+                ribLeft.pitch -= 0.08f * charge;
+                ribRight.pitch -= 0.08f * charge;
+                core.pitch -= 0.18f * charge;
+                core.yaw += 0.08f * fastPulse;
+            }
+            case 3 -> { // VOID RAIN: arms and crown pull energy overhead.
+                shoulderLeft.pitch -= 0.80f * charge;
+                shoulderRight.pitch -= 0.80f * charge;
+                forearmLeft.pitch -= 0.55f * charge;
+                forearmRight.pitch -= 0.55f * charge;
+                head.pitch -= 0.12f * charge;
+                crown.pitch -= 0.18f * charge;
+                crown.roll += 0.08f * fastPulse;
+                core.pivotZ -= 0.35f * charge;
+            }
+            case 4 -> { // NULL DASH: compress, then snap forward.
+                torso.pitch += 0.24f * charge;
+                torso.yaw += 0.10f * MathHelper.sin(animationProgress * 0.2f) * charge;
+                leftLeg.pitch -= 0.22f * charge;
+                rightLeg.pitch -= 0.42f * charge;
+                leftArm.pitch += 0.35f * charge;
+                rightArm.pitch += 0.35f * charge;
+                if (impact > 0.65f) {
+                    torso.pitch -= 0.42f * impact;
+                    head.pitch -= 0.18f * impact;
+                }
+            }
+            case 5 -> { // GRAVITY WELL: arms pull inward around a bright core.
+                shoulderLeft.pitch -= 0.45f * charge;
+                shoulderRight.pitch -= 0.45f * charge;
+                forearmLeft.pitch += 0.55f * charge;
+                forearmRight.pitch += 0.55f * charge;
+                forearmLeft.roll += 0.18f * charge;
+                forearmRight.roll -= 0.18f * charge;
+                core.yaw += 0.28f * charge;
+                core.pivotZ -= 0.22f * charge;
+            }
+            case 6 -> { // REALITY TEAR: asymmetric dimensional distortion.
+                torso.yaw += 0.22f * charge;
+                shoulderLeft.roll += 0.32f * charge;
+                shoulderRight.roll -= 0.12f * charge;
+                head.roll -= 0.18f * charge;
+                eyeSlit.roll += 0.14f * charge;
+                shardLeft.roll += 0.30f * charge;
+                shardRight.roll -= 0.24f * charge;
+                spineTip.yaw -= 0.24f * charge;
+            }
+            case 7 -> { // COLLAPSE: the entire silhouette compresses before release.
+                torso.pitch += 0.18f * charge;
+                torso.pivotY += 0.45f * charge;
+                leftLeg.pitch -= 0.28f * charge;
+                rightLeg.pitch -= 0.28f * charge;
+                shoulderLeft.pitch += 0.32f * charge;
+                shoulderRight.pitch += 0.32f * charge;
+                core.pitch += 0.20f * charge;
+                crown.pitch += 0.15f * charge;
+                if (impact > 0.55f) {
+                    torso.pitch -= 0.25f * impact;
+                    shoulderLeft.pitch -= 0.55f * impact;
+                    shoulderRight.pitch -= 0.55f * impact;
+                    core.pitch -= 0.32f * impact;
+                }
+            }
+            default -> {
+                if (entity.isVisualDefeated()) {
+                    torso.pitch += 0.18f;
+                    head.pitch += 0.12f;
+                    leftArm.pitch += 0.20f;
+                    rightArm.pitch += 0.20f;
+                    core.pivotZ -= 0.18f;
+                }
+            }
+        }
+
         if (entity.hurtTime > 0) {
             float hit = MathHelper.sin(entity.hurtTime * 0.65f) * 0.08f;
             torso.roll += hit;
