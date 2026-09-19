@@ -372,6 +372,23 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
             shoulderRight.pitch += phaseHeat * 0.035f;
         }
 
+        // Phase 4 is visually unstable even when the Warden is not attacking.
+        // Armor pieces drift independently, making the final phase feel like a
+        // creature held together by the Null core rather than a simple speed boost.
+        if (phase >= 4.0f) {
+            float fracture = MathHelper.sin(animationProgress * 0.11f);
+            float fractureFast = MathHelper.sin(animationProgress * 0.19f + 1.7f);
+            shardLeft.pivotX += fracture * 0.35f;
+            shardLeft.pivotY += fractureFast * 0.28f;
+            shardRight.pivotX -= fractureFast * 0.30f;
+            shardRight.pivotY += fracture * 0.25f;
+            collarLeft.pivotY += fracture * 0.12f;
+            collarRight.pivotY -= fractureFast * 0.12f;
+            crown.yaw += fracture * 0.045f;
+            chestSpine.roll += fractureFast * 0.035f;
+            eyeSlit.roll += fracture * 0.018f;
+        }
+
         switch (attack) {
             case 1 -> { // VOID CLEAVE: huge one-sided wind-up.
                 torso.yaw += -0.16f * charge;
