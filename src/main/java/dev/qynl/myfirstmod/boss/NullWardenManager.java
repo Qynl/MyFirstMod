@@ -148,7 +148,7 @@ public final class NullWardenManager {
 
         if (arena.intro > 0) {
             arena.intro--;
-            arena.boss.setAi(false);
+            arena.boss.setAiDisabled(false);
             arena.boss.setInvulnerable(true);
             arena.boss.setVelocity(Vec3d.ZERO);
 
@@ -169,7 +169,7 @@ public final class NullWardenManager {
             return;
         }
 
-        arena.boss.setAi(true);
+        arena.boss.setAiDisabled(true);
 
         float hp = arena.boss.getHealth() / arena.boss.getMaxHealth();
         if (arena.bar != null) arena.bar.setPercent(Math.max(0.0F, hp));
@@ -460,7 +460,7 @@ public final class NullWardenManager {
         arena.attackWindup = 0;
         arena.boss.setHealth(1.0F);
         arena.boss.setInvulnerable(true);
-        arena.boss.setAi(false);
+        arena.boss.setAiDisabled(false);
         if (arena.bar != null) arena.bar.setVisible(false);
 
         world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_DEATH,
