@@ -34,7 +34,9 @@ jobs:
           gradle-version: "8.12"
 
       - name: Validate generated resources
-        run: python3 -m unittest discover -s tests -v
+        run: |
+          set -o pipefail
+          python3 -m unittest discover -s tests -v 2>&1 | tee ci-resources.log
 
       - name: Build
         run: |
@@ -50,7 +52,7 @@ jobs:
         run: |
           python3 - <<'PYCODE'
           from pathlib import Path
-          for filename in ['ci-build.log', 'build/ci/server-smoke.log', 'build/ci/server-commands.log']:
+          for filename in ['ci-resources.log', 'ci-build.log', 'build/ci/server-smoke.log', 'build/ci/server-commands.log']:
               p = Path(filename)
               if p.exists():
                   text = p.read_text()
@@ -78,6 +80,7 @@ jobs:
         with:
           name: Validation-${{ github.sha }}
           path: |
+            ci-resources.log
             ci-build.log
             build/ci/server-smoke.log
             build/ci/server-commands.log

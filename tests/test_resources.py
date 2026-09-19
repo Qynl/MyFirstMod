@@ -226,7 +226,7 @@ class ResourceTests(unittest.TestCase):
         subprocess.run([sys.executable,str(ROOT/'scripts/generate_gallery.py')],check=True)
         for name in names:
             content=(ROOT/'docs/images'/name).read_bytes()
-            self.assertEqual(content,before[name])
+            self.assertTrue(content==before[name], name+" is not reproducible")
             import xml.etree.ElementTree as ET
             tree=ET.fromstring(content)
             self.assertEqual(tree.attrib['role'],'img')
