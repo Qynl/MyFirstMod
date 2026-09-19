@@ -1,0 +1,37 @@
+{
+  "criteria": {
+    "entered": {
+      "trigger": "minecraft:changed_dimension",
+      "conditions": {
+        "to": "myfirstmod:null_realm"
+      }
+    },
+    "has_material": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:raw_resonite",
+              "myfirstmod:resonite_ingot",
+              "myfirstmod:prism_dust",
+              "myfirstmod:hushwood",
+              "myfirstmod:hushberry"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered",
+      "has_material"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "myfirstmod:resonite_axe"
+    ]
+  }
+}

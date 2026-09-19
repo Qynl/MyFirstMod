@@ -24,6 +24,7 @@ import java.util.*;
 /** Party-scoped courts with bounded lifetimes, explicit intermissions and five endgame tiers. */
 public final class RealmTrials {
     private static final Map<BlockPos,Trial> ACTIVE=new HashMap<>();
+    public static boolean isEnrolled(UUID id) {return ACTIVE.values().stream().anyMatch(t->t.players.contains(id));}
     public static boolean owns(UUID id) {return ACTIVE.values().stream().anyMatch(t->t.mobs.containsKey(id));}
     public static void clear() {ACTIVE.values().forEach(t->t.bar.clearPlayers());ACTIVE.clear();}
 

@@ -44,6 +44,10 @@ public final class NullWardenManager {
 
     private NullWardenManager() {}
 
+    public static boolean isEncounterActive(ServerWorld world) {
+        var state=saved(world);
+        return state.bossUuid!=null && !state.defeated;
+    }
     public static void clear() { ARENAS.clear(); }
     public static void entityLoaded(Entity entity, ServerWorld world) {
         if (!(entity instanceof NullWardenEntity boss)) return;

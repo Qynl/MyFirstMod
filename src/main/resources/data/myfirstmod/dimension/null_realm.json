@@ -11,7 +11,37 @@
           "parameters": {
             "temperature": [
               -1,
-              -0.2
+              -0.3
+            ],
+            "humidity": [
+              -1,
+              1
+            ],
+            "continentalness": [
+              -1,
+              1
+            ],
+            "erosion": [
+              -1,
+              1
+            ],
+            "depth": [
+              -1,
+              1
+            ],
+            "weirdness": [
+              -1,
+              1
+            ],
+            "offset": 0
+          }
+        },
+        {
+          "biome": "myfirstmod:luminous_fen",
+          "parameters": {
+            "temperature": [
+              -0.3,
+              0.15
             ],
             "humidity": [
               -1,
@@ -40,8 +70,8 @@
           "biome": "myfirstmod:prism_wastes",
           "parameters": {
             "temperature": [
-              -0.2,
-              0.35
+              0.15,
+              0.55
             ],
             "humidity": [
               -1,
@@ -70,7 +100,7 @@
           "biome": "myfirstmod:cinder_steps",
           "parameters": {
             "temperature": [
-              0.35,
+              0.55,
               1
             ],
             "humidity": [

@@ -114,24 +114,39 @@ public final class RealmFeatures {
     private static final class Flora extends Feature<DefaultFeatureConfig> {
         Flora() { super(DefaultFeatureConfig.CODEC); }
         @Override public boolean generate(FeatureContext<DefaultFeatureConfig> context) {
-            BlockPos p = center(context);
-            if (reserved(p)) return false;
             var world = context.getWorld();
+            int px=(context.getOrigin().getX() & ~15)+4+context.getRandom().nextInt(8);
+            int pz=(context.getOrigin().getZ() & ~15)+4+context.getRandom().nextInt(8);
+            BlockPos p=new BlockPos(px,world.getTopY(Heightmap.Type.WORLD_SURFACE_WG,px,pz),pz);
+            if (reserved(p)) return false;
             int height = 3 + context.getRandom().nextInt(7);
             var surface=world.getBlockState(p.down());
             // Decoration must not grow through a trial core or on an archive roof.
-            if(!surface.isOf(Blocks.CALCITE) && !surface.isOf(Blocks.SCULK) && !surface.isOf(Blocks.SMOOTH_BASALT)) return false;
-            boolean crystal = surface.isOf(Blocks.CALCITE);
-            boolean grove = world.getBlockState(p.down()).isOf(Blocks.SCULK);
+            if(!surface.isOf(ModBlocks.PRISMSTONE) && !surface.isOf(ModBlocks.HUSHED_MOSS)
+                    && !surface.isOf(ModBlocks.CINDERSTONE) && !surface.isOf(ModBlocks.LUMEN_MOSS)) return false;
+            boolean crystal = surface.isOf(ModBlocks.PRISMSTONE);
+            boolean grove = surface.isOf(ModBlocks.HUSHED_MOSS);
+            if(surface.isOf(ModBlocks.LUMEN_MOSS)) {
+                for(int dx=-2;dx<=2;dx++) for(int dz=-2;dz<=2;dz++) {
+                    place(world,p.add(dx,-2,dz),ModBlocks.LUMEN_MOSS);
+                    place(world,p.add(dx,-1,dz),Math.abs(dx)==2||Math.abs(dz)==2?ModBlocks.LUMEN_MOSS:Blocks.WATER);
+                }
+                for(int side:new int[]{-3,3}) {
+                    place(world,p.add(side,0,0),ModBlocks.HUSHWOOD);
+                    place(world,p.add(side,1,0),ModBlocks.PRISM_LAMP);
+                    place(world,p.add(side,2,0),ModBlocks.HUSH_LEAVES);
+                }
+                return true;
+            }
             for (int y=0;y<height;y++) {
-                place(world,p.up(y),crystal ? Blocks.AMETHYST_BLOCK : Blocks.BASALT);
+                place(world,p.up(y),crystal ? Blocks.AMETHYST_BLOCK : grove ? ModBlocks.HUSHWOOD : ModBlocks.CINDERSTONE);
                 if (y < height/2) for (int d : new int[]{-1,1})
-                    place(world,p.add(d,y,0),crystal ? Blocks.CALCITE : Blocks.SMOOTH_BASALT);
+                    place(world,p.add(d,y,0),crystal ? ModBlocks.PRISMSTONE : grove ? ModBlocks.HUSHWOOD : ModBlocks.CINDERSTONE);
             }
             if (grove) {
                 for (int x=-3;x<=3;x++) for (int z=-3;z<=3;z++) if (Math.abs(x)+Math.abs(z)<=4)
-                    place(world,p.add(x,height-1,z), ((x+z)&1)==0 ? Blocks.WARPED_WART_BLOCK : Blocks.SCULK);
-                place(world,p.up(height),Blocks.SHROOMLIGHT);
+                    place(world,p.add(x,height-1,z), ModBlocks.HUSH_LEAVES);
+                place(world,p.up(height),ModBlocks.PRISM_LAMP);
             } else place(world,p.up(height),Blocks.SEA_LANTERN);
             return true;
         }

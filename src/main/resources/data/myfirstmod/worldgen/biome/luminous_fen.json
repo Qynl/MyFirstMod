@@ -1,0 +1,61 @@
+{
+  "has_precipitation": false,
+  "temperature": 0.4,
+  "downfall": 0,
+  "effects": {
+    "fog_color": 1589058,
+    "sky_color": 1654343,
+    "water_color": 3237503,
+    "water_fog_color": 1188659,
+    "particle": {
+      "options": {
+        "type": "minecraft:spore_blossom_air"
+      },
+      "probability": 0.004
+    },
+    "mood_sound": {
+      "sound": "minecraft:ambient.cave",
+      "tick_delay": 8000,
+      "block_search_extent": 8,
+      "offset": 2
+    }
+  },
+  "spawners": {
+    "monster": [
+      {
+        "type": "myfirstmod:rift_sentinel",
+        "weight": 25,
+        "minCount": 1,
+        "maxCount": 2
+      },
+      {
+        "type": "myfirstmod:shardstalker",
+        "weight": 35,
+        "minCount": 1,
+        "maxCount": 2
+      }
+    ]
+  },
+  "spawn_costs": {},
+  "carvers": {},
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [
+      "myfirstmod:realm_ruins",
+      "myfirstmod:waystone_shrine"
+    ],
+    [],
+    [
+      "myfirstmod:realm_resources"
+    ],
+    [],
+    [],
+    [
+      "myfirstmod:realm_flora"
+    ],
+    []
+  ]
+}

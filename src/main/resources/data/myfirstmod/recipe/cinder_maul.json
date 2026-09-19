@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ICI",
+    "ICI",
+    " S "
+  ],
+  "key": {
+    "I": {
+      "item": "myfirstmod:resonite_ingot"
+    },
+    "C": {
+      "item": "myfirstmod:cinder_pearl"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:cinder_maul",
+    "count": 1
+  }
+}

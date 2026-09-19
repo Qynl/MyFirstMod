@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "myfirstmod:resonite_ore",
+    "myfirstmod:prism_ore",
+    "myfirstmod:cinder_ore",
+    "myfirstmod:resonite_block"
+  ]
+}

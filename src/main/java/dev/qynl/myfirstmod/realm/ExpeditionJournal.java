@@ -48,6 +48,13 @@ public final class ExpeditionJournal {
         List<RawFilteredPair<Text>> pages=new ArrayList<>();
         page(pages,"journal.myfirstmod.progress",record.biomes.size(),record.courts.size(),record.trials,record.highestTier,record.victories);
         page(pages,"journal.myfirstmod.exploration");
+        page(pages,"journal.myfirstmod.resources");
+        page(pages,"journal.myfirstmod.wilds_gear");
+        page(pages,"journal.myfirstmod.waystones");
+        BlockPos bound=BlockPos.fromLong(record.boundWaystone);
+        page(pages,"journal.myfirstmod.bound_stone",record.hasWaystone
+                ? Text.literal(bound.getX()+", "+bound.getY()+", "+bound.getZ())
+                : Text.translatable("journal.myfirstmod.no_stone"));
         page(pages,"journal.myfirstmod.trials");
         page(pages,"journal.myfirstmod.oaths");
         page(pages,"journal.myfirstmod.warden");

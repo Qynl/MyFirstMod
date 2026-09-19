@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SS",
+    "SS"
+  ],
+  "key": {
+    "S": {
+      "item": "myfirstmod:polished_nullstone"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:nullstone_bricks",
+    "count": 4
+  }
+}

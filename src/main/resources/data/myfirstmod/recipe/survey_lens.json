@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " IP",
+    " SI",
+    "S  "
+  ],
+  "key": {
+    "I": {
+      "item": "myfirstmod:resonite_ingot"
+    },
+    "P": {
+      "item": "myfirstmod:prism_dust"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:survey_lens",
+    "count": 1
+  }
+}

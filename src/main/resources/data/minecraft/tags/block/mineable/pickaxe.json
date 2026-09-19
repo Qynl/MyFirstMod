@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "myfirstmod:nullstone",
+    "myfirstmod:polished_nullstone",
+    "myfirstmod:nullstone_bricks",
+    "myfirstmod:resonite_ore",
+    "myfirstmod:prism_ore",
+    "myfirstmod:cinder_ore",
+    "myfirstmod:resonite_block",
+    "myfirstmod:prism_lamp",
+    "myfirstmod:prismstone",
+    "myfirstmod:cinderstone"
+  ]
+}

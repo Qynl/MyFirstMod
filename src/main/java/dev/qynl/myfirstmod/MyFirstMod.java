@@ -22,6 +22,7 @@ public class MyFirstMod implements ModInitializer {
         ModItems.register();
         ModEntities.register();
         dev.qynl.myfirstmod.realm.RealmFeatures.register();
+        dev.qynl.myfirstmod.realm.WildsFeatures.register();
         dev.qynl.myfirstmod.realm.ExpeditionJournal.register();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             dev.qynl.myfirstmod.realm.RealmTrials.clear();
@@ -37,6 +38,8 @@ public class MyFirstMod implements ModInitializer {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
             if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;
             if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
+            ActionResult waystone=dev.qynl.myfirstmod.realm.Waystones.interact(serverPlayer,hit.getBlockPos());
+            if(waystone!=ActionResult.PASS) return waystone;
             ActionResult altar=dev.qynl.myfirstmod.boss.NullWardenManager.interactAltar(serverPlayer,hit.getBlockPos());
             if(altar!=ActionResult.PASS) return altar;
             ActionResult trial = dev.qynl.myfirstmod.realm.RealmTrials.interact(serverPlayer, hit.getBlockPos());

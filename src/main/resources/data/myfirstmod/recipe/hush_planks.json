@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:hushwood"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:hush_planks",
+    "count": 4
+  }
+}

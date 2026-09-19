@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " PP",
+    " IP",
+    "S  "
+  ],
+  "key": {
+    "P": {
+      "item": "myfirstmod:prism_dust"
+    },
+    "I": {
+      "item": "myfirstmod:resonite_ingot"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:prism_staff",
+    "count": 1
+  }
+}

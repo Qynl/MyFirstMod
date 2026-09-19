@@ -44,10 +44,13 @@
     [],
     [],
     [
-      "myfirstmod:realm_ruins"
+      "myfirstmod:realm_ruins",
+      "myfirstmod:waystone_shrine"
     ],
     [],
-    [],
+    [
+      "myfirstmod:realm_resources"
+    ],
     [],
     [],
     [

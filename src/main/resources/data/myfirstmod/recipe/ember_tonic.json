@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:cinder_pearl"
+    },
+    {
+      "item": "myfirstmod:hushberry"
+    },
+    {
+      "item": "minecraft:glass_bottle"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:ember_tonic",
+    "count": 1
+  }
+}

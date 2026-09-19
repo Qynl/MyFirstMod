@@ -22,7 +22,7 @@ class ResourceTests(unittest.TestCase):
         dimension=load(DATA/'dimension/null_realm.json')
         self.assertEqual(dimension['generator']['settings'],'myfirstmod:null_realm')
         biomes=dimension['generator']['biome_source']['biomes']
-        self.assertEqual(len(biomes),3)
+        self.assertEqual(len(biomes),4)
         for biome in biomes:
             self.assertTrue((DATA/('worldgen/biome/'+biome['biome'].split(':')[1]+'.json')).exists())
         noise=load(DATA/'worldgen/noise_settings/null_realm.json')
@@ -46,7 +46,7 @@ class ResourceTests(unittest.TestCase):
                 for feature in stage:
                     placed=load(DATA/('worldgen/placed_feature/'+feature.split(':')[1]+'.json'))
                     configured=load(DATA/('worldgen/configured_feature/'+placed['feature'].split(':')[1]+'.json'))
-                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora'])
+                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine'])
             self.assertEqual({s['type'] for s in biome['spawners']['monster']},
                              {'myfirstmod:rift_sentinel','myfirstmod:shardstalker'})
 
@@ -125,7 +125,7 @@ class ResourceTests(unittest.TestCase):
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))
         before={str(p.relative_to(RES)):p.read_bytes() for p in paths if p.is_file()}
-        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py']:
+        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py']:
             subprocess.run([sys.executable,str(ROOT/'scripts'/script)],check=True)
         after={str(p.relative_to(RES)):p.read_bytes() for p in RES.rglob('*') if p.is_file()}
         self.assertEqual(before,after)

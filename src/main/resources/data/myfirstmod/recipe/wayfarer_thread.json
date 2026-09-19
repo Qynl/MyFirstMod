@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " F ",
+    "FPF",
+    " R "
+  ],
+  "key": {
+    "F": {
+      "item": "myfirstmod:dusk_fiber"
+    },
+    "P": {
+      "item": "minecraft:ender_pearl"
+    },
+    "R": {
+      "item": "myfirstmod:resonant_shard"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:wayfarer_thread",
+    "count": 1
+  }
+}

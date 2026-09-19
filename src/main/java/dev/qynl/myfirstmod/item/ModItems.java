@@ -8,7 +8,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 
 public final class ModItems {
+    public static final java.util.List<Item> ALL = new java.util.ArrayList<>();
     private static Item register(String name,Item item) {
+        ALL.add(item);
         return Registry.register(Registries.ITEM,Identifier.of(MyFirstMod.MOD_ID,name),item);
     }
     public static final Item NULL_RELIC=register("null_relic",new NullHeartItem(new Item.Settings().maxCount(1).fireproof().rarity(Rarity.EPIC)));
@@ -20,5 +22,36 @@ public final class ModItems {
     public static final Item ECHO_SIGIL=register("echo_sigil",new Item(new Item.Settings().maxCount(16).fireproof().rarity(Rarity.RARE)));
     public static final Item WARDEN_CREST=register("warden_crest",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
     public static final Item RIFT_AEGIS=register("rift_aegis",new RiftAegisItem(new Item.Settings().maxDamage(768).fireproof().rarity(Rarity.EPIC)));
-    public static void register() {}
+    public static final Item RAW_RESONITE=register("raw_resonite",new Item(new Item.Settings()));
+    public static final Item RESONITE_INGOT=register("resonite_ingot",new Item(new Item.Settings().fireproof()));
+    public static final Item PRISM_DUST=register("prism_dust",new Item(new Item.Settings()));
+    public static final Item CINDER_PEARL=register("cinder_pearl",new Item(new Item.Settings().fireproof()));
+    public static final Item DUSK_FIBER=register("dusk_fiber",new Item(new Item.Settings()));
+    public static final Item HUSHBERRY=register("hushberry",new Item(new Item.Settings().food(
+            new net.minecraft.component.type.FoodComponent.Builder().nutrition(3).saturationModifier(.3f).build())));
+    public static final Item EXPEDITION_STEW=register("expedition_stew",new Item(new Item.Settings().maxCount(1).food(
+            new net.minecraft.component.type.FoodComponent.Builder().nutrition(10).saturationModifier(.8f).usingConvertsTo(net.minecraft.item.Items.BOWL).build())));
+    public static final Item EMBER_TONIC=register("ember_tonic",new EmberTonicItem(new Item.Settings().maxCount(16).fireproof()));
+    public static final Item RESONITE_PICKAXE=register("resonite_pickaxe",new net.minecraft.item.PickaxeItem(ResoniteMaterial.INSTANCE,
+            new Item.Settings().fireproof().attributeModifiers(net.minecraft.item.PickaxeItem.createAttributeModifiers(ResoniteMaterial.INSTANCE,1,-2.8f))));
+    public static final Item RESONITE_AXE=register("resonite_axe",new net.minecraft.item.AxeItem(ResoniteMaterial.INSTANCE,
+            new Item.Settings().fireproof().attributeModifiers(net.minecraft.item.AxeItem.createAttributeModifiers(ResoniteMaterial.INSTANCE,5.5f,-3f))));
+    public static final Item RESONITE_SHOVEL=register("resonite_shovel",new net.minecraft.item.ShovelItem(ResoniteMaterial.INSTANCE,
+            new Item.Settings().fireproof().attributeModifiers(net.minecraft.item.ShovelItem.createAttributeModifiers(ResoniteMaterial.INSTANCE,1.5f,-3f))));
+    public static final Item PRISM_STAFF=register("prism_staff",new PrismStaffItem(new Item.Settings().maxDamage(768).rarity(Rarity.RARE)));
+    public static final Item CINDER_MAUL=register("cinder_maul",new CinderMaulItem(new Item.Settings().fireproof().rarity(Rarity.RARE)));
+    public static final Item SURVEY_LENS=register("survey_lens",new ExpeditionUtilityItem(new Item.Settings().maxCount(1),ExpeditionUtilityItem.Kind.SURVEY));
+    public static final Item VEIL_CHARM=register("veil_charm",new ExpeditionUtilityItem(new Item.Settings().maxDamage(128).rarity(Rarity.RARE),ExpeditionUtilityItem.Kind.VEIL));
+    public static final Item REPAIR_KIT=register("repair_kit",new ExpeditionUtilityItem(new Item.Settings().maxCount(16),ExpeditionUtilityItem.Kind.REPAIR));
+    public static final Item WAYFARER_THREAD=register("wayfarer_thread",new WayfarerThreadItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+    public static void register() {
+        Registry.register(Registries.ITEM_GROUP,Identifier.of(MyFirstMod.MOD_ID,"null_realm"),
+                net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup.builder()
+                        .displayName(net.minecraft.text.Text.translatable("itemGroup.myfirstmod.null_realm"))
+                        .icon(()->new net.minecraft.item.ItemStack(ARENA_COMPASS))
+                        .entries((context,entries)->{
+                            ALL.forEach(entries::add);
+                            dev.qynl.myfirstmod.block.ModBlocks.BUILDING_BLOCKS.forEach(entries::add);
+                        }).build());
+    }
 }

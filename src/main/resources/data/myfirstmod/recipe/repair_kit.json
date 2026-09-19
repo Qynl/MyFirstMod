@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:resonite_ingot"
+    },
+    {
+      "item": "myfirstmod:resonite_ingot"
+    },
+    {
+      "item": "myfirstmod:dusk_fiber"
+    },
+    {
+      "item": "myfirstmod:resonant_shard"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:repair_kit",
+    "count": 1
+  }
+}
