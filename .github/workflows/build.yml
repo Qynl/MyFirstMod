@@ -8,20 +8,20 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: "8.12"
 
@@ -29,7 +29,21 @@ jobs:
         run: python3 -m unittest discover -s tests -v
 
       - name: Build
-        run: ./gradlew build --no-daemon
+        run: |
+          set -o pipefail
+          ./gradlew build --no-daemon --console=plain 2>&1 | tee ci-build.log
+
+      - name: Report build diagnostics
+        if: failure()
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          p = Path('ci-build.log')
+          if p.exists():
+              for line in p.read_text().splitlines()[-100:]:
+                  escaped = line.replace('%', '%25').replace('\r', '%0D')
+                  print(f'::error title=Build diagnostics::{escaped}')
+          PYCODE
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
