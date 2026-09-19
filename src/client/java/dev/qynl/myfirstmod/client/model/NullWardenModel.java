@@ -26,6 +26,12 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
     private final ModelPart shoulderRight;
     private final ModelPart waist;
     private final ModelPart mantle;
+    private final ModelPart chestPlate;
+    private final ModelPart jaw;
+    private final ModelPart backSpine;
+    private final ModelPart leftHip;
+    private final ModelPart rightHip;
+    private final ModelPart crown;
 
     public NullWardenModel(ModelPart root) {
         this.root = root;
@@ -42,6 +48,12 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         this.shoulderRight = torso.getChild("shoulder_right");
         this.waist = torso.getChild("waist");
         this.mantle = torso.getChild("mantle");
+        this.chestPlate = torso.getChild("chest_plate");
+        this.jaw = head.getChild("jaw");
+        this.backSpine = torso.getChild("back_spine");
+        this.leftHip = root.getChild("left_hip");
+        this.rightHip = root.getChild("right_hip");
+        this.crown = head.getChild("crown");
     }
 
     public static TexturedModelData getTexturedModelData() {
@@ -63,6 +75,15 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(0, 48).cuboid(-4, -4, -5, 8, 8, 2)
                         .uv(20, 48).cuboid(-3, -3, -6, 6, 6, 2),
                 ModelTransform.pivot(0, 0, -1));
+
+        t.addChild("chest_plate", ModelPartBuilder.create()
+                        .uv(0, 92).cuboid(-7, -8, -5, 14, 10, 2)
+                        .uv(32, 92).cuboid(-5, -1, -6, 10, 4, 2),
+                ModelTransform.pivot(0, 0, 0));
+        t.addChild("back_spine", ModelPartBuilder.create()
+                        .uv(44, 92).cuboid(-2, -8, 4, 4, 16, 4)
+                        .uv(60, 92).cuboid(-4, -3, 6, 8, 4, 3),
+                ModelTransform.pivot(0, 0, 0));
 
         t.addChild("shoulder_left", ModelPartBuilder.create()
                         .uv(0, 78).cuboid(-2, -2, -5, 9, 5, 10)
@@ -99,6 +120,13 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(30, 66).cuboid(-4, 14, -5, 9, 5, 10),
                 ModelTransform.pivot(-4, 10, 0));
 
+        r.addChild("left_hip", ModelPartBuilder.create()
+                        .uv(76, 52).cuboid(-5, -2, -5, 10, 5, 10),
+                ModelTransform.pivot(4, 9, 0));
+        r.addChild("right_hip", ModelPartBuilder.create()
+                        .uv(76, 52).cuboid(-5, -2, -5, 10, 5, 10),
+                ModelTransform.pivot(-4, 9, 0));
+
         ModelPartData h = t.getChild("head");
         h.addChild("left_horn", ModelPartBuilder.create()
                         .uv(52, 35).cuboid(0, -8, -2, 3, 10, 4)
@@ -108,6 +136,15 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(52, 35).cuboid(-3, -8, -2, 3, 10, 4)
                         .uv(52, 49).cuboid(-4, -12, -1, 2, 5, 2),
                 ModelTransform.pivot(-4, -2, 0));
+        h.addChild("jaw", ModelPartBuilder.create()
+                        .uv(76, 28).cuboid(-4, 1, -5, 8, 4, 10)
+                        .uv(76, 42).cuboid(-3, 4, -4, 6, 2, 8),
+                ModelTransform.pivot(0, 0, 0));
+        h.addChild("crown", ModelPartBuilder.create()
+                        .uv(96, 0).cuboid(-2, -10, -2, 4, 5, 4)
+                        .uv(96, 12).cuboid(-7, -7, -1, 5, 3, 3)
+                        .uv(108, 12).cuboid(2, -7, -1, 5, 3, 3),
+                ModelTransform.pivot(0, 0, 0));
 
         return TexturedModelData.of(data, 128, 96);
     }
@@ -136,6 +173,12 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         shoulderRight.roll = -shoulderLeft.roll;
         waist.yaw = MathHelper.sin(animationProgress * 0.035f) * 0.035f;
         mantle.pitch = MathHelper.sin(animationProgress * 0.055f) * 0.035f;
+        chestPlate.pitch = MathHelper.sin(animationProgress * 0.08f) * 0.012f;
+        jaw.pitch = MathHelper.sin(animationProgress * 0.09f) * 0.018f;
+        crown.roll = MathHelper.sin(animationProgress * 0.05f) * 0.025f;
+        backSpine.yaw = MathHelper.sin(animationProgress * 0.04f) * 0.035f;
+        leftHip.roll = MathHelper.sin(animationProgress * 0.06f) * 0.025f;
+        rightHip.roll = -leftHip.roll;
         core.pitch = MathHelper.sin(animationProgress * 0.12f) * 0.05f;
     }
 }
