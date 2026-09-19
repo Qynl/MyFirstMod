@@ -155,6 +155,12 @@ def main():
             connection.command(keep+'summon myfirstmod:grave_regent 0 65 0')
             connection.command(keep+'summon minecraft:item 0 66 22 {Item:{id:"myfirstmod:requiem_glaive",count:1}}')
             connection.command(keep+'loot spawn 0 66 22 loot myfirstmod:entities/grave_regent')
+            # Flat natural-ground fixtures exercise the new scenery path for all four materials.
+            for material in ['hushed_moss','lumen_moss','prismstone','cinderstone']:
+                connection.command(prefix+'fill 1041 60 1041 1055 200 1055 minecraft:air')
+                connection.command(prefix+f'fill 1041 78 1041 1055 80 1055 myfirstmod:{material}')
+                connection.command(prefix+'place feature myfirstmod:realm_scenery 1048 81 1048')
+                connection.command(prefix+'execute unless blocks 1042 81 1042 1053 81 1053 1042 100 1042 all run say SMOKE_SCENERY_OK')
             # Actual vanilla city-center templates, including their top-center jigsaw final state.
             city='execute in minecraft:overworld run '
             connection.command(city+'forceload add 2000 2000 2095 2095')

@@ -214,6 +214,10 @@ class ResourceTests(unittest.TestCase):
         for generator in (ROOT/'scripts').glob('generate_*.py'):
             self.assertIn(generator.name,readme)
         self.assertFalse((DATA/'recipe/portal_frame.json').exists())
+        gate=load(ASSETS/'lang/en_us.json')['journal.myfirstmod.gate']
+        self.assertIn('Echo Shard',gate)
+        self.assertIn('22x8',gate)
+        self.assertNotIn('4-wide',gate)
         self.assertEqual(set(load(ASSETS/'blockstates/void_portal.json')['variants']),{'axis=x','axis=z'})
         self.assertTrue((ASSETS/'textures/block/void_portal.png.mcmeta').exists())
         for biome in (DATA/'worldgen/biome').glob('*.json'):

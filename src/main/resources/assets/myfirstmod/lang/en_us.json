@@ -298,7 +298,7 @@
   "memory.myfirstmod.3": "The archivists sealed the crowned above the drowned, but left a place below for those without names.",
   "memory.myfirstmod.4": "They called the guardian cruel until the first star fell through the broken observatory.",
   "memory.myfirstmod.5": "Not every light in the fen is a soul. Some are promises that no one has yet broken.",
-  "journal.myfirstmod.gate": "THE VOID GATE\n\nEight polished deepslate around an echo shard makes four frame blocks.\n\nBuild a 4-wide, 5-tall reinforced-deepslate frame along positive X. Leave its 2x3 interior empty. Ignite bottom-left, near a sculk catalyst.",
+  "journal.myfirstmod.gate": "ANCIENT THRESHOLD\n\nFind the great reinforced frame in an Overworld Ancient City.\n\nKeep its 22x8 outline intact and 20x6 opening clear. Use one Echo Shard on any frame block. Both orientations work.\n\nThe sanctuary gate returns you home.",
   "entity.myfirstmod.grave_regent": "The Grave Regent",
   "block.myfirstmod.keep_gate": "Hollow Gate",
   "block.myfirstmod.keep_heart": "Expedition Heart",

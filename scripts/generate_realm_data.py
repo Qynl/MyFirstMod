@@ -43,6 +43,7 @@ for name,chance in [('realm_ruins',12),('realm_flora',2),('realm_resources',1),(
 put('worldgen/configured_feature/realm_vault.json',{'type':'myfirstmod:realm_vault','config':{}})
 
 p=ROOT.parents[1]/'assets/myfirstmod/lang/en_us.json';lang=json.loads(p.read_text());lang.update({
+ 'journal.myfirstmod.gate':'ANCIENT THRESHOLD\n\nFind the great reinforced frame in an Overworld Ancient City.\n\nKeep its 22x8 outline intact and 20x6 opening clear. Use one Echo Shard on any frame block. Both orientations work.\n\nThe sanctuary gate returns you home.',
  'message.myfirstmod.city_gate_location':'The gateway must stand within an Ancient City in the Overworld.',
  'message.myfirstmod.city_gate_incomplete':'The great frame is incomplete or obstructed. Preserve its 22 by 8 outline and clear the 20 by 6 opening.',
  'message.myfirstmod.city_gate_open':'The ancient gateway is already awake.',
