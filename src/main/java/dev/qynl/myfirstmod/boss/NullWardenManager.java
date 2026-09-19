@@ -425,6 +425,7 @@ public final class NullWardenManager {
                             8, .25, .35, .25, .01);
                 }
                 if (a.pylonProgress[i] % 10 == 0) {
+                    cleanser.sendMessage(Text.literal("NULL PYLON // " + a.pylonProgress[i] + "/50"), true);
                     world.playSound(null, p, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
                             SoundCategory.BLOCKS, .8f, 1.3f);
                     world.spawnParticles(ParticleTypes.SCULK_SOUL,
