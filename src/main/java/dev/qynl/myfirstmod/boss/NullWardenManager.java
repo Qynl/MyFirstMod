@@ -244,10 +244,53 @@ public final class NullWardenManager {
         if (a.defeated) {
             rewardPending(server, world, a);
             if (!a.returnPortalBuilt) buildReturnPortal(world, a);
-            if (++a.victoryTicks >= 100) {
+
+            // Victory is a short aftermath, not an instant despawn. The arena
+            // visibly powers down while the defeated core collapses in stages.
+            a.victoryTicks++;
+            int v = a.victoryTicks;
+            a.boss.setAiDisabled(true);
+            a.boss.setInvulnerable(true);
+            a.boss.setVelocity(Vec3d.ZERO);
+
+            if (v <= 80 && v % 5 == 0) {
+                double radius = 1.5 + v * 0.08;
+                ring(world, a.boss.getX(), a.boss.getY() + 0.1, a.boss.getZ(),
+                        radius, ParticleTypes.REVERSE_PORTAL, 48);
+                world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                        a.boss.getX(), a.boss.getY() + 1.0, a.boss.getZ(),
+                        10, 1.0 + v * 0.015, 1.0, 1.0 + v * 0.015, .02);
+            }
+            if (v == 1) {
+                world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_DEATH,
+                        SoundCategory.HOSTILE, 3.5f, .7f);
+            }
+            if (v == 25 || v == 50) {
+                world.playSound(null, a.boss.getBlockPos(), SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE,
+                        SoundCategory.HOSTILE, 1.8f, .55f);
+            }
+            if (v == 70) {
+                world.playSound(null, CENTER, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
+                        SoundCategory.HOSTILE, 2.2f, .65f);
+                for (int i = 0; i < 4; i++) {
+                    BlockPos p = PYLONS[i];
+                    world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                            p.getX() + .5, p.getY() + 11, p.getZ() + .5,
+                            30, .7, 1.2, .7, .02);
+                }
+            }
+            if (v >= 80 && v % 4 == 0) {
+                ring(world, a.boss.getX(), a.boss.getY() + .2, a.boss.getZ(),
+                        Math.max(0.5, 8.0 - (v - 80) * .7),
+                        ParticleTypes.END_ROD, 36);
+            }
+
+            if (v >= 100) {
                 a.boss.discard();
                 a.boss = null;
                 a.bossUuid = null;
+                persist(world, a);
+            } else if (v % 10 == 0) {
                 persist(world, a);
             }
             return;
