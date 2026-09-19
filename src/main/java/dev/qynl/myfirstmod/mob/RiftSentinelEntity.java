@@ -25,6 +25,7 @@ public class RiftSentinelEntity extends ZombieEntity {
     }
     @Override protected void initDataTracker(DataTracker.Builder builder) {super.initDataTracker(builder);builder.add(TELL,0);}
     public int tell() {return getDataTracker().get(TELL);}
+    @Override public void setBaby(boolean baby) {super.setBaby(false);}
     @Override protected boolean burnsInDaylight() {return false;}
     @Override public boolean tryAttack(Entity target) {return charge==0 && recovery==0 && super.tryAttack(target);}
     @Override public boolean damage(DamageSource source,float amount) {

@@ -45,9 +45,11 @@ public final class AshenFlaskItem extends Item {
                 player.sendMessage(Text.translatable(rest?"message.myfirstmod.rest_unsafe":"message.myfirstmod.flask_empty"),true);
                 return TypedActionResult.fail(stack);
             }
-            var data=stack.getOrDefault(DataComponentTypes.CUSTOM_DATA,NbtComponent.DEFAULT).copyNbt();
-            data.putBoolean("AshenRest",rest);stack.set(DataComponentTypes.CUSTOM_DATA,NbtComponent.of(data));
         }
+        // Predict the same use duration on both sides before starting the animation.
+        // The server alone validates and applies rest/healing effects.
+        var data=stack.getOrDefault(DataComponentTypes.CUSTOM_DATA,NbtComponent.DEFAULT).copyNbt();
+        data.putBoolean("AshenRest",player.isSneaking());stack.set(DataComponentTypes.CUSTOM_DATA,NbtComponent.of(data));
         player.setCurrentHand(hand);return TypedActionResult.consume(stack);
     }
     public static boolean resting(ItemStack stack) {return stack.getOrDefault(DataComponentTypes.CUSTOM_DATA,NbtComponent.DEFAULT).copyNbt().getBoolean("AshenRest");}

@@ -32,6 +32,10 @@ public final class RiftSentinelModel extends SinglePartEntityModel<RiftSentinelE
         leftLeg.pitch=MathHelper.cos(walk*.6662f)*amount;rightLeg.pitch=-leftLeg.pitch;
         leftArm.pitch=-leftLeg.pitch*.5f;rightArm.pitch=.1f+leftLeg.pitch*.35f;
         if(e.tell()>0) {float t=1-e.tell()/32f;rightArm.pitch=-2.1f-t*.4f;rightArm.roll=-.3f;body.yaw=-.25f;leftArm.pitch=-.8f;}
-        if(e.tell()<0) {rightArm.pitch=-.6f;head.pitch=.4f;body.pitch=.13f;}
+        if(e.tell()<0) {
+            float elapsed=Math.max(0,30+e.tell());
+            rightArm.pitch=elapsed<8?MathHelper.lerp(elapsed/8,-2.5f,1.1f):MathHelper.lerp((elapsed-8)/22,1.1f,.1f);
+            rightArm.roll=.2f;body.yaw=.25f;head.pitch=.25f;body.pitch=.1f;
+        }
     }
 }

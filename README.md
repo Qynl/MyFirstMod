@@ -1,6 +1,10 @@
-# Convergence update — 1.4.0
+# Ashen Pilgrimage — 1.5.0
 
-Adds opt-in observatory encounters, an original animated Rift Herald, three relic attunements, and renewable Hush Nurseries. See [the Convergence guide](docs/CONVERGENCE.md) for progression, recipes, and upgrade notes.
+A darker overhaul of the Null Realm: three-level Mourning Cathedrals, a funerary rite, upgradeable shared-charge healing flasks, safe waystone rest, grounded evasion, original knight/hunter models, committed enemy attacks, Warden counterattack windows, and reworked terrain decoration.
+
+**Start here:** [Ashen Pilgrimage guide](docs/PILGRIMAGE.md) · [Convergence systems](docs/CONVERGENCE.md) · [Wilds crafting](docs/WILDS.md)
+
+Your first visit after upgrading grants a flask and Pilgrim’s Step. Sneak-use the flask near a safe waystone to rest. Seek cathedral embers before harder encounters. New landmarks require new chunks; back up your world.
 
 # The Null Warden — Wilds & Relics (1.3.0)
 
@@ -17,7 +21,7 @@ The realm now has its own gathering and equipment progression, not just combat c
 - **Luminous Fen**, a fourth biome with glowing moss, shallow pools, and luminous growths.
 - **Underground fracture caves** between roughly Y=-40 and Y=48, beneath custom Nullstone terrain.
 - **Three mineable ores:** Resonite, Prism, and Cinder. Resonite is smelted into ingots; the other ores drop useful magical materials.
-- **15 collectible custom blocks:** stone, bricks, moss, Hushwood, planks, foliage, ores, metal storage, and lamps. Original textures and mining/loot tags are included.
+- **17 collectible custom blocks:** stone, bricks, moss, Hushwood, planks, foliage, ores, metal storage, and lamps. Original textures and mining/loot tags are included.
 - **21 new items**, including a complete custom-textured armor set, three tools, two weapons, surveying/stealth/repair/recall equipment, and expedition food.
 - **Waystone shrines:** attune to a discovered shrine and return using a channeled Wayfarer Thread.
 - A dedicated Creative tab, recipe unlocks, expanded journal pages, wrapped tooltips, staff-ammunition display, and recall progress bar.
@@ -71,7 +75,7 @@ The sanctuary includes a nearby introductory court and a lit approach to the are
 - **Rift Sentinel:** armored guardian with a stationary, 1.8-second telegraphed close-range pulse. Retreat beyond the visible ring.
 - **Shardstalker:** faster climbing hunter with a sparkling warning before a short-range slowing pulse.
 
-Both have original textures and distinct behavior, but currently reuse vanilla zombie/spider model rigs and base navigation. They spawn in the realm and in trials; boss echoes now use Sentinels rather than full vanilla Wardens.
+Both now have original animated meshes and textures: a horned greatblade knight and a six-limbed crystal hunter. Vanilla-derived navigation remains. Their special attacks have committed tells and recovery windows; see the Pilgrimage guide for counterplay. They spawn in the realm and trials, and boss echoes use Sentinels.
 
 ## The guardian
 

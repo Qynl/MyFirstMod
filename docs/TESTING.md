@@ -1,3 +1,11 @@
+# 1.5 validation additions
+
+The Pilgrimage update adds pure tests for rite order/reset, bounded flask capacity and persistence, and forward-cleave safe boundaries; resource tests for cathedral placement, seal states, models/textures and deterministic generation; and dedicated-server fixtures for all three cathedral floors, custom spawner IDs, pilgrim loot, and item registration.
+
+Manual release checklist: navigate both stair flights in Survival; try the rite out of order and reload mid-rite; have two players attempt the same reward; drink/rest while damaged; swap/craft multiple flasks; upgrade at capacity cap; dodge toward walls, water and ledges; stagger a knight; sidestep a stalker; check Warden melee-vs-ranged recovery damage; inspect animations and HUD at small GUI sizes. **These manual checks have not been performed in this sandbox.**
+
+---
+
 # Validation / release gate
 
 ## Automated validation

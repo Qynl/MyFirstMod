@@ -26,7 +26,8 @@ public final class ShardstalkerModel extends SinglePartEntityModel<ShardstalkerE
         root.traverse().forEach(ModelPart::resetTransform);head.yaw=yaw*.008f;
         for(int i=0;i<6;i++) {float side=i<3?-1:1;legs[i].yaw=(i%3-1)*side*.4f+MathHelper.sin(walk*1.3f+i*2)*amount*.5f;legs[i].roll=side*(.15f+MathHelper.cos(walk*1.3f+i*2)*amount*.18f);}
         core.pivotY+=MathHelper.sin(time*.09f)*.3f;
-        if(e.tell()>0) {core.pivotY+=2;head.pivotY+=2;core.pitch=-.12f;}
+        if(e.tell()>0 && e.tell()<=30) {core.pivotY+=2;head.pivotY+=2;core.pitch=-.12f;}
+        if(e.tell()==40) {core.pitch=-.3f;for(int i=0;i<6;i++) legs[i].roll=(i<3?-1:1)*.65f;}
         if(e.tell()<0) {core.roll=.12f;head.pitch=.3f;}
     }
 }
