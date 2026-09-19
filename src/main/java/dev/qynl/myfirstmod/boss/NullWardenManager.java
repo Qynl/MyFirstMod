@@ -914,7 +914,12 @@ public final class NullWardenManager {
 
     public static void saveReturnPoint(ServerPlayerEntity player, RegistryKey<World> worldKey,
                                        BlockPos pos, float yaw, float pitch) {
-        NullWardenState data = saved(player.getServerWorld());
+        ServerWorld nullRealm = player.getServer().getWorld(
+                RegistryKey.of(net.minecraft.registry.RegistryKeys.WORLD,
+                        net.minecraft.util.Identifier.of(dev.qynl.myfirstmod.MyFirstMod.MOD_ID, "null_realm")));
+        if (nullRealm == null) return;
+
+        NullWardenState data = saved(nullRealm);
         data.returnPoints.put(player.getUuid(), new NullWardenState.ReturnPointData(
                 worldKey.getValue().toString(), pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
         data.dirty();
