@@ -1,5 +1,6 @@
 package dev.qynl.myfirstmod.item;
 
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -10,7 +11,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
@@ -21,11 +22,11 @@ public class NullbladeItem extends SwordItem {
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
 
         if (user.getItemCooldownManager().isCoolingDown(this)) {
-            return ActionResult.PASS;
+            return TypedActionResult.fail(stack);
         }
 
         user.getItemCooldownManager().set(this, 70);
@@ -67,14 +68,14 @@ public class NullbladeItem extends SwordItem {
             );
         }
 
-        return ActionResult.SUCCESS;
+        return TypedActionResult.success(stack, world.isClient);
     }
 
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (attacker instanceof PlayerEntity player && !player.getWorld().isClient) {
             target.addVelocity(0, 0.18, 0);
-            stack.damage(1, player, Hand.MAIN_HAND);
+            stack.damage(1, player, EquipmentSlot.MAINHAND);
         }
         return true;
     }
