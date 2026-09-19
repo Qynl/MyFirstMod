@@ -346,6 +346,7 @@ public final class NullWardenManager {
             a.phase = phase;
             a.attack = Attack.NONE;
             a.attackTarget = null;
+            a.attackX = a.attackY = a.attackZ = 0;
             a.attackWindup = 0;
             a.activePylons = (1 << phase) - 1;
             a.pylonProgress = new int[4];
@@ -551,6 +552,9 @@ public final class NullWardenManager {
             };
         };
         a.attackTarget = target.getUuid();
+        a.attackX = target.getX();
+        a.attackY = target.getY();
+        a.attackZ = target.getZ();
         a.attackWindup = a.attack.windup;
         a.boss.setVisualState(a.phase, attackVisualId(a.attack), 100, false);
         a.nextAttackTick = a.ticks + a.attack.windup + a.attack.recovery;
@@ -599,6 +603,7 @@ public final class NullWardenManager {
         ServerPlayerEntity t = target(world, a);
         if (t == null) return;
         int left = a.attackWindup;
+        double tx = a.attackX, ty = a.attackY, tz = a.attackZ;
         switch (a.attack) {
             case VOID_CLEAVE -> {
                 Vec3d f = a.boss.getRotationVector().normalize();
@@ -654,10 +659,12 @@ public final class NullWardenManager {
                         6, ParticleTypes.SCULK_SOUL, 80);
             }
             case VOID_RAIN -> {
+                ring(world, a.attackX, a.attackY + .1, a.attackZ,
+                        2.75, ParticleTypes.EXPLOSION, 56);
                 for (ServerPlayerEntity p : activePlayers(world, a)) {
-                    ring(world, p.getX(), p.getY() + .1, p.getZ(),
-                            2.75, ParticleTypes.EXPLOSION, 40);
-                    p.damage(world.getDamageSources().mobAttack(a.boss), 10);
+                    if (p.squaredDistanceTo(a.attackX, p.getY(), a.attackZ) <= 7.56) {
+                        p.damage(world.getDamageSources().mobAttack(a.boss), 10);
+                    }
                 }
             }
             case NULL_DASH -> {
@@ -671,39 +678,49 @@ public final class NullWardenManager {
                 shockwave(world, t, 3.5);
             }
             case GRAVITY_WELL -> {
-                gravity(world, a, .6);
+                pullTowardPoint(world, a, a.attackX, a.attackY, a.attackZ, .62, 12);
                 for (ServerPlayerEntity p : activePlayers(world, a))
-                    if (p.squaredDistanceTo(t) < 12.25)
+                    if (p.squaredDistanceTo(a.attackX, p.getY(), a.attackZ) < 12.25)
                         p.damage(world.getDamageSources().mobAttack(a.boss), 12);
+                ring(world, a.attackX, a.attackY + .15, a.attackZ,
+                        3.5, ParticleTypes.REVERSE_PORTAL, 64);
             }
             case REALITY_TEAR -> {
                 for (ServerPlayerEntity p : activePlayers(world, a))
-                    if (p.squaredDistanceTo(t) < 16)
+                    if (p.squaredDistanceTo(a.attackX, p.getY(), a.attackZ) < 16)
                         p.damage(world.getDamageSources().mobAttack(a.boss), 14);
-                world.playSound(null, t.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_SPAWN,
-                        SoundCategory.HOSTILE, 1.6f, .7f);
+                world.playSound(null, BlockPos.ofFloored(a.attackX, a.attackY, a.attackZ),
+                        SoundEvents.BLOCK_END_PORTAL_SPAWN, SoundCategory.HOSTILE, 1.6f, .7f);
             }
             case COLLAPSE -> {
                 for (ServerPlayerEntity p : activePlayers(world, a))
-                    if (p.squaredDistanceTo(t) < 25)
+                    if (p.squaredDistanceTo(a.attackX, p.getY(), a.attackZ) < 25)
                         p.damage(world.getDamageSources().mobAttack(a.boss), 20);
-                gravity(world, a, .85);
-                shockwave(world, t, 9);
+                pullTowardPoint(world, a, a.attackX, a.attackY, a.attackZ, .82, 15);
+                ring(world, a.attackX, a.attackY + .15, a.attackZ, 9,
+                        ParticleTypes.EXPLOSION, 96);
             }
             default -> {}
         }
     }
 
-    private static void gravity(ServerWorld world, ArenaState a, double strength) {
+    private static void pullTowardPoint(ServerWorld world, ArenaState a,
+                                          double x, double y, double z,
+                                          double strength, double radius) {
         for (ServerPlayerEntity p : activePlayers(world, a)) {
-            Vec3d d = a.boss.getPos().subtract(p.getPos());
-            double len = Math.sqrt(d.x * d.x + d.z * d.z);
-            if (len > .1 && len < 15) {
-                p.addVelocity(d.x / len * Math.min(strength, .9), .12,
-                        d.z / len * Math.min(strength, .9));
+            double dx = x - p.getX();
+            double dz = z - p.getZ();
+            double len = Math.sqrt(dx * dx + dz * dz);
+            if (len > .1 && len < radius) {
+                double scaled = Math.min(strength, .9) * (1.0 - len / radius);
+                p.addVelocity(dx / len * scaled, .08, dz / len * scaled);
                 p.velocityModified = true;
             }
         }
+    }
+
+    private static void gravity(ServerWorld world, ArenaState a, double strength) {
+        pullTowardPoint(world, a, a.boss.getX(), a.boss.getY(), a.boss.getZ(), strength, 15);
     }
 
     private static void phaseShift(ServerWorld world, ArenaState a) {
@@ -760,6 +777,7 @@ public final class NullWardenManager {
         a.defeated = true;
         a.attack = Attack.NONE;
         a.attackTarget = null;
+        a.attackX = a.attackY = a.attackZ = 0;
         a.attackWindup = 0;
         a.activePylons = 0;
         a.victoryTicks = 0;
@@ -1044,6 +1062,7 @@ public final class NullWardenManager {
         int victoryTicks, targetRotation;
         int activePylons;
         int[] pylonProgress = new int[4];
+        double attackX, attackY, attackZ;
         UUID attackTarget;
         Attack attack = Attack.NONE;
         boolean defeated, returnPortalBuilt;
