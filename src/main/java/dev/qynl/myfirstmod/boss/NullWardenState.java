@@ -26,6 +26,7 @@ public final class NullWardenState extends PersistentState {
     public boolean returnPortalBuilt;
     public int phase = 1;
     public int activePylons;
+    public int[] pylonProgress = new int[4];
 
     public static Type<NullWardenState> type() {
         return new Type<>(
@@ -50,6 +51,12 @@ public final class NullWardenState extends PersistentState {
         state.returnPortalBuilt = nbt.getBoolean("ReturnPortalBuilt");
         state.phase = Math.max(1, nbt.getInt("Phase"));
         state.activePylons = nbt.getInt("ActivePylons");
+        if (nbt.contains("PylonProgress", 9)) {
+            NbtList progress = nbt.getList("PylonProgress", 3);
+            for (int i = 0; i < Math.min(4, progress.size()); i++) {
+                state.pylonProgress[i] = Math.max(0, Math.min(50, progress.getInt(i)));
+            }
+        }
 
         readUuidList(nbt, "Participants", state.participants);
         readUuidList(nbt, "EligiblePlayers", state.eligiblePlayers);
@@ -101,6 +108,9 @@ public final class NullWardenState extends PersistentState {
         nbt.putBoolean("ReturnPortalBuilt", returnPortalBuilt);
         nbt.putInt("Phase", phase);
         nbt.putInt("ActivePylons", activePylons);
+        NbtList progress = new NbtList();
+        for (int value : pylonProgress) progress.add(net.minecraft.nbt.NbtInt.of(Math.max(0, Math.min(50, value))));
+        nbt.put("PylonProgress", progress);
 
         writeUuidList(nbt, "Participants", participants);
         writeUuidList(nbt, "EligiblePlayers", eligiblePlayers);
