@@ -2,6 +2,7 @@ package dev.qynl.myfirstmod.boss;
 
 import dev.qynl.myfirstmod.block.ModBlocks;
 import dev.qynl.myfirstmod.item.ModItems;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
