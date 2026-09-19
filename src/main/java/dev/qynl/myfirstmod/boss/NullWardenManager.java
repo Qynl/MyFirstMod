@@ -306,6 +306,8 @@ public final class NullWardenManager {
         a.ticks++;
         updateEligibility(a);
 
+        tickRealmAtmosphere(world, a);
+
         // Ambient arena pulse: the room itself should feel alive between attacks.
         if (a.ticks % 5 == 0) {
             double pulse = 0.9 + Math.sin(a.ticks * 0.08) * 0.18;
@@ -1384,6 +1386,64 @@ public final class NullWardenManager {
         }
 
         buildRealmLandmarks(world);
+    }
+
+    private static void tickRealmAtmosphere(ServerWorld world, ArenaState a) {
+        // The Null Realm moves even when the boss is not attacking. All effects
+        // here are cosmetic and sparse, so atmosphere never competes with combat.
+        int beat = a.ticks;
+
+        // Slow drifting streams connect the arena to the broken horizon.
+        if (beat % 6 == 0) {
+            double phase = beat * 0.035;
+            int[][] anchors = {
+                    {38, 80, 0}, {-40, 84, 12}, {8, 79, 39},
+                    {-14, 87, -41}, {31, 76, -30}, {-33, 88, -27}
+            };
+            for (int i = 0; i < anchors.length; i++) {
+                if ((i + beat / 6) % 2 != 0) continue;
+                double angle = phase * (i % 2 == 0 ? 1.0 : -0.75) + i * 1.7;
+                double radius = 1.2 + Math.sin(phase * 1.7 + i) * .45;
+                double x = anchors[i][0] + Math.cos(angle) * radius;
+                double z = anchors[i][2] + Math.sin(angle) * radius;
+                double y = anchors[i][1] + .8 + Math.sin(phase * 2.0 + i) * 1.4;
+                world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                        x, y, z, 2, .05, .12, .05, .008);
+            }
+        }
+
+        // Every few seconds one landmark "answers" the arena with a vertical
+        // pulse. The rotating index makes the horizon feel reactive rather than
+        // like six identical particle emitters firing at once.
+        if (beat % 120 == 0) {
+            int[][] towers = {
+                    {38, 72, 0, 8}, {-40, 76, 12, 11},
+                    {8, 70, 39, 9}, {-14, 74, -41, 13},
+                    {31, 69, -30, 7}, {-33, 78, -27, 10}
+            };
+            int index = Math.floorMod(beat / 120, towers.length);
+            int[] t = towers[index];
+            double y = t[1] + t[3] + 1.0;
+            world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                    t[0] + .5, y, t[2] + .5,
+                    18, .35, .8, .35, .018);
+            ring(world, t[0] + .5, y, t[2] + .5,
+                    1.5 + (t[3] % 3) * .35, ParticleTypes.END_ROD, 24);
+        }
+
+        // Rare low-frequency "Null wind" gives the dimension a soundscape without
+        // turning every tick into noise. The pitch changes with the current phase.
+        if (beat > 0 && beat % 300 == 0) {
+            float pitch = switch (a.phase) {
+                case 2 -> .72f;
+                case 3 -> .62f;
+                case 4 -> .52f;
+                default -> .82f;
+            };
+            world.playSound(null, CENTER,
+                    SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
+                    SoundCategory.AMBIENT, .65f, pitch);
+        }
     }
 
     private static void buildRealmLandmarks(ServerWorld world) {
