@@ -207,6 +207,7 @@ public final class NullWardenManager {
         a.idleTicks = 0;
         a.victoryTicks = 0;
         a.targetRotation = 0;
+        a.recoveryTicks = 0;
         a.defeated = false;
         a.rewardedPlayers.clear();
         a.eligiblePlayers.clear();
@@ -373,6 +374,13 @@ public final class NullWardenManager {
             }
         } else if (a.ticks >= a.nextAttackTick) {
             beginAttack(world, a);
+        }
+
+        // Short recovery windows are intentional: the boss cannot chain attacks
+        // indefinitely, giving players a reliable moment to reposition or cleanse.
+        if (a.attack == Attack.NONE && a.recoveryTicks > 0) {
+            a.recoveryTicks--;
+            a.boss.setAiDisabled(false);
         }
 
         int echoInterval = switch (a.phase) {
@@ -704,6 +712,7 @@ public final class NullWardenManager {
         a.attackWindup = a.attack.windup;
         a.boss.setVisualState(a.phase, attackVisualId(a.attack), 100, false);
         a.nextAttackTick = a.ticks + a.attack.windup + a.attack.recovery;
+        a.recoveryTicks = a.attack.recovery;
 
         for (ServerPlayerEntity p : participants(world, a))
             p.sendMessage(Text.literal("NULL WARDEN // " + a.attack.name), true);
@@ -1207,6 +1216,7 @@ public final class NullWardenManager {
         int ticks, intro, phase = 1, idleTicks, nextAttackTick = 40, attackWindup;
         int victoryTicks, targetRotation;
         int hazardTicks, hazardPattern = -1;
+        int recoveryTicks;
         int activePylons;
         int[] pylonProgress = new int[4];
         double attackX, attackY, attackZ;
