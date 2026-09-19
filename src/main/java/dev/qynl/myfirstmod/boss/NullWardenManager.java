@@ -665,23 +665,98 @@ public final class NullWardenManager {
     }
 
     private static void buildArena(ServerWorld world) {
+        // A deliberately constructed ritual arena instead of a flat boss platform.
         for (int x = -ARENA_RADIUS; x <= ARENA_RADIUS; x++) {
             for (int z = -ARENA_RADIUS; z <= ARENA_RADIUS; z++) {
-                if (Math.sqrt(x * x + z * z) > ARENA_RADIUS) continue;
-                world.setBlockState(new BlockPos(x, 80, z),
-                        x * x + z * z < 17 * 17
-                                ? Blocks.POLISHED_BLACKSTONE.getDefaultState()
-                                : Blocks.CRYING_OBSIDIAN.getDefaultState());
-                for (int y = 81; y <= 100; y++)
+                double d = Math.sqrt(x * x + z * z);
+                if (d > ARENA_RADIUS) continue;
+
+                BlockPos floor = new BlockPos(x, 80, z);
+                if (d < 7) {
+                    world.setBlockState(floor, Blocks.POLISHED_BLACKSTONE.getDefaultState());
+                } else if (((Math.abs(x) + Math.abs(z)) % 4) == 0) {
+                    world.setBlockState(floor, Blocks.CRYING_OBSIDIAN.getDefaultState());
+                } else {
+                    world.setBlockState(floor, Blocks.POLISHED_BLACKSTONE_BRICKS.getDefaultState());
+                }
+
+                for (int y = 81; y <= 100; y++) {
                     world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
+                }
             }
         }
 
+        // Raised central ritual dais.
+        for (int x = -6; x <= 6; x++) {
+            for (int z = -6; z <= 6; z++) {
+                if (x * x + z * z <= 36) {
+                    world.setBlockState(new BlockPos(x, 81, z),
+                            Blocks.POLISHED_BLACKSTONE.getDefaultState());
+                    if (x * x + z * z <= 9) {
+                        world.setBlockState(new BlockPos(x, 82, z),
+                                Blocks.CRYING_OBSIDIAN.getDefaultState());
+                    }
+                }
+            }
+        }
+
+        // Four monumental pylon towers with collars and floating caps.
         for (int i = 0; i < 4; i++) {
             BlockPos p = PYLONS[i];
-            for (int y = 0; y < 11; y++)
-                world.setBlockState(p.add(0, y, 0), Blocks.REINFORCED_DEEPSLATE.getDefaultState());
-            world.setBlockState(p.up(11), Blocks.SCULK_CATALYST.getDefaultState());
+
+            for (int y = 0; y < 11; y++) {
+                world.setBlockState(p.add(0, y, 0),
+                        Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+                if (y >= 3 && y <= 8) {
+                    world.setBlockState(p.add(1, y, 0),
+                            Blocks.SCULK.getDefaultState());
+                    world.setBlockState(p.add(-1, y, 0),
+                            Blocks.SCULK.getDefaultState());
+                }
+            }
+
+            for (int x = -2; x <= 2; x++) {
+                for (int z = -2; z <= 2; z++) {
+                    if (Math.abs(x) == 2 || Math.abs(z) == 2) {
+                        world.setBlockState(p.add(x, 11, z),
+                                Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+                    }
+                }
+            }
+            world.setBlockState(p.up(12), Blocks.SCULK_CATALYST.getDefaultState());
+            world.setBlockState(p.up(13), Blocks.SCULK.getDefaultState());
+        }
+
+        // Four outer monuments make the circular boundary read as an actual arena.
+        BlockPos[] corners = {
+                new BlockPos(19, 81, 19), new BlockPos(-19, 81, 19),
+                new BlockPos(-19, 81, -19), new BlockPos(19, 81, -19)
+        };
+        for (BlockPos base : corners) {
+            for (int y = 0; y < 8; y++) {
+                world.setBlockState(base.add(0, y, 0), Blocks.POLISHED_BLACKSTONE_BRICKS.getDefaultState());
+                if (y > 1) {
+                    world.setBlockState(base.add(1, y, 0), Blocks.CRYING_OBSIDIAN.getDefaultState());
+                    world.setBlockState(base.add(-1, y, 0), Blocks.CRYING_OBSIDIAN.getDefaultState());
+                }
+            }
+            world.setBlockState(base.up(8), Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+            world.setBlockState(base.up(9), Blocks.SCULK_CATALYST.getDefaultState());
+        }
+
+        // Cardinal arches frame the boss without closing the sky.
+        for (int[] dir : new int[][]{{1,0},{-1,0},{0,1},{0,-1}}) {
+            int dx = dir[0], dz = dir[1];
+            for (int side = -3; side <= 3; side++) {
+                int x = dx * 22 + (dz != 0 ? side : 0);
+                int z = dz * 22 + (dx != 0 ? side : 0);
+                world.setBlockState(new BlockPos(x, 81, z), Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+                world.setBlockState(new BlockPos(x, 82, z), Blocks.POLISHED_BLACKSTONE_BRICKS.getDefaultState());
+            }
+            for (int y = 82; y <= 88; y++) {
+                world.setBlockState(new BlockPos(dx * 22, y, dz * 22),
+                        Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+            }
         }
     }
 
