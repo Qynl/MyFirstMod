@@ -5,6 +5,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExpeditionRecordTest {
+    @Test void convergenceMailAndTimersSurviveRestart() {
+        ExpeditionRecord record=new ExpeditionRecord();
+        record.riftsClosed=7;record.pendingRiftCores=3;record.vigorReadyAt=81234;record.galeReadyAt=81555;
+        ExpeditionRecord restored=ExpeditionRecord.read(record.write());
+        assertEquals(7,restored.riftsClosed);assertEquals(3,restored.pendingRiftCores);
+        assertEquals(81234,restored.vigorReadyAt);assertEquals(81555,restored.galeReadyAt);
+        var legacy=ExpeditionRecord.read(new NbtCompound());assertEquals(0,legacy.pendingRiftCores);
+        var invalid=new NbtCompound();invalid.putInt("PendingRiftCores",999);
+        assertEquals(64,ExpeditionRecord.read(invalid).pendingRiftCores);
+    }
+
     @Test void boundWaystoneSurvivesRestartAtNegativeCoordinates() {
         ExpeditionRecord record=new ExpeditionRecord();
         record.hasWaystone=true;

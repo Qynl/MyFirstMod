@@ -110,7 +110,7 @@ public final class RealmRifts {
             } else {
                 if(world.getEntity(r.heraldId) instanceof RiftHeraldEntity loaded) r.herald=loaded;
                 // An unloaded actor is never considered a kill.
-                if(r.herald!=null && !r.herald.isAlive()) {
+                if(r.herald!=null && r.herald.getHealth()<=0) {
                     reward(world,r);discard(world,r);iterator.remove();continue;
                 }
                 if(r.herald==null || r.herald.isRemoved()) continue;

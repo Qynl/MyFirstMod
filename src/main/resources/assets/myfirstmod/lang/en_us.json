@@ -195,5 +195,7 @@
   "item.myfirstmod.vigor_rune.tooltip": "Forge into a relic: successful abilities heal one heart. Shared 10s cooldown.",
   "item.myfirstmod.gale_rune.tooltip": "Forge into a relic: casts grant Speed I for 4s. Shared 10s cooldown.",
   "item.myfirstmod.focus_rune.tooltip": "Forge into a relic: 20% shorter ability cooldowns.",
-  "message.myfirstmod.rift_mail": "CONVERGENCE // Claimed %s Astral Cores, shards, and experience."
+  "message.myfirstmod.rift_mail": "CONVERGENCE // Claimed %s Astral Cores, shards, and experience.",
+  "herald.myfirstmod.attack.1": "ASTRAL BURST // Leave the marked circle!",
+  "herald.myfirstmod.attack.2": "STAR RING // Move inside 3 blocks or beyond 6!"
 }
