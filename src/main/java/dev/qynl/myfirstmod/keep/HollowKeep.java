@@ -39,7 +39,19 @@ public final class HollowKeep {
                 .then(net.minecraft.server.command.CommandManager.literal("prepare").executes(ctx->{boolean ready=prepare(ctx.getSource().getServer());ctx.getSource().sendFeedback(()->Text.literal(ready?"KEEP_READY":"KEEP_BUILDING"),false);return 1;}))));
     }
     public static void clear() {if(run!=null)run.bar.clearPlayers();run=null;build=-1;readyAt=0;}
-    private static void tickets(ServerWorld world,boolean force) {for(int x=-2;x<=1;x++)for(int z=-2;z<=1;z++)world.setChunkForced(x,z,force);}
+    private static void tickets(ServerWorld world,boolean force) {
+        var state=RealmState.get(world);
+        if(force) {
+            for(int x=-2;x<=1;x++)for(int z=-2;z<=1;z++) {
+                long pos=ChunkPos.toLong(x,z);
+                if(!world.getForcedChunks().contains(pos)){world.setChunkForced(x,z,true);state.keepForcedChunks.add(pos);}
+            }
+        } else {
+            for(long pos:state.keepForcedChunks){var chunk=new ChunkPos(pos);world.setChunkForced(chunk.x,chunk.z,false);}
+            state.keepForcedChunks.clear();
+        }
+        state.markDirty();
+    }
     private static ActionResult tell(ServerPlayerEntity p,String key,Object... args) {p.sendMessage(Text.translatable(key,args),false);return ActionResult.SUCCESS;}
     public static ActionResult interact(ServerPlayerEntity p,BlockPos pos) {
         var w=p.getServerWorld();var block=w.getBlockState(pos);
@@ -123,7 +135,7 @@ public final class HollowKeep {
             if(++build>=16){RealmState.get(world).sanctuaryBuilt=true;RealmState.get(world).markDirty();build=-1;tickets(world,false);}
         }
         if(world.getTime()%5!=0)return;
-        for(var p:world.getPlayers())if(p.isAlive()&&p.getY()<55){if(!land(p,world,new BlockPos(0,65,27)))exit(p);}
+        for(var p:List.copyOf(world.getPlayers()))if(p.isAlive()&&p.getY()<55){if(!land(p,world,new BlockPos(0,65,27)))exit(p);}
         if(run==null)return;
         var present=world.getPlayers().stream().filter(p->enrolled(p.getUuid())&&eligible(p)).toList();
         for(var p:List.copyOf(run.bar.getPlayers()))if(!present.contains(p))run.bar.removePlayer(p);

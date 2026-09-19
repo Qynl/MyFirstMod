@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class RealmState extends PersistentState {
+    public final java.util.Set<Long> keepForcedChunks=new java.util.HashSet<>();
     public boolean sanctuaryBuilt;
     public int bossClears, contentVersion;
     public long rematchReadyAt;
@@ -24,6 +25,7 @@ public final class RealmState extends PersistentState {
     }
     private static RealmState read(NbtCompound nbt) {
         RealmState state=new RealmState();
+        for(long pos:nbt.getLongArray("KeepForcedChunks"))state.keepForcedChunks.add(pos);
         state.sanctuaryBuilt=nbt.getBoolean("SanctuaryBuilt");
         state.contentVersion=nbt.getInt("ContentVersion");
         state.bossClears=Math.max(0,nbt.getInt("BossClears"));
@@ -45,6 +47,7 @@ public final class RealmState extends PersistentState {
         return state;
     }
     @Override public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        nbt.putLongArray("KeepForcedChunks",keepForcedChunks.stream().mapToLong(Long::longValue).toArray());
         nbt.putBoolean("SanctuaryBuilt",sanctuaryBuilt);
         nbt.putInt("BossClears",bossClears);
         nbt.putInt("ContentVersion",contentVersion);
