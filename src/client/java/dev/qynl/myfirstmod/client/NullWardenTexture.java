@@ -24,7 +24,7 @@ public final class NullWardenTexture {
     }
 
     private static NativeImage buildBaseTexture() {
-        NativeImage image = new NativeImage(128, 96, false);
+        NativeImage image = new NativeImage(128, 128, false);
 
         for (int y = 0; y < 96; y++) {
             for (int x = 0; x < 128; x++) {
@@ -85,7 +85,7 @@ public final class NullWardenTexture {
     }
 
     private static NativeImage buildGlowTexture() {
-        NativeImage image = new NativeImage(128, 96, true);
+        NativeImage image = new NativeImage(128, 128, true);
 
         // Transparent by default. Only the model's core, crown and horn UV islands glow.
         fillRect(image, 0, 60, 28, 10, 255, 38, 245, 255);
@@ -121,7 +121,7 @@ public final class NullWardenTexture {
         int err = dx + dy;
 
         while (true) {
-            if (x0 >= 0 && x0 < 128 && y0 >= 0 && y0 < 96) {
+            if (x0 >= 0 && x0 < 128 && y0 >= 0 && y0 < 128) {
                 image.setColor(x0, y0, argb(255, r, g, b));
             }
             if (x0 == x1 && y0 == y1) {
@@ -140,7 +140,7 @@ public final class NullWardenTexture {
     }
 
     private static void fillRect(NativeImage image, int x, int y, int w, int h, int a, int r, int g, int b) {
-        for (int py = y; py < y + h && py < 96; py++) {
+        for (int py = y; py < y + h && py < 128; py++) {
             for (int px = x; px < x + w && px < 128; px++) {
                 image.setColor(px, py, argb(a, r, g, b));
             }
