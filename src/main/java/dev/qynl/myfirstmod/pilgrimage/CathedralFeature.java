@@ -1,7 +1,6 @@
 package dev.qynl.myfirstmod.pilgrimage;
 
 import dev.qynl.myfirstmod.block.ModBlocks;
-import dev.qynl.myfirstmod.boss.ModEntities;
 import dev.qynl.myfirstmod.realm.RealmFeatures;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
@@ -68,14 +67,30 @@ public final class CathedralFeature extends Feature<DefaultFeatureConfig> {
         put(w,p.down(16),ModBlocks.MOURNING_RELIQUARY);
         for(int y:new int[]{-8,-16}) {
             var spawner=p.add(0,y,-5);put(w,spawner,Blocks.SPAWNER);
-            if(w.getBlockEntity(spawner) instanceof MobSpawnerBlockEntity entity) {
-                entity.getLogic().setEntityId(y==-8?ModEntities.RIFT_SENTINEL:ModEntities.SHARDSTALKER,w.toServerWorld(),context.getRandom(),spawner);
-                entity.markDirty();
+            var nbt=spawnerData(spawner,y==-8?"rift_sentinel":"shardstalker");
+            if(w instanceof net.minecraft.server.world.ServerWorld live) {
+                if(live.getBlockEntity(spawner) instanceof MobSpawnerBlockEntity entity) {
+                    entity.getLogic().readNbt(live,spawner,nbt);entity.markDirty();
+                }
+            } else {
+                // Never call a live-world block-entity listener from a generation worker:
+                // it can request this unfinished chunk and deadlock generation.
+                w.getChunk(spawner).addPendingBlockEntityNbt(nbt);
             }
             var chest=p.add(-2,y,5);put(w,chest,Blocks.CHEST);
             LootableInventory.setLootTable(w,context.getRandom(),chest,RegistryKey.of(RegistryKeys.LOOT_TABLE,Identifier.of("myfirstmod","chests/pilgrim_cache")));
         }
         return true;
+    }
+    private static net.minecraft.nbt.NbtCompound spawnerData(BlockPos pos,String actor) {
+        var nbt=new net.minecraft.nbt.NbtCompound();
+        nbt.putString("id","minecraft:mob_spawner");nbt.putInt("x",pos.getX());nbt.putInt("y",pos.getY());nbt.putInt("z",pos.getZ());
+        var entity=new net.minecraft.nbt.NbtCompound();entity.putString("id","myfirstmod:"+actor);
+        var data=new net.minecraft.nbt.NbtCompound();data.put("entity",entity);nbt.put("SpawnData",data);
+        nbt.putShort("Delay",(short)100);nbt.putShort("MinSpawnDelay",(short)300);nbt.putShort("MaxSpawnDelay",(short)600);
+        nbt.putShort("SpawnCount",(short)2);nbt.putShort("MaxNearbyEntities",(short)4);
+        nbt.putShort("RequiredPlayerRange",(short)10);nbt.putShort("SpawnRange",(short)3);
+        return nbt;
     }
     private static void stair(StructureWorldAccess w,BlockPos p,Direction direction) {
         for(int h=1;h<=3;h++) put(w,p.up(h),Blocks.AIR);
