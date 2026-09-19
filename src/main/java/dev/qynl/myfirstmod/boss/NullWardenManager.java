@@ -474,7 +474,12 @@ public final class NullWardenManager {
 
     private static void resetEncounter(ServerWorld world, ArenaState arena) {
         if (arena.boss != null && arena.boss.isAlive()) arena.boss.discard();
-        if (arena.bar != null) arena.bar.clearPlayers();
+        if (arena.bar != null) {
+            for (UUID uuid : arena.participants) {
+                ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
+                if (player != null) arena.bar.removePlayer(player);
+            }
+        }
         arena.boss = null;
         arena.bar = null;
         arena.participants.clear();
