@@ -1374,7 +1374,7 @@ public final class NullWardenManager {
         int victoryTicks, targetRotation;
         int hazardTicks, hazardPattern = -1;
         int recoveryTicks, exposeTicks, attackStep;
-        int activePylons;
+        int activePylons, cleansedPylons;
         int[] pylonProgress = new int[4];
         double attackX, attackY, attackZ;
         UUID attackTarget;
