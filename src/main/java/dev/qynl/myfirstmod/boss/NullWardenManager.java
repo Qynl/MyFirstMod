@@ -260,6 +260,21 @@ public final class NullWardenManager {
                     a.boss.getX(), a.boss.getY() + 1.0, a.boss.getZ(),
                     3, 1.1, 1.4, 1.1, 0.015);
         }
+        // Ritual pathways continuously connect the boss to every active pylon.
+        if (a.ticks % 3 == 0 && a.activePylons != 0) {
+            for (int i = 0; i < 4; i++) {
+                if ((a.activePylons & (1 << i)) == 0) continue;
+                BlockPos p = PYLONS[i];
+                double bx = a.boss.getX(), bz = a.boss.getZ();
+                double px = p.getX() + .5, pz = p.getZ() + .5;
+                for (int n = 0; n < 10; n++) {
+                    double k = (n + ((a.ticks % 15) / 15.0)) / 10.0;
+                    world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                            bx + (px - bx) * k, 80.35, bz + (pz - bz) * k,
+                            1, .08, .02, .08, .005);
+                }
+            }
+        }
         if (a.ticks % 20 == 0) {
             for (int i = 0; i < 4; i++) {
                 if ((a.activePylons & (1 << i)) == 0) continue;
@@ -273,6 +288,19 @@ public final class NullWardenManager {
         if (a.intro > 0) {
             a.intro--;
             a.boss.setAiDisabled(true);
+            // Cinematic awakening: the arena contracts toward the boss in pulses.
+            double t = (100 - a.intro) / 100.0;
+            double radius = Math.max(1.0, 9.0 - t * 7.5);
+            ring(world, a.boss.getX(), a.boss.getY() + .08, a.boss.getZ(),
+                    radius, ParticleTypes.REVERSE_PORTAL, 80);
+            if (a.intro % 5 == 0) {
+                world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                        a.boss.getX(), a.boss.getY() + 1.2, a.boss.getZ(),
+                        20, 2.0 + t, 1.5, 2.0 + t, .025);
+                world.spawnParticles(ParticleTypes.END_ROD,
+                        a.boss.getX(), a.boss.getY() + 1.0, a.boss.getZ(),
+                        8, 1.0, .8, 1.0, .02);
+            }
             a.boss.setInvulnerable(true);
             a.boss.setVelocity(Vec3d.ZERO);
             if (a.intro % 10 == 0) {
@@ -637,7 +665,13 @@ public final class NullWardenManager {
         world.spawnParticles(ParticleTypes.EXPLOSION,
                 a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 48, 2, 2, 2, .08);
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
-                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 300, 4, 3, 4, .08);
+                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 420, 5, 4, 5, .1);
+        world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 240, 4, 3, 4, .055);
+        for (int r = 3; r <= 12; r += 3) {
+            ring(world, a.boss.getX(), 81.0, a.boss.getZ(), r,
+                    ParticleTypes.END_ROD, 64);
+        }
 
         rewardPending(world.getServer(), world, a);
         buildReturnPortal(world, a);
