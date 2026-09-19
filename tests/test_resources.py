@@ -46,7 +46,7 @@ class ResourceTests(unittest.TestCase):
                 for feature in stage:
                     placed=load(DATA/('worldgen/placed_feature/'+feature.split(':')[1]+'.json'))
                     configured=load(DATA/('worldgen/configured_feature/'+placed['feature'].split(':')[1]+'.json'))
-                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial'])
+                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial','myfirstmod:realm_scenery'])
             self.assertEqual({s['type'] for s in biome['spawners']['monster']},
                              {'myfirstmod:rift_sentinel','myfirstmod:shardstalker'})
 
@@ -204,7 +204,7 @@ class ResourceTests(unittest.TestCase):
         for seal in ['iron_vow','ember_vow','mist_vow']:
             self.assertEqual(json.dumps(load(DATA/f'recipe/{seal}.json')).count('myfirstmod:memory_shard'),2)
 
-    def test_current_readme_links_and_portal_recipe(self):
+    def test_current_readme_links_and_portal_assets(self):
         readme=(ROOT/'README.md').read_text()
         version=re.search(r'mod_version=(.+)',(ROOT/'gradle.properties').read_text()).group(1)
         self.assertIn(version,readme)
@@ -213,9 +213,28 @@ class ResourceTests(unittest.TestCase):
                 self.assertTrue((ROOT/link.split('#')[0]).exists(),link)
         for generator in (ROOT/'scripts').glob('generate_*.py'):
             self.assertIn(generator.name,readme)
-        recipe=load(DATA/'recipe/portal_frame.json')
-        self.assertEqual(recipe['result'],{'id':'minecraft:reinforced_deepslate','count':4})
-        self.assertEqual(recipe['key']['E']['item'],'minecraft:echo_shard')
+        self.assertFalse((DATA/'recipe/portal_frame.json').exists())
+        self.assertEqual(set(load(ASSETS/'blockstates/void_portal.json')['variants']),{'axis=x','axis=z'})
+        self.assertTrue((ASSETS/'textures/block/void_portal.png.mcmeta').exists())
+        for biome in (DATA/'worldgen/biome').glob('*.json'):
+            self.assertIn('myfirstmod:realm_scenery',json.dumps(load(biome)))
+            self.assertIn('ambient_sound',load(biome)['effects'])
+
+    def test_gallery_is_reproducible_and_labeled(self):
+        names=['item-gallery.svg','creature-gallery.svg','biome-palettes.svg','ancient-city-gateway.svg']
+        before={name:(ROOT/'docs/images'/name).read_bytes() for name in names}
+        subprocess.run([sys.executable,str(ROOT/'scripts/generate_gallery.py')],check=True)
+        for name in names:
+            content=(ROOT/'docs/images'/name).read_bytes()
+            self.assertEqual(content,before[name])
+            import xml.etree.ElementTree as ET
+            tree=ET.fromstring(content)
+            self.assertEqual(tree.attrib['role'],'img')
+            self.assertIsNotNone(tree.find('{http://www.w3.org/2000/svg}desc'))
+        models=before['creature-gallery.svg'].decode()
+        for name in ['NullWarden','GraveRegent','RiftHerald','RiftSentinel','Shardstalker']:
+            self.assertIn('data-model="'+name+'"',models)
+        self.assertIn('not gameplay screenshots',models)
 
     def test_hollow_keep_resources(self):
         dimension=load(DATA/'dimension/hollow_keep.json')

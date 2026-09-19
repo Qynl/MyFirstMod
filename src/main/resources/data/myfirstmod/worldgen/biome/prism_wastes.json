@@ -13,6 +13,7 @@
       },
       "probability": 0.004
     },
+    "ambient_sound": "minecraft:ambient.soul_sand_valley.loop",
     "mood_sound": {
       "sound": "minecraft:ambient.cave",
       "tick_delay": 8000,
@@ -57,7 +58,8 @@
     [],
     [],
     [
-      "myfirstmod:realm_flora"
+      "myfirstmod:realm_flora",
+      "myfirstmod:realm_scenery"
     ],
     []
   ]

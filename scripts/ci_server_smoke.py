@@ -155,6 +155,39 @@ def main():
             connection.command(keep+'summon myfirstmod:grave_regent 0 65 0')
             connection.command(keep+'summon minecraft:item 0 66 22 {Item:{id:"myfirstmod:requiem_glaive",count:1}}')
             connection.command(keep+'loot spawn 0 66 22 loot myfirstmod:entities/grave_regent')
+            # Actual vanilla city-center templates, including their top-center jigsaw final state.
+            city='execute in minecraft:overworld run '
+            connection.command(city+'forceload add 2000 2000 2095 2095')
+            deadline=time.monotonic()+90
+            while not all('passed' in connection.command(city+f'execute if loaded {x} 80 {z}',allow_failure=True).lower()
+                          for x in range(2008,2096,16) for z in range(2008,2096,16)):
+                if time.monotonic()>deadline:raise TimeoutError('Ancient City fixture chunks did not load')
+                time.sleep(1)
+            def rotated(x,y,z,turn):
+                for _ in range(turn):x,z=-z,x
+                return f'{2048+x} {80+y} {2048+z}'
+            for template in range(1,4):
+                for turn,rotation in enumerate(['none','clockwise_90','180','counterclockwise_90']):
+                    corners=[tuple(map(int,rotated(x,0,z,turn).split())) for x in [0,17] for z in [0,40]]
+                    xmin,xmax=min(p[0] for p in corners),max(p[0] for p in corners)
+                    zmin,zmax=min(p[2] for p in corners),max(p[2] for p in corners)
+                    connection.command(city+f'fill {xmin} 80 {zmin} {xmax} 110 {zmax} minecraft:air')
+                    connection.command(city+f'place template minecraft:ancient_city/city_center/city_center_{template} 2048 80 2048 {rotation}')
+                    # /place template retains jigsaws; natural jigsaw generation replaces this one.
+                    connection.command(city+f'setblock {rotated(13,24,20,turn)} minecraft:reinforced_deepslate',allow_failure=True)
+                    if turn==0:
+                        connection.command(city+f'setblock {rotated(13,20,18,turn)} minecraft:chest')
+                        response=connection.command(city+f'nullgate {rotated(13,17,10,turn)}',allow_failure=True)
+                        if 'GATE_INVALID' not in response:raise RuntimeError('Obstructed city gate was accepted: '+response)
+                        connection.command(city+f'execute if block {rotated(13,18,11,turn)} minecraft:air run say SMOKE_GATE_NO_PARTIAL_WRITE')
+                        connection.command(city+f'setblock {rotated(13,20,18,turn)} minecraft:air')
+                    response=connection.command(city+f'nullgate {rotated(13,17,10,turn)}')
+                    if 'GATE_OPEN' not in response:raise RuntimeError('Vanilla city frame did not open: '+response)
+                    axis='z' if turn%2==0 else 'x'
+                    for y,z in [(18,11),(18,30),(23,11),(23,30),(20,20)]:
+                        connection.command(city+f'execute if block {rotated(13,y,z,turn)} myfirstmod:void_portal[axis={axis}] run say SMOKE_CITY_GATE_OK')
+                    connection.command(city+f'execute if block {rotated(13,24,20,turn)} minecraft:reinforced_deepslate run say SMOKE_CITY_OUTLINE_OK')
+            connection.command(city+'forceload remove 2000 2000 2095 2095')
             connection.command('save-all flush')
             connection.command('stop')
             code=proc.wait(timeout=120)

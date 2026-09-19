@@ -1,7 +1,11 @@
 {
   "variants": {
-    "": {
+    "axis=x": {
       "model": "myfirstmod:block/void_portal"
+    },
+    "axis=z": {
+      "model": "myfirstmod:block/void_portal",
+      "y": 90
     }
   }
 }

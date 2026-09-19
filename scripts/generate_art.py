@@ -74,3 +74,15 @@ for name in ['echo_sigil','warden_crest','rift_aegis']:
     put(Path('models/item/'+name+'.json'),{'parent':'minecraft:item/generated','textures':{'layer0':'myfirstmod:item/'+name}})
 put(Path('blockstates/echo_altar.json'),{'variants':{'':{'model':'myfirstmod:block/echo_altar'}}})
 put(Path('models/block/echo_altar.json'),{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/ascended_core'}})
+
+# Ancient City gateway: original animated teal/violet membrane, not a solid purple cube.
+pixels=[]
+for frame in range(16):
+ for y in range(16):
+  for x in range(16):
+   wave=math.sin((x+y)*.6-frame*math.tau/16)+math.sin((x-y)*.4+frame*math.tau/16)
+   pixels.append((int(34+15*wave),int(94+26*wave),int(122+30*wave),185))
+png('block/void_portal.png',16,256,pixels)
+put(Path('textures/block/void_portal.png.mcmeta'),{'animation':{'frametime':3,'interpolate':True}})
+put(Path('blockstates/void_portal.json'),{'variants':{'axis=x':{'model':'myfirstmod:block/void_portal'},'axis=z':{'model':'myfirstmod:block/void_portal','y':90}}})
+put(Path('models/block/void_portal.json'),{'textures':{'portal':'myfirstmod:block/void_portal','particle':'myfirstmod:block/void_portal'},'elements':[{'from':[0,0,6],'to':[16,16,10],'shade':False,'faces':{f:{'texture':'#portal','uv':[0,0,16,16]} for f in ['north','south','east','west','up','down']}}]})

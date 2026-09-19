@@ -21,6 +21,8 @@ public class MyFirstMod implements ModInitializer {
         ModBlocks.register();
         ModItems.register();
         ModEntities.register();
+        dev.qynl.myfirstmod.realm.RealmScenery.register();
+        VoidPortalManager.registerGateCommand();
         dev.qynl.myfirstmod.keep.HollowKeep.registerCommands();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(dev.qynl.myfirstmod.keep.HollowKeep::resetTickets);
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register(dev.qynl.myfirstmod.keep.HollowKeep::resetTickets);
@@ -67,9 +69,9 @@ public class MyFirstMod implements ModInitializer {
             if(altar!=ActionResult.PASS) return altar;
             ActionResult trial = dev.qynl.myfirstmod.realm.RealmTrials.interact(serverPlayer, hit.getBlockPos());
             if (trial != ActionResult.PASS) return trial;
-            if (!serverPlayer.getStackInHand(hand).isOf(Items.FLINT_AND_STEEL)) return ActionResult.PASS;
+            if (!serverPlayer.getStackInHand(hand).isOf(Items.ECHO_SHARD)) return ActionResult.PASS;
             if (world.getBlockState(hit.getBlockPos()).isOf(Blocks.REINFORCED_DEEPSLATE)
-                    && VoidPortalManager.tryIgnite(serverPlayer, hit.getBlockPos())) return ActionResult.SUCCESS;
+                    && VoidPortalManager.tryIgnite(serverPlayer, hit.getBlockPos(), hand)) return ActionResult.SUCCESS;
             return ActionResult.PASS;
         });
 

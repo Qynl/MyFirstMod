@@ -1,5 +1,5 @@
 # The Null Warden
-## 1.7 — The Hollow Keep
+## 1.8 — The Ancient Threshold
 
 **A dark-fantasy expedition through a ruined dimension: prepare at a sanctuary, recover forgotten memories, descend beneath cathedrals, and challenge the guardian of a broken kingdom.**
 
@@ -13,6 +13,7 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 
 ## Contents
 
+- [New in 1.8 — The Ancient Threshold](#new-in-18--the-ancient-threshold)
 - [New in 1.7 — The Hollow Keep](#new-in-17--the-hollow-keep)
 - [What is new in 1.6?](#what-is-new-in-16)
 - [Install and update](#install-and-update)
@@ -32,6 +33,31 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 - [Troubleshooting and limitations](#troubleshooting-and-limitations)
 - [Build, tests, and repository guide](#build-tests-and-repository-guide)
 
+## New in 1.8 — The Ancient Threshold
+
+**The great Ancient City monument is now your entrance.** Awaken the existing reinforced-deepslate frame with an Echo Shard and step through its full twenty-block-wide veil. No tiny handmade frame, catalyst search, or ignition corner.
+
+![Ancient City gateway dimensions and the route through both dimensions](docs/images/ancient-city-gateway.svg)
+
+- **Vanilla-template-sized gateway:** 22×8 outside, 20×6 inside, either horizontal axis. Right-click any frame block; Survival requires an actual Ancient City structure in the Overworld. One Echo Shard opens all 120 portal blocks.
+- **New terrain composition:** broad basins, folded ridges, shallow winding ravines, underground fractures, and a distinct subsurface stone band. The realm is still explorable ground—not a flat arena or an End preset.
+- **More biome scenery:** moss carpets, mushrooms, fallen wood, crystal buds, basalt rubble, and carefully bounded fen pools between landmarks. Regional ambient loops complement fog and particles.
+- **Gateway presentation:** an original animated teal/violet membrane, thin axis-aware geometry, opening sound and particles. Already-active gates cost nothing; obstructed gates never carve through builds.
+- **Hollow Keep lighting:** integrated hall and ward-room lamps make its silhouettes easier to read. Existing Keep architecture is not rebuilt on upgrade.
+- **Illustrated guide:** actual item textures, source-derived creature geometry, biome material plates, gateway diagram, and fortress map. These are **not gameplay screenshots**.
+
+### Items and equipment
+
+![Twenty-four original item textures, including weapons, armor, flasks, navigation tools, vows and boss rewards](docs/images/item-gallery.svg)
+
+These are the mod's actual PNG item assets, enlarged without smoothing. See [equipment and crafting](#equipment-and-crafting) for their mechanics.
+
+### Bosses and creatures
+
+![Source-derived geometric previews of the Null Warden, Grave Regent, Rift Herald, Rift Sentinel and Shardstalker](docs/images/creature-gallery.svg)
+
+**Model-preview disclosure:** geometry and bone pivots are read from the real Java model sources. Material colors are simplified; Minecraft UV textures, glow, live animation, and renderer scale are not reproduced. These previews show silhouettes, not a claim of in-game visual verification.
+
 ## New in 1.7 — The Hollow Keep
 
 A separate dungeon dimension with a **63×63 fortress**, three ward chambers, a large central hall, and the **Grave Regent**, an original custom-modeled boss. The first clear awards the **Requiem Glaive**. This is a shared, repeatable expedition—not another small worldgen ruin. See [the complete Keep guide](docs/HOLLOW_KEEP.md).
@@ -50,7 +76,7 @@ This update connects exploration to long-term preparation rather than adding onl
 - **Pilgrim Ledger:** claim contracts and exchange Memory Shards for repairs, ammunition, sigils, and metal.
 - **Three persistent vows:** Iron, Embers, and Mist each grant a benefit with a burden; Silence removes a vow.
 - **Pilgrim Atlas:** bounded surveys of already-loaded terrain, five landmark categories, remembered destinations, and a directional HUD.
-- **Survival-craftable portal frames:** four reinforced deepslate from polished deepslate and an echo shard.
+- The 1.6 handcrafted-frame route is **retired in 1.8**; use the Ancient City monument instead. Existing active portals remain usable.
 - New recipes, original pixel assets, journal pages, persistent save fields, and expanded automated checks.
 
 Everything from earlier updates remains: Ashen Flasks, cathedral embers, Convergence encounters, relic attunement, farming, custom armor/tools, court tiers, and Warden rematches.
@@ -63,7 +89,7 @@ Everything from earlier updates remains: Ashen Flasks, cathedral embers, Converg
 | Mod loader | **Fabric Loader 0.16.10** development target; metadata accepts 0.16.10+ |
 | Fabric API | Built against **0.116.17+1.21.1**; install a compatible 1.21.1 build |
 | Java | **21** |
-| Mod version | **1.7.0** |
+| Mod version | **1.8.0** |
 
 1. Install Fabric for Minecraft 1.21.1.
 2. Open a **successful** [build workflow run](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml).
@@ -77,32 +103,17 @@ Existing expedition progress is retained. Sanctuary upgrades only fill designate
 
 ## Enter the Null Realm
 
-The gate accepts a specific **4-wide × 5-tall frame in the X/Y plane**, with a **2-wide × 3-tall air interior**. Rotated Z/Y frames are not supported.
+1. Find an **Ancient City in the Overworld** and reach the large central reinforced-deepslate monument. Vanilla does not activate this structure; this mod supplies that behavior.
+2. Bring **one Echo Shard**, obtainable from Ancient City loot. You do not need to mine or craft reinforced deepslate.
+3. Preserve the complete **22-block-wide × 8-block-tall outline**, including corners. The **20×6 opening** must contain only air or already-active portal blocks. Clear obstructions yourself; activation does not destroy them.
+4. **Right-click any reinforced-deepslate frame block with the Echo Shard**, in either hand. The shard is consumed only on successful activation; Creative consumes nothing.
+5. Step through the teal veil. City rotations are supported in both the X/Y and Z/Y planes.
 
-```text
-RRRR
-R..R
-R..R
-R..R
-RRRR
-^
-Ignite this bottom-left frame block.
+The gateway brings you to the **Hushed Threshold at approximately (0, 81, 160)**. A return gate is available immediately—defeating the boss is not required to leave. Return-point information survives restarts; returning searches for supported, collision-free, dry space near the original entry rather than placing you inside the membrane. If the return landing is blocked, the saved point is retained and the return fails safely.
 
-R = reinforced deepslate   . = air
-```
+**Creative/testing:** matching 22×8 replicas can be activated outside cities. Operators can run `/nullgate x y z` against a frame block to validate and open a fixture without a player; this deliberately bypasses the Survival location/item checks. See [the gateway implementation and test notes](docs/ANCIENT_CITY.md).
 
-- The positive X direction runs from the ignition block across the bottom row.
-- Place a **sculk catalyst within 14 blocks in X/Z and 5 blocks vertically** of that ignition block.
-- Use **flint and steel** on the bottom-left reinforced-deepslate block.
-- The complete frame uses **14 blocks**, including corners.
-
-### Survival frame recipe
-
-Surround one **echo shard** with eight **polished deepslate** to craft **four reinforced deepslate**. Four crafts supply 16 blocks: enough for one frame with two spare. This retains an Ancient City resource requirement without relying on vanilla reinforced-deepslate drops.
-
-Place carefully: this recipe does **not** change vanilla reinforced deepslate's mining speed or lack of an ordinary block drop.
-
-The gate brings you to the **Hushed Threshold at approximately (0, 81, 160)**. A return gate is available immediately—defeating the boss is not required to leave. Return-point information survives restarts.
+**Old saves:** active small portals continue working. The old reinforced-deepslate recipe and new small-frame ignition are removed. Existing crafted blocks are not deleted. New terrain and scenery appear only in **new chunks**; back up your world before upgrading and expect visible terrain seams at old boundaries.
 
 ## Your first expedition
 
@@ -130,7 +141,11 @@ Do not build a permanent base in the Warden arena: encounter preparation rebuild
 
 ## Biomes and landmarks
 
-The realm uses its **own noise settings**, not the End preset. It combines ridges, smaller fractures, and underground tunnels with four biomes.
+The realm uses its **own noise settings**, not the End preset. Low-frequency basins shape the large terrain; folded ridges and smaller fractures add relief. A separate winding-ravine field cuts into the surface but is bounded vertically so it does not slice every valley down to bedrock. Underground tunnels remain below Y=48. Bring blocks and your Pilgrim’s Step for broken terrain.
+
+![Actual surface and scenery texture palettes for the four Null Realm biomes](docs/images/biome-palettes.svg)
+
+*Material reference, not generated landscape screenshots. New scenery remains inside its owning chunk, avoids the reserved sanctuary approach, and skips chunks whose center is occupied by landmark blocks.*
 
 | Biome | What to look for |
 | --- | --- |
@@ -422,7 +437,7 @@ Contract claims and transactions run server-side; extra ledgers and alternate it
 
 ## Troubleshooting and limitations
 
-**“The seal is incomplete.”** Check frame dimensions, corners, positive-X orientation, air interior, catalyst range, and ignition corner. Rotated gates are unsupported.
+**“The great frame is incomplete or obstructed.”** Check the 22×8 reinforced outline and 20×6 opening; all frame chunks must be loaded. Use an Echo Shard, not flint and steel. Survival activation also requires the Overworld Ancient City structure. Rotated gates work.
 
 **“I cannot find new content.”** Explore previously ungenerated chunks or use a fresh test world. The atlas surveys loaded chunk-center columns only; it is not a guarantee that an unseen landmark exists nearby. `/locate structure` does not find these features.
 
@@ -480,6 +495,7 @@ python3 scripts/generate_convergence.py
 python3 scripts/generate_pilgrimage.py
 python3 scripts/generate_remembrance.py
 python3 scripts/generate_keep.py
+python3 scripts/generate_gallery.py
 python3 -m unittest discover -s tests -v
 ```
 

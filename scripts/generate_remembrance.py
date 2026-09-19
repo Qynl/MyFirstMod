@@ -41,6 +41,6 @@ for name,ingredients in recipes.items():
  data('advancement/recipes/'+name+'.json',{'criteria':{'material':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':[ingredients[-1]]}]}}},'rewards':{'recipes':['myfirstmod:'+name]}})
 data('loot_table/chests/memorial_cache.json',{'type':'minecraft:chest','pools':[{'rolls':3,'entries':[{'type':'minecraft:item','name':'myfirstmod:'+name,'weight':weight,'functions':[{'function':'minecraft:set_count','count':count}]} for name,count,weight in [('hushberry',4,4),('prism_dust',4,3),('resonite_ingot',2,3),('repair_kit',1,1),('dusk_fiber',3,3)]]}]})
 p=B/'src/main/resources/data/minecraft/tags/block/mineable/axe.json';d=json.loads(p.read_text());d['values']=sorted(set(d['values']+['myfirstmod:pilgrim_ledger']));p.write_text(json.dumps(d,indent=2)+'\n')
-# A real Survival entry route: vanilla reinforced deepslate normally has no obtainable drop.
-data('recipe/portal_frame.json',{'type':'minecraft:crafting_shaped','category':'building','pattern':['DDD','DED','DDD'],'key':{'D':{'item':'minecraft:polished_deepslate'},'E':{'item':'minecraft:echo_shard'}},'result':{'id':'minecraft:reinforced_deepslate','count':4}})
-data('advancement/recipes/portal_frame.json',{'criteria':{'echo':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':['minecraft:echo_shard']}]}}},'rewards':{'recipes':['myfirstmod:portal_frame']}})
+# Legacy handcrafted-frame entry is retired; old active gates remain functional.
+for path in ['recipe/portal_frame.json','advancement/recipes/portal_frame.json']:
+ (D/path).unlink(missing_ok=True)

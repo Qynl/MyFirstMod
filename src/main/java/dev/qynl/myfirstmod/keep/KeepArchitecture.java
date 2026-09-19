@@ -20,6 +20,7 @@ public final class KeepArchitecture {
                 boolean edge=Math.max(Math.abs(x),Math.abs(z))==10;
                 boolean door=(Math.abs(x)<=2 || Math.abs(z)<=2) && y<=69;
                 if(edge && y>=65 && y<=77 && !door) b=y>=71 && (Math.abs(x)+Math.abs(z))%4<2?Blocks.PURPLE_STAINED_GLASS:Blocks.DEEPSLATE_TILES;
+                if(y==70 && ((Math.abs(x)==10&&Math.abs(z)==6)||(Math.abs(z)==10&&Math.abs(x)==6)))b=ModBlocks.PRISM_LAMP;
                 if(y==78+(10-Math.abs(x))/3 && Math.abs(x)<=10 && Math.abs(z)<=10 && z%5==0) b=Blocks.CHISELED_DEEPSLATE;
                 for(int[] c:WARDS) {
                     int dx=x-c[0],dz=z-c[1];
@@ -27,6 +28,7 @@ public final class KeepArchitecture {
                     if(wall && y>=65 && y<=72 && !((Math.abs(dx)<=1 || Math.abs(dz)<=1)&&y<=68)) b=Blocks.DEEPSLATE_BRICKS;
                     if(y==73 && Math.abs(dx)<=7 && Math.abs(dz)<=7 && (dx%4==0 || dz%4==0)) b=Blocks.POLISHED_BASALT;
                     if(Math.abs(dx)==5 && Math.abs(dz)==5 && y==65) b=Blocks.SOUL_LANTERN;
+                    if(y==69 && ((Math.abs(dx)==7&&dz==0)||(Math.abs(dz)==7&&dx==0)))b=ModBlocks.PRISM_LAMP;
                     if(dx==0 && dz==0 && y==65) b=ModBlocks.KEEP_WARD;
                 }
                 // Paired grave gardens flank the entrance without narrowing its central path.
