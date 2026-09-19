@@ -2,6 +2,7 @@ package dev.qynl.myfirstmod;
 
 import dev.qynl.myfirstmod.block.ModBlocks;
 import dev.qynl.myfirstmod.item.ModItems;
+import dev.qynl.myfirstmod.item.NullbladeItem;
 import dev.qynl.myfirstmod.portal.VoidPortalManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -10,12 +11,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MyFirstMod implements ModInitializer {
     public static final String MOD_ID = "myfirstmod";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     @Override
     public void onInitialize() {
@@ -26,15 +24,12 @@ public class MyFirstMod implements ModInitializer {
             if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;
             if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
             if (!serverPlayer.getStackInHand(hand).isOf(Items.FLINT_AND_STEEL)) return ActionResult.PASS;
-
             if (world.getBlockState(hit.getBlockPos()).isOf(Blocks.REINFORCED_DEEPSLATE)
-                    && VoidPortalManager.tryIgnite(serverPlayer, hit.getBlockPos())) {
-                return ActionResult.SUCCESS;
-            }
+                    && VoidPortalManager.tryIgnite(serverPlayer, hit.getBlockPos())) return ActionResult.SUCCESS;
             return ActionResult.PASS;
         });
 
         ServerTickEvents.END_SERVER_TICK.register(VoidPortalManager::tick);
-        LOGGER.info("The Null Warden awakens beyond the ancient city.");
+        ServerTickEvents.END_SERVER_TICK.register(NullbladeItem::tick);
     }
 }
