@@ -80,8 +80,10 @@ pixels=[]
 for frame in range(16):
  for y in range(16):
   for x in range(16):
-   wave=math.sin((x+y)*.6-frame*math.tau/16)+math.sin((x-y)*.4+frame*math.tau/16)
-   pixels.append((int(34+15*wave),int(94+26*wave),int(122+30*wave),185))
+   # Integer spatial periods make the tiled membrane seamless in both directions.
+   a=(x+y-frame)*math.tau/16;b=(x-y+frame)*math.tau/16
+   wave=(math.sin(a)+math.sin(b))/2
+   pixels.append((int(74+42*math.sin(b)),int(96+50*math.sin(a)),int(154+40*wave),185))
 png('block/void_portal.png',16,256,pixels)
 put(Path('textures/block/void_portal.png.mcmeta'),{'animation':{'frametime':3,'interpolate':True}})
 put(Path('blockstates/void_portal.json'),{'variants':{'axis=x':{'model':'myfirstmod:block/void_portal'},'axis=z':{'model':'myfirstmod:block/void_portal','y':90}}})

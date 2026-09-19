@@ -268,8 +268,9 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                 ModelTransform.pivot(-4, -2, 0));
 
         h.addChild("eye_slit", ModelPartBuilder.create()
-                        .uv(0, 104).cuboid(-4, -2, -5.25f, 8, 2, 1)
-                        .uv(10, 104).cuboid(-2, -1, -5.35f, 4, 1, 1),
+                        // The brow reaches z=-6; keep the luminous slit in front, not buried inside it.
+                        .uv(0, 104).cuboid(-4, -2, -6.15f, 8, 2, 1)
+                        .uv(10, 104).cuboid(-2, -1, -6.25f, 4, 1, 1),
                 ModelTransform.pivot(0, 0, 0));
 
         h.addChild("jaw", ModelPartBuilder.create()
