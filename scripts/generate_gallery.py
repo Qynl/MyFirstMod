@@ -74,7 +74,9 @@ def world(nodes,key,p):
  x,y=x*math.cos(rz)-y*math.sin(rz),x*math.sin(rz)+y*math.cos(rz)
  return world(nodes,n['parent'],(x+px,y+py,z+pz))
 def project(p):
- x,y,z=p;return (.881*x+.472*z,.142*x+.951*y-.264*z,.45*x-.30*y-.84*z)
+ # Quantization prevents coplanar painter-order drift across Python/libm versions.
+ x,y,z=(round(v,6) for v in p)
+ return tuple(round(v,6) for v in (.881*x+.472*z,.142*x+.951*y-.264*z,.45*x-.30*y-.84*z))
 def model(name,x,y,w,h):
  nodes=extract(name);polys=[]
  for key,n in nodes.items():
@@ -89,7 +91,7 @@ def model(name,x,y,w,h):
  points=[p for _,ps,_ in polys for p in ps];minx=min(p[0] for p in points);maxx=max(p[0] for p in points);miny=min(p[1] for p in points);maxy=max(p[1] for p in points)
  scale=min(w/(maxx-minx),h/(maxy-miny));ox=x+(w-(maxx-minx)*scale)/2;oy=y+(h-(maxy-miny)*scale)/2
  out=[f'<g data-model="{name}" data-parts="{len(nodes)-1}">']
- for _,pts,color in sorted(polys,key=lambda p:p[0]):
+ for _,pts,color in sorted(polys,key=lambda p:round(p[0],6)):
   coords=' '.join(f'{ox+(p[0]-minx)*scale:.2f},{oy+(p[1]-miny)*scale:.2f}' for p in pts)
   out.append(f'<polygon points="{coords}" fill="{color}" stroke="#142330" stroke-width="0.55" stroke-linejoin="round"/>')
  out.append('</g>');return out

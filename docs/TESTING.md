@@ -1,3 +1,13 @@
+# 1.8 validation additions
+
+The Ancient City gate adds five JUnit methods covering both axes, every outline click, every missing frame block, all 120 possible interior obstructions, already-open/partial gates, and old-small-frame rejection. Resource tests cover the axis-specific membrane, animated texture, retired recipe, biome scenery/ambience, and reproducible illustrated documentation.
+
+The dedicated-server smoke uses the actual three vanilla city-center templates in all four rotations (12 fixtures), finalizes their top-center jigsaw as worldgen does, rejects a chest-obstructed opening without partial writes, then checks the actual portal block states and intact outline. This exercises the shared matcher and builder through an operator fixture command—not player item consumption or a connected-player teleport.
+
+Manual checks still outstanding: Survival activation in naturally generated cities; main/offhand item consumption; protected/obstructed frames; entry/return and server restarts; blocked return landings; animated membrane appearance; terrain traversal and decoration across seeds; old-save boundaries; client performance; and multiplayer. The README uses real item textures and clearly labeled geometric model previews, **not gameplay screenshots**. See [Ancient Threshold details](ANCIENT_CITY.md).
+
+---
+
 # 1.7 validation additions
 
 The Keep tests cover party-health clamps, cleave/ring/cross safe boundaries, persistent reward mail, dimension/resource closure, and the actual incremental fortress constructor through permission-gated `/hollowkeep prepare`. Dedicated-server checks inspect all ward blocks, the Expedition Heart, entrance gate and tower, and summon the Regent and glaive.
@@ -10,7 +20,7 @@ Manual checklist (not yet performed): full solo and multiplayer runs; late entry
 
 Remembrance adds contract thresholds/rewards, save defaults and round-trips, bounded landmark eviction and rewarded-memory archives, vow/offer bounds, recipe/resource checks, and dedicated-server memorial/ledger/loot/item fixtures.
 
-Manual checklist: read one stele twice and with two players; reconnect and retry; claim multiple eligible contracts and verify no repeat payout; buy with exact/insufficient payment and full inventory; change each vow at a safe/unsafe waystone and across restarts; leave the realm and wait for effects to expire; survey unloaded chunk borders; consume a cathedral and refresh its atlas marker; verify left/right bearings at cardinal headings; check a 1.5 save's sanctuary migration; craft and ignite the Survival portal. **These connected-player checks have not been performed in the sandbox.**
+Manual checklist: read one stele twice and with two players; reconnect and retry; claim multiple eligible contracts and verify no repeat payout; buy with exact/insufficient payment and full inventory; change each vow at a safe/unsafe waystone and across restarts; leave the realm and wait for effects to expire; survey unloaded chunk borders; consume a cathedral and refresh its atlas marker; verify left/right bearings at cardinal headings; check a 1.5 save's sanctuary migration; activate the Ancient City portal (the 1.6 handcrafted route is retired in 1.8). **These connected-player checks have not been performed in the sandbox.**
 
 ---
 
@@ -26,10 +36,10 @@ Manual release checklist: navigate both stair flights in Survival; try the rite 
 
 ## Automated validation
 
-- Local Python resource suite: **15 passing tests**.
+- Local Python resource suite: **21 tests**.
 - `git diff --check`: clean.
 - Java builds run in **GitHub Actions** because this workspace has no Java installation.
-- CI compiles main/client sources, runs **twelve JUnit tests**, creates the remapped JAR, and executes `scripts/ci_server_smoke.py`.
+- CI compiles main/client sources, runs **35 JUnit tests**, creates the remapped JAR, and executes `scripts/ci_server_smoke.py`.
 - The smoke test launches a real Fabric dedicated server, loads the custom dimension codecs, generates chunks, places a ruin, forced archive vault, and shrine, checks shrine placement and three ore drop tables, spawns both realm mobs, saves, and shuts down. Logs and JUnit reports are uploaded as `Validation-<commit>`; the mod is in `Null-Warden-<commit>`.
 
 Check the final Actions run for the exact revision under test. Compilation is not a playtest, and the smoke test does not simulate a connected player or a complete boss/trial encounter.
@@ -53,7 +63,7 @@ The initial CI attempt caught a Warden attribute API mismatch. The first dedicat
 - [ ] Check the automatic compass, a full inventory, repeated entries, death, and the replacement recipe.
 - [ ] Face all four directions at four arena-relative positions. The needle must point at X=0/Z=0.
 - [ ] Confirm dormant behavior outside the realm and the distance overlay in both hands.
-- [ ] Find all three biomes and all three ruin layouts. Check entrance clearance, archive passages, cache loot, and natural enemy spawning.
+- [ ] Find all four biomes and all three ruin layouts. Check entrance clearance, archive passages, cache loot, and natural enemy spawning.
 - [ ] Explore far from spawn; profile generation, particles, and server tick time. The initial sanctuary/arena build is synchronous and requires profiling.
 - [ ] Verify existing generated chunks remain intact outside the rebuilt central footprint. Test upgrades only on a backup.
 

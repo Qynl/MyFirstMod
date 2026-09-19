@@ -171,7 +171,11 @@ public final class VoidPortalManager {
                 if(Math.max(Math.abs(dx),Math.abs(dz))!=radius)continue;
                 var p=origin.add(dx,y,dz);if(!world.isChunkLoaded(p))continue;
                 var feet=world.getBlockState(p);var head=world.getBlockState(p.up());
-                if(feet.isOf(ModBlocks.VOID_PORTAL)||head.isOf(ModBlocks.VOID_PORTAL))continue;
+                var floor=world.getBlockState(p.down());
+                if(feet.isOf(ModBlocks.VOID_PORTAL)||head.isOf(ModBlocks.VOID_PORTAL)
+                    ||feet.isIn(net.minecraft.registry.tag.BlockTags.FIRE)||head.isIn(net.minecraft.registry.tag.BlockTags.FIRE)
+                    ||feet.isOf(Blocks.POWDER_SNOW)||feet.isOf(Blocks.WITHER_ROSE)||feet.isOf(Blocks.SWEET_BERRY_BUSH)
+                    ||floor.isOf(Blocks.MAGMA_BLOCK)||floor.isOf(Blocks.CACTUS))continue;
                 if(feet.getCollisionShape(world,p).isEmpty()&&head.getCollisionShape(world,p.up()).isEmpty()
                     &&feet.getFluidState().isEmpty()&&head.getFluidState().isEmpty()
                     &&world.getBlockState(p.down()).isSideSolidFullSquare(world,p.down(),net.minecraft.util.math.Direction.UP))return p;
