@@ -326,10 +326,32 @@ public final class NullWardenManager {
             return;
         }
 
-        a.boss.setAiDisabled(a.attack != Attack.NONE);
+        a.boss.setAiDisabled(a.attack != Attack.NONE || a.exposeTicks > 0);
         a.boss.setInvulnerable(a.activePylons != 0);
 
-        applyPhaseMovement(world, a);
+        if (a.exposeTicks > 0) {
+            a.exposeTicks--;
+            a.boss.setVelocity(Vec3d.ZERO);
+            a.boss.setVisualState(a.phase, 0,
+                    Math.min(100, a.exposeTicks), false);
+            if (a.exposeTicks % 5 == 0) {
+                ring(world, a.boss.getX(), a.boss.getY() + .15, a.boss.getZ(),
+                        3.0 + (100 - a.exposeTicks) * .035,
+                        ParticleTypes.END_ROD, 72);
+                world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                        a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(),
+                        12, 1.4, 1.0, 1.4, .025);
+            }
+            if (a.exposeTicks == 0) {
+                a.nextAttackTick = a.ticks + 30;
+                a.recoveryTicks = 30;
+                for (ServerPlayerEntity p : participants(world, a)) {
+                    p.sendMessage(Text.literal("The Null Warden is re-forming."), true);
+                }
+            }
+        } else {
+            applyPhaseMovement(world, a);
+        }
 
         a.boss.setVisualState(a.phase, attackVisualId(a.attack),
                 a.attack == Attack.NONE ? 0 : (int) Math.min(100,
@@ -362,6 +384,11 @@ public final class NullWardenManager {
         tickPylons(world, a);
         tickPylonPressure(world, a);
         tickPhaseArena(world, a);
+
+        if (a.exposeTicks > 0) {
+            if (a.ticks % 10 == 0) persist(world, a);
+            return;
+        }
 
         if (a.attack != Attack.NONE) {
             a.attackWindup--;
@@ -465,6 +492,17 @@ public final class NullWardenManager {
                         player.sendMessage(Text.literal(a.activePylons == 0
                                 ? "The Null Warden is exposed."
                                 : "Pylon cleansed. Keep moving."), true);
+                    }
+                    if (a.activePylons == 0) {
+                        a.exposeTicks = 100;
+                        a.attack = Attack.NONE;
+                        a.attackTarget = null;
+                        a.attackWindup = 0;
+                        a.nextAttackTick = a.ticks + 100;
+                        a.recoveryTicks = 100;
+                        world.playSound(null, a.boss.getBlockPos(),
+                                SoundEvents.ENTITY_WARDEN_HEARTBEAT,
+                                SoundCategory.HOSTILE, 3.0f, 1.35f);
                     }
                     persist(world, a);
                 }
@@ -1261,7 +1299,7 @@ public final class NullWardenManager {
         int ticks, intro, phase = 1, idleTicks, nextAttackTick = 40, attackWindup;
         int victoryTicks, targetRotation;
         int hazardTicks, hazardPattern = -1;
-        int recoveryTicks;
+        int recoveryTicks, exposeTicks;
         int activePylons;
         int[] pylonProgress = new int[4];
         double attackX, attackY, attackZ;
