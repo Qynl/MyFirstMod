@@ -26,90 +26,104 @@ public final class NullWardenTexture {
     private static NativeImage buildBaseTexture() {
         NativeImage image = new NativeImage(128, 128, false);
 
+        // Layered Null-forged material palette. Broad regions stay readable at
+        // game distance, while fine seams provide close-up detail.
         for (int y = 0; y < 96; y++) {
             for (int x = 0; x < 128; x++) {
-                int r = 8;
-                int g = 10;
-                int b = 15;
-
-                int panel = ((x / 4) + (y / 4)) & 3;
-                if (panel == 1) {
-                    r = 12;
-                    g = 15;
-                    b = 22;
-                } else if (panel == 2) {
-                    r = 15;
-                    g = 18;
-                    b = 27;
+                int r = 7, g = 9, b = 13;
+                int band = (x / 16 + y / 12) & 3;
+                switch (band) {
+                    case 1 -> { r = 13; g = 16; b = 22; }
+                    case 2 -> { r = 19; g = 22; b = 29; }
+                    case 3 -> { r = 10; g = 13; b = 18; }
                 }
 
-                if ((x + y * 2) % 29 == 0) {
-                    r = 18;
-                    g = 28;
-                    b = 34;
+                // Subtle vertical grain keeps large armor plates from reading flat.
+                int grain = (x * 13 + y * 7) & 15;
+                if (grain == 0 || grain == 1) {
+                    r += 5; g += 6; b += 8;
                 }
 
-                if ((x * 7 + y * 3) % 113 == 0) {
-                    r = 43;
-                    g = 14;
-                    b = 58;
+                // Occasional cold mineral flecks.
+                if ((x * 17 + y * 29) % 137 == 0) {
+                    r = 31; g = 39; b = 47;
                 }
 
                 image.setColor(x, y, argb(255, r, g, b));
             }
         }
 
-        // Deliberate sculk-like seams and angular fracture lines.
-        for (int i = 0; i < 9; i++) {
-            int x0 = 6 + i * 13;
-            int y0 = 7 + (i * 17) % 78;
-            paintLine(image, x0, y0, x0 + 5, y0 + 4, 30, 74, 82);
-            paintLine(image, x0 + 5, y0 + 4, x0 + 8, y0 + 1, 17, 43, 54);
+        // Distinct panel fields: chest/torso, limbs, head and mantle each use
+        // a different value range so the silhouette remains legible.
+        fillRect(image, 0, 0, 42, 32, 255, 15, 17, 23);
+        fillRect(image, 43, 0, 43, 32, 255, 9, 12, 18);
+        fillRect(image, 87, 0, 41, 32, 255, 20, 19, 28);
+        fillRect(image, 0, 32, 31, 28, 255, 11, 14, 20);
+        fillRect(image, 32, 32, 32, 28, 255, 18, 20, 27);
+        fillRect(image, 65, 32, 31, 28, 255, 12, 15, 21);
+        fillRect(image, 97, 32, 31, 28, 255, 16, 18, 25);
+        fillRect(image, 0, 61, 42, 35, 255, 12, 15, 21);
+        fillRect(image, 43, 61, 43, 35, 255, 22, 22, 28);
+        fillRect(image, 87, 61, 41, 35, 255, 8, 11, 16);
+
+        // Hard armor boundaries. Broken segments imply overlapping plates.
+        int[][] seams = {
+                {2, 31, 39, 31}, {44, 30, 82, 30}, {88, 29, 125, 29},
+                {3, 59, 27, 59}, {35, 61, 62, 61}, {68, 58, 94, 58},
+                {99, 62, 125, 62}, {4, 94, 38, 94}, {47, 91, 81, 91},
+                {90, 95, 124, 95}
+        };
+        for (int i = 0; i < seams.length; i++) {
+            int[] s = seams[i];
+            paintLine(image, s[0], s[1], s[2], s[3],
+                    i % 2 == 0 ? 4 : 30, i % 2 == 0 ? 7 : 34, i % 2 == 0 ? 11 : 42);
         }
 
-        // Controlled violet cracks, concentrated around armor edges.
-        for (int i = 0; i < 14; i++) {
-            int x0 = 4 + (i * 19) % 120;
-            int y0 = 5 + (i * 23) % 86;
-            paintLine(image, x0, y0, x0 + 3, y0 + 2, 63, 18, 82);
-        }
-
-        // Signature fractured armor seams. They are deliberately angular and
-        // asymmetrical so the silhouette reads as damaged Null-forged armor.
+        // Signature fractured armor seams, intentionally asymmetric.
         int[][] fractures = {
-                {16, 12, 25, 18}, {33, 9, 38, 20}, {46, 24, 54, 17},
-                {64, 8, 72, 14}, {78, 20, 86, 13}, {91, 31, 103, 25},
-                {7, 43, 18, 37}, {23, 52, 31, 61}, {42, 45, 51, 39},
-                {58, 54, 67, 64}, {73, 47, 82, 55}, {96, 60, 111, 51},
-                {12, 74, 24, 68}, {36, 72, 45, 81}, {66, 76, 77, 70},
-                {84, 80, 94, 88}, {105, 72, 118, 78}
+                {10, 8, 20, 15}, {27, 5, 35, 18}, {47, 22, 57, 14},
+                {67, 6, 76, 13}, {82, 17, 91, 10}, {98, 34, 115, 26},
+                {6, 42, 17, 36}, {24, 48, 34, 59}, {43, 43, 53, 37},
+                {57, 52, 69, 64}, {74, 45, 83, 54}, {96, 56, 113, 49},
+                {9, 73, 22, 66}, {35, 69, 46, 82}, {63, 76, 77, 68},
+                {85, 78, 96, 88}, {105, 71, 121, 79}
         };
         for (int i = 0; i < fractures.length; i++) {
             int[] f = fractures[i];
-            paintLine(image, f[0], f[1], f[2], f[3], 36, 11, 48);
+            paintLine(image, f[0], f[1], f[2], f[3], 43, 13, 55);
+            paintLine(image, f[0], f[1] + 1, f[2], f[3] + 1, 18, 24, 31);
             if ((i & 1) == 0) {
-                paintLine(image, f[2], f[3], f[2] + 2, f[3] + 4, 24, 76, 83);
+                paintLine(image, f[2], f[3], f[2] + 2, f[3] + 4, 26, 78, 84);
             }
         }
 
-        // Small cyan stress points make the core energy appear to leak through
-        // seams instead of looking like a flat emissive decal.
-        for (int i = 0; i < 12; i++) {
-            int x = 8 + (i * 31) % 112;
-            int y = 8 + (i * 17) % 80;
-            fillRect(image, x, y, 1 + (i % 2), 1, 28, 28, 190, 202);
+        // Raised plate highlights: narrow, offset strips rather than outlines.
+        int[][] highlights = {
+                {4, 3, 18, 3}, {48, 4, 61, 4}, {91, 4, 105, 4},
+                {5, 35, 18, 35}, {38, 34, 54, 34}, {71, 34, 83, 34},
+                {8, 64, 20, 64}, {49, 64, 62, 64}, {92, 66, 107, 66}
+        };
+        for (int[] h : highlights) {
+            paintLine(image, h[0], h[1], h[2], h[3], 48, 53, 61);
         }
 
-        // Cyan core glyph in the UV region used by the chest core.
-        paintGlowGlyph(image, 0, 60, 28, 10, 33, 236, 255);
+        // Small cyan stress points make energy leak through the fractures.
+        for (int i = 0; i < 14; i++) {
+            int x = 7 + (i * 29) % 114;
+            int y = 7 + (i * 19) % 84;
+            fillRect(image, x, y, 1 + (i & 1), 1, 255, 35, 148, 160);
+        }
 
-        // Signature narrow eye slit.
+        // Core, eye, crown and horn UV islands.
+        paintGlowGlyph(image, 0, 60, 28, 10, 33, 236, 255);
         fillRect(image, 0, 104, 8, 2, 255, 39, 214, 229);
         fillRect(image, 10, 104, 4, 1, 255, 98, 242, 255);
-
-        // Head/crown accent regions.
         paintGlowGlyph(image, 96, 0, 32, 22, 96, 42, 255);
         paintGlowGlyph(image, 52, 35, 10, 20, 39, 194, 210);
+
+        // Dark secondary material on the lower atlas prevents accidental
+        // bright sampling on newly added fragment faces.
+        fillRect(image, 0, 108, 128, 20, 255, 4, 6, 10);
 
         return image;
     }
