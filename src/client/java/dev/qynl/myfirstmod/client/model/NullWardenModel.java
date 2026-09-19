@@ -223,7 +223,7 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(116, 10).cuboid(-2, -3, -1, 4, 7, 2),
                 ModelTransform.of(10, -3, 2, 0, 0, 0.25f));
 
-        return TexturedModelData.of(data, 128, 96);
+        return TexturedModelData.of(data, 128, 128);
     }
 
     @Override
