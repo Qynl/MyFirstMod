@@ -350,12 +350,15 @@ public final class NullWardenManager {
             a.attackWindup = 0;
             a.activePylons = (1 << phase) - 1;
             a.pylonProgress = new int[4];
+            a.hazardTicks = 0;
+            a.hazardPattern = -1;
             phaseShift(world, a);
             persist(world, a);
         }
 
         tickPylons(world, a);
         tickPylonPressure(world, a);
+        tickPhaseArena(world, a);
 
         if (a.attack != Attack.NONE) {
             a.attackWindup--;
@@ -535,6 +538,149 @@ public final class NullWardenManager {
             case REALITY_TEAR -> 6;
             case COLLAPSE -> 7;
         };
+    }
+
+
+    /**
+     * Each late phase changes the floor pattern, not just the Warden's attack list.
+     * Hazards always telegraph first and only resolve while the Warden is between
+     * attacks, keeping the arena readable instead of turning the fight into noise.
+     */
+    private static void tickPhaseArena(ServerWorld world, ArenaState a) {
+        if (a.phase < 2 || a.defeated || a.attack != Attack.NONE) {
+            if (a.hazardTicks > 0) {
+                a.hazardTicks = 0;
+                a.hazardPattern = -1;
+            }
+            return;
+        }
+
+        int interval = switch (a.phase) {
+            case 2 -> 100;
+            case 3 -> 80;
+            default -> 60;
+        };
+        int warning = switch (a.phase) {
+            case 2 -> 30;
+            case 3 -> 24;
+            default -> 20;
+        };
+
+        if (a.hazardTicks <= 0) {
+            if (a.ticks % interval != 0) return;
+            a.hazardTicks = warning;
+            a.hazardPattern++;
+            int patterns = a.phase == 3 ? 8 : 4;
+            if (a.hazardPattern >= patterns) a.hazardPattern = 0;
+            world.playSound(null, CENTER, SoundEvents.BLOCK_SCULK_SENSOR_CLICKING,
+                    SoundCategory.HOSTILE, .8f, 1.0f + a.phase * .12f);
+        }
+
+        a.hazardTicks--;
+
+        if (a.hazardTicks > 0) {
+            if (a.phase == 2) {
+                warningWedge(world, a.hazardPattern, a.hazardTicks, warning);
+            } else if (a.phase == 3) {
+                warningRingSegment(world, a.hazardPattern, a.hazardTicks, warning);
+            } else {
+                warningCollapseRing(world, a.hazardTicks, warning);
+            }
+        } else {
+            if (a.phase == 2) {
+                resolveWedge(world, a);
+            } else if (a.phase == 3) {
+                resolveRingSegment(world, a);
+            } else {
+                resolveCollapseRing(world, a);
+            }
+        }
+    }
+
+    private static void warningWedge(ServerWorld world, int sector, int remaining, int warning) {
+        double centerAngle = sector * Math.PI / 2.0 + Math.PI / 4.0;
+        double strength = .35 + (warning - remaining) / (double) warning * .65;
+        for (int r = 7; r <= 21; r += 2) {
+            for (int side = -2; side <= 2; side++) {
+                double angle = centerAngle + side * .045;
+                world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                        .5 + Math.cos(angle) * r, 80.25,
+                        .5 + Math.sin(angle) * r, 1, .08, .02, .08, .004 + strength * .006);
+            }
+        }
+    }
+
+    private static void warningRingSegment(ServerWorld world, int segment, int remaining, int warning) {
+        double start = segment * Math.PI / 4.0;
+        double end = start + Math.PI / 4.0;
+        for (double angle = start; angle <= end; angle += Math.PI / 32.0) {
+            for (int r = 8; r <= 20; r += 3) {
+                world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                        .5 + Math.cos(angle) * r, 80.25,
+                        .5 + Math.sin(angle) * r, 1, .05, .02, .05,
+                        .006 + (warning - remaining) * .0003);
+            }
+        }
+    }
+
+    private static void warningCollapseRing(ServerWorld world, int remaining, int warning) {
+        double radius = 19.5 - (warning - remaining) * .12;
+        ring(world, .5, 80.25, .5, radius, ParticleTypes.REVERSE_PORTAL, 96);
+        ring(world, .5, 80.28, .5, 15.0, ParticleTypes.SCULK_SOUL, 64);
+    }
+
+    private static void resolveWedge(ServerWorld world, ArenaState a) {
+        double centerAngle = a.hazardPattern * Math.PI / 2.0 + Math.PI / 4.0;
+        for (ServerPlayerEntity p : activePlayers(world, a)) {
+            double dx = p.getX() - .5;
+            double dz = p.getZ() - .5;
+            double radius = Math.sqrt(dx * dx + dz * dz);
+            double angle = Math.atan2(dz, dx);
+            double diff = Math.atan2(Math.sin(angle - centerAngle), Math.cos(angle - centerAngle));
+            if (radius >= 6 && radius <= 22 && Math.abs(diff) < Math.PI / 4.0) {
+                p.damage(world.getDamageSources().magic(), 7);
+                p.addVelocity(-dx * .025, .18, -dz * .025);
+                p.velocityModified = true;
+            }
+        }
+        world.playSound(null, CENTER, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
+                SoundCategory.HOSTILE, 1.1f, 1.1f);
+        ring(world, .5, 80.25, .5, 20, ParticleTypes.SCULK_SOUL, 96);
+    }
+
+    private static void resolveRingSegment(ServerWorld world, ArenaState a) {
+        double start = a.hazardPattern * Math.PI / 4.0;
+        double end = start + Math.PI / 4.0;
+        for (ServerPlayerEntity p : activePlayers(world, a)) {
+            double dx = p.getX() - .5;
+            double dz = p.getZ() - .5;
+            double radius = Math.sqrt(dx * dx + dz * dz);
+            double angle = Math.atan2(dz, dx);
+            double diff = Math.atan2(Math.sin(angle - (start + end) / 2),
+                    Math.cos(angle - (start + end) / 2));
+            if (radius >= 8 && radius <= 21 && Math.abs(diff) < Math.PI / 9.0) {
+                p.damage(world.getDamageSources().magic(), 9);
+            }
+        }
+        world.playSound(null, CENTER, SoundEvents.BLOCK_END_PORTAL_SPAWN,
+                SoundCategory.HOSTILE, 1.0f, 1.35f);
+        ring(world, .5, 80.25, .5, 18, ParticleTypes.REVERSE_PORTAL, 96);
+    }
+
+    private static void resolveCollapseRing(ServerWorld world, ArenaState a) {
+        for (ServerPlayerEntity p : activePlayers(world, a)) {
+            double dx = p.getX() - .5;
+            double dz = p.getZ() - .5;
+            double radius = Math.sqrt(dx * dx + dz * dz);
+            if (radius > 15.5 && radius <= 23) {
+                p.damage(world.getDamageSources().magic(), 11);
+                p.addVelocity(-dx * .035, .12, -dz * .035);
+                p.velocityModified = true;
+            }
+        }
+        world.playSound(null, CENTER, SoundEvents.ENTITY_WARDEN_HEARTBEAT,
+                SoundCategory.HOSTILE, 1.8f, .55f);
+        ring(world, .5, 80.25, .5, 19, ParticleTypes.EXPLOSION, 96);
     }
 
     private static void beginAttack(ServerWorld world, ArenaState a) {
@@ -1060,6 +1206,7 @@ public final class NullWardenManager {
         final Map<UUID, Integer> joinTicks = new HashMap<>();
         int ticks, intro, phase = 1, idleTicks, nextAttackTick = 40, attackWindup;
         int victoryTicks, targetRotation;
+        int hazardTicks, hazardPattern = -1;
         int activePylons;
         int[] pylonProgress = new int[4];
         double attackX, attackY, attackZ;
