@@ -842,12 +842,19 @@ public final class NullWardenManager {
         ServerPlayerEntity closest = null;
         double closestDistance = Double.MAX_VALUE;
         ServerPlayerEntity rotated = null;
+        ServerPlayerEntity cleanser = null;
         int targetIndex = Math.floorMod(a.targetRotation, Math.max(1, a.activeParticipants.size()));
         int index = 0;
 
         for (UUID id : a.activeParticipants) {
             ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
             if (p == null) continue;
+
+            // Cleansing is the encounter's highest-commitment action. If someone
+            // is actively cleansing a live pylon, the Warden deliberately notices
+            // them and can pressure that player with the next telegraphed attack.
+            if (isCleansingPylon(world, a, p)) cleanser = p;
+
             if (index == targetIndex) rotated = p;
 
             double d = p.squaredDistanceTo(a.boss);
@@ -859,8 +866,23 @@ public final class NullWardenManager {
         }
 
         a.targetRotation++;
+        if (cleanser != null) return cleanser;
         if (rotated != null) return rotated;
         return closest;
+    }
+
+    private static boolean isCleansingPylon(ServerWorld world, ArenaState a, ServerPlayerEntity player) {
+        if (!player.isSneaking() || a.activePylons == 0) return false;
+
+        for (int i = 0; i < 4; i++) {
+            if ((a.activePylons & (1 << i)) == 0) continue;
+            BlockPos p = PYLONS[i];
+            if (player.squaredDistanceTo(
+                    p.getX() + .5, p.getY() + 1, p.getZ() + .5) <= 9) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static ServerPlayerEntity target(ServerWorld world, ArenaState a) {
