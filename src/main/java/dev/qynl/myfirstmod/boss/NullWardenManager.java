@@ -250,6 +250,26 @@ public final class NullWardenManager {
         a.ticks++;
         updateEligibility(a);
 
+        // Ambient arena pulse: the room itself should feel alive between attacks.
+        if (a.ticks % 5 == 0) {
+            double pulse = 0.9 + Math.sin(a.ticks * 0.08) * 0.18;
+            world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                    CENTER.getX() + 0.5, 81.2, CENTER.getZ() + 0.5,
+                    5, 5.5 * pulse, 0.15, 5.5 * pulse, 0.008);
+            world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                    a.boss.getX(), a.boss.getY() + 1.0, a.boss.getZ(),
+                    3, 1.1, 1.4, 1.1, 0.015);
+        }
+        if (a.ticks % 20 == 0) {
+            for (int i = 0; i < 4; i++) {
+                if ((a.activePylons & (1 << i)) == 0) continue;
+                BlockPos p = PYLONS[i];
+                world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                        p.getX() + 0.5, p.getY() + 13, p.getZ() + 0.5,
+                        10, 0.5, 1.2, 0.5, 0.015);
+            }
+        }
+
         if (a.intro > 0) {
             a.intro--;
             a.boss.setAiDisabled(true);
@@ -550,7 +570,11 @@ public final class NullWardenManager {
         world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_ROAR,
                 SoundCategory.HOSTILE, 3.5f, .45f);
         world.spawnParticles(ParticleTypes.EXPLOSION,
-                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 14, 1.5, 1.5, 1.5, .04);
+                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 22, 2.2, 2.0, 2.2, .06);
+        world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 120, 5, 2.5, 5, .035);
+        world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 100, 4, 3, 4, .045);
         for (ServerPlayerEntity p : participants(world, a)) {
             p.sendMessage(Text.literal("NULL WARDEN // PHASE " + a.phase), true);
             p.sendMessage(Text.literal("The pylons are feeding it. Sneak beside each one to cleanse it."), false);
