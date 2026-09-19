@@ -196,9 +196,11 @@ public final class NullWardenManager {
         a.attackTarget = null;
         a.nextAttackTick = 40;
         a.idleTicks = 0;
+        a.victoryTicks = 0;
         a.defeated = false;
         a.rewardedPlayers.clear();
         a.returnPortalBuilt = false;
+        a.joinTicks.clear();
 
         world.playSound(null, CENTER, SoundEvents.ENTITY_WARDEN_EMERGE,
                 SoundCategory.HOSTILE, 5, .5f);
@@ -225,6 +227,12 @@ public final class NullWardenManager {
         if (a.defeated) {
             rewardPending(server, world, a);
             if (!a.returnPortalBuilt) buildReturnPortal(world, a);
+            if (++a.victoryTicks >= 100) {
+                a.boss.discard();
+                a.boss = null;
+                a.bossUuid = null;
+                persist(world, a);
+            }
             return;
         }
 
@@ -234,6 +242,8 @@ public final class NullWardenManager {
         }
 
         a.ticks++;
+
+        updateEligibility(a);
 
         if (a.intro > 0) {
             a.intro--;
@@ -300,10 +310,18 @@ public final class NullWardenManager {
             if (p != null && p.getServerWorld() == world && p.isAlive()
                     && p.squaredDistanceTo(.5, 81, .5) <= HARD_BOUNDARY * HARD_BOUNDARY) {
                 a.activeParticipants.add(id);
+                a.joinTicks.putIfAbsent(id, a.ticks);
                 if (a.bar != null) a.bar.addPlayer(p);
             } else if (p != null && a.bar != null) {
                 a.bar.removePlayer(p);
             }
+        }
+    }
+
+    private static void updateEligibility(ArenaState a) {
+        for (UUID id : a.activeParticipants) {
+            int joined = a.joinTicks.getOrDefault(id, a.ticks);
+            if (a.ticks - joined >= 100) a.eligiblePlayers.add(id);
         }
     }
 
@@ -380,23 +398,28 @@ public final class NullWardenManager {
     }
 
     private static ServerPlayerEntity selectTarget(ServerWorld world, ArenaState a) {
-        ServerPlayerEntity best = null;
-        double bestDistance = Double.MAX_VALUE;
-        int offset = a.ticks / 20;
+        ServerPlayerEntity closest = null;
+        double closestDistance = Double.MAX_VALUE;
+        ServerPlayerEntity rotated = null;
+        int targetIndex = Math.floorMod(a.targetRotation, Math.max(1, a.activeParticipants.size()));
         int index = 0;
 
         for (UUID id : a.activeParticipants) {
             ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
             if (p == null) continue;
-            if (a.phase >= 2 && (index + offset) % 3 == 0) return p;
+            if (index == targetIndex) rotated = p;
+
             double d = p.squaredDistanceTo(a.boss);
-            if (d < bestDistance) {
-                bestDistance = d;
-                best = p;
+            if (d < closestDistance) {
+                closestDistance = d;
+                closest = p;
             }
             index++;
         }
-        return best;
+
+        a.targetRotation++;
+        if (rotated != null) return rotated;
+        return closest;
     }
 
     private static ServerPlayerEntity target(ServerWorld world, ArenaState a) {
@@ -467,7 +490,9 @@ public final class NullWardenManager {
             }
             case VOID_RAIN -> {
                 for (ServerPlayerEntity p : activePlayers(world, a)) {
-                    if (p.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < 0) continue;
+                    double radius = 2.75;
+                    ring(world, p.getX(), p.getY() + .1, p.getZ(),
+                            radius, ParticleTypes.EXPLOSION, 40);
                     p.damage(world.getDamageSources().mobAttack(a.boss), 10);
                 }
             }
@@ -563,6 +588,7 @@ public final class NullWardenManager {
         a.attackTarget = null;
         a.attackWindup = 0;
         a.activePylons = 0;
+        a.victoryTicks = 0;
         a.boss.setHealth(1);
         a.boss.setInvulnerable(true);
         a.boss.setAiDisabled(true);
@@ -581,7 +607,7 @@ public final class NullWardenManager {
     }
 
     private static void rewardPending(MinecraftServer server, ServerWorld world, ArenaState a) {
-        for (UUID id : a.participants) {
+        for (UUID id : a.eligiblePlayers) {
             ServerPlayerEntity p = server.getPlayerManager().getPlayer(id);
             if (p != null && p.getServerWorld() == world) rewardIfEligible(p, a);
         }
@@ -589,7 +615,7 @@ public final class NullWardenManager {
     }
 
     private static void rewardIfEligible(ServerPlayerEntity p, ArenaState a) {
-        if (!a.participants.contains(p.getUuid())) return;
+        if (!a.eligiblePlayers.contains(p.getUuid())) return;
         if (!a.rewardedPlayers.add(p.getUuid())) return;
         p.getInventory().offerOrDrop(new ItemStack(ModItems.NULLBLADE));
         p.getInventory().offerOrDrop(new ItemStack(ModItems.NULL_RELIC));
@@ -611,6 +637,8 @@ public final class NullWardenManager {
         a.participants.clear();
         a.activeParticipants.clear();
         a.rewardedPlayers.clear();
+        a.eligiblePlayers.clear();
+        a.joinTicks.clear();
         a.echoes.clear();
         a.defeated = false;
         a.returnPortalBuilt = false;
@@ -746,9 +774,12 @@ public final class NullWardenManager {
         ServerBossBar bar;
         final Set<UUID> participants = new HashSet<>();
         final Set<UUID> activeParticipants = new HashSet<>();
+        final Set<UUID> eligiblePlayers = new HashSet<>();
         final Set<UUID> rewardedPlayers = new HashSet<>();
         final Set<UUID> echoes = new HashSet<>();
+        final Map<UUID, Integer> joinTicks = new HashMap<>();
         int ticks, intro, phase = 1, idleTicks, nextAttackTick = 40, attackWindup;
+        int victoryTicks, targetRotation;
         int activePylons;
         int[] pylonProgress = new int[4];
         UUID attackTarget;
