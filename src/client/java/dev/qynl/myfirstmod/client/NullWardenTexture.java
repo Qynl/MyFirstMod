@@ -6,6 +6,8 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 
 public final class NullWardenTexture {
+    public static Identifier TEXTURE;
+    public static Identifier GLOW_TEXTURE;
     private NullWardenTexture() {}
 
     public static Identifier register() {
