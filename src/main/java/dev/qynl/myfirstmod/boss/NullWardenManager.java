@@ -380,7 +380,7 @@ public final class NullWardenManager {
         if (a.bar != null && a.attack != Attack.NONE && a.attackWindup % 5 == 0) {
             a.bar.setName(Text.literal("THE NULL WARDEN  //  " + a.attack.name));
         } else if (a.bar != null && a.attack == Attack.NONE) {
-            a.bar.setName(Text.literal("THE NULL WARDEN  //  PHASE " + a.phase));
+            a.bar.setName(Text.literal("THE NULL WARDEN  //  " + phaseName(a.phase)));
         }
 
         float health = a.boss.getHealth() / a.boss.getMaxHealth();
@@ -1049,6 +1049,15 @@ public final class NullWardenManager {
         pullTowardPoint(world, a, a.boss.getX(), a.boss.getY(), a.boss.getZ(), strength, 15);
     }
 
+    private static String phaseName(int phase) {
+        return switch (phase) {
+            case 1 -> "THE WATCHER";
+            case 2 -> "THE AWAKENING";
+            case 3 -> "THE FRACTURE";
+            default -> "THE COLLAPSE";
+        };
+    }
+
     private static void phaseShift(ServerWorld world, ArenaState a) {
         if (a.bar != null) {
             a.bar.setColor(switch (a.phase) {
@@ -1072,7 +1081,7 @@ public final class NullWardenManager {
             default -> "Phase 4: all pylons resonate faster. Cleanse them before the arena overwhelms you.";
         };
         for (ServerPlayerEntity p : participants(world, a)) {
-            p.sendMessage(Text.literal("NULL WARDEN // PHASE " + a.phase), true);
+            p.sendMessage(Text.literal("NULL WARDEN // " + phaseName(a.phase)), true);
             p.sendMessage(Text.literal("The pylons are feeding it. Sneak beside each one to cleanse it."), false);
             p.sendMessage(Text.literal(rule), false);
         }
@@ -1177,6 +1186,7 @@ public final class NullWardenManager {
         a.returnPortalBuilt = false;
         a.phase = 1;
         a.activePylons = 0;
+        a.cleansedPylons = 0;
         a.pylonProgress = new int[4];
         a.attack = Attack.NONE;
         a.attackTarget = null;
