@@ -1,3 +1,11 @@
+# 1.6 validation additions
+
+Remembrance adds contract thresholds/rewards, save defaults and round-trips, bounded landmark eviction and rewarded-memory archives, vow/offer bounds, recipe/resource checks, and dedicated-server memorial/ledger/loot/item fixtures.
+
+Manual checklist: read one stele twice and with two players; reconnect and retry; claim multiple eligible contracts and verify no repeat payout; buy with exact/insufficient payment and full inventory; change each vow at a safe/unsafe waystone and across restarts; leave the realm and wait for effects to expire; survey unloaded chunk borders; consume a cathedral and refresh its atlas marker; verify left/right bearings at cardinal headings; check a 1.5 save's sanctuary migration; craft and ignite the Survival portal. **These connected-player checks have not been performed in the sandbox.**
+
+---
+
 # 1.5 validation additions
 
 The Pilgrimage update adds pure tests for rite order/reset, bounded flask capacity and persistence, and forward-cleave safe boundaries; resource tests for cathedral placement, seal states, models/textures and deterministic generation; and dedicated-server fixtures for all three cathedral floors, custom spawner IDs, pilgrim loot, and item registration.

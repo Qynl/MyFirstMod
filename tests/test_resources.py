@@ -204,6 +204,19 @@ class ResourceTests(unittest.TestCase):
         for seal in ['iron_vow','ember_vow','mist_vow']:
             self.assertEqual(json.dumps(load(DATA/f'recipe/{seal}.json')).count('myfirstmod:memory_shard'),2)
 
+    def test_current_readme_links_and_portal_recipe(self):
+        readme=(ROOT/'README.md').read_text()
+        version=re.search(r'mod_version=(.+)',(ROOT/'gradle.properties').read_text()).group(1)
+        self.assertIn(version,readme)
+        for link in re.findall(r'\]\(([^)]+)\)',readme):
+            if '://' not in link and not link.startswith('#'):
+                self.assertTrue((ROOT/link.split('#')[0]).exists(),link)
+        for generator in (ROOT/'scripts').glob('generate_*.py'):
+            self.assertIn(generator.name,readme)
+        recipe=load(DATA/'recipe/portal_frame.json')
+        self.assertEqual(recipe['result'],{'id':'minecraft:reinforced_deepslate','count':4})
+        self.assertEqual(recipe['key']['E']['item'],'minecraft:echo_shard')
+
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))
         before={str(p.relative_to(RES)):p.read_bytes() for p in paths if p.is_file()}

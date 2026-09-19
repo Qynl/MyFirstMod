@@ -17,13 +17,13 @@ public final class RemembranceLedger {
         var state=RealmState.get(world);
         if(block.isOf(ModBlocks.MEMORY_STELE)) {
             var record=state.expedition(player.getUuid());
+            int story=Math.floorMod(pos.asLong(),6);
+            player.sendMessage(Text.translatable("memory.myfirstmod."+story),false);
             if(record.memories.contains(pos.asLong()) || record.memories.size()>=256) {
                 player.sendMessage(Text.translatable("message.myfirstmod.memory_known"),true);return ActionResult.SUCCESS;
             }
             record.memories.add(pos.asLong());state.markDirty();
             player.getInventory().offerOrDrop(new ItemStack(ModItems.MEMORY_SHARD));player.addExperience(25);
-            int story=Math.floorMod(pos.asLong(),6);
-            player.sendMessage(Text.translatable("memory.myfirstmod."+story),false);
             player.sendMessage(Text.translatable("message.myfirstmod.memory_found",record.memories.size()),true);
             return ActionResult.SUCCESS;
         }

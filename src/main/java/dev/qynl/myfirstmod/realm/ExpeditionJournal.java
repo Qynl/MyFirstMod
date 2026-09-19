@@ -51,6 +51,7 @@ public final class ExpeditionJournal {
         page(pages,"journal.myfirstmod.vows");
         page(pages,"journal.myfirstmod.atlas");
         page(pages,"journal.myfirstmod.ledger");
+        page(pages,"journal.myfirstmod.gate");
         page(pages,"journal.myfirstmod.pilgrimage");
         page(pages,"journal.myfirstmod.flask",record.flaskCharges,dev.qynl.myfirstmod.pilgrimage.PilgrimageRules.capacity(record.flaskUpgrades));
         page(pages,"journal.myfirstmod.cathedral",record.cathedralsOpened);
@@ -72,6 +73,9 @@ public final class ExpeditionJournal {
         page(pages,"journal.myfirstmod.warden");
         page(pages,"journal.myfirstmod.equipment");
         page(pages,"journal.myfirstmod.endgame");
+        // Collected memories become readable journal pages, not one-time chat-only lore.
+        record.memories.stream().map(pos->Math.floorMod(pos,6)).distinct().sorted()
+                .forEach(story->page(pages,"memory.myfirstmod."+story));
         // Short pages remain readable at the vanilla book's fixed width.
         List<Long> known=new ArrayList<>(record.courts);
         for(int i=Math.max(0,known.size()-12);i<known.size();i+=3) {

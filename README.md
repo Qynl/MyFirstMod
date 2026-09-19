@@ -1,186 +1,496 @@
-# Ashen Pilgrimage — 1.5.0
+# The Null Warden
+## 1.6 — Remembrance
 
-A darker overhaul of the Null Realm: three-level Mourning Cathedrals, a funerary rite, upgradeable shared-charge healing flasks, safe waystone rest, grounded evasion, original knight/hunter models, committed enemy attacks, Warden counterattack windows, and reworked terrain decoration.
+**A dark-fantasy expedition through a ruined dimension: prepare at a sanctuary, recover forgotten memories, descend beneath cathedrals, and challenge the guardian of a broken kingdom.**
 
-**Start here:** [Ashen Pilgrimage guide](docs/PILGRIMAGE.md) · [Convergence systems](docs/CONVERGENCE.md) · [Wilds crafting](docs/WILDS.md)
+Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes a custom dimension, four biomes, original creature models, exploration landmarks, equipment progression, opt-in encounters, and persistent player records.
 
-Your first visit after upgrading grants a flask and Pilgrim’s Step. Sneak-use the flask near a safe waystone to rest. Seek cathedral embers before harder encounters. New landmarks require new chunks; back up your world.
+[Download builds](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml) · [Report an issue](https://github.com/Qynl/MyFirstMod/issues) · [Validation details](docs/TESTING.md)
 
-# The Null Warden — core systems
+> **Development build:** automated compilation, rule/resource tests, and dedicated-server smoke tests are used. They do not establish visual polish, combat balance, multiplayer reliability, or modpack compatibility. Back up saves and try a disposable world first. New landmarks require **new chunks**.
 
-A Minecraft **1.21.1 / Fabric / Java 21** exploration and boss mod.
+---
 
-The Null Realm now has its own noise terrain and four custom biomes, an arrival sanctuary, procedural ruin courts, two realm enemies, a four-phase guardian, and a repeatable post-boss progression loop.
+## Contents
 
-> **Development build.** CI compiles the mod and runs automated checks, including a dedicated-server worldgen smoke test. Visual presentation, combat balance, and multiplayer still require hands-on playtesting; see [validation scope](docs/TESTING.md). Back up existing worlds. Use a fresh test world for the complete terrain update: existing chunks never regenerate automatically.
+- [What is new in 1.6?](#what-is-new-in-16)
+- [Install and update](#install-and-update)
+- [Enter the Null Realm](#enter-the-null-realm)
+- [Your first expedition](#your-first-expedition)
+- [Biomes and landmarks](#biomes-and-landmarks)
+- [Memories, contracts, and trading](#memories-contracts-and-trading)
+- [Swear a vow](#swear-a-vow)
+- [Navigation and recall](#navigation-and-recall)
+- [Rest, healing, and evasion](#rest-healing-and-evasion)
+- [Enemies and counterplay](#enemies-and-counterplay)
+- [Courts, cathedrals, and rifts](#courts-cathedrals-and-rifts)
+- [The Warden and rematches](#the-warden-and-rematches)
+- [Equipment and crafting](#equipment-and-crafting)
+- [Building and cultivation](#building-and-cultivation)
+- [Multiplayer and persistence](#multiplayer-and-persistence)
+- [Troubleshooting and limitations](#troubleshooting-and-limitations)
+- [Build, tests, and repository guide](#build-tests-and-repository-guide)
 
-## New in 1.3 — Wilds & Relics
+## What is new in 1.6?
 
-The realm now has its own gathering and equipment progression, not just combat courts:
+This update connects exploration to long-term preparation rather than adding only another boss:
 
-- **Luminous Fen**, a fourth biome with glowing moss, shallow pools, and luminous growths.
-- **Underground fracture caves** between roughly Y=-40 and Y=48, beneath custom Nullstone terrain.
-- **Three mineable ores:** Resonite, Prism, and Cinder. Resonite is smelted into ingots; the other ores drop useful magical materials.
-- **15 collectible custom blocks in 1.3 (17 with Convergence):** stone, bricks, moss, Hushwood, planks, foliage, ores, metal storage, and lamps. Original textures and mining/loot tags are included.
-- **21 new items**, including a complete custom-textured armor set, three tools, two weapons, surveying/stealth/repair/recall equipment, and expedition food.
-- **Waystone shrines:** attune to a discovered shrine and return using a channeled Wayfarer Thread.
-- A dedicated Creative tab, recipe unlocks, expanded journal pages, wrapped tooltips, staff-ammunition display, and recall progress bar.
+- **Forgotten memorials:** three generated layouts—broken bell towers, pilgrim shelters, and grave gardens—with supply caches and readable Memory Stelae.
+- **Six short lore passages** and per-player remembrance rewards. A memorial can reward each player once.
+- **Seven permanent milestone contracts** covering biomes, memories, courts, cathedrals, rifts, and the Warden.
+- **Pilgrim Ledger:** claim contracts and exchange Memory Shards for repairs, ammunition, sigils, and metal.
+- **Three persistent vows:** Iron, Embers, and Mist each grant a benefit with a burden; Silence removes a vow.
+- **Pilgrim Atlas:** bounded surveys of already-loaded terrain, five landmark categories, remembered destinations, and a directional HUD.
+- **Survival-craftable portal frames:** four reinforced deepslate from polished deepslate and an echo shard.
+- New recipes, original pixel assets, journal pages, persistent save fields, and expanded automated checks.
 
-**Existing saves:** new terrain, plants, ores, and shrines appear in newly generated chunks. New stone and climate distribution can create visible seams against old chunks. Back up your world; a fresh world gives the most consistent generation. Existing inventory items, trial progress, and boss progression are retained.
+Everything from earlier updates remains: Ashen Flasks, cathedral embers, Convergence encounters, relic attunement, farming, custom armor/tools, court tiers, and Warden rematches.
 
-See [the Wilds equipment guide](docs/WILDS.md) for stats, crafting, and controls.
+## Install and update
 
-## New in 1.2 — Echoes
-
-- **Replayable Warden rituals:** offer an Echo Sigil at the altar near the arena. Challenge levels increase through three rematches, with reactivating pylon pairs and shorter recovery windows. Original attack warning times remain intact.
-- **Five court challenge tiers:** party boss bars, intermissions, final-wave captains, and three different oaths—not only health scaling.
-- **Sunken archive vaults:** another dungeon floor, a real staircase, pillars, and a separate treasure cache.
-- **Expedition journal:** a vanilla book interface with live statistics, mechanics, crafting help, and remembered court coordinates/cooldowns. Reopen it to refresh.
-- **Multi-route compass:** sneak-use cycles the arena, sanctuary, and nearest ready court you have discovered.
-- **New equipment:** Echo Sigils, Warden Crests, and a projectile-deflecting Rift Aegis.
-- **Persistent reward mailboxes:** an offline participant's boss loot is retained even if another group starts a new ritual.
-
-See [full 1.2 changelog](docs/CHANGELOG.md).
-
-## Your expedition
-
-1. Find an Ancient City's sculk catalyst and a reinforced-deepslate seal.
-2. Build/complete the supported **4-block-wide, 5-block-tall frame in the X/Y plane**; ignite its bottom-left corner using flint and steel. The interior must be empty. The existing ignition implementation does not support rotated frames.
-3. Arrive at the **Hushed Threshold**, not directly inside a boss fight. A return gate is available immediately.
-4. Receive a **Resonance Compass**. Its custom animated needle points toward the Warden arena; holding it shows distance. Follow the lit causeway or explore first.
-5. Discover ruin courts and use their **Resonance Cores** to opt into three-wave trials.
-6. Approach the arena in Survival or Adventure to awaken the Null Warden.
-7. Claim the blade and heart, then return to the courts: defeating the boss permanently unlocks **Ascended Trials** globally in that realm.
-8. Forge a Resonance Matrix and awaken your Nullblade at a smithing table.
-9. Sneak-use a core to attempt your next challenge tier. Gather Echo Sigils from tier 2+ completions, vaults, or crafting.
-10. Offer a sigil at the **Echo Altar (8, 81, 30)**. Rematch victories award Warden Crests for the Rift Aegis.
-
-## A realm of its own
-
-The dimension no longer uses the End's noise settings or biome.
-
-| Biome | Identity |
+| Requirement | Target |
 | --- | --- |
-| **Hushed Grove** | Custom moss, harvestable Hushwood and Hush Leaves, luminous crowns, drifting souls |
-| **Prism Wastes** | Custom Prismstone, amethyst formations, violet fog, floating motes |
-| **Cinder Steps** | Custom Cinderstone terraces, ash, fractured spires |
-| **Luminous Fen** | Glowing moss, shallow pools, luminous growths, spore-filled teal fog |
+| Minecraft | **1.21.1**, Java Edition |
+| Mod loader | **Fabric Loader 0.16.10** development target; metadata accepts 0.16.10+ |
+| Fabric API | Built against **0.116.17+1.21.1**; install a compatible 1.21.1 build |
+| Java | **21** |
+| Mod version | **1.6.0** |
 
-Seeded terrain combines layered ridges with smaller three-dimensional fractures and underground tunnels. Biome-local resource weighting makes Cinder Pearls more common under Cinder Steps and Prism Dust more common elsewhere; all three ore types can occur throughout the realm. Procedural decoration places three ruin layouts: an enclosed **reliquary**, an open **observatory**, and a two-storey **archive** with a sunken treasure vault. Waystone shrines add a separate exploration landmark with an attunement stone and supplies. These are code-generated, chunk-contained features, not copied vanilla structure templates. Courts contain a loot cache and an opt-in trial core. They do not currently integrate with `/locate structure`.
+1. Install Fabric for Minecraft 1.21.1.
+2. Open a **successful** [build workflow run](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml).
+3. Download its `Null-Warden-<commit>` artifact and extract the ZIP. GitHub may require sign-in to download artifacts.
+4. Put the installable mod JAR and Fabric API in `mods/`. Do not install the `-sources.jar`.
+5. On a dedicated server, install the same mod version and compatible Fabric API on **both server and clients**.
 
-The sanctuary includes a nearby introductory court and a lit approach to the arena. Exploration features are excluded from the protected central approach. Sanctuary construction happens once per world; arena resets rebuild the combat footprint. Do not build a permanent base inside that footprint.
+**Updating:** stop the game/server, back up the entire world, remove the older mod JAR, and install the new one. Do not keep two versions installed. A fresh test world best demonstrates the full terrain; old chunks remain unchanged and may meet new terrain at visible seams.
 
-## Realm creatures
+Existing expedition progress is retained. Sanctuary upgrades only fill designated **empty** blocks; they do not replace an occupied player build. If an upgrade station is missing because its position was occupied, craft a replacement ledger/forge or use another waystone.
 
-- **Rift Sentinel:** armored guardian with a stationary, 1.8-second telegraphed close-range pulse. Retreat beyond the visible ring.
-- **Shardstalker:** faster climbing hunter with a sparkling warning before a short-range slowing pulse.
+## Enter the Null Realm
 
-Both now have original animated meshes and textures: a horned greatblade knight and a six-limbed crystal hunter. Vanilla-derived navigation remains. Their special attacks have committed tells and recovery windows; see the Pilgrimage guide for counterplay. They spawn in the realm and trials, and boss echoes use Sentinels.
+The gate accepts a specific **4-wide × 5-tall frame in the X/Y plane**, with a **2-wide × 3-tall air interior**. Rotated Z/Y frames are not supported.
 
-## The guardian
+```text
+RRRR
+R..R
+R..R
+R..R
+RRRR
+^
+Ignite this bottom-left frame block.
 
-The existing four-phase encounter has been revised, rather than discarded:
+R = reinforced deepslate   . = air
+```
 
-- Five-second awakening sequence, short phase transitions, and a five-second victory sequence.
-- Letterboxing and narrative subtitles, with synchronized emergence/fracture poses. These are **in-engine cinematic sequences**, not free-camera cutscenes; you retain movement and camera control. Hide the HUD with F1 to hide the overlay.
-- Explicitly locked attack positions. Warnings no longer chase players while damage lands somewhere else.
-- A dash that commits to its marked destination, rather than teleporting onto the player at impact.
-- Cone and ring boundaries that match their damage areas, plus textual dodge instructions.
-- Native Warden AI attacks disabled: no unrelated sonic-boom or melee attacks interrupting the encounter's tells.
-- Pylon pulses have advance warnings. Sneaking within the inner three-block pocket grounds their pulse while cleansing; boss attacks still demand attention.
-- Opening health scales with nearby players, up to four-player scaling.
-- Persistent participant/reward tracking, stale-actor cleanup, and runtime-state cleanup when a server closes.
+- The positive X direction runs from the ignition block across the bottom row.
+- Place a **sculk catalyst within 14 blocks in X/Z and 5 blocks vertically** of that ignition block.
+- Use **flint and steel** on the bottom-left reinforced-deepslate block.
+- The complete frame uses **14 blocks**, including corners.
 
-Peaceful mode does not start the encounter or trials. You can still enter, explore, and return. Creative and spectator players do not start or enroll in combat.
+### Survival frame recipe
 
-## Rewards worth keeping
+Surround one **echo shard** with eight **polished deepslate** to craft **four reinforced deepslate**. Four crafts supply 16 blocks: enough for one frame with two spare. This retains an Ancient City resource requirement without relying on vanilla reinforced-deepslate drops.
 
-### Nullblade
+Place carefully: this recipe does **not** change vanilla reinforced deepslate's mining speed or lack of an ordinary block drop.
 
-An actual sword attribute profile: **10 attack damage / 1.8 attack speed**, 2,531 durability, fireproof.
+The gate brings you to the **Hushed Threshold at approximately (0, 81, 160)**. A return gate is available immediately—defeating the boss is not required to leave. Return-point information survives restarts.
 
-- **Hold use, then release:** Soul Rend. Minimum charge 0.6 seconds; fully charged at 1.5 seconds. At full charge, deals 16 ability damage within 6.5 blocks in a forward sweep.
-- Soul Rend affects hostile, non-allied mobs within line of sight—not pets, passive mobs, or other players. Successful hits restore up to two hearts total.
-- **Sneak-use:** Riftstep, up to six blocks. Checks intermediate collision and safe grounded destinations; does not pass through walls or intentionally land in fluid/off a ledge.
-- Shared ability cooldowns prevent swapping between blade tiers to bypass recovery. Abilities consume durability.
+## Your first expedition
 
-### Heart of the Null
+1. **Read your Null Expedition journal.** Reopen it to refresh progress and instructions.
+2. **Keep the Resonance Compass.** It routes to the arena, sanctuary, or a discovered ready court.
+3. **Collect the starter kit.** Your first realm visit after the Pilgrimage update grants an Ashen Flask and Pilgrim's Step once per player. Replacements are craftable.
+4. **Bind the sanctuary waystone**, then practice resting with the flask. The forge, waystone, and ledger are near the arrival platform.
+5. **Mine and gather.** Smelt Resonite, gather staff ammunition, and harvest Hush Leaves for food/fiber.
+6. **Craft a Pilgrim Atlas.** Survey nearby loaded terrain for landmarks rather than wandering without a destination.
+7. **Read memorials.** Spend Memory Shards on supplies or craft a vow that suits your approach.
+8. **Explore a cathedral.** Defeat or suppress its spawners, solve its rite, and strengthen your flask with a Mourning Ember.
+9. **Try courts and Convergence rifts.** These are opt-in encounters, not automatic fights when you pass by.
+10. **Follow the causeway to the Warden.** Victory unlocks higher court progression, the Nullblade/Heart, and rematches.
 
-A reusable defensive artifact: use for regeneration II, absorption II, and slow falling. **45-second cooldown.** It is not consumed.
+| Sanctuary landmark | Coordinates |
+| --- | --- |
+| Arrival | `(0, 81, 160)` |
+| Attunement Forge | `(-6, 81, 160)` |
+| Waystone | `(6, 81, 160)` |
+| Pilgrim Ledger | `(6, 81, 158)` |
+| Echo Altar, near arena | `(8, 81, 30)` |
 
-### Nullblade, Awakened
+Do not build a permanent base in the Warden arena: encounter preparation rebuilds its combat footprint. The reserved central approach excludes random exploration features.
 
-Craft a **Resonance Matrix** from eight Resonant Shards surrounding an amethyst shard. At a smithing table combine:
+## Biomes and landmarks
 
-| Template slot | Equipment slot | Addition slot |
-| --- | --- | --- |
-| Echo shard | Nullblade | Resonance Matrix |
+The realm uses its **own noise settings**, not the End preset. It combines ridges, smaller fractures, and underground tunnels with four biomes.
 
-The smithing transform carries the base stack's applicable components forward, including enchantments. The awakened blade has **12 attack damage**, 4,096 durability, a full-charge 24-damage/eight-block Soul Rend, up to three hearts of healing, shorter Rend cooldown, and eight-block Riftstep.
+| Biome | What to look for |
+| --- | --- |
+| **Hushed Grove** | Leaning Hushwood, branching canopies, harvestable leaves, moss, hanging lights |
+| **Prism Wastes** | Clustered crystal spears, Prismstone, violet atmosphere |
+| **Cinder Steps** | Ash, basalt/cinder formations, increased Cinder selection in ore generation |
+| **Luminous Fen** | Glowing moss, shallow pools, luminous growths, teal fog |
 
-First-encounter rewards are **four shards and 500 XP** per eligible participant. Each player's first victory also grants **Nullblade and Heart**, including newcomers winning their first rematch. Rematches grant **a Warden Crest, eight shards, and 350 XP**. Reward mailboxes are independent of the active fight: offline winners receive their queued rewards when alive in the realm again. A full inventory drops items instead of deleting them.
+| Landmark | Purpose |
+| --- | --- |
+| Ruin court | Supply cache and an opt-in Resonance trial |
+| Archive vault | A sunken second storey, staircase, and deeper treasure cache |
+| Waystone shrine | Bind a recall destination and find supplies |
+| Convergence observatory | Ground seals, defeat the Rift Herald, earn Astral Cores |
+| Mourning Cathedral | Three levels, spawners, funerary puzzle, flask-upgrade ember |
+| Forgotten memorial | Bell tower, shelter, or grave garden; per-player memory reward and a shared supply chest |
 
-### Rift Aegis
+These are **code-generated, chunk-contained features**, not sprawling multi-chunk castles or `/locate structure` entries. Cathedrals occupy a 15×15 footprint with a nave above two underground floors. Terrain and feature checks can reject a placement; rarity values are not guarantees that every selected chunk contains a landmark.
 
-Craft a **shield + Warden Crest + Resonance Matrix**. Use the Aegis to reflect visible hostile-owned projectiles in the forward hemisphere within five blocks, directing them along your aim, and gain resistance II for three seconds. It has a 12-second cooldown and consumes two of its 768 durability per activation. This is a timed parry artifact, not a hold-to-block vanilla shield.
+## Memories, contracts, and trading
 
-## After the boss
+### Forgotten memorials
 
-Courts remain useful after victory:
+Use a **Memory Stele** to read one of six passages and gain **one Memory Shard + 25 XP**. The stele remains, so other players can recover their own memory. Revisited stelae still show their lore, and recovered passages appear as journal pages. Your reward is tied to that coordinate and can only be claimed once.
 
-| Tier | Waves | Shards / player | XP / player |
+A player record stores up to **256 rewarded memorial coordinates**. At the cap, additional stelae do not reward shards; old entries are not evicted to enable repeat farming. Memory Shards are physical, tradeable items. They are distinct from Resonant Shards and Mourning Embers.
+
+### Seven contracts
+
+Use a **Pilgrim Ledger without Memory Shards in your main hand** to view contract status and automatically claim all newly eligible rewards. Contracts are always active, need no acceptance step, and each pays once per player. Existing saved accomplishments count.
+
+| Requirement | Memory Shards |
+| --- | ---: |
+| Visit two different realm biomes | 2 |
+| Remember three different memorials | 3 |
+| Complete three courts | 4 |
+| Open a cathedral reliquary | 4 |
+| Close two Convergence rifts | 5 |
+| Complete court tier 3 or higher | 6 |
+| Defeat the Warden | 6 |
+| **Total one-time contract rewards** | **30** |
+
+### Supply exchange
+
+**Sneak-use** the ledger to cycle offers. Then hold enough Memory Shards in your **main hand** and use it normally to buy the selected offer. Only that held stack is used as payment.
+
+| Offer | Cost |
+| --- | ---: |
+| 2 Repair Kits | 2 Memory Shards |
+| 24 Prism Dust | 2 Memory Shards |
+| 2 Echo Sigils | 3 Memory Shards |
+| 12 Resonite Ingots | 4 Memory Shards |
+
+The ledger works only in the Null Realm. Craft one with **book + Hush Planks + Resonite Ingot**. Contracts and offer selection belong to the player, not the block; placing extra ledgers does not reset rewards.
+
+## Swear a vow
+
+Vows are **player specializations**, separate from an individual weapon's attunement. Use a seal near a **safe realm waystone** to consume it and replace your current vow. There is one vow slot and a **60-second shared, persistent change cooldown**.
+
+| Vow | Benefit | Burden | Shapeless recipe |
 | --- | --- | --- | --- |
-| 0 (before boss) | 3 | 2 | 50 |
+| **Iron** | Resistance I | Slowness I | 2 Memory Shards + Resonite Ingot |
+| **Embers** | Strength I | Hunger I | 2 Memory Shards + Cinder Pearl |
+| **Mist** | Speed I | Weakness I | 2 Memory Shards + Dusk Fiber |
+| **Silence** | Return to Unbound | Removes the vow | Paper + Hushberry |
+
+The chosen vow survives death, gear swaps, and restarts. Its effects refresh for living Survival/Adventure players **inside the realm**, not Creative or spectator players. Effects naturally linger up to **three seconds** after leaving or changing vows. Vanilla potion stacking rules apply; existing stronger effects are not forcibly removed. Strength/Weakness affect ordinary melee, not every scripted relic ability.
+
+Safety uses the flask's rest checks: grounded, near a waystone, no nearby living hostiles, and no relevant enrolled encounter. Selecting the same vow or attempting a change too soon does not consume the seal.
+
+## Navigation and recall
+
+### Resonance Compass
+
+The original animated compass still serves its focused purpose:
+
+- Ordinary use refreshes its destination.
+- Sneak-use cycles **Warden arena → sanctuary → nearest known ready court**.
+- Court readiness is checked when used, not continuously.
+- Discover courts by interacting with their cores; the saved list retains up to 128.
+- Replacement: **compass + echo shard**.
+
+### Pilgrim Atlas
+
+Craft **compass + book + Prism Dust**. Use it in the realm to survey and refresh a route; **sneak-use cycles five categories**:
+
+**Waystone → Court → Convergence Observatory → Mourning Reliquary → Unread Memorial**
+
+Holding it shows the selected category, horizontal distance, and ahead/behind/left/right bearing. Chat reports the destination's full coordinates.
+
+**What a survey actually does:** checks the center columns of a 9×9 chunk grid around your current chunk, between Y=12 and Y=180, and skips unloaded chunks. Ordinary surveys have a five-second cooldown. Interacting with supported landmarks also records their exact positions.
+
+The atlas remembers up to **128 positions**, evicting the oldest stored entry when adding beyond that limit. It is **not a map renderer, global locator, chunk loader, or teleport item**. It can miss non-center/custom-built landmarks until interacted with. Known markers in unloaded chunks may be stale; loaded markers are checked and removed if the landmark is gone. Memorial routing skips places you already rewarded. Atlas court routing does not filter encounter cooldowns; use the Resonance Compass for that.
+
+### Wayfarer Thread
+
+Use a waystone to bind your personal destination. Hold a Thread for **three seconds** to recall; sneak while finishing to return to the sanctuary instead. An unbound Thread uses the sanctuary.
+
+Damage interrupts the channel. Enrolled trials/rifts and nearby active Warden combat block recall. A successful recall has a **60-second cooldown**. It deliberately loads the destination chunk, then searches for a supported, collision-free landing without replacing blocks. A missing/obstructed stone fails without spending the cooldown.
+
+## Rest, healing, and evasion
+
+### Ashen Flask
+
+- Hold use for **1.6 seconds** to restore **four hearts**, consuming one charge.
+- Starts with **three charges per player** and a four-second drinking cooldown.
+- Damage interrupts use; a full-health player cannot start drinking.
+- **Sneak-use for five seconds near a safe waystone** to refill charges and restore health.
+- Rest with a **Mourning Ember offhand** to permanently add one charge, up to **five**. Hold the flask main-hand.
+- Charges belong to your saved player record. Extra flasks, trading, or relogging do not refill them.
+- Realm only; replacement recipe: **glass bottle + Resonite Ingot + Hushberry**.
+
+Rest checks for a waystone within three blocks horizontally/two vertically, solid footing, no living hostiles within twelve blocks of your bounding box, and no enrolled court/rift or nearby active Warden fight. Checks continue throughout the channel. At maximum capacity, resting does not consume an ember.
+
+### Pilgrim's Step
+
+Use for a grounded forward evasion of up to **three blocks**; sneak-use backsteps. It has a **2.5-second cooldown**, adds hunger exhaustion, and provides **no invulnerability**. The path is sampled at quarter-block intervals and stops at walls, unsafe support, fluid, unloaded chunks, and ledges.
+
+Replacement: **leather + Dusk Fiber + Resonite Ingot**. This is an item ability, not a dedicated dodge key. Normal vanilla item-use priority applies when using offhand equipment.
+
+## Enemies and counterplay
+
+| Enemy | Behavior | Response |
+| --- | --- | --- |
+| **Rift Sentinel** | Original horned knight model, greatblade, committed 32-tick forward cleave | Circle behind its 3.5-block arc, retreat, or land a player hit of at least six incoming damage during the tell to stagger it |
+| **Shardstalker** | Original six-limbed crystal hunter; 30-tick fixed-position tell, physical lunge | Leave the marked position, watch the creature's actual landing, punish recovery |
+| **Rift Herald** | Original floating construct with crown and orbiting shards; bursts and ring attacks | Leave the burst circle; for the ring, stay within three blocks or beyond six |
+| **Null Warden** | Four-phase scripted guardian with pylons, committed attacks, and cinematic transitions | Read the ground/text tells, cleanse pylons, and punish recovery openings |
+
+Sentinel and Stalker ordinary melee is disabled during their special windup/recovery sequences. The Stalker's marked point is its intended destination, not a guaranteed blast boundary: it moves with collision and damages around its final position.
+
+Original meshes and animations replace the old zombie/spider renderers, but those mobs retain vanilla-derived navigation/spawning foundations. HUD cues do not require recognizing particle colors alone. There is no forced camera rotation or new camera shake; F1 hides overlays.
+
+## Courts, cathedrals, and rifts
+
+### Resonance Courts
+
+Use a core to enroll nearby eligible players. Late arrivals are not enrolled. Before the first Warden victory, courts have three waves. After victory, normal use chooses tier 1; sneak-use attempts the activating player's next tier, capped at five.
+
+| Tier | Waves | Resonant Shards / eligible player | XP |
+| --- | ---: | ---: | ---: |
+| 0, before Warden | 3 | 2 | 50 |
 | 1 | 4 | 4 | 100 |
 | 2 | 5 | 6 | 150 |
 | 3 | 5 | 8 | 200 |
 | 4 | 5 | 10 | 250 |
 | 5 | 5 | 12 | 300 |
 
-Use a core normally for tier 1 after the boss; **sneak-use** to attempt the activating player's next tier, capped at five. Tier 2+ also grants one Echo Sigil per eligible survivor.
+Tier 2+ also awards an Echo Sigil. Ascended courts end with a named captain and use an oath:
 
-The selected court/tier has one oath:
+- **Fracture:** leave fixed circles before eruption.
+- **Siphon:** sneak in both ward circles to stop enemy healing.
+- **Pursuit:** faster hunters.
 
-- **Fracture:** fixed circles erupt after two seconds. Move out; overlapping circles do not multiply damage.
-- **Siphon:** two visible wards slowly heal enemies. Sneak within their circles for two seconds to ground each ward.
-- **Pursuit:** faster hunters. Every ascended court ends with a tougher, named captain.
+These encounter oaths are **not** the new player vows. Waves have five-second intermissions. Victorious courts recharge for five minutes; abandonment resets after thirty seconds, with a ten-minute maximum encounter duration.
 
-Nearby eligible players enroll at activation; late arrivals receive no completion loot. One enrollment per player prevents overlapping court farming. A party boss bar shows wave, remaining enemies, tier, and oath. Waves have five-second intermissions. Completed courts recharge for five minutes; abandoned courts reset after 30 seconds, and all trials have a ten-minute maximum duration. Interrupted trials reset on server restart rather than resuming with stale guardians.
+### Mourning Cathedrals
 
-The Echo Altar has a three-minute ritual cooldown. Rematch health scales up through challenge level three, recovery becomes shorter, and different pylon pairs reactivate at phase changes. Failed rematches restore the cleared realm state—no free automatic boss respawn and no loss of ascended court access.
+Descend the west staircase to the crypt, then the east staircase to the ossuary. Destroy or suppress the Sentinel/Stalker spawners and search both supply chests.
 
-### Journal and routes
+The lowest reliquary explains the rite: activate the seals in this order:
 
-The sanctuary gives you a **Null Expedition** book. Reopen it to refresh statistics and the most recent known court coordinates. A replacement is crafted from a book and amethyst shard. Discover biomes by visiting; discover courts by interacting with their cores. Each player's saved court list keeps the 128 most recent discoveries, and the journal shows the latest twelve.
+1. **Drowned:** middle crypt.
+2. **Crowned:** upper nave.
+3. **Nameless:** lowest ossuary.
 
-A replacement compass uses a compass and echo shard. Sneak-use selects a destination; ordinary use refreshes the selected route. Court mode chooses the nearest discovered court whose cooldown has expired at the time you use the compass. It is not an omniscient dungeon locator or a live activity tracker.
+Correct seals glow; a mistake resets the sequence. Progress survives restarts. Use the lowest reliquary after completing the rite to receive **one Mourning Ember, six Resonant Shards, one Echo Sigil, and 180 XP**.
 
-## Build and validation
+This is **one shared reward per cathedral**, not one per player. Claiming consumes the reliquary. The surrounding dungeon is breakable and does not force Adventure mode.
+
+### Convergence Observatories
+
+Use the central anchor to opt in. Nearby eligible players within 24 blocks enroll; scaling is capped at four players.
+
+1. Sneak on each of the three glowing seal zones for three seconds while sentinels defend the site.
+2. Complete all three seals; guardians disappear during a three-second emergence.
+3. Defeat the Herald, which has **180–390 health** and attacks faster below half health.
+
+Eligible participants present for at least five seconds receive **one Astral Core, four Resonant Shards, and 120 XP** through persistent reward delivery. A summoned standalone Herald does not produce that encounter reward. Victory locks the site for ten minutes; events also expire on abandonment or timeout. Herald attacks do not destroy terrain.
+
+## The Warden and rematches
+
+Approaching the arena in Survival/Adventure starts the initial encounter. Creative/spectator players do not start or enroll in combat; Peaceful does not start these encounters.
+
+The Warden has a five-second awakening, four phases, brief phase transitions, and a victory sequence. Its native AI attacks are disabled in favor of scripted, marked attacks. Sneak near glowing pylons to cleanse them: the inner pocket grounds **pylon pulses**, not the boss's other attacks.
+
+**Recovery counterattacks:** direct player-attack damage receives a 20% bonus in designated openings. The HUD announces the opportunity. Ranged arrows and the Prism Staff's indirect-magic beam do not receive it; Nullblade's player-attributed slash abilities can.
+
+| Victory | Per-player rewards |
+| --- | --- |
+| Initial encounter | 4 Resonant Shards + 500 XP |
+| Each player's first victory, including a first win during a rematch | Nullblade + Heart of the Null, in addition to encounter rewards |
+| Rematch | Warden Crest + 8 Resonant Shards + 350 XP |
+
+After a realm victory, offer an **Echo Sigil** at the altar at `(8, 81, 30)`. The ritual has a three-minute cooldown. Rematch challenge scaling increases through level three, with shorter recovery and reactivated pylon pairs. Failed rematches do not remove unlocked court progression.
+
+## Equipment and crafting
+
+### Materials are not interchangeable
+
+| Material | Source and role |
+| --- | --- |
+| **Resonite** | Mined metal; smelt Raw Resonite for armor, tools, stations, and repairs |
+| **Prism Dust** | Ore drop, staff ammunition, lamps, surveying, and Focus runes |
+| **Cinder Pearl** | Ore drop, mauls, tonics, and Ember vows |
+| **Resonant Shard** | Court/boss/rift progression; matrices, repairs, sigils, and runes |
+| **Astral Core** | Convergence reward; relic-attunement runes |
+| **Mourning Ember** | Cathedral reward; permanent flask capacity upgrades |
+| **Memory Shard** | Memorials and contracts; ledger trades and player vows |
+| **Warden Crest** | Rematch trophy; Rift Aegis crafting |
+
+Realm ores replace Nullstone below roughly Y=65 and require iron-tier tools or better. Hush Leaves provide berries and fiber. The full **Resonite armor set** grants night vision and haste I in the realm; individual armor pieces have diamond-equivalent protection/toughness, not Netherite knockback resistance. Tools have 1,800 durability and use ingots for repair.
+
+### Active gear quick reference
+
+| Gear | Use |
+| --- | --- |
+| **Nullblade** | Hold/release Soul Rend; sneak-use safe Riftstep. Base sword: 10 attack damage / 1.8 speed. Abilities consume durability and share cooldowns across blade tiers |
+| **Awakened Nullblade** | Stronger blade, longer Rend/Riftstep, shorter recovery; upgraded by smithing |
+| **Heart of the Null** | Regeneration II, absorption II, slow falling; reusable, 45-second cooldown |
+| **Prism Staff** | 24-block hostile-only beam; 8 indirect-magic damage, one Prism Dust/shot, 1.5-second cooldown |
+| **Cinder Maul** | Slow melee weapon; grounded four-block hostile-only slam, six-second cooldown |
+| **Rift Aegis** | Reflect nearby visible hostile projectiles ahead, plus resistance II for three seconds; 12-second cooldown; not a vanilla hold-block shield |
+| **Survey Lens** | Reports up to three nearby realm ore coordinates; no chunk loading |
+| **Veil Charm** | Eight seconds of invisibility and speed; armor remains visible; 45-second cooldown |
+| **Repair Kit** | Restore up to 400 durability to damaged mod equipment in the other hand; consumes a kit |
+| **Ember Tonic** | Sixty seconds of fire resistance; returns its bottle |
+
+Special hostile-targeting abilities avoid passive mobs, pets, and players, but **ordinary weapon melee follows the server's normal PvP rules**. Magic, Strength/Weakness, and custom abilities are not all affected by armor or modifiers identically.
+
+### Important recipes
+
+| Output | Ingredients / station |
+| --- | --- |
+| Resonance Matrix | Eight Resonant Shards around an amethyst shard |
+| Awakened Nullblade | Smithing: **echo shard in template slot**, Nullblade equipment, Resonance Matrix addition |
+| Echo Sigil | Four Resonant Shards around an echo shard |
+| Rift Aegis | Shield + Warden Crest + Resonance Matrix |
+| Expedition Journal | Book + amethyst shard |
+| Wayfarer Thread | Three Dusk Fiber + ender pearl + Resonant Shard |
+| Repair Kit | Two Resonite Ingots + Dusk Fiber + Resonant Shard |
+
+Recipe JSON and the vanilla recipe book are authoritative for shaped layouts. [Wilds crafting reference](docs/WILDS.md) covers tool, armor, weapon, food, and building recipes in more detail.
+
+### Relic attunement
+
+Hold a supported relic main-hand and a rune offhand, then use an **Attunement Forge**. Sneak to replace an existing attunement; the previous rune is not refunded. Each relic has one socket.
+
+Supported: both Nullblades, Prism Staff, Cinder Maul, and Rift Aegis.
+
+| Rune | Craft with an Astral Core + Resonant Shard + … | Effect |
+| --- | --- | --- |
+| **Vigor** | Golden apple | Successful ability hits heal one heart; shared ten-second cooldown. Aegis requires a reflection |
+| **Gale** | Feather | Ability casts grant Speed I for four seconds; shared ten-second cooldown |
+| **Focus** | Prism Dust | Ability cooldowns reduced by 20%, minimum one second |
+
+Vigor/Gale effect timers persist and cannot be bypassed by swapping relics. Attunement preserves unrelated custom data and lore. It coexists with your player vow.
+
+## Building and cultivation
+
+Collectible blocks include Nullstone and its polished/brick forms, three ores, Resonite storage, Prism Lamps, Prismstone, Cinderstone, both mosses, Hushwood/planks/leaves, the forge, Hush Nursery, and Pilgrim Ledger: **18 registered collectible blocks**.
+
+World-only cores, seals, stelae, waystones, and reliquaries are not ordinary collectible building items.
+
+Craft **two Hush Nurseries** from two Hushberries, Dusk Fiber, and Lumen Moss. Plant on dirt, grass, farmland, or supported moss. They have four growth stages, support bonemeal, and grow in realm darkness; outside the realm they need light level 8+. Use a mature nursery for **two berries and one fiber** without uprooting it. Breaking any stage returns the nursery.
+
+The realm can support a base, crafting, food production, and repeated expeditions. Keep permanent builds out of the arena/reset footprint.
+
+## Multiplayer and persistence
+
+| System | Ownership / reset behavior |
+| --- | --- |
+| Vow, flask capacity/charges, contracts, memories, atlas | Per-player persistent record |
+| Waystone binding | Per player; binding another stone replaces that player's destination |
+| Memorial shard | Once per player per remembered coordinate, up to archive cap |
+| Cathedral reliquary and generated chests | Shared world rewards |
+| Court/rift enrollment | Nearby eligible players at activation; late arrivals excluded |
+| Boss/rift reward mail | Queued per player; claimed when alive in the realm, including after reconnect |
+| Interrupted courts/rifts | Canceled on restart; tagged orphan actors cleaned up |
+| Sanctuary upgrade stations | Added only at empty designated positions |
+
+Inventory overflow uses offer-or-drop behavior rather than silently deleting rewards. Normal death/inventory rules still apply: there is no added soul-loss tax, forced inventory wipe, or automatic equipment recovery.
+
+Contract claims and transactions run server-side; extra ledgers and alternate item stacks do not reset player progress. The mod does not implement a claim/protection plugin, anti-griefing layer, or multiplayer consent UI. Coordinate with other players before triggering nearby-party encounters or claiming shared treasure.
+
+## Troubleshooting and limitations
+
+**“The seal is incomplete.”** Check frame dimensions, corners, positive-X orientation, air interior, catalyst range, and ignition corner. Rotated gates are unsupported.
+
+**“I cannot find new content.”** Explore previously ungenerated chunks or use a fresh test world. The atlas surveys loaded chunk-center columns only; it is not a guarantee that an unseen landmark exists nearby. `/locate structure` does not find these features.
+
+**“The atlas points to empty ground.”** An unloaded remembered landmark may have been consumed or removed. Refresh after its chunk loads. Ordinary atlas use can remove stale loaded markers.
+
+**“My vow/flask does nothing.”** Check dimension, game mode, nearby hostiles, encounter enrollment, and cooldowns. Changing a vow requires safety, but an already chosen vow does not require carrying its seal.
+
+**“I cannot rest or recall.”** Finish/leave the enrolled encounter, avoid damage, and make sure the stone/landing remains usable. A stationary safe-looking spot does not bypass encounter locks.
+
+**“The ledger will not claim contracts.”** Remove Memory Shards from your main hand and do not sneak. Shards select buying; sneaking selects the next offer. Contracts pay only once.
+
+**“My teammate got the cathedral reward.”** That reliquary is shared. Memorial rewards and contracts are per player; cathedral treasure is not.
+
+**Known scope:** no custom recorded soundtrack/voice acting, no global minimap, no free-camera cutscenes, no guaranteed compatibility with shader/rendering/AI overhaul mods, and no completed connected-player combat or multiplayer test in this development sandbox. The cathedral is a compact vertical dungeon rather than a large castle network.
+
+## Build, tests, and repository guide
+
+### Build locally
+
+Install **Java 21**. The repository includes the **Gradle 8.12 wrapper** and uses **Fabric Loom 1.9.2** with Yarn `1.21.1+build.3`.
 
 ```sh
-# Java 21 must be installed; the Gradle 8.12 wrapper is included.
-./gradlew build
-
-# Unit tests (also included in build):
-./gradlew test
-
-# Fast data/resource checks, Python 3 only:
+./gradlew build                       # main + client compilation, tests, JAR
+./gradlew test                        # JUnit only
 python3 -m unittest discover -s tests -v
 ```
 
-Windows: `gradlew.bat build`. Output: `build/libs/`.
+Windows: use `gradlew.bat`. Installable output is in `build/libs/`; omit source JARs.
 
-CI runs resource tests, JUnit balancing tests, the Loom build, and a real dedicated-server smoke test for main/arena pushes and pull requests. It uploads the installable JAR separately from test reports. Download the `Null-Warden-<commit>` artifact from a successful [Actions run](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml).
+### CI validation
 
-The smoke test boots Fabric, generates realm chunks, places a ruin, archive vault, and shrine, checks actual ore drops and a shrine loot table, spawns both realm mobs, saves, and shuts down cleanly. It is not a combat bot or a visual/multiplayer test. The smoke-test script owns the disposable `run/ci-smoke` world and overwrites `run/server.properties`/`eula.txt`; never point it at a production server.
+[The build workflow](.github/workflows/build.yml) runs on `main`/`arena/**` pushes and pull requests:
 
-Original pixel textures and worldgen resources are reproducible:
+1. Python resource contracts and deterministic regeneration.
+2. JUnit rule/persistence tests and the Loom build.
+3. A real Fabric dedicated-server smoke test.
+4. Separate installable-JAR and validation-report artifacts.
+
+The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, inspects cathedral spawner IDs, exercises ore/nursery/ledger loot, summons entities/items, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
+
+**This is not a combat bot.** It does not prove that a human completed a rite, channelled a flask, bought from a ledger, used the atlas, or enjoyed the fight. Manual checks are listed in [TESTING.md](docs/TESTING.md).
+
+> `scripts/ci_server_smoke.py` owns a disposable `run/ci-smoke` world and overwrites `run/server.properties` and `eula.txt`. Never use it against a production server directory.
+
+### Reproduce generated assets
+
+Python standard library only; run generators in this order:
 
 ```sh
 python3 scripts/generate_art.py
 python3 scripts/generate_realm_data.py
 python3 scripts/generate_loot.py
 python3 scripts/generate_wilds.py
+python3 scripts/generate_convergence.py
+python3 scripts/generate_pilgrimage.py
+python3 scripts/generate_remembrance.py
+python3 -m unittest discover -s tests -v
 ```
 
-The Gradle wrapper is sourced from the official Gradle 8.12 repository (Apache-2.0). The mod retains its existing declared MIT license.
+The original generated textures are deterministic. Translations and Java models are also checked in, but are not all produced by these scripts. Keep build/cache outputs out of version control.
+
+### Source map
+
+| Path | Responsibility |
+| --- | --- |
+| `src/main/java/dev/qynl/myfirstmod/boss/` | Warden entity, encounter controller, persistence |
+| `…/realm/` | Terrain features, courts, journal, expedition records, waystones |
+| `…/rift/` | Convergence observatory and encounter |
+| `…/pilgrimage/` | Cathedral geometry/rite and Pilgrimage rules |
+| `…/remembrance/` | Memorials, atlas survey, vows, contracts, supply exchange |
+| `…/item/`, `…/block/`, `…/mob/` | Registered gameplay objects and behavior |
+| `src/client/java/` | Original models, renderers, textures, HUD |
+| `src/main/resources/` | Recipes, loot, translations, textures, worldgen data |
+| `src/test/java/`, `tests/` | Java and Python automated tests |
+| `scripts/` | Deterministic generators and disposable server smoke test |
+
+### Further reading and history
+
+- [1.6 Remembrance notes](docs/REMEMBRANCE.md)
+- [1.5 Ashen Pilgrimage guide](docs/PILGRIMAGE.md)
+- [1.4 Convergence guide](docs/CONVERGENCE.md)
+- [1.3 Wilds materials and crafting](docs/WILDS.md)
+- [Earlier Echoes changelog](docs/CHANGELOG.md)
+
+Older version guides describe their release scope; this README is the consolidated current overview. The project retains its declared **MIT license**. The Gradle wrapper comes from the official Gradle 8.12 repository under Apache-2.0.
