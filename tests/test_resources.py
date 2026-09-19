@@ -46,7 +46,7 @@ class ResourceTests(unittest.TestCase):
                 for feature in stage:
                     placed=load(DATA/('worldgen/placed_feature/'+feature.split(':')[1]+'.json'))
                     configured=load(DATA/('worldgen/configured_feature/'+placed['feature'].split(':')[1]+'.json'))
-                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine'])
+                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory'])
             self.assertEqual({s['type'] for s in biome['spawners']['monster']},
                              {'myfirstmod:rift_sentinel','myfirstmod:shardstalker'})
 
@@ -125,7 +125,7 @@ class ResourceTests(unittest.TestCase):
     def test_wilds_blocks_are_complete(self):
         source=(ROOT/'src/main/java/dev/qynl/myfirstmod/block/ModBlocks.java').read_text()
         names=set(re.findall(r'(?:stone|building)\("([a-z_]+)"',source))
-        self.assertEqual(len(names),15)
+        self.assertEqual(len(names),17)
         language=load(ASSETS/'lang/en_us.json')
         for name in names:
             self.assertTrue((ASSETS/f'blockstates/{name}.json').exists(),name)
@@ -171,10 +171,19 @@ class ResourceTests(unittest.TestCase):
             self.assertTrue((ASSETS/f'textures/models/armor/resonite_layer_{layer}.png').exists())
         self.assertTrue((DATA/'worldgen/configured_feature/waystone_shrine.json').exists())
 
+    def test_convergence_resources(self):
+        for biome in (DATA/'worldgen/biome').glob('*.json'):
+            self.assertIn('myfirstmod:rift_observatory',json.dumps(load(biome)))
+        self.assertTrue((DATA/'worldgen/configured_feature/rift_observatory.json').exists())
+        self.assertEqual(len(load(ASSETS/'blockstates/hush_nursery.json')['variants']),4)
+        self.assertTrue((ASSETS/'textures/entity/rift_herald.png').exists())
+        for rune in ['vigor_rune','gale_rune','focus_rune']:
+            self.assertIn('myfirstmod:astral_core',json.dumps(load(DATA/f'recipe/{rune}.json')))
+
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))
         before={str(p.relative_to(RES)):p.read_bytes() for p in paths if p.is_file()}
-        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py']:
+        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py']:
             subprocess.run([sys.executable,str(ROOT/'scripts'/script)],check=True)
         after={str(p.relative_to(RES)):p.read_bytes() for p in RES.rglob('*') if p.is_file()}
         self.assertEqual(before,after)

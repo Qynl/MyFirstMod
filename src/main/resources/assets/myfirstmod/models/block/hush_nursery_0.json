@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "myfirstmod:block/hush_nursery_0"
+  }
+}

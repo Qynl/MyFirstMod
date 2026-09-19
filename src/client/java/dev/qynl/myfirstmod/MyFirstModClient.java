@@ -15,6 +15,7 @@ public class MyFirstModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.VOID_PORTAL, RenderLayer.getTranslucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.HUSH_NURSERY,RenderLayer.getCutout());
 
         EntityModelLayerRegistry.registerModelLayer(
                 NullWardenRenderer.MODEL_LAYER,
@@ -26,6 +27,9 @@ public class MyFirstModClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.NULL_WARDEN, NullWardenRenderer::new);
         EntityRendererRegistry.register(ModEntities.RIFT_SENTINEL, dev.qynl.myfirstmod.client.render.RiftSentinelRenderer::new);
         EntityRendererRegistry.register(ModEntities.SHARDSTALKER, dev.qynl.myfirstmod.client.render.ShardstalkerRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.RiftHeraldRenderer.LAYER,
+                dev.qynl.myfirstmod.client.model.RiftHeraldModel::data);
+        EntityRendererRegistry.register(ModEntities.RIFT_HERALD,dev.qynl.myfirstmod.client.render.RiftHeraldRenderer::new);
         dev.qynl.myfirstmod.client.RealmHud.register();
         net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
             if (net.minecraft.registry.Registries.ITEM.getId(stack.getItem()).getNamespace().equals("myfirstmod")) {

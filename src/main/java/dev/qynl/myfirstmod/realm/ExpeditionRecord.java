@@ -9,6 +9,8 @@ import java.util.Set;
 /** Per-player expedition progress. Bounded discovery storage keeps saves small. */
 public final class ExpeditionRecord {
     public int trials, highestTier, victories, pendingNormal, pendingEcho;
+    public int riftsClosed,pendingRiftCores;
+    public long vigorReadyAt,galeReadyAt;
     public boolean hasWaystone;
     public long boundWaystone;
     public final Set<String> biomes = new LinkedHashSet<>();
@@ -21,6 +23,9 @@ public final class ExpeditionRecord {
         ExpeditionRecord record = new ExpeditionRecord();
         record.hasWaystone=nbt.getBoolean("HasWaystone");
         record.boundWaystone=nbt.getLong("BoundWaystone");
+        record.riftsClosed=Math.max(0,nbt.getInt("RiftsClosed"));
+        record.pendingRiftCores=Math.max(0,Math.min(64,nbt.getInt("PendingRiftCores")));
+        record.vigorReadyAt=nbt.getLong("VigorReadyAt");record.galeReadyAt=nbt.getLong("GaleReadyAt");
         record.trials = Math.max(0, nbt.getInt("Trials"));
         record.highestTier = Math.max(0, Math.min(5, nbt.getInt("Tier")));
         record.victories = Math.max(0, nbt.getInt("Victories"));
@@ -34,6 +39,8 @@ public final class ExpeditionRecord {
     }
     public NbtCompound write() {
         NbtCompound nbt = new NbtCompound();
+        nbt.putInt("RiftsClosed",riftsClosed);nbt.putInt("PendingRiftCores",pendingRiftCores);
+        nbt.putLong("VigorReadyAt",vigorReadyAt);nbt.putLong("GaleReadyAt",galeReadyAt);
         nbt.putBoolean("HasWaystone",hasWaystone);nbt.putLong("BoundWaystone",boundWaystone);
         nbt.putInt("PendingNormal",pendingNormal);nbt.putInt("PendingEcho",pendingEcho);
         nbt.putInt("Trials", trials); nbt.putInt("Tier", highestTier); nbt.putInt("Victories", victories);

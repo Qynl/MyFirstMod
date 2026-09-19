@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:astral_core"
+    },
+    {
+      "item": "minecraft:feather"
+    },
+    {
+      "item": "myfirstmod:resonant_shard"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:gale_rune",
+    "count": 1
+  }
+}

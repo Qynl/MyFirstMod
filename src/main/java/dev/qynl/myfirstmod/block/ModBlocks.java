@@ -53,5 +53,9 @@ public final class ModBlocks {
     public static final Block WAYSTONE = Registry.register(Registries.BLOCK,
             Identifier.of(MyFirstMod.MOD_ID,"waystone"),
             new Block(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->12)));
+    public static final Block RIFT_ANCHOR=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"rift_anchor"),
+            new Block(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->12)));
+    public static final Block ATTUNEMENT_FORGE=building("attunement_forge",new Block(AbstractBlock.Settings.copy(Blocks.SMITHING_TABLE).strength(4).luminance(s->7)));
+    public static final Block HUSH_NURSERY=building("hush_nursery",new HushNurseryBlock(AbstractBlock.Settings.copy(Blocks.WHEAT).ticksRandomly().luminance(s->2)));
     public static void register() {}
 }

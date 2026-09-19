@@ -1,0 +1,32 @@
+{
+  "parent": "myfirstmod:enter_realm",
+  "display": {
+    "icon": {
+      "id": "myfirstmod:astral_core"
+    },
+    "title": {
+      "text": "A Star in the Silence"
+    },
+    "description": {
+      "text": "Close a Convergence rift and claim an Astral Core."
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "core": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:astral_core"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

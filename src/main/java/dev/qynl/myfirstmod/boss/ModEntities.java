@@ -29,7 +29,13 @@ public final class ModEntities {
             EntityType.Builder.create(dev.qynl.myfirstmod.mob.ShardstalkerEntity::new, SpawnGroup.MONSTER)
                     .dimensions(1.4f, .9f).build("myfirstmod:shardstalker"));
 
+    public static final EntityType<dev.qynl.myfirstmod.mob.RiftHeraldEntity> RIFT_HERALD=Registry.register(
+            Registries.ENTITY_TYPE,Identifier.of(MyFirstMod.MOD_ID,"rift_herald"),
+            EntityType.Builder.create(dev.qynl.myfirstmod.mob.RiftHeraldEntity::new,SpawnGroup.MONSTER)
+                    .dimensions(1.3f,2.4f).maxTrackingRange(48).trackingTickInterval(2).build("myfirstmod:rift_herald"));
     public static void register() {
+        net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
+                RIFT_HERALD,dev.qynl.myfirstmod.mob.RiftHeraldEntity.attributes());
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
                 NULL_WARDEN, net.minecraft.entity.mob.WardenEntity.addAttributes());
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(

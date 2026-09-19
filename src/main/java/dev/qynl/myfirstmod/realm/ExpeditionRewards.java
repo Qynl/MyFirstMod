@@ -24,6 +24,12 @@ public final class ExpeditionRewards {
         RealmState state=RealmState.get(player.getServerWorld());
         var record=state.expedition(player.getUuid());
         int normal=record.pendingNormal,echo=record.pendingEcho;
+        if(record.pendingRiftCores>0) {
+            int cores=record.pendingRiftCores;record.pendingRiftCores=0;state.markDirty();
+            offer(player,ModItems.ASTRAL_CORE,cores);offer(player,ModItems.RESONANT_SHARD,cores*4);
+            player.addExperience(cores*120);
+            player.sendMessage(Text.translatable("message.myfirstmod.rift_mail",cores),false);
+        }
         if(normal+echo==0) return;
         boolean first=record.victories==0;
         // Clear the mailbox before effects; callbacks cannot recursively claim it again.

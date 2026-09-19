@@ -1,7 +1,8 @@
 {
   "replace": false,
   "values": [
-    "myfirstmod:hushwood",
-    "myfirstmod:hush_planks"
+    "myfirstmod:attunement_forge",
+    "myfirstmod:hush_planks",
+    "myfirstmod:hushwood"
   ]
 }

@@ -23,17 +23,19 @@ public final class RiftAegisItem extends Item {
         ItemStack stack=player.getStackInHand(hand);
         if(player.getItemCooldownManager().isCoolingDown(this)) return TypedActionResult.fail(stack);
         if(world instanceof ServerWorld server) {
-            player.getItemCooldownManager().set(this,240);
+            player.getItemCooldownManager().set(this,RelicAttunements.cooldown(stack,240));
+            boolean reflected=false;
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,60,1));
             var look=player.getRotationVec(1);
             for(ProjectileEntity shot:server.getEntitiesByClass(ProjectileEntity.class,player.getBoundingBox().expand(5),
                     e->e.getOwner() instanceof HostileEntity && e.squaredDistanceTo(player)<25 && player.canSee(e))) {
                 var direction=shot.getPos().subtract(player.getEyePos()).normalize();
                 if(direction.dotProduct(look)<0) continue;
-                shot.setOwner(player);
+                reflected=true;shot.setOwner(player);
                 shot.setVelocity(look.multiply(Math.max(1.5,Math.min(3,shot.getVelocity().length()))));
                 shot.velocityModified=true;
             }
+            RelicAttunements.afterCast(player,stack,reflected);
             stack.damage(2,player,hand==Hand.MAIN_HAND?EquipmentSlot.MAINHAND:EquipmentSlot.OFFHAND);
             server.spawnParticles(ParticleTypes.ELECTRIC_SPARK,player.getX(),player.getY()+1,player.getZ(),50,1,.8,1,.04);
             server.playSound(null,player.getBlockPos(),SoundEvents.ITEM_SHIELD_BLOCK,SoundCategory.PLAYERS,1.2f,.7f);

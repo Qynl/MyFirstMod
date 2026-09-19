@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:hushberry"
+    },
+    {
+      "item": "myfirstmod:hushberry"
+    },
+    {
+      "item": "myfirstmod:dusk_fiber"
+    },
+    {
+      "item": "myfirstmod:lumen_moss"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:hush_nursery",
+    "count": 2
+  }
+}

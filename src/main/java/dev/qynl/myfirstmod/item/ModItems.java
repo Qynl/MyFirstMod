@@ -48,6 +48,10 @@ public final class ModItems {
     public static final Item RESONITE_CHESTPLATE=register("resonite_chestplate",new net.minecraft.item.ArmorItem(ResoniteArmor.MATERIAL,net.minecraft.item.ArmorItem.Type.CHESTPLATE,new Item.Settings().fireproof().maxDamage(net.minecraft.item.ArmorItem.Type.CHESTPLATE.getMaxDamage(38))));
     public static final Item RESONITE_LEGGINGS=register("resonite_leggings",new net.minecraft.item.ArmorItem(ResoniteArmor.MATERIAL,net.minecraft.item.ArmorItem.Type.LEGGINGS,new Item.Settings().fireproof().maxDamage(net.minecraft.item.ArmorItem.Type.LEGGINGS.getMaxDamage(38))));
     public static final Item RESONITE_BOOTS=register("resonite_boots",new net.minecraft.item.ArmorItem(ResoniteArmor.MATERIAL,net.minecraft.item.ArmorItem.Type.BOOTS,new Item.Settings().fireproof().maxDamage(net.minecraft.item.ArmorItem.Type.BOOTS.getMaxDamage(38))));
+    public static final Item ASTRAL_CORE=register("astral_core",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
+    public static final Item VIGOR_RUNE=register("vigor_rune",new Item(new Item.Settings().maxCount(16).fireproof().rarity(Rarity.RARE)));
+    public static final Item GALE_RUNE=register("gale_rune",new Item(new Item.Settings().maxCount(16).fireproof().rarity(Rarity.RARE)));
+    public static final Item FOCUS_RUNE=register("focus_rune",new Item(new Item.Settings().maxCount(16).fireproof().rarity(Rarity.RARE)));
     public static void register() {
         net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(dev.qynl.myfirstmod.block.ModBlocks.HUSHWOOD,300);
         Registry.register(Registries.ITEM_GROUP,Identifier.of(MyFirstMod.MOD_ID,"null_realm"),

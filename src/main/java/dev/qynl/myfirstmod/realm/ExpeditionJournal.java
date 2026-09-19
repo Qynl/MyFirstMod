@@ -48,6 +48,9 @@ public final class ExpeditionJournal {
         List<RawFilteredPair<Text>> pages=new ArrayList<>();
         page(pages,"journal.myfirstmod.progress",record.biomes.size(),record.courts.size(),record.trials,record.highestTier,record.victories);
         page(pages,"journal.myfirstmod.exploration");
+        page(pages,"journal.myfirstmod.convergence",record.riftsClosed);
+        page(pages,"journal.myfirstmod.attunement");
+        page(pages,"journal.myfirstmod.cultivation");
         page(pages,"journal.myfirstmod.resources");
         page(pages,"journal.myfirstmod.wilds_gear");
         page(pages,"journal.myfirstmod.waystones");

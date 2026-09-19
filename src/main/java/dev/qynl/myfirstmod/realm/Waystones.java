@@ -21,7 +21,7 @@ public final class Waystones {
     }
     public static boolean combatLocked(ServerPlayerEntity player) {
         return dev.qynl.myfirstmod.boss.NullWardenManager.isEncounterActive(player.getServerWorld())
-                && player.squaredDistanceTo(.5,81,.5)<48*48 || RealmTrials.isEnrolled(player.getUuid());
+                && player.squaredDistanceTo(.5,81,.5)<48*48 || RealmTrials.isEnrolled(player.getUuid()) || dev.qynl.myfirstmod.rift.RealmRifts.isEnrolled(player.getUuid());
     }
     public static boolean recall(ServerPlayerEntity player) {
         var world=player.getServerWorld();

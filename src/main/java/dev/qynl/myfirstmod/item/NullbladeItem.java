@@ -59,7 +59,8 @@ public class NullbladeItem extends SwordItem {
             }
         }
         if(hits>0) player.heal(Math.min(ascended?6:4,hits*1.5f));
-        cooldown(player,ascended?90:120);
+        RelicAttunements.afterCast(player,stack,hits>0);
+        cooldown(player,RelicAttunements.cooldown(stack,ascended?90:120));
         stack.damage(3,player,player.getActiveHand()==Hand.MAIN_HAND?EquipmentSlot.MAINHAND:EquipmentSlot.OFFHAND);
         for(int i=0;i<64;i++) {
             double angle=i*Math.PI*2/64;
@@ -89,7 +90,8 @@ public class NullbladeItem extends SwordItem {
         if(destination.squaredDistanceTo(start)<1) return;
         player.requestTeleport(destination.x,destination.y,destination.z);
         player.fallDistance=0;
-        cooldown(player,80);
+        RelicAttunements.afterCast(player,stack,false);
+        cooldown(player,RelicAttunements.cooldown(stack,80));
         stack.damage(2,player,hand==Hand.OFF_HAND?EquipmentSlot.OFFHAND:EquipmentSlot.MAINHAND);
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,start.x,start.y+1,start.z,32,.4,.7,.4,.04);
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,destination.x,destination.y+1,destination.z,32,.4,.7,.4,.04);

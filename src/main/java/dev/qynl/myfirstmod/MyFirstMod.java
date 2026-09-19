@@ -23,14 +23,17 @@ public class MyFirstMod implements ModInitializer {
         ModEntities.register();
         dev.qynl.myfirstmod.realm.RealmFeatures.register();
         dev.qynl.myfirstmod.realm.WildsFeatures.register();
+        dev.qynl.myfirstmod.rift.RiftObservatoryFeature.register();
         dev.qynl.myfirstmod.realm.ExpeditionJournal.register();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             dev.qynl.myfirstmod.realm.RealmTrials.clear();
+            dev.qynl.myfirstmod.rift.RealmRifts.clear();
             dev.qynl.myfirstmod.boss.NullWardenManager.clear();
             VoidPortalManager.clear();
         });
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             dev.qynl.myfirstmod.boss.NullWardenManager.entityLoaded(entity, world);
+            if(entity.getCommandTags().contains("null_rift") && !dev.qynl.myfirstmod.rift.RealmRifts.owns(entity.getUuid())) entity.discard();
             if (entity.getCommandTags().contains("null_trial")
                     && !dev.qynl.myfirstmod.realm.RealmTrials.owns(entity.getUuid())) entity.discard();
         });
@@ -38,6 +41,12 @@ public class MyFirstMod implements ModInitializer {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
             if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;
             if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
+            ActionResult harvest=dev.qynl.myfirstmod.block.HushNurseryBlock.harvest(serverPlayer,hit.getBlockPos());
+            if(harvest!=ActionResult.PASS) return harvest;
+            ActionResult forge=dev.qynl.myfirstmod.item.RelicAttunements.interact(serverPlayer,hit.getBlockPos());
+            if(forge!=ActionResult.PASS) return forge;
+            ActionResult rift=dev.qynl.myfirstmod.rift.RealmRifts.interact(serverPlayer,hit.getBlockPos());
+            if(rift!=ActionResult.PASS) return rift;
             ActionResult waystone=dev.qynl.myfirstmod.realm.Waystones.interact(serverPlayer,hit.getBlockPos());
             if(waystone!=ActionResult.PASS) return waystone;
             ActionResult altar=dev.qynl.myfirstmod.boss.NullWardenManager.interactAltar(serverPlayer,hit.getBlockPos());
@@ -55,5 +64,6 @@ public class MyFirstMod implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.item.ResoniteArmor::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.realm.RealmExpedition::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.realm.RealmTrials::tick);
+        ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.rift.RealmRifts::tick);
     }
 }

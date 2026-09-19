@@ -98,6 +98,15 @@ def main():
             connection.command(prefix+'fill 1042 80 1042 1054 80 1054 myfirstmod:hushed_moss')
             connection.command(prefix+'place feature myfirstmod:waystone_shrine 1048 81 1048')
             connection.command(prefix+'execute if block 1048 81 1048 myfirstmod:waystone run say SMOKE_WAYSTONE_OK')
+            connection.command(prefix+'fill 1042 81 1042 1054 200 1054 minecraft:air')
+            connection.command(prefix+'fill 1042 80 1042 1054 80 1054 myfirstmod:hushed_moss')
+            connection.command(prefix+'place feature myfirstmod:rift_observatory 1048 81 1048')
+            connection.command(prefix+'execute if block 1048 81 1048 myfirstmod:rift_anchor run say SMOKE_RIFT_OK')
+            connection.command(prefix+'summon myfirstmod:rift_herald 1048 83 1048')
+            connection.command(prefix+'setblock 1044 81 1044 myfirstmod:attunement_forge')
+            connection.command(prefix+'setblock 1045 81 1044 myfirstmod:hush_nursery[age=3]')
+            connection.command(prefix+'loot spawn 1045 83 1044 mine 1045 81 1044 minecraft:iron_hoe')
+            connection.command(prefix+'execute if entity @e[type=minecraft:item,nbt={Item:{id:"myfirstmod:hush_nursery"}}] run say SMOKE_NURSERY_OK')
             # Exercise the actual block-loot codecs, not just JSON parsing.
             for index,(ore,drop) in enumerate([('resonite_ore','raw_resonite'),('prism_ore','prism_dust'),('cinder_ore','cinder_pearl')]):
                 x=8+index

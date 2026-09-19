@@ -1,3 +1,7 @@
+# Convergence update — 1.4.0
+
+Adds opt-in observatory encounters, an original animated Rift Herald, three relic attunements, and renewable Hush Nurseries. See [the Convergence guide](docs/CONVERGENCE.md) for progression, recipes, and upgrade notes.
+
 # The Null Warden — Wilds & Relics (1.3.0)
 
 A Minecraft **1.21.1 / Fabric / Java 21** exploration and boss mod.

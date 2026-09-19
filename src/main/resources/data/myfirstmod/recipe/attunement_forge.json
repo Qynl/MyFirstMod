@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IRI",
+    "BBB"
+  ],
+  "key": {
+    "I": {
+      "item": "myfirstmod:resonite_ingot"
+    },
+    "R": {
+      "item": "myfirstmod:resonance_matrix"
+    },
+    "B": {
+      "item": "myfirstmod:nullstone_bricks"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:attunement_forge",
+    "count": 1
+  }
+}

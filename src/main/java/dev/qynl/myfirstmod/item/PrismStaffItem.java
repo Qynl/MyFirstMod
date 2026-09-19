@@ -43,9 +43,10 @@ public final class PrismStaffItem extends Item {
                 var hit=bounds.contains(start)?java.util.Optional.of(start):bounds.raycast(start,end);
                 if(hit.isPresent() && start.squaredDistanceTo(hit.get())<=best) {closest=enemy;best=start.squaredDistanceTo(hit.get());}
             }
+            boolean landed=false;
             if(closest!=null) {
-                if(closest.damage(server.getDamageSources().playerAttack(user),8))
-                    closest.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING,100,0));
+                landed=closest.damage(server.getDamageSources().playerAttack(user),8);
+                if(landed) closest.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING,100,0));
                 end=start.add(end.subtract(start).normalize().multiply(Math.sqrt(best)));
             }
             var direction=end.subtract(start);
@@ -54,7 +55,8 @@ public final class PrismStaffItem extends Item {
                 var point=start.add(direction.multiply(i/(double)points));
                 server.spawnParticles(ParticleTypes.END_ROD,point.x,point.y,point.z,1,0,0,0,0);
             }
-            user.getItemCooldownManager().set(this,30);
+            RelicAttunements.afterCast(user,stack,landed);
+            user.getItemCooldownManager().set(this,RelicAttunements.cooldown(stack,30));
             stack.damage(1,user,hand==Hand.MAIN_HAND?EquipmentSlot.MAINHAND:EquipmentSlot.OFFHAND);
             server.playSound(null,user.getBlockPos(),SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,SoundCategory.PLAYERS,1,1.5f);
         }

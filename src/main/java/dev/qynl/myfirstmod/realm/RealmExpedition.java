@@ -18,7 +18,7 @@ public final class RealmExpedition {
     public static final BlockPos ARRIVAL=new BlockPos(0,81,160);
     public static void prepare(ServerWorld world) {
         RealmState state=RealmState.get(world);
-        if(state.sanctuaryBuilt) {prepareAltar(world,state);return;}
+        if(state.sanctuaryBuilt) {prepareAltar(world,state);prepareForge(world,state);return;}
         NullWardenManager.prepareArena(world);
         // Lit, railed causeway: entry is always safe regardless of the seed's local terrain.
         for(int z=23;z<=170;z++) for(int x=-3;x<=3;x++) {
@@ -51,7 +51,15 @@ public final class RealmExpedition {
         put(world,new BlockPos(21,81,152),ModBlocks.RESONANCE_CORE);
         state.sanctuaryBuilt=true;
         prepareAltar(world,state);
+        prepareForge(world,state);
         state.markDirty();
+    }
+    private static void prepareForge(ServerWorld world,RealmState state) {
+        if(state.contentVersion>=3) return;
+        BlockPos pos=new BlockPos(-6,81,160);
+        // Upgrade old sanctuaries without overwriting an occupied player block.
+        if(world.getBlockState(pos).isAir()) put(world,pos,ModBlocks.ATTUNEMENT_FORGE);
+        state.contentVersion=3;state.markDirty();
     }
     private static void prepareAltar(ServerWorld world,RealmState state) {
         if(state.contentVersion>=2) return;

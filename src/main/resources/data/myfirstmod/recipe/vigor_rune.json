@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:astral_core"
+    },
+    {
+      "item": "minecraft:golden_apple"
+    },
+    {
+      "item": "myfirstmod:resonant_shard"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:vigor_rune",
+    "count": 1
+  }
+}

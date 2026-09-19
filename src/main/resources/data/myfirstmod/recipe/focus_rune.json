@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:astral_core"
+    },
+    {
+      "item": "myfirstmod:prism_dust"
+    },
+    {
+      "item": "myfirstmod:resonant_shard"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:focus_rune",
+    "count": 1
+  }
+}

@@ -19,17 +19,21 @@ public final class CinderMaulItem extends SwordItem {
         var stack=user.getStackInHand(hand);
         if(!user.isOnGround() || user.getItemCooldownManager().isCoolingDown(this)) return TypedActionResult.fail(stack);
         if(world instanceof ServerWorld server) {
+            boolean landed=false;
             for(var enemy:server.getEntitiesByClass(HostileEntity.class,user.getBoundingBox().expand(4),
                     e->e.isAlive() && !e.isTeammate(user) && e.squaredDistanceTo(user)<=16 && user.canSee(e))) {
-                if(enemy.damage(server.getDamageSources().playerAttack(user),7))
+                if(enemy.damage(server.getDamageSources().playerAttack(user),7)) {
+                    landed=true;
                     enemy.takeKnockback(.8,user.getX()-enemy.getX(),user.getZ()-enemy.getZ());
+                }
             }
             for(int i=0;i<40;i++) {
                 double angle=i*Math.PI/20;
                 server.spawnParticles(ParticleTypes.FLAME,user.getX()+Math.cos(angle)*4,user.getY()+.2,
                         user.getZ()+Math.sin(angle)*4,1,0,.1,0,.01);
             }
-            user.getItemCooldownManager().set(this,120);
+            RelicAttunements.afterCast(user,stack,landed);
+            user.getItemCooldownManager().set(this,RelicAttunements.cooldown(stack,120));
             stack.damage(3,user,hand==Hand.MAIN_HAND?EquipmentSlot.MAINHAND:EquipmentSlot.OFFHAND);
         }
         return TypedActionResult.success(stack,world.isClient);

@@ -16,6 +16,7 @@ public final class RealmState extends PersistentState {
     public ExpeditionRecord expedition(java.util.UUID player) {
         return expeditions.computeIfAbsent(player, id -> new ExpeditionRecord());
     }
+    public final Map<Long,Long> riftCooldowns=new HashMap<>();
     public final Map<Long,Long> trialCooldowns = new HashMap<>();
     public static RealmState get(ServerWorld world) {
         return world.getPersistentStateManager().getOrCreate(new Type<>(RealmState::new,
@@ -37,6 +38,10 @@ public final class RealmState extends PersistentState {
             NbtCompound entry=trials.getCompound(i);
             state.trialCooldowns.put(entry.getLong("Pos"),entry.getLong("Ready"));
         }
+        NbtList rifts=nbt.getList("Rifts",10);
+        for(int i=0;i<rifts.size();i++) {
+            var entry=rifts.getCompound(i);state.riftCooldowns.put(entry.getLong("Pos"),entry.getLong("Ready"));
+        }
         return state;
     }
     @Override public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
@@ -52,6 +57,9 @@ public final class RealmState extends PersistentState {
             NbtCompound entry=new NbtCompound();entry.putLong("Pos",pos);entry.putLong("Ready",time);trials.add(entry);
         });
         nbt.put("Trials",trials);
+        NbtList rifts=new NbtList();
+        riftCooldowns.forEach((pos,ready)->{var entry=new NbtCompound();entry.putLong("Pos",pos);entry.putLong("Ready",ready);rifts.add(entry);});
+        nbt.put("Rifts",rifts);
         return nbt;
     }
 }
