@@ -26,6 +26,7 @@ import java.util.Map;
 public final class VoidPortalManager {
     public static final RegistryKey<World> NULL_REALM = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(MyFirstMod.MOD_ID, "null_realm"));
     private static final Map<java.util.UUID, Integer> COOLDOWNS = new HashMap<>();
+    private static final Map<java.util.UUID, BlockPos> RETURN_POINTS = new HashMap<>();
 
     public static boolean tryIgnite(ServerPlayerEntity player, BlockPos clicked) {
         ServerWorld world = player.getServerWorld();
@@ -74,6 +75,7 @@ public final class VoidPortalManager {
             return;
         }
 
+        RETURN_POINTS.put(player.getUuid(), player.getBlockPos());
         ServerWorld target = server.getWorld(NULL_REALM);
         if (target == null) return;
         player.teleport(target, 0.5, 82, 0.5, player.getYaw(), player.getPitch());
