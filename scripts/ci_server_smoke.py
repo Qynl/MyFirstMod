@@ -81,6 +81,20 @@ def main():
             connection.command(prefix+'setblock 21 81 152 myfirstmod:resonance_core')
             connection.command(prefix+'summon myfirstmod:rift_sentinel 8 120 152')
             connection.command(prefix+'summon myfirstmod:shardstalker 10 120 154')
+            # Deterministic shrine fixture, independent of random trees or steep terrain.
+            connection.command(prefix+'forceload add 1040 1040')
+            connection.command(prefix+'fill 1042 60 1042 1054 200 1054 minecraft:air')
+            connection.command(prefix+'fill 1042 80 1042 1054 80 1054 myfirstmod:hushed_moss')
+            connection.command(prefix+'place feature myfirstmod:waystone_shrine 1048 81 1048')
+            connection.command(prefix+'if block 1048 81 1048 myfirstmod:waystone run say SMOKE_WAYSTONE_OK')
+            # Exercise the actual block-loot codecs, not just JSON parsing.
+            for index,(ore,drop) in enumerate([('resonite_ore','raw_resonite'),('prism_ore','prism_dust'),('cinder_ore','cinder_pearl')]):
+                x=8+index
+                connection.command(prefix+f'setblock {x} 110 155 myfirstmod:{ore}')
+                connection.command(prefix+f'loot spawn {x} 120 155 mine {x} 110 155 minecraft:iron_pickaxe')
+                selector='@e[type=minecraft:item,nbt={Item:{id:"myfirstmod:'+drop+'"}}]'
+                connection.command(prefix+'if entity '+selector+' run say SMOKE_ORE_OK')
+            connection.command(prefix+'loot spawn 8 120 155 loot myfirstmod:chests/waystone_cache')
             connection.command('save-all flush')
             connection.command('stop')
             code=proc.wait(timeout=120)
@@ -89,7 +103,7 @@ def main():
             bad=[line for line in text.splitlines() if re.search(
                 r'Failed to (?:parse|load)|Couldn.t (?:parse|load)|Error loading|Exception in server tick|Unbound values|Missing referenced',line,re.I)]
             if bad:raise RuntimeError('Resource/runtime errors:\n'+'\n'.join(bad))
-            print('PASS: dedicated server startup, realm chunks, structures, entities, save and shutdown.',flush=True)
+            print('PASS: server startup, realm chunks, ruins/vault/shrine, ore drops, caches, mobs, save and shutdown.',flush=True)
         finally:
             if connection:connection.socket.close()
             if proc.poll() is None:

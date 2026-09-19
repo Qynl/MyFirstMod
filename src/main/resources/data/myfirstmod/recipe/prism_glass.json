@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "category": "blocks",
+  "ingredient": {
+    "item": "myfirstmod:prismstone"
+  },
+  "result": {
+    "id": "minecraft:glass"
+  },
+  "experience": 0.1,
+  "cookingtime": 200
+}

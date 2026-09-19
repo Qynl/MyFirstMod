@@ -25,6 +25,11 @@ public final class RealmFeatures {
         Registry.register(Registries.FEATURE, Identifier.of(MyFirstMod.MOD_ID, "realm_vault"), new Ruins(2));
     }
 
+    public static int surfaceHeight(StructureWorldAccess world,int x,int z) {
+        return world.getTopY(world instanceof net.minecraft.server.world.ServerWorld
+                ? Heightmap.Type.WORLD_SURFACE : Heightmap.Type.WORLD_SURFACE_WG,x,z);
+    }
+
     private static void place(StructureWorldAccess world, BlockPos pos, Block block) {
         world.setBlockState(pos, block.getDefaultState(), Block.NOTIFY_LISTENERS);
     }
@@ -32,7 +37,7 @@ public final class RealmFeatures {
     private static BlockPos center(FeatureContext<DefaultFeatureConfig> context) {
         int x = (context.getOrigin().getX() & ~15) + 8;
         int z = (context.getOrigin().getZ() & ~15) + 8;
-        return new BlockPos(x, context.getWorld().getTopY(Heightmap.Type.WORLD_SURFACE_WG, x, z), z);
+        return new BlockPos(x, surfaceHeight(context.getWorld(),x,z), z);
     }
 
     private static boolean reserved(BlockPos p) {
@@ -117,7 +122,7 @@ public final class RealmFeatures {
             var world = context.getWorld();
             int px=(context.getOrigin().getX() & ~15)+4+context.getRandom().nextInt(8);
             int pz=(context.getOrigin().getZ() & ~15)+4+context.getRandom().nextInt(8);
-            BlockPos p=new BlockPos(px,world.getTopY(Heightmap.Type.WORLD_SURFACE_WG,px,pz),pz);
+            BlockPos p=new BlockPos(px,surfaceHeight(world,px,pz),pz);
             if (reserved(p)) return false;
             int height = 3 + context.getRandom().nextInt(7);
             var surface=world.getBlockState(p.down());

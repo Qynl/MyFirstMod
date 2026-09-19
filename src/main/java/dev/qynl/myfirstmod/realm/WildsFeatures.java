@@ -31,7 +31,7 @@ public final class WildsFeatures {
         @Override public boolean generate(FeatureContext<DefaultFeatureConfig> context) {
             var world=context.getWorld();var random=context.getRandom();
             int cx=context.getOrigin().getX() & ~15,cz=context.getOrigin().getZ() & ~15;
-            int surface=world.getTopY(Heightmap.Type.WORLD_SURFACE_WG,cx+8,cz+8);
+            int surface=RealmFeatures.surfaceHeight(world,cx+8,cz+8);
             int ceiling=Math.min(64,surface-6);
             if(ceiling<=-24) return false;
             String biome=world.getBiome(new BlockPos(cx+8,surface,cz+8)).getKey()
@@ -57,7 +57,7 @@ public final class WildsFeatures {
             var world=context.getWorld();
             int x=(context.getOrigin().getX() & ~15)+8,z=(context.getOrigin().getZ() & ~15)+8;
             if(Math.abs(x)<96 && z>-96 && z<192) return false;
-            BlockPos p=new BlockPos(x,world.getTopY(Heightmap.Type.WORLD_SURFACE_WG,x,z),z);
+            BlockPos p=new BlockPos(x,RealmFeatures.surfaceHeight(world,x,z),z);
             if(p.getY()<20 || p.getY()>160) return false;
             var ground=world.getBlockState(p.down());
             if(!(ground.isOf(ModBlocks.HUSHED_MOSS) || ground.isOf(ModBlocks.LUMEN_MOSS)

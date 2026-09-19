@@ -155,5 +155,13 @@
   "journal.myfirstmod.wilds_gear": "EXPEDITION GEAR\n\nThe Prism Staff spends dust for precise ranged attacks.\n\nGrounded maul slams push enemies away.\n\nHold damaged mod gear in your other hand to use a Repair Kit.",
   "journal.myfirstmod.waystones": "WAYSTONES\n\nBind at a shrine. Channel a Wayfarer Thread for 3s to recall; sneak for sanctuary. Damage interrupts.\n\nNo recall from boss fights or enrolled trials. Cooldown: 60s.",
   "journal.myfirstmod.bound_stone": "BOUND WAYSTONE\n\n%s\n\nIf its landing is blocked, recall fails without spending the cooldown.",
-  "journal.myfirstmod.no_stone": "No shrine bound. Your thread returns to the sanctuary."
+  "journal.myfirstmod.no_stone": "No shrine bound. Your thread returns to the sanctuary.",
+  "item.myfirstmod.resonite_helmet": "Resonite Helmet",
+  "item.myfirstmod.resonite_helmet.tooltip": "Full Resonite set in the Null Realm: night vision and haste I. Repair with ingots.",
+  "item.myfirstmod.resonite_chestplate": "Resonite Chestplate",
+  "item.myfirstmod.resonite_chestplate.tooltip": "Full Resonite set in the Null Realm: night vision and haste I. Repair with ingots.",
+  "item.myfirstmod.resonite_leggings": "Resonite Leggings",
+  "item.myfirstmod.resonite_leggings.tooltip": "Full Resonite set in the Null Realm: night vision and haste I. Repair with ingots.",
+  "item.myfirstmod.resonite_boots": "Resonite Boots",
+  "item.myfirstmod.resonite_boots.tooltip": "Full Resonite set in the Null Realm: night vision and haste I. Repair with ingots."
 }

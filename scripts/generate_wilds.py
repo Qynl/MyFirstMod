@@ -133,3 +133,28 @@ for name in ['realm_cache','vault_cache']:
     if marker not in json.dumps(table):
         table['pools'].append({'rolls':1,'entries':[count_drop('resonite_ingot',2,4),count_drop('prism_dust',3,6),count_drop('repair_kit',1,1)]})
     data('loot_table/chests/'+name+'.json',table)
+
+# A distinct, non-dyed armor material with original worn and inventory textures.
+for layer in [1,2]:
+    rng=random.Random('resonite-armor-'+str(layer));pixels=[]
+    for y in range(32):
+        for x in range(64):
+            n=rng.randint(-7,7)
+            color=(40+n,83+n,99+n)
+            if y%8 in [0,7] or x%8 in [0,7]:color=(23,35,59)
+            if (x+y*2)%19<2:color=(105,230,213)
+            if y%16==4 and x%8 in [3,4]:color=(210,253,233)
+            pixels.append(color+(255,))
+    png(f'models/armor/resonite_layer_{layer}.png',64,32,pixels)
+sprite('resonite_helmet',[([(4,5),(26,5),(30,12),(28,25),(21,25),(21,18),(11,18),(11,25),(4,25),(2,12)],DARK), ([(7,8),(24,8),(27,13),(26,22),(24,22),(24,15),(8,15),(8,22),(6,22),(5,13)],TEAL), ([(10,9),(21,9),(21,12),(10,12)],LIGHT)])
+sprite('resonite_chestplate',[([(9,3),(13,8),(19,8),(23,3),(31,11),(26,16),(25,29),(7,29),(6,16),(1,11)],DARK), ([(9,7),(13,11),(19,11),(23,7),(27,11),(23,14),(22,26),(10,26),(9,14),(5,11)],TEAL), ([(14,13),(18,13),(20,18),(16,23),(12,18)],LIGHT)])
+sprite('resonite_leggings',[([(7,3),(25,3),(26,29),(17,29),(16,16),(15,29),(6,29)],DARK), ([(10,6),(22,6),(22,12),(10,12)],TEAL), ([(9,14),(14,14),(12,26),(9,26)],TEAL), ([(18,14),(23,14),(23,26),(20,26)],TEAL)])
+sprite('resonite_boots',[([(5,7),(14,7),(14,29),(2,29),(2,20),(5,18)],DARK), ([(19,7),(28,7),(28,18),(31,20),(31,29),(19,29)],DARK), ([(7,10),(12,10),(12,26),(5,26),(5,22),(8,21)],TEAL), ([(21,10),(26,10),(25,21),(28,22),(28,26),(21,26)],TEAL)])
+armor={'resonite_helmet':['III','I I'],'resonite_chestplate':['I I','III','III'],'resonite_leggings':['III','I I','I I'],'resonite_boots':['I I','I I']}
+for name,pattern in armor.items():
+    asset('models/item/'+name+'.json',{'parent':'minecraft:item/generated','textures':{'layer0':'myfirstmod:item/'+name}})
+    shaped(name,pattern,{'I':'resonite_ingot'})
+    data('advancement/recipes/'+name+'.json',{'criteria':{'ingot':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':['myfirstmod:resonite_ingot']}]}}},'rewards':{'recipes':['myfirstmod:'+name]}})
+for tag in ['stone_crafting_materials','stone_tool_materials']:
+    put(vanilla,'tags/item/'+tag+'.json',{'replace':False,'values':['myfirstmod:nullstone']})
+data('recipe/prism_glass.json',{'type':'minecraft:smelting','category':'blocks','ingredient':ingredient('prismstone'),'result':{'id':'minecraft:glass'},'experience':.1,'cookingtime':200})

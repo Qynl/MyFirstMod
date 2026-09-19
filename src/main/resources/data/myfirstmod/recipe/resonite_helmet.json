@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "I I"
+  ],
+  "key": {
+    "I": {
+      "item": "myfirstmod:resonite_ingot"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:resonite_helmet",
+    "count": 1
+  }
+}

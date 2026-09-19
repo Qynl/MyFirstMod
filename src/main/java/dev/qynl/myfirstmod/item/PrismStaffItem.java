@@ -39,7 +39,8 @@ public final class PrismStaffItem extends Item {
             HostileEntity closest=null;double best=start.squaredDistanceTo(end);
             for(var enemy:server.getEntitiesByClass(HostileEntity.class,new Box(start,end).expand(1),
                     e->e.isAlive() && !e.isTeammate(user))) {
-                var hit=enemy.getBoundingBox().expand(.15).raycast(start,end);
+                var bounds=enemy.getBoundingBox().expand(.15);
+                var hit=bounds.contains(start)?java.util.Optional.of(start):bounds.raycast(start,end);
                 if(hit.isPresent() && start.squaredDistanceTo(hit.get())<=best) {closest=enemy;best=start.squaredDistanceTo(hit.get());}
             }
             if(closest!=null) {

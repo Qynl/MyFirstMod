@@ -52,6 +52,7 @@ public class MyFirstMod implements ModInitializer {
 
         ServerTickEvents.END_SERVER_TICK.register(VoidPortalManager::tick);
         ServerTickEvents.END_SERVER_TICK.register(NullbladeItem::tick);
+        ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.item.ResoniteArmor::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.realm.RealmExpedition::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.realm.RealmTrials::tick);
     }

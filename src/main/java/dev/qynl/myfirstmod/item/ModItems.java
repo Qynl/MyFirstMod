@@ -44,7 +44,12 @@ public final class ModItems {
     public static final Item VEIL_CHARM=register("veil_charm",new ExpeditionUtilityItem(new Item.Settings().maxDamage(128).rarity(Rarity.RARE),ExpeditionUtilityItem.Kind.VEIL));
     public static final Item REPAIR_KIT=register("repair_kit",new ExpeditionUtilityItem(new Item.Settings().maxCount(16),ExpeditionUtilityItem.Kind.REPAIR));
     public static final Item WAYFARER_THREAD=register("wayfarer_thread",new WayfarerThreadItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+    public static final Item RESONITE_HELMET=register("resonite_helmet",new net.minecraft.item.ArmorItem(ResoniteArmor.MATERIAL,net.minecraft.item.ArmorItem.Type.HELMET,new Item.Settings().fireproof().maxDamage(net.minecraft.item.ArmorItem.Type.HELMET.getMaxDamage(38))));
+    public static final Item RESONITE_CHESTPLATE=register("resonite_chestplate",new net.minecraft.item.ArmorItem(ResoniteArmor.MATERIAL,net.minecraft.item.ArmorItem.Type.CHESTPLATE,new Item.Settings().fireproof().maxDamage(net.minecraft.item.ArmorItem.Type.CHESTPLATE.getMaxDamage(38))));
+    public static final Item RESONITE_LEGGINGS=register("resonite_leggings",new net.minecraft.item.ArmorItem(ResoniteArmor.MATERIAL,net.minecraft.item.ArmorItem.Type.LEGGINGS,new Item.Settings().fireproof().maxDamage(net.minecraft.item.ArmorItem.Type.LEGGINGS.getMaxDamage(38))));
+    public static final Item RESONITE_BOOTS=register("resonite_boots",new net.minecraft.item.ArmorItem(ResoniteArmor.MATERIAL,net.minecraft.item.ArmorItem.Type.BOOTS,new Item.Settings().fireproof().maxDamage(net.minecraft.item.ArmorItem.Type.BOOTS.getMaxDamage(38))));
     public static void register() {
+        net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(dev.qynl.myfirstmod.block.ModBlocks.HUSHWOOD,300);
         Registry.register(Registries.ITEM_GROUP,Identifier.of(MyFirstMod.MOD_ID,"null_realm"),
                 net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup.builder()
                         .displayName(net.minecraft.text.Text.translatable("itemGroup.myfirstmod.null_realm"))
