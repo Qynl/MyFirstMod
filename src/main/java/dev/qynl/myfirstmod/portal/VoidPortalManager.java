@@ -108,12 +108,16 @@ public final class VoidPortalManager {
 
         COOLDOWNS.put(player.getUuid(), TELEPORT_COOLDOWN);
 
+        BlockPos returnPos = player.getBlockPos();
+        RegistryKey<World> returnWorld = player.getServerWorld().getRegistryKey();
+        float returnYaw = player.getYaw();
+        float returnPitch = player.getPitch();
+
+        // Return data is owned by the Null Realm encounter state, not the
+        // origin world's state. This makes returning work across dimensions
+        // and survives a server restart.
         NullWardenManager.saveReturnPoint(
-                player,
-                player.getServerWorld().getRegistryKey(),
-                player.getBlockPos(),
-                player.getYaw(),
-                player.getPitch()
+                player, returnWorld, returnPos, returnYaw, returnPitch
         );
 
         player.teleport(target, 0.5, 82.0, 0.5, player.getYaw(), player.getPitch());
