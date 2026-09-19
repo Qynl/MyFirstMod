@@ -29,6 +29,16 @@ public final class KeepArchitecture {
                     if(Math.abs(dx)==5 && Math.abs(dz)==5 && y==65) b=Blocks.SOUL_LANTERN;
                     if(dx==0 && dz==0 && y==65) b=ModBlocks.KEEP_WARD;
                 }
+                // Paired grave gardens flank the entrance without narrowing its central path.
+                if(Math.abs(x)>=15&&Math.abs(x)<=23&&z>=15&&z<=23) {
+                    if(Math.abs(x)%4==3&&z%4==3&&y>=65&&y<=67)b=Blocks.CHISELED_DEEPSLATE;
+                    if(Math.abs(x)%4==3&&z%4==0&&y==65)b=Blocks.DEEPSLATE_TILE_SLAB;
+                }
+                if(z==18&&Math.abs(x)==5&&y>=65&&y<=73)b=Blocks.POLISHED_BASALT;
+                if(z==18&&Math.abs(x)<=5&&y==76-Math.abs(x)/2)b=Blocks.CHISELED_DEEPSLATE;
+                if(z==-7&&Math.abs(x)<=3&&y==65)b=Blocks.DEEPSLATE_TILE_SLAB;
+                if(z==-8&&Math.abs(x)<=2&&y>=65&&y<=68)b=Blocks.CHISELED_DEEPSLATE;
+                if(z==-8&&Math.abs(x)==3&&y>=65&&y<=70)b=Blocks.POLISHED_BASALT;
                 if(Math.abs(x)>=27 && Math.abs(x)<=29 && Math.abs(z)>=27 && Math.abs(z)<=29 && y<=84) b=Blocks.DEEPSLATE_TILES;
                 if(Math.abs(x)==28 && Math.abs(z)==28 && y==85) b=ModBlocks.PRISM_LAMP;
                 if(x==0 && z==28 && y==65) b=ModBlocks.KEEP_GATE;

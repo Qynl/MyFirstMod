@@ -68,6 +68,7 @@ public final class NullWardenManager {
             return net.minecraft.util.ActionResult.PASS;
         if(player.isCreative() || player.isSpectator() || world.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)
             return altarMessage(player,"message.myfirstmod.trial_survival");
+        if(dev.qynl.myfirstmod.keep.HollowKeep.enrolled(player.getUuid()))return altarMessage(player,"message.myfirstmod.trial_busy");
         if(!isDefeated(world)) return altarMessage(player,"message.myfirstmod.altar_locked");
         ArenaState a=getArena(world);
         if(a.boss!=null || a.awaitingBossTicks>0 || !a.defeated) return altarMessage(player,"message.myfirstmod.altar_busy");
@@ -78,7 +79,7 @@ public final class NullWardenManager {
         a.rematch=true;
         a.challengeTier=Math.min(3,Math.max(1,state.bossClears));
         a.participants.clear();a.participants.add(player.getUuid());
-        for(var ally:world.getPlayers()) if(!ally.isCreative() && !ally.isSpectator()
+        for(var ally:world.getPlayers()) if(!dev.qynl.myfirstmod.keep.HollowKeep.enrolled(ally.getUuid()) && !ally.isCreative() && !ally.isSpectator()
                 && ally.squaredDistanceTo(.5,81,.5)<34*34) a.participants.add(ally.getUuid());
         start(world,player,a);
         if(a.boss!=null && a.boss.isAlive()) {
@@ -94,6 +95,7 @@ public final class NullWardenManager {
     }
     public static void prepareArena(ServerWorld world) { buildArena(world); }
     public static void approachArena(ServerWorld world, ServerPlayerEntity player) {
+        if(dev.qynl.myfirstmod.keep.HollowKeep.enrolled(player.getUuid()))return;
         if (player.isCreative() || player.isSpectator() || world.getDifficulty() == net.minecraft.world.Difficulty.PEACEFUL) return;
         ArenaState a = getArena(world);
         if (a.awaitingBossTicks > 0) return;

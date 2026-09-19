@@ -327,5 +327,9 @@
   "regent.myfirstmod.attack.2": "FUNERAL RING · Inside 2.5 blocks or outside 7.5",
   "regent.myfirstmod.attack.3": "CROSS OF ASH · Leave both marked lanes",
   "journal.myfirstmod.keep": "THE HOLLOW KEEP\n\nClears claimed: %s\n\nAfter the Warden falls, use the gate at -6, 81, 158. Gather within 16 blocks of the Expedition Heart to enroll. Break west, east, and north wards, then face the Regent in the great hall.",
-  "journal.myfirstmod.regent": "THE GRAVE REGENT\n\nDodge the cleave, funeral ring, and marked cross. Below half health it attacks faster and harder.\n\nFlasks, armor bonuses, and vows work in the Keep. Rest is blocked during a run. Return through the gate to claim rewards; your first clear grants a glaive."
+  "journal.myfirstmod.regent": "THE GRAVE REGENT\n\nDodge the cleave, funeral ring, and marked cross. Below half health it attacks faster and harder.\n\nFlasks, armor bonuses, and vows work in the Keep. Rest is blocked during a run. Return through the gate to claim rewards; your first clear grants a glaive.",
+  "biome.myfirstmod.hollow_keep": "The Hollow Keep",
+  "region.myfirstmod.hollow_keep": "The throne remembers every name",
+  "hud.myfirstmod.glaive": "REQUIEM · %s%%",
+  "message.myfirstmod.keep_landing": "The arrival area is obstructed. Clear a safe landing near the gate or sanctuary."
 }

@@ -39,13 +39,14 @@ public final class RealmTrials {
         if(ACTIVE.containsKey(pos)) return ActionResult.SUCCESS;
         if(world.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL) return message(player,"message.myfirstmod.trial_peaceful");
         // One enrollment at a time prevents overlapping courts sharing the same party.
-        if(dev.qynl.myfirstmod.rift.RealmRifts.isEnrolled(player.getUuid()) || ACTIVE.values().stream().anyMatch(t->t.players.contains(player.getUuid())))
+        if(dev.qynl.myfirstmod.keep.HollowKeep.enrolled(player.getUuid()) || dev.qynl.myfirstmod.rift.RealmRifts.isEnrolled(player.getUuid()) || ACTIVE.values().stream().anyMatch(t->t.players.contains(player.getUuid())))
             return message(player,"message.myfirstmod.trial_busy");
         long remaining=state.trialCooldowns.getOrDefault(pos.asLong(),0L)-world.getTime();
         if(remaining>0) return message(player,"message.myfirstmod.trial_cooldown",(remaining+19)/20);
         int tier=NullWardenManager.isDefeated(world)?(player.isSneaking()?TrialRules.nextTier(record.highestTier):1):0;
         Trial trial=new Trial(pos.toImmutable(),tier,world.getTime()+12000);
         for(ServerPlayerEntity p:world.getPlayers()) if(eligible(p,pos)
+                && !dev.qynl.myfirstmod.keep.HollowKeep.enrolled(p.getUuid())
                 && !dev.qynl.myfirstmod.rift.RealmRifts.isEnrolled(p.getUuid())
                 && ACTIVE.values().stream().noneMatch(t->t.players.contains(p.getUuid()))) trial.players.add(p.getUuid());
         ACTIVE.put(trial.pos,trial);

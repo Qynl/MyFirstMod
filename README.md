@@ -3,7 +3,7 @@
 
 **A dark-fantasy expedition through a ruined dimension: prepare at a sanctuary, recover forgotten memories, descend beneath cathedrals, and challenge the guardian of a broken kingdom.**
 
-Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes a custom dimension, four biomes, original creature models, exploration landmarks, equipment progression, opt-in encounters, and persistent player records.
+Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an exploration dimension and a separate fortress dimension, four realm biomes, original creature models, exploration landmarks, equipment progression, opt-in encounters, and persistent player records.
 
 [Download builds](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml) · [Report an issue](https://github.com/Qynl/MyFirstMod/issues) · [Validation details](docs/TESTING.md)
 
@@ -13,6 +13,7 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes a custom d
 
 ## Contents
 
+- [New in 1.7 — The Hollow Keep](#new-in-17--the-hollow-keep)
 - [What is new in 1.6?](#what-is-new-in-16)
 - [Install and update](#install-and-update)
 - [Enter the Null Realm](#enter-the-null-realm)
@@ -120,6 +121,7 @@ The gate brings you to the **Hushed Threshold at approximately (0, 81, 160)**. A
 | Attunement Forge | `(-6, 81, 160)` |
 | Waystone | `(6, 81, 160)` |
 | Pilgrim Ledger | `(6, 81, 158)` |
+| Hollow Gate, unlocked after Warden victory | `(-6, 81, 158)` |
 | Echo Altar, near arena | `(8, 81, 30)` |
 
 Do not build a permanent base in the Warden arena: encounter preparation rebuilds its combat footprint. The reserved central approach excludes random exploration features.
@@ -193,7 +195,7 @@ Vows are **player specializations**, separate from an individual weapon's attune
 | **Mist** | Speed I | Weakness I | 2 Memory Shards + Dusk Fiber |
 | **Silence** | Return to Unbound | Removes the vow | Paper + Hushberry |
 
-The chosen vow survives death, gear swaps, and restarts. Its effects refresh for living Survival/Adventure players **inside the realm**, not Creative or spectator players. Effects naturally linger up to **three seconds** after leaving or changing vows. Vanilla potion stacking rules apply; existing stronger effects are not forcibly removed. Strength/Weakness affect ordinary melee, not every scripted relic ability.
+The chosen vow survives death, gear swaps, and restarts. Its effects refresh for living Survival/Adventure players **inside the realm**, not Creative or spectator players. Flasks, vows, and the full Resonite set bonus also operate in the Hollow Keep using the same player record. Effects naturally linger up to **three seconds** after leaving or changing vows. Vanilla potion stacking rules apply; existing stronger effects are not forcibly removed. Strength/Weakness affect ordinary melee, not every scripted relic ability.
 
 Safety uses the flask's rest checks: grounded, near a waystone, no nearby living hostiles, and no relevant enrolled encounter. Selecting the same vow or attempting a change too soon does not consume the seal.
 
@@ -237,7 +239,7 @@ Damage interrupts the channel. Enrolled trials/rifts and nearby active Warden co
 - **Sneak-use for five seconds near a safe waystone** to refill charges and restore health.
 - Rest with a **Mourning Ember offhand** to permanently add one charge, up to **five**. Hold the flask main-hand.
 - Charges belong to your saved player record. Extra flasks, trading, or relogging do not refill them.
-- Realm only; replacement recipe: **glass bottle + Resonite Ingot + Hushberry**.
+- Expedition dimensions only (Null Realm and Hollow Keep); replacement recipe: **glass bottle + Resonite Ingot + Hushberry**.
 
 Rest checks for a waystone within three blocks horizontally/two vertically, solid footing, no living hostiles within twelve blocks of your bounding box, and no enrolled court/rift or nearby active Warden fight. Checks continue throughout the channel. At maximum capacity, resting does not consume an ember.
 
@@ -253,6 +255,7 @@ Replacement: **leather + Dusk Fiber + Resonite Ingot**. This is an item ability,
 | --- | --- | --- |
 | **Rift Sentinel** | Original horned knight model, greatblade, committed 32-tick forward cleave | Circle behind its 3.5-block arc, retreat, or land a player hit of at least six incoming damage during the tell to stagger it |
 | **Shardstalker** | Original six-limbed crystal hunter; 30-tick fixed-position tell, physical lunge | Leave the marked position, watch the creature's actual landing, punish recovery |
+| **Grave Regent** | Crowned funeral monarch in the Keep; cleave, ring, and cross-lane attacks | Clear three wards first; dodge its committed tells and use recovery windows |
 | **Rift Herald** | Original floating construct with crown and orbiting shards; bursts and ring attacks | Leave the burst circle; for the ring, stay within three blocks or beyond six |
 | **Null Warden** | Four-phase scripted guardian with pylons, committed attacks, and cinematic transitions | Read the ground/text tells, cleanse pylons, and punish recovery openings |
 
@@ -336,6 +339,7 @@ After a realm victory, offer an **Echo Sigil** at the altar at `(8, 81, 30)`. Th
 | **Astral Core** | Convergence reward; relic-attunement runes |
 | **Mourning Ember** | Cathedral reward; permanent flask capacity upgrades |
 | **Memory Shard** | Memorials and contracts; ledger trades and player vows |
+| **Regent Crest** | Hollow Keep completion trophy; replacement Requiem Glaive recipe |
 | **Warden Crest** | Rematch trophy; Rift Aegis crafting |
 
 Realm ores replace Nullstone below roughly Y=65 and require iron-tier tools or better. Hush Leaves provide berries and fiber. The full **Resonite armor set** grants night vision and haste I in the realm; individual armor pieces have diamond-equivalent protection/toughness, not Netherite knockback resistance. Tools have 1,800 durability and use ingots for repair.
@@ -344,6 +348,7 @@ Realm ores replace Nullstone below roughly Y=65 and require iron-tier tools or b
 
 | Gear | Use |
 | --- | --- |
+| **Requiem Glaive** | First Keep-clear weapon: charge for one second, release a 14-damage forward reaping arc; successful hits slow enemies and grant temporary absorption |
 | **Nullblade** | Hold/release Soul Rend; sneak-use safe Riftstep. Base sword: 10 attack damage / 1.8 speed. Abilities consume durability and share cooldowns across blade tiers |
 | **Awakened Nullblade** | Stronger blade, longer Rend/Riftstep, shorter recovery; upgraded by smithing |
 | **Heart of the Null** | Regeneration II, absorption II, slow falling; reusable, 45-second cooldown |
@@ -375,7 +380,7 @@ Recipe JSON and the vanilla recipe book are authoritative for shaped layouts. [W
 
 Hold a supported relic main-hand and a rune offhand, then use an **Attunement Forge**. Sneak to replace an existing attunement; the previous rune is not refunded. Each relic has one socket.
 
-Supported: both Nullblades, Prism Staff, Cinder Maul, and Rift Aegis.
+Supported: both Nullblades, Prism Staff, Cinder Maul, Rift Aegis, and Requiem Glaive.
 
 | Rune | Craft with an Astral Core + Resonant Shard + … | Effect |
 | --- | --- | --- |
@@ -404,7 +409,8 @@ The realm can support a base, crafting, food production, and repeated expedition
 | Memorial shard | Once per player per remembered coordinate, up to archive cap |
 | Cathedral reliquary and generated chests | Shared world rewards |
 | Court/rift enrollment | Nearby eligible players at activation; late arrivals excluded |
-| Boss/rift reward mail | Queued per player; claimed when alive in the realm, including after reconnect |
+| Keep run | One shared party at a time; canceled on restart; fortress geometry persists |
+| Boss/rift/Keep reward mail | Queued per player; claimed when alive in the realm, including after reconnect |
 | Interrupted courts/rifts | Canceled on restart; tagged orphan actors cleaned up |
 | Sanctuary upgrade stations | Added only at empty designated positions |
 
@@ -453,7 +459,7 @@ Windows: use `gradlew.bat`. Installable output is in `build/libs/`; omit source 
 3. A real Fabric dedicated-server smoke test.
 4. Separate installable-JAR and validation-report artifacts.
 
-The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, inspects cathedral spawner IDs, exercises ore/nursery/ledger loot, summons entities/items, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
+The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, inspects cathedral spawner IDs, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
 
 **This is not a combat bot.** It does not prove that a human completed a rite, channelled a flask, bought from a ledger, used the atlas, or enjoyed the fight. Manual checks are listed in [TESTING.md](docs/TESTING.md).
 
@@ -485,6 +491,7 @@ The original generated textures are deterministic. Translations and Java models 
 | `…/realm/` | Terrain features, courts, journal, expedition records, waystones |
 | `…/rift/` | Convergence observatory and encounter |
 | `…/pilgrimage/` | Cathedral geometry/rite and Pilgrimage rules |
+| `…/keep/` | Dedicated fortress dimension, incremental builder, party expedition, Regent AI |
 | `…/remembrance/` | Memorials, atlas survey, vows, contracts, supply exchange |
 | `…/item/`, `…/block/`, `…/mob/` | Registered gameplay objects and behavior |
 | `src/client/java/` | Original models, renderers, textures, HUD |
@@ -494,6 +501,7 @@ The original generated textures are deterministic. Translations and Java models 
 
 ### Further reading and history
 
+- [1.7 Hollow Keep expedition guide](docs/HOLLOW_KEEP.md)
 - [1.6 Remembrance notes](docs/REMEMBRANCE.md)
 - [1.5 Ashen Pilgrimage guide](docs/PILGRIMAGE.md)
 - [1.4 Convergence guide](docs/CONVERGENCE.md)

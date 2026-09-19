@@ -55,7 +55,7 @@ public final class HollowKeep {
                 return tell(p,"message.myfirstmod.keep_building");
             }
             if(run!=null&&!enrolled(p.getUuid())&&!p.isCreative())return tell(p,"message.myfirstmod.keep_busy");
-            p.teleport(target,.5,65,27.5,180,0);p.fallDistance=0;
+            if(!land(p,target,new BlockPos(0,65,27)))return tell(p,"message.myfirstmod.keep_landing");
             return tell(p,"message.myfirstmod.keep_arrival");
         }
         if(!w.getRegistryKey().equals(WORLD))return ActionResult.PASS;
@@ -81,7 +81,18 @@ public final class HollowKeep {
     private static boolean eligible(ServerPlayerEntity p){return p.isAlive()&&!p.isCreative()&&!p.isSpectator();}
     private static void exit(ServerPlayerEntity p) {
         var home=p.getServer().getWorld(VoidPortalManager.NULL_REALM);if(home==null)return;
-        RealmExpedition.prepare(home);p.teleport(home,.5,81,160.5,180,0);p.fallDistance=0;
+        RealmExpedition.prepare(home);if(!land(p,home,new BlockPos(0,81,160)))tell(p,"message.myfirstmod.keep_landing");
+    }
+    private static boolean land(ServerPlayerEntity player,ServerWorld world,BlockPos anchor) {
+        for(int radius=0;radius<=6;radius++)for(int dx=-radius;dx<=radius;dx++)for(int dz=-radius;dz<=radius;dz++) {
+            if(Math.max(Math.abs(dx),Math.abs(dz))!=radius)continue;
+            BlockPos feet=anchor.add(dx,0,dz),below=feet.down();world.getChunk(feet);
+            var ground=world.getBlockState(below);var box=player.getBoundingBox().offset(feet.toBottomCenterPos().subtract(player.getPos()));
+            if(!ground.isSolidBlock(world,below)||!world.getFluidState(below).isEmpty()||!world.getWorldBorder().contains(box)||!world.isSpaceEmpty(player,box)||world.containsFluid(box))continue;
+            if(ground.isOf(net.minecraft.block.Blocks.MAGMA_BLOCK)||ground.isOf(net.minecraft.block.Blocks.CAMPFIRE)||ground.isOf(net.minecraft.block.Blocks.SOUL_CAMPFIRE)||world.getBlockState(feet).isIn(net.minecraft.registry.tag.BlockTags.FIRE))continue;
+            player.teleport(world,feet.getX()+.5,feet.getY(),feet.getZ()+.5,180,0);player.fallDistance=0;return true;
+        }
+        return false;
     }
     private static boolean spawnRoom(ServerWorld world,int room) {
         int count=2+KeepRules.party(run.players.size());int[] center=KeepArchitecture.WARDS[room];
@@ -112,7 +123,7 @@ public final class HollowKeep {
             if(++build>=16){RealmState.get(world).sanctuaryBuilt=true;RealmState.get(world).markDirty();build=-1;tickets(world,false);}
         }
         if(world.getTime()%5!=0)return;
-        for(var p:world.getPlayers())if(p.isAlive()&&p.getY()<55){p.teleport(world,.5,65,27.5,180,0);p.fallDistance=0;}
+        for(var p:world.getPlayers())if(p.isAlive()&&p.getY()<55){if(!land(p,world,new BlockPos(0,65,27)))exit(p);}
         if(run==null)return;
         var present=world.getPlayers().stream().filter(p->enrolled(p.getUuid())&&eligible(p)).toList();
         for(var p:List.copyOf(run.bar.getPlayers()))if(!present.contains(p))run.bar.removePlayer(p);
@@ -127,6 +138,8 @@ public final class HollowKeep {
             run.bar.setName(Text.translatable("entity.myfirstmod.grave_regent"));run.bar.setPercent(Math.max(0,Math.min(1,run.boss.getHealth()/run.boss.getMaxHealth())));
             if(run.boss.squaredDistanceTo(.5,65,.5)>100)run.boss.refreshPositionAndAngles(.5,65,.5,180,0);
         } else if(run.emergence>0) {
+            double radius=2+run.emergence*.065;
+            for(int i=0;i<32;i++){double angle=i*Math.PI/16;world.spawnParticles(net.minecraft.particle.ParticleTypes.SOUL,.5+Math.cos(angle)*radius,65.15,.5+Math.sin(angle)*radius,1,0,0,0,0);}
             run.emergence-=5;run.bar.setName(Text.translatable("message.myfirstmod.keep_emergence"));
             if(run.emergence==0&&!spawnBoss(world))finish(world,false);
         } else {
@@ -149,6 +162,7 @@ public final class HollowKeep {
     private static void discardGuards(){if(run!=null){run.guards.values().forEach(Entity::discard);run.guards.clear();}}
     private static void finish(ServerWorld world,boolean won) {
         if(won) {
+            world.spawnParticles(net.minecraft.particle.ParticleTypes.END_ROD,.5,67,.5,100,4,2,4,.04);
             var home=world.getServer().getWorld(VoidPortalManager.NULL_REALM);var state=RealmState.get(home);
             for(UUID id:run.players)if(run.participation.getOrDefault(id,0)>=200){var r=state.expedition(id);r.pendingKeepRewards=Math.min(64,r.pendingKeepRewards+1);}
             state.markDirty();

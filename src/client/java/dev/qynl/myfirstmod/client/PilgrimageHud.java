@@ -17,13 +17,13 @@ public final class PilgrimageHud {
     private static int titleTicks,quietTicks;
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client->{
-            if(client.world==null || client.player==null || !client.world.getRegistryKey().equals(VoidPortalManager.NULL_REALM)) {
+            if(client.world==null || client.player==null || !dev.qynl.myfirstmod.keep.HollowKeep.expedition(client.world)) {
                 biome="";titleTicks=0;quietTicks=0;return;
             }
             if(client.isPaused()) return;
             if(titleTicks>0) titleTicks--;if(quietTicks>0) quietTicks--;
             if(client.player.age%20!=0) return;
-            String current=client.world.getBiome(client.player.getBlockPos()).getKey().map(k->k.getValue().toString()).orElse("");
+            String current=client.world.getRegistryKey().equals(dev.qynl.myfirstmod.keep.HollowKeep.WORLD)?"myfirstmod:hollow_keep":client.world.getBiome(client.player.getBlockPos()).getKey().map(k->k.getValue().toString()).orElse("");
             if(!current.equals(biome) && quietTicks==0 && current.startsWith("myfirstmod:")) {
                 biome=current;title=current.substring(current.indexOf(':')+1);titleTicks=100;quietTicks=240;
             }
@@ -32,13 +32,27 @@ public final class PilgrimageHud {
             var c=MinecraftClient.getInstance();if(c.player==null || c.world==null || c.options.hudHidden) return;
             int w=draw.getScaledWindowWidth(),h=draw.getScaledWindowHeight();
             boolean realm=c.world.getRegistryKey().equals(VoidPortalManager.NULL_REALM);
-            if(realm && titleTicks>0 && c.currentScreen==null) {
+            if(dev.qynl.myfirstmod.keep.HollowKeep.expedition(c.world) && titleTicks>0 && c.currentScreen==null) {
                 int alpha=Math.min(255,Math.min(titleTicks,100-titleTicks)*18);
                 if(alpha>8) {
                     int y=h/3;
                     draw.fill(w/2-70,y+14,w/2+70,y+15,(alpha<<24)|0x90785B);
                     draw.drawCenteredTextWithShadow(c.textRenderer,Text.translatable("biome.myfirstmod."+title),w/2,y,(alpha<<24)|0xE1D1AD);
                     draw.drawCenteredTextWithShadow(c.textRenderer,Text.translatable("region.myfirstmod."+title),w/2,y+23,(alpha<<24)|0xB7ABA0);
+                }
+            }
+            if(c.player.isUsingItem()&&c.player.getActiveItem().isOf(ModItems.REQUIEM_GLAIVE)) {
+                int charge=Math.min(120,c.player.getItemUseTime()*6);
+                draw.fill(w/2-60,h-68,w/2+60,h-64,0xB0302832);draw.fill(w/2-60,h-68,w/2-60+charge,h-64,0xFFD7B876);
+                draw.drawCenteredTextWithShadow(c.textRenderer,Text.translatable("hud.myfirstmod.glaive",Math.min(100,c.player.getItemUseTime()*5)),w/2,h-80,0xE5C88A);
+            }
+            if(c.world.getRegistryKey().equals(dev.qynl.myfirstmod.keep.HollowKeep.WORLD)) {
+                for(var entity:c.world.getEntities()) if(entity instanceof dev.qynl.myfirstmod.keep.GraveRegentEntity regent&&regent.isAlive()&&c.player.squaredDistanceTo(regent)<28*28) {
+                    if(regent.attack()!=0) {
+                        draw.drawCenteredTextWithShadow(c.textRenderer,Text.translatable("regent.myfirstmod.attack."+regent.attack()),w/2,100,0xEDC794);
+                        draw.fill(w/2-60,113,w/2+60,116,0xA0302832);draw.fill(w/2-60,113,w/2-60+regent.charge()*3,116,0xFFCD8A76);
+                    }
+                    break;
                 }
             }
             var atlas=c.player.getMainHandStack().isOf(ModItems.PILGRIM_ATLAS)?c.player.getMainHandStack():c.player.getOffHandStack();

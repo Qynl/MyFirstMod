@@ -1,3 +1,11 @@
+# 1.7 validation additions
+
+The Keep tests cover party-health clamps, cleave/ring/cross safe boundaries, persistent reward mail, dimension/resource closure, and the actual incremental fortress constructor through permission-gated `/hollowkeep prepare`. Dedicated-server checks inspect all ward blocks, the Expedition Heart, entrance gate and tower, and summon the Regent and glaive.
+
+Manual checklist (not yet performed): full solo and multiplayer runs; late entry and enrolled rejoin; deaths/disconnects/abandonment; a restart in each chamber and during Regent emergence; all three attacks and second-half cadence; armor/vows/flask state across dimensions; obstructed spawn/landing areas; first and repeated reward claims including offline participants; glaive charge, absorption, and attunement; rendering and HUD at multiple GUI scales. No connected-player full-clear or visual playtest is claimed.
+
+---
+
 # 1.6 validation additions
 
 Remembrance adds contract thresholds/rewards, save defaults and round-trips, bounded landmark eviction and rewarded-memory archives, vow/offer bounds, recipe/resource checks, and dedicated-server memorial/ledger/loot/item fixtures.

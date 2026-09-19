@@ -38,14 +38,14 @@ public final class RealmRifts {
             return ActionResult.PASS;
         if(player.isSpectator() || player.isCreative()) return message(player,"message.myfirstmod.trial_survival");
         if(world.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL) return message(player,"message.myfirstmod.trial_peaceful");
-        if(ACTIVE.containsKey(pos) || isEnrolled(player.getUuid()) || RealmTrials.isEnrolled(player.getUuid())
+        if(dev.qynl.myfirstmod.keep.HollowKeep.enrolled(player.getUuid()) || ACTIVE.containsKey(pos) || isEnrolled(player.getUuid()) || RealmTrials.isEnrolled(player.getUuid())
                 || NullWardenManager.isEncounterActive(world) && player.squaredDistanceTo(.5,81,.5)<48*48)
             return message(player,"message.myfirstmod.trial_busy");
         RealmState state=RealmState.get(world);
         long wait=state.riftCooldowns.getOrDefault(pos.asLong(),0L)-world.getTime();
         if(wait>0) return message(player,"message.myfirstmod.trial_cooldown",(wait+19)/20);
         Rift rift=new Rift(pos.toImmutable(),world.getTime()+12000);
-        for(var p:world.getPlayers()) if(eligible(p,pos) && !isEnrolled(p.getUuid()) && !RealmTrials.isEnrolled(p.getUuid()))
+        for(var p:world.getPlayers()) if(eligible(p,pos) && !dev.qynl.myfirstmod.keep.HollowKeep.enrolled(p.getUuid()) && !isEnrolled(p.getUuid()) && !RealmTrials.isEnrolled(p.getUuid()))
             rift.players.add(p.getUuid());
         ACTIVE.put(rift.pos,rift);
         state.riftCooldowns.put(pos.asLong(),world.getTime()+1200);state.markDirty();

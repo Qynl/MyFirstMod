@@ -4,11 +4,11 @@ A separate **shared dungeon dimension**, with a hand-designed 63×63 fortress, t
 
 ## Enter and prepare
 
-After the Null Warden has fallen at least once in the realm, use the **Hollow Gate at (-6,81,158)** in the sanctuary. The migration adds it only if the block is empty. Operators can place `myfirstmod:keep_gate` if their build occupies that spot.
+After the Null Warden has fallen at least once in the realm, use the **Hollow Gate at (-6,81,158)** in the sanctuary. The migration adds it only if the block is empty. If an old build occupies the gate spot, its owner can clear that block and re-enter the realm to install the gate. No occupied block is overwritten.
 
 On first use the reserved fortress is constructed one chunk per server tick in `myfirstmod:hollow_keep`. Wait, then use the gate again to enter. The fortress persists and is not rebuilt for each expedition. Do not remove its required interactable blocks or build a base in its combat rooms.
 
-A waystone near the entrance permits resting before the run. **Ashen Flasks, persistent vows, and Resonite armor bonuses work here**, drawing on the same player state as the realm. The old atlas/compass/recall thread are realm navigation tools, not Keep navigation tools. The entrance gate always returns to the sanctuary. Falling below Y=55 while alive rescues a player to the Keep entrance.
+A waystone near the entrance permits resting before the run. **Ashen Flasks, persistent vows, and Resonite armor bonuses work here**, drawing on the same player state as the realm. The old atlas/compass/recall thread are realm navigation tools, not Keep navigation tools. The entrance gate permits returning to the sanctuary even during an expedition. Entry/exit searches for a supported, fluid-free, collision-free landing; an obstructed destination fails rather than overwriting blocks. Falling below Y=55 while alive rescues a player to the Keep entrance.
 
 ## Shared expedition
 
