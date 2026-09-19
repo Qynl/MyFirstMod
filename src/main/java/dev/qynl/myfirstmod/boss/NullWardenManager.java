@@ -28,6 +28,8 @@ public final class NullWardenManager {
     private static int phase = 1;
     private static boolean defeated;
     private static int intro = 0;
+    private static int attackWindup = 0;
+    private static int attackType = 0;
 
     private NullWardenManager() {}
 
@@ -108,7 +110,11 @@ public final class NullWardenManager {
             case 3 -> 65;
             default -> 48;
         };
-        if (ticks % interval == 0) ability(world);
+        if (attackWindup > 0) {
+            attackWindup--;
+            telegraph(world, targetForAttack(world), phase >= 3 ? 4.5 : 3.5, attackWindup);
+            if (attackWindup == 0) resolveAbility(world);
+        } else if (ticks % interval == 0) beginAbility(world);
 
         if (phase >= 2 && ticks % 240 == 0) summonEcho(world);
         if (phase == 4 && ticks % 180 == 0) gravityPulse(world);
@@ -120,6 +126,33 @@ public final class NullWardenManager {
         world.spawnParticles(ParticleTypes.SCULK_SOUL, boss.getX(), boss.getY() + 1, boss.getZ(), 100, 2.5, 2, 2.5, .06);
         for (ServerPlayerEntity p : world.getPlayers()) {
             p.sendMessage(Text.literal("THE NULL WARDEN • PHASE " + phase), true);
+        }
+    }
+
+    private static ServerPlayerEntity targetForAttack(ServerWorld world) { return nearest(world); }
+
+    private static void beginAbility(ServerWorld world) {
+        if (nearest(world) == null) return;
+        attackType = phase;
+        attackWindup = switch (phase) { case 1 -> 22; case 2 -> 18; case 3 -> 15; default -> 12; };
+        world.playSound(null, boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_HEARTBEAT, SoundCategory.HOSTILE, 2.0f, 0.8f);
+    }
+
+    private static void resolveAbility(ServerWorld world) {
+        ServerPlayerEntity target = nearest(world);
+        if (target == null || boss == null) return;
+        if (attackType == 1) {
+            target.damage(world.getDamageSources().mobAttack(boss), 7);
+        } else if (attackType == 2) {
+            ring(world, target, 4.0);
+            target.damage(world.getDamageSources().mobAttack(boss), 10);
+        } else if (attackType == 3) {
+            target.damage(world.getDamageSources().mobAttack(boss), 13);
+            if (boss.squaredDistanceTo(target) > 64) boss.teleport(target.getX(), target.getY(), target.getZ(), false);
+        } else {
+            ring(world, target, 6.0);
+            target.damage(world.getDamageSources().mobAttack(boss), 16);
+            gravityPulse(world);
         }
     }
 
