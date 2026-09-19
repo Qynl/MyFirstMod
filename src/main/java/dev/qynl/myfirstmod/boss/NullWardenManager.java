@@ -164,7 +164,7 @@ public final class NullWardenManager {
 
     private static void start(ServerWorld world, ServerPlayerEntity player, ArenaState a) {
         buildArena(world);
-        a.boss = EntityType.WARDEN.create(world);
+        a.boss = ModEntities.NULL_WARDEN.create(world);
         if (a.boss == null) {
             a.participants.clear();
             return;
