@@ -67,7 +67,7 @@ public final class NullWardenManager {
 
         if (a.bossUuid != null) {
             Entity entity = world.getEntity(a.bossUuid);
-            if (entity instanceof WardenEntity w && w.isAlive()) {
+            if (entity instanceof NullWardenEntity w && w.isAlive()) {
                 a.boss = w;
                 a.bar = createBar();
                 a.bar.setPercent(w.getHealth() / w.getMaxHealth());
@@ -183,6 +183,7 @@ public final class NullWardenManager {
         a.boss.setCustomNameVisible(false);
         a.boss.setAiDisabled(true);
         a.boss.setInvulnerable(true);
+        a.boss.setVisualState(1, 0, 0, false);
         world.spawnEntity(a.boss);
 
         a.bossUuid = a.boss.getUuid();
@@ -288,6 +289,7 @@ public final class NullWardenManager {
         if (a.intro > 0) {
             a.intro--;
             a.boss.setAiDisabled(true);
+            a.boss.setVisualState(1, 0, 0, false);
             // Cinematic awakening: the arena contracts toward the boss in pulses.
             double t = (100 - a.intro) / 100.0;
             double radius = Math.max(1.0, 9.0 - t * 7.5);
@@ -321,6 +323,10 @@ public final class NullWardenManager {
 
         a.boss.setAiDisabled(a.attack != Attack.NONE);
         a.boss.setInvulnerable(a.activePylons != 0);
+
+        a.boss.setVisualState(a.phase, attackVisualId(a.attack),
+                a.attack == Attack.NONE ? 0 : (int) Math.min(100,
+                        100.0 * a.attackWindup / Math.max(1, a.attack.windup)), false);
 
         float health = a.boss.getHealth() / a.boss.getMaxHealth();
         if (a.bar != null) a.bar.setPercent(Math.max(0, health));
@@ -435,6 +441,19 @@ public final class NullWardenManager {
         }
     }
 
+    private static int attackVisualId(Attack attack) {
+        return switch (attack) {
+            case NONE -> 0;
+            case VOID_CLEAVE -> 1;
+            case SCULK_RING -> 2;
+            case VOID_RAIN -> 3;
+            case NULL_DASH -> 4;
+            case GRAVITY_WELL -> 5;
+            case REALITY_TEAR -> 6;
+            case COLLAPSE -> 7;
+        };
+    }
+
     private static void beginAttack(ServerWorld world, ArenaState a) {
         ServerPlayerEntity target = selectTarget(world, a);
         if (target == null) return;
@@ -451,6 +470,7 @@ public final class NullWardenManager {
         };
         a.attackTarget = target.getUuid();
         a.attackWindup = a.attack.windup;
+        a.boss.setVisualState(a.phase, attackVisualId(a.attack), 100, false);
         a.nextAttackTick = a.ticks + a.attack.windup + a.attack.recovery;
 
         for (ServerPlayerEntity p : participants(world, a))
@@ -658,6 +678,7 @@ public final class NullWardenManager {
         a.boss.setHealth(1);
         a.boss.setInvulnerable(true);
         a.boss.setAiDisabled(true);
+        a.boss.setVisualState(a.phase, 0, 0, true);
         if (a.bar != null) a.bar.setVisible(false);
 
         world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_DEATH,
@@ -916,7 +937,7 @@ public final class NullWardenManager {
     }
 
     private static final class ArenaState {
-        WardenEntity boss;
+        NullWardenEntity boss;
         UUID bossUuid;
         ServerBossBar bar;
         final Set<UUID> participants = new HashSet<>();
