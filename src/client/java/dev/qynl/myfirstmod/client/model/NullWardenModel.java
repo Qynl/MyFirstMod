@@ -390,8 +390,6 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         core.pitch = pulse * (0.055f + phase * 0.012f);
         coreRing.yaw = animationProgress * (0.012f + phase * 0.002f);
         coreRing.pitch = pulse * 0.06f;
-        coreRing.scaleX = 1.0f + Math.max(0.0f, pulse) * 0.08f;
-        coreRing.scaleY = 1.0f + Math.max(0.0f, pulse) * 0.08f;
         leftCrownShard.pitch = fastPulse * 0.08f;
         leftCrownShard.roll += MathHelper.sin(animationProgress * 0.071f) * 0.045f;
         rightCrownShard.pitch = -fastPulse * 0.07f;
