@@ -44,7 +44,7 @@ public final class NullWardenManager {
         }
 
         if (arena.boss != null && arena.boss.isAlive()) {
-            arena.bar.addPlayer(player);
+            if (arena.bar != null) arena.bar.addPlayer(player);
             return;
         }
 
@@ -64,7 +64,11 @@ public final class NullWardenManager {
         buildArena(world);
 
         arena.boss = EntityType.WARDEN.create(world);
-        if (arena.boss == null) return;
+        if (arena.boss == null) {
+            arena.participants.clear();
+            arena.bar = null;
+            return;
+        }
 
         var maxHealth = arena.boss.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         if (maxHealth != null) maxHealth.setBaseValue(500.0);
@@ -165,7 +169,7 @@ public final class NullWardenManager {
         arena.boss.setAi(true);
 
         float hp = arena.boss.getHealth() / arena.boss.getMaxHealth();
-        arena.bar.setPercent(Math.max(0.0F, hp));
+        if (arena.bar != null) arena.bar.setPercent(Math.max(0.0F, hp));
 
         int newPhase = hp > 0.75F ? 1 : hp > 0.50F ? 2 : hp > 0.20F ? 3 : 4;
         if (newPhase != arena.phase) {
@@ -385,10 +389,11 @@ public final class NullWardenManager {
     }
 
     private static void summonEcho(ServerWorld world, ArenaState arena) {
-        long echoCount = world.getEntitiesByType(EntityType.WARDEN, entity ->
-                entity != arena.boss && entity.isAlive()).size();
-
-        if (echoCount >= Math.min(3, arena.phase)) return;
+        arena.echoes.removeIf(uuid -> {
+            var entity = world.getEntity(uuid);
+            return entity == null || !entity.isAlive();
+        });
+        if (arena.echoes.size() >= Math.min(3, arena.phase)) return;
 
         WardenEntity echo = EntityType.WARDEN.create(world);
         if (echo == null) return;
@@ -407,6 +412,7 @@ public final class NullWardenManager {
         echo.setHealth(65.0F);
 
         world.spawnEntity(echo);
+        arena.echoes.add(echo.getUuid());
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
                 echo.getX(), echo.getY() + 1, echo.getZ(),
                 90, .8, 1, .8, .06);
@@ -448,7 +454,7 @@ public final class NullWardenManager {
         arena.boss.setHealth(1.0F);
         arena.boss.setInvulnerable(true);
         arena.boss.setAi(false);
-        arena.bar.setVisible(false);
+        if (arena.bar != null) arena.bar.setVisible(false);
 
         world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_DEATH,
                 SoundCategory.HOSTILE, 5.0F, .45F);
@@ -461,6 +467,7 @@ public final class NullWardenManager {
                 300, 4, 3, 4, .08);
 
         for (ServerPlayerEntity player : participants(world, arena)) {
+            if (!arena.rewardedPlayers.add(player.getUuid())) continue;
             player.getInventory().offerOrDrop(new ItemStack(ModItems.NULLBLADE));
             player.getInventory().offerOrDrop(new ItemStack(ModItems.NULL_RELIC));
             player.sendMessage(Text.literal("THE NULL WARDEN HAS FALLEN"), false);
@@ -474,6 +481,11 @@ public final class NullWardenManager {
 
     private static void resetEncounter(ServerWorld world, ArenaState arena) {
         if (arena.boss != null && arena.boss.isAlive()) arena.boss.discard();
+        for (UUID uuid : arena.echoes) {
+            var echo = world.getEntity(uuid);
+            if (echo != null && echo.isAlive()) echo.discard();
+        }
+        arena.echoes.clear();
         if (arena.bar != null) {
             for (UUID uuid : arena.participants) {
                 ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
@@ -483,6 +495,7 @@ public final class NullWardenManager {
         arena.boss = null;
         arena.bar = null;
         arena.participants.clear();
+        arena.rewardedPlayers.clear();
         arena.attack = Attack.NONE;
         arena.attackWindup = 0;
         arena.defeated = false;
@@ -577,6 +590,8 @@ public final class NullWardenManager {
         WardenEntity boss;
         ServerBossBar bar;
         final Set<UUID> participants = new HashSet<>();
+        final Set<UUID> rewardedPlayers = new HashSet<>();
+        final Set<UUID> echoes = new HashSet<>();
 
         int ticks;
         int phase = 1;
