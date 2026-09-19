@@ -1,6 +1,7 @@
 package dev.qynl.myfirstmod;
 
 import dev.qynl.myfirstmod.block.ModBlocks;
+import dev.qynl.myfirstmod.boss.ModEntities;
 import dev.qynl.myfirstmod.item.ModItems;
 import dev.qynl.myfirstmod.item.NullbladeItem;
 import dev.qynl.myfirstmod.portal.VoidPortalManager;
@@ -19,6 +20,7 @@ public class MyFirstMod implements ModInitializer {
     public void onInitialize() {
         ModBlocks.register();
         ModItems.register();
+        ModEntities.register();
 
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
             if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;
