@@ -320,7 +320,7 @@ public final class NullWardenManager {
                 a.attackTarget = null;
                 a.boss.setAiDisabled(false);
             }
-        } else if (a.activePylons == 0 && a.ticks >= a.nextAttackTick) {
+        } else if (a.ticks >= a.nextAttackTick) {
             beginAttack(world, a);
         }
 
@@ -357,17 +357,27 @@ public final class NullWardenManager {
             if ((a.activePylons & (1 << i)) == 0) continue;
             BlockPos p = PYLONS[i];
             boolean cleansing = false;
+            ServerPlayerEntity cleanser = null;
             for (UUID id : a.activeParticipants) {
                 ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(id);
                 if (player != null && player.isSneaking()
                         && player.squaredDistanceTo(p.getX() + .5, p.getY() + 1, p.getZ() + .5) <= 9) {
                     cleansing = true;
+                    cleanser = player;
                     break;
                 }
             }
 
+            // Cleansing is deliberately exposed: the Warden keeps attacking while
+            // somebody works on a pylon. The objective is now a contested space,
+            // not a safe maintenance phase.
             if (cleansing) {
                 a.pylonProgress[i]++;
+                if (a.pylonProgress[i] % 5 == 0 && cleanser != null) {
+                    world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                            cleanser.getX(), cleanser.getY() + 1.0, cleanser.getZ(),
+                            8, .25, .35, .25, .01);
+                }
                 if (a.pylonProgress[i] % 10 == 0) {
                     world.playSound(null, p, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
                             SoundCategory.BLOCKS, .8f, 1.3f);
