@@ -62,6 +62,7 @@ public final class NullWardenManager {
         a.defeated = data.defeated;
         a.phase = Math.max(1, data.phase);
         a.activePylons = data.activePylons;
+        a.pylonProgress = data.pylonProgress.clone();
         a.bossUuid = data.bossUuid;
         a.returnPortalBuilt = data.returnPortalBuilt;
 
@@ -115,6 +116,7 @@ public final class NullWardenManager {
         data.returnPortalBuilt = a.returnPortalBuilt;
         data.phase = a.phase;
         data.activePylons = a.activePylons;
+        data.pylonProgress = a.pylonProgress.clone();
         data.dirty();
     }
 
@@ -130,6 +132,7 @@ public final class NullWardenManager {
         data.returnPortalBuilt = false;
         data.phase = 1;
         data.activePylons = 0;
+        data.pylonProgress = new int[4];
         data.dirty();
     }
 
@@ -197,6 +200,7 @@ public final class NullWardenManager {
         a.intro = 100;
         a.phase = 1;
         a.activePylons = 0;
+        a.pylonProgress = new int[4];
         a.attack = Attack.NONE;
         a.attackTarget = null;
         a.nextAttackTick = 40;
@@ -328,6 +332,12 @@ public final class NullWardenManager {
                 a.attack == Attack.NONE ? 0 : (int) Math.min(100,
                         100.0 * a.attackWindup / Math.max(1, a.attack.windup)), false);
 
+        if (a.bar != null && a.attack != Attack.NONE && a.attackWindup % 5 == 0) {
+            a.bar.setName(Text.literal("THE NULL WARDEN  //  " + a.attack.name));
+        } else if (a.bar != null && a.attack == Attack.NONE) {
+            a.bar.setName(Text.literal("THE NULL WARDEN  //  PHASE " + a.phase));
+        }
+
         float health = a.boss.getHealth() / a.boss.getMaxHealth();
         if (a.bar != null) a.bar.setPercent(Math.max(0, health));
 
@@ -347,7 +357,9 @@ public final class NullWardenManager {
 
         if (a.attack != Attack.NONE) {
             a.attackWindup--;
-            telegraph(world, a);
+            // Telegraphs are visual warnings, not a particle flood. Updating every
+            // second tick keeps the signal crisp while cutting arena particle load.
+            if ((a.attackWindup & 1) == 0) telegraph(world, a);
             if (a.attackWindup <= 0) {
                 resolveAttack(world, a);
                 a.attack = Attack.NONE;
@@ -737,6 +749,7 @@ public final class NullWardenManager {
         a.returnPortalBuilt = false;
         a.phase = 1;
         a.activePylons = 0;
+        a.pylonProgress = new int[4];
         a.attack = Attack.NONE;
         a.attackTarget = null;
     }
