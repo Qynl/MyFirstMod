@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "myfirstmod:ascended_nullblade"
+    },
+    "title": {
+      "text": "An Answer to the Void"
+    },
+    "description": {
+      "text": "Awaken the Nullblade at a smithing table."
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:ascended_nullblade"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "myfirstmod:gather_resonance"
+}

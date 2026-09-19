@@ -8,6 +8,9 @@ import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.world.World;
 
 public class NullWardenEntity extends WardenEntity {
+    private boolean defeatPending;
+    private static final TrackedData<Byte> CINEMATIC =
+            DataTracker.registerData(NullWardenEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Byte> PHASE =
             DataTracker.registerData(NullWardenEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Byte> ATTACK =
@@ -24,6 +27,7 @@ public class NullWardenEntity extends WardenEntity {
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
+        builder.add(CINEMATIC, (byte) 0);
         builder.add(PHASE, (byte) 1);
         builder.add(ATTACK, (byte) 0);
         builder.add(ATTACK_PROGRESS, (byte) 0);
@@ -35,6 +39,26 @@ public class NullWardenEntity extends WardenEntity {
         getDataTracker().set(ATTACK, (byte) Math.max(0, Math.min(7, attack)));
         getDataTracker().set(ATTACK_PROGRESS, (byte) Math.max(0, Math.min(127, attackProgress)));
         getDataTracker().set(DEFEATED, defeated);
+    }
+
+    public void setCinematic(int stage) { getDataTracker().set(CINEMATIC, (byte) stage); }
+    public int getCinematic() { return getDataTracker().get(CINEMATIC); }
+    public boolean isDefeatPending() { return defeatPending; }
+
+    @Override public void onDeath(net.minecraft.entity.damage.DamageSource source) {
+        // Keep the actor alive for the finale; vanilla death removal used to truncate it after 20 ticks.
+        defeatPending = true;
+        setHealth(1);
+        setInvulnerable(true);
+        setAiDisabled(true);
+    }
+    @Override public void writeCustomDataToNbt(net.minecraft.nbt.NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.putBoolean("NullDefeatPending", defeatPending);
+    }
+    @Override public void readCustomDataFromNbt(net.minecraft.nbt.NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        defeatPending = nbt.getBoolean("NullDefeatPending");
     }
 
     public int getVisualPhase() {

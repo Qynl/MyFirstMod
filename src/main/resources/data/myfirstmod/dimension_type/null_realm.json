@@ -1,12 +1,12 @@
 {
   "ultrawarm": false,
   "natural": false,
-  "ambient_light": 0.05,
-  "infiniburn": "minecraft:infiniburn_overworld",
+  "ambient_light": 0.16,
+  "infiniburn": "#minecraft:infiniburn_overworld",
   "respawn_anchor_works": false,
   "has_skylight": false,
   "bed_works": false,
-  "effects": "minecraft:the_end",
+  "effects": "minecraft:overworld",
   "min_y": -64,
   "height": 384,
   "logical_height": 384,
@@ -20,5 +20,6 @@
       "min_inclusive": 0,
       "max_inclusive": 7
     }
-  }
+  },
+  "fixed_time": 18000
 }

@@ -15,5 +15,10 @@ public final class ModBlocks {
             new VoidPortalBlock(AbstractBlock.Settings.copy(Blocks.NETHER_PORTAL).noCollision().nonOpaque().strength(-1.0F).luminance(state -> 11))
     );
 
+    public static final Block RESONANCE_CORE = Registry.register(Registries.BLOCK,
+            Identifier.of(MyFirstMod.MOD_ID, "resonance_core"),
+            new Block(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1, 3600000)
+                    .luminance(state -> 9)));
+
     public static void register() {}
 }

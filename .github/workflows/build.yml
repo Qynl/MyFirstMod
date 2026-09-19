@@ -2,7 +2,8 @@ name: Build Mod
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "arena/**"]
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -22,10 +23,13 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "9.5.1"
+          gradle-version: "8.12"
+
+      - name: Validate generated resources
+        run: python3 -m unittest discover -s tests -v
 
       - name: Build
-        run: gradle build
+        run: ./gradlew build --no-daemon
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4

@@ -44,6 +44,32 @@ public final class NullWardenManager {
 
     private NullWardenManager() {}
 
+    public static void clear() { ARENAS.clear(); }
+    public static void entityLoaded(Entity entity, ServerWorld world) {
+        if (!(entity instanceof NullWardenEntity boss)) return;
+        ArenaState arena = ARENAS.get(world.getRegistryKey());
+        if (arena != null && arena.boss != null && arena.boss.getUuid().equals(boss.getUuid())) {
+            arena.boss = boss;
+            return;
+        }
+        // A reset can happen while an abandoned actor's chunk is unloaded.
+        if (!boss.getUuid().equals(saved(world).bossUuid)) boss.discard();
+        else if (arena != null) restoreActor(world,arena,boss);
+    }
+    public static boolean isDefeated(ServerWorld world) { return saved(world).defeated; }
+    public static void prepareArena(ServerWorld world) { buildArena(world); }
+    public static void approachArena(ServerWorld world, ServerPlayerEntity player) {
+        if (player.isCreative() || player.isSpectator() || world.getDifficulty() == net.minecraft.world.Difficulty.PEACEFUL) return;
+        ArenaState a = getArena(world);
+        if (a.awaitingBossTicks > 0) return;
+        if (a.defeated) {
+            if (a.eligiblePlayers.contains(player.getUuid()) && !a.rewardedPlayers.contains(player.getUuid())) {
+                rewardIfEligible(player, a);
+                persist(world, a);
+            }
+        } else if (a.boss == null || !a.participants.contains(player.getUuid())) enterArena(world, player);
+    }
+
     private static NullWardenState saved(ServerWorld world) {
         return world.getPersistentStateManager().getOrCreate(
                 NullWardenState.type(), NullWardenState.ID);
@@ -54,6 +80,8 @@ public final class NullWardenManager {
     }
 
     private static ArenaState load(ServerWorld world) {
+        // The arena is bounded. Load its actor chunks before resolving persistent UUIDs.
+        for (int cx=-2;cx<=2;cx++) for (int cz=-2;cz<=2;cz++) world.getChunk(cx,cz);
         NullWardenState data = saved(world);
         ArenaState a = new ArenaState();
         a.participants.addAll(data.participants);
@@ -71,15 +99,13 @@ public final class NullWardenManager {
         if (a.bossUuid != null) {
             Entity entity = world.getEntity(a.bossUuid);
             if (entity instanceof NullWardenEntity w && w.isAlive()) {
-                a.boss = w;
-                a.bar = createBar();
-                a.bar.setPercent(w.getHealth() / w.getMaxHealth());
-                for (UUID id : a.participants) {
-                    ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
-                    if (p != null && p.getServerWorld() == world) a.bar.addPlayer(p);
-                }
+                restoreActor(world,a,w);
                 return a;
             }
+            // Entity storage loads asynchronously even when the block chunk is available.
+            // Wait for its load callback instead of treating a temporarily absent UUID as a wipe.
+            a.awaitingBossTicks = 200;
+            return a;
         }
 
         if (a.defeated) {
@@ -90,6 +116,23 @@ public final class NullWardenManager {
         cleanup(world, a);
         clearSaved(world);
         return new ArenaState();
+    }
+
+    private static void restoreActor(ServerWorld world,ArenaState a,NullWardenEntity boss) {
+        a.boss=boss;
+        a.bossUuid=boss.getUuid();
+        a.awaitingBossTicks=0;
+        boss.setAiDisabled(true);
+        boss.setInvulnerable(a.defeated || a.activePylons!=0);
+        boss.setVisualState(a.phase,0,0,a.defeated);
+        boss.setCinematic(a.defeated?2:0);
+        if(a.bar==null) a.bar=createBar();
+        a.bar.setPercent(Math.max(0,Math.min(1,boss.getHealth()/boss.getMaxHealth())));
+        a.bar.setVisible(!a.defeated);
+        for(UUID id:a.participants) {
+            var player=world.getServer().getPlayerManager().getPlayer(id);
+            if(player!=null && player.getServerWorld()==world) a.bar.addPlayer(player);
+        }
     }
 
     private static ServerBossBar createBar() {
@@ -180,12 +223,15 @@ public final class NullWardenManager {
         var hp = a.boss.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         var damage = a.boss.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
         var speed = a.boss.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        if (hp != null) hp.setBaseValue(500);
+        long nearby = world.getPlayers().stream().filter(p -> !p.isCreative() && !p.isSpectator()
+                && p.squaredDistanceTo(.5,81,.5) < 34*34).count();
+        float maxHealth = 500 + 180 * Math.min(3, Math.max(0, nearby - 1));
+        if (hp != null) hp.setBaseValue(maxHealth);
         if (damage != null) damage.setBaseValue(18);
         if (speed != null) speed.setBaseValue(.38);
 
-        a.boss.setHealth(500);
-        a.boss.refreshPositionAndAngles(.5, 81, .5, 180, 0);
+        a.boss.setHealth(maxHealth);
+        a.boss.refreshPositionAndAngles(.5, 83, .5, 180, 0);
         a.boss.setCustomName(Text.literal("THE NULL WARDEN"));
         a.boss.setCustomNameVisible(false);
         a.boss.setAiDisabled(true);
@@ -202,7 +248,9 @@ public final class NullWardenManager {
 
         a.ticks = 0;
         a.intro = 100;
+        a.boss.setCinematic(1);
         a.phase = 1;
+        a.transitionTicks = 0;
         a.activePylons = 0;
         a.cleansedPylons = 0;
         a.pylonProgress = new int[4];
@@ -231,16 +279,26 @@ public final class NullWardenManager {
 
     private static void tickArena(MinecraftServer server, ServerWorld world, ArenaState a) {
         if (a.boss == null) {
-            if (a.defeated) rewardPending(server, world, a);
+            if (a.awaitingBossTicks > 0) {
+                Entity actor=world.getEntity(a.bossUuid);
+                if(actor instanceof NullWardenEntity boss) restoreActor(world,a,boss);
+                else if(--a.awaitingBossTicks==0) {
+                    if(a.defeated) {a.bossUuid=null;persist(world,a);}
+                    else reset(world,a);
+                }
+                return;
+            }
+            if (a.defeated && world.getTime() % 20 == 0) rewardPending(server, world, a);
             return;
         }
 
         updatePlayers(server, world, a);
         if (a.activeParticipants.isEmpty()) {
-            if (++a.idleTicks >= 600) reset(world, a);
-            return;
+            if (++a.idleTicks >= 600 && !a.defeated) reset(world, a);
+            if (!a.defeated) return;
         }
         a.idleTicks = 0;
+        if (a.boss.isRemoved() && !a.defeated) return;
 
         if (a.defeated) {
             rewardPending(server, world, a);
@@ -298,11 +356,13 @@ public final class NullWardenManager {
             return;
         }
 
-        if (!a.boss.isAlive()) {
+        if (a.boss.isDefeatPending() || !a.boss.isAlive()) {
             finish(world, a);
             return;
         }
 
+        if (a.boss.squaredDistanceTo(.5,a.boss.getY(),.5) > 24*24 || a.boss.getY() < 75)
+            a.boss.refreshPositionAndAngles(.5,83,.5,a.boss.getYaw(),0);
         a.ticks++;
         updateEligibility(a);
 
@@ -365,8 +425,8 @@ public final class NullWardenManager {
             // Cinematic awakening: the arena contracts toward the boss in pulses.
             double t = (100 - a.intro) / 100.0;
             double radius = Math.max(1.0, 9.0 - t * 7.5);
-            ring(world, a.boss.getX(), a.boss.getY() + .08, a.boss.getZ(),
-                    radius, ParticleTypes.REVERSE_PORTAL, 80);
+            if (a.intro % 2 == 0) ring(world, a.boss.getX(), a.boss.getY() + .08, a.boss.getZ(),
+                    radius, ParticleTypes.REVERSE_PORTAL, 48);
             if (a.intro % 5 == 0) {
                 world.spawnParticles(ParticleTypes.SCULK_SOUL,
                         a.boss.getX(), a.boss.getY() + 1.2, a.boss.getZ(),
@@ -385,15 +445,29 @@ public final class NullWardenManager {
                         24, 1.3, 1.2, 1.3, .02);
             }
             if (a.intro == 0) {
+                a.boss.setCinematic(0);
                 a.boss.setInvulnerable(false);
-                a.boss.setAiDisabled(false);
+                a.boss.setAiDisabled(true);
                 world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_ROAR,
                         SoundCategory.HOSTILE, 4, .55f);
             }
             return;
         }
 
-        a.boss.setAiDisabled(a.attack != Attack.NONE || a.exposeTicks > 0);
+        // Native Warden AI adds untelegraphed melee/sonic attacks. The encounter owns all attacks.
+        a.boss.setAiDisabled(true);
+        if (a.transitionTicks > 0) {
+            a.transitionTicks--;
+            a.boss.setInvulnerable(true);
+            a.boss.setVelocity(Vec3d.ZERO);
+            if (a.transitionTicks % 5 == 0) ring(world,.5,81.2,.5,18-a.transitionTicks*.2,ParticleTypes.END_ROD,48);
+            for (UUID id : a.echoes) {
+                Entity echo = world.getEntity(id);
+                if (echo instanceof net.minecraft.entity.mob.MobEntity mob) mob.setAiDisabled(a.transitionTicks != 0);
+            }
+            if (a.transitionTicks == 0) a.boss.setCinematic(0);
+            return;
+        }
         a.boss.setInvulnerable(a.activePylons != 0);
 
         if (a.exposeTicks > 0) {
@@ -445,8 +519,14 @@ public final class NullWardenManager {
             a.hazardTicks = 0;
             a.hazardPattern = -1;
             a.attackStep = 0;
+            a.transitionTicks = 60;
+            a.nextAttackTick = a.ticks + 90;
+            a.boss.setCinematic(3);
+            a.boss.setVisualState(a.phase, 0, 0, false);
+            a.boss.setInvulnerable(true);
             phaseShift(world, a);
             persist(world, a);
+            return;
         }
 
         tickPylons(world, a);
@@ -467,7 +547,7 @@ public final class NullWardenManager {
                 resolveAttack(world, a);
                 a.attack = Attack.NONE;
                 a.attackTarget = null;
-                a.boss.setAiDisabled(false);
+                a.boss.setAiDisabled(true);
             }
         } else if (a.ticks >= a.nextAttackTick) {
             beginAttack(world, a);
@@ -477,7 +557,7 @@ public final class NullWardenManager {
         // indefinitely, giving players a reliable moment to reposition or cleanse.
         if (a.attack == Attack.NONE && a.recoveryTicks > 0) {
             a.recoveryTicks--;
-            a.boss.setAiDisabled(false);
+            a.boss.setAiDisabled(true);
         }
 
         int echoInterval = switch (a.phase) {
@@ -494,6 +574,7 @@ public final class NullWardenManager {
         for (UUID id : a.participants) {
             ServerPlayerEntity p = server.getPlayerManager().getPlayer(id);
             if (p != null && p.getServerWorld() == world && p.isAlive()
+                    && !p.isCreative() && !p.isSpectator()
                     && p.squaredDistanceTo(.5, 81, .5) <= HARD_BOUNDARY * HARD_BOUNDARY) {
                 a.activeParticipants.add(id);
                 a.joinTicks.putIfAbsent(id, a.ticks);
@@ -594,7 +675,12 @@ public final class NullWardenManager {
             case 3 -> 35;
             default -> 25;
         };
-        if (a.ticks % interval != 0) return;
+        int pulse = a.ticks % (interval + 60);
+        if (pulse >= interval + 40 && a.ticks % 4 == 0) {
+            for (int i=0;i<4;i++) if ((a.activePylons & (1<<i)) != 0)
+                ring(world,PYLONS[i].getX()+.5,81.2,PYLONS[i].getZ()+.5,4.5,ParticleTypes.FLAME,28);
+        }
+        if (pulse != 0) return;
 
         float damage = switch (a.phase) {
             case 2 -> 5.0f;
@@ -618,7 +704,8 @@ public final class NullWardenManager {
             for (ServerPlayerEntity player : activePlayers(world, a)) {
                 double distance = player.squaredDistanceTo(
                         p.getX() + .5, player.getY(), p.getZ() + .5);
-                if (distance <= radius * radius) {
+                // Sneaking in the inner cleansing pocket grounds the pulse.
+                if (distance <= radius * radius && !(player.isSneaking() && distance <= 9)) {
                     player.damage(world.getDamageSources().mobAttack(a.boss), damage);
 
                     if (a.phase >= 3) {
@@ -900,6 +987,11 @@ public final class NullWardenManager {
         a.attackY = target.getY();
         a.attackZ = target.getZ();
         a.attackWindup = a.attack.windup;
+        float facing = (float) (Math.toDegrees(Math.atan2(a.attackZ-a.boss.getZ(), a.attackX-a.boss.getX())) - 90);
+        a.boss.setYaw(facing);
+        a.boss.setHeadYaw(facing);
+        a.boss.setBodyYaw(facing);
+        a.boss.setVelocity(Vec3d.ZERO);
         a.boss.setVisualState(a.phase, attackVisualId(a.attack), 100, false);
         int phaseDelay = switch (a.phase) {
             case 1 -> 12;
@@ -980,32 +1072,33 @@ public final class NullWardenManager {
         switch (a.attack) {
             case VOID_CLEAVE -> {
                 Vec3d f = a.boss.getRotationVector().normalize();
-                for (int i = 0; i < 20; i++) {
-                    double d = 1.5 + i * .25;
-                    double spread = (i % 5 - 2) * .35;
-                    world.spawnParticles(new DustParticleEffect(
-                                    new Vector3f(.65f, .1f, .9f), left < 7 ? 1.8f : 1.1f),
-                            a.boss.getX() + f.x * d - f.z * spread,
-                            a.boss.getY() + .15,
-                            a.boss.getZ() + f.z * d + f.x * spread,
-                            1, 0, 0, 0, 0);
+                double heading = Math.atan2(f.z,f.x), halfAngle = Math.acos(.55);
+                for (int i=0;i<=24;i++) {
+                    double angle = heading - halfAngle + 2*halfAngle*i/24;
+                    world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                            a.boss.getX()+Math.cos(angle)*5,a.boss.getY()+.15,a.boss.getZ()+Math.sin(angle)*5,
+                            1,0,0,0,0);
+                }
+                for (int side : new int[]{-1,1}) for (int i=1;i<=10;i++) {
+                    double angle=heading+side*halfAngle;
+                    world.spawnParticles(ParticleTypes.END_ROD,
+                            a.boss.getX()+Math.cos(angle)*i*.5,a.boss.getY()+.15,a.boss.getZ()+Math.sin(angle)*i*.5,
+                            1,0,0,0,0);
                 }
             }
-            case SCULK_RING -> ring(world, a.boss.getX(), a.boss.getY() + .1, a.boss.getZ(),
-                    6, ParticleTypes.SCULK_SOUL, 64);
-            case VOID_RAIN -> {
-                for (UUID id : a.activeParticipants) {
-                    ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
-                    if (p != null) ring(world, p.getX(), p.getY() + .1, p.getZ(),
-                            left < 7 ? 2.7 : 2.2, ParticleTypes.REVERSE_PORTAL, 36);
-                }
+            case SCULK_RING -> {
+                ring(world,a.boss.getX(),a.boss.getY()+.1,a.boss.getZ(),4,ParticleTypes.END_ROD,40);
+                ring(world,a.boss.getX(),a.boss.getY()+.1,a.boss.getZ(),8,ParticleTypes.SCULK_SOUL,64);
             }
-            case NULL_DASH -> ring(world, t.getX(), t.getY() + .1, t.getZ(),
-                    left < 7 ? 3.5 : 2.5, ParticleTypes.REVERSE_PORTAL, 48);
+            case VOID_RAIN -> ring(world, tx, ty + .1, tz, 2.75, ParticleTypes.REVERSE_PORTAL, 40);
+            case NULL_DASH -> {
+                ring(world, tx, ty + .1, tz, 3.5, ParticleTypes.REVERSE_PORTAL, 48);
+                ring(world, a.boss.getX(), a.boss.getY()+.1, a.boss.getZ(), 2.5, ParticleTypes.REVERSE_PORTAL, 32);
+            }
             case GRAVITY_WELL, REALITY_TEAR, COLLAPSE ->
-                    ring(world, t.getX(), t.getY() + .08, t.getZ(), a.attack.radius,
-                            left < 7 ? ParticleTypes.EXPLOSION : ParticleTypes.REVERSE_PORTAL,
-                            a.attack == Attack.COLLAPSE ? 72 : 48);
+                    ring(world, tx, ty + .08, tz, a.attack.radius,
+                            left < 7 ? ParticleTypes.FLAME : ParticleTypes.REVERSE_PORTAL,
+                            a.attack == Attack.COLLAPSE ? 64 : 40);
             default -> {}
         }
     }
@@ -1017,10 +1110,12 @@ public final class NullWardenManager {
         switch (a.attack) {
             case VOID_CLEAVE -> {
                 Vec3d f = a.boss.getRotationVector().normalize();
-                Vec3d delta = t.getPos().subtract(a.boss.getPos());
-                double d = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-                double dot = d < .01 ? 1 : (f.x * delta.x + f.z * delta.z) / d;
-                if (d <= 5 && dot > .55) t.damage(world.getDamageSources().mobAttack(a.boss), 12);
+                for (ServerPlayerEntity player : activePlayers(world,a)) {
+                    Vec3d delta = player.getPos().subtract(a.boss.getPos());
+                    double d = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
+                    double dot = d < .01 ? 1 : (f.x * delta.x + f.z * delta.z) / d;
+                    if (d <= 5 && dot > .55) player.damage(world.getDamageSources().mobAttack(a.boss),12);
+                }
                 shockwave(world, t, 3);
             }
             case SCULK_RING -> {
@@ -1042,7 +1137,7 @@ public final class NullWardenManager {
             }
             case NULL_DASH -> {
                 Vec3d from = a.boss.getPos();
-                a.boss.teleport(t.getX(), t.getY(), t.getZ(), false);
+                a.boss.teleport(a.attackX, a.attackY, a.attackZ, false);
                 for (ServerPlayerEntity p : activePlayers(world, a)) {
                     if (p.squaredDistanceTo(from.x, from.y, from.z) < 6.25
                             || p.squaredDistanceTo(a.boss) < 12.25)
@@ -1123,9 +1218,9 @@ public final class NullWardenManager {
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
                 a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 100, 4, 3, 4, .045);
         String rule = switch (a.phase) {
-            case 2 -> "Phase 2: pylon fields pulse. Commit carefully while cleansing.";
-            case 3 -> "Phase 3: pylon fields pull you inward. Movement is the price of cleansing.";
-            default -> "Phase 4: all pylons resonate faster. Cleanse them before the arena overwhelms you.";
+            case 2 -> "Phase 2: sneak inside a pylon ring to ground its pulse and cleanse it.";
+            case 3 -> "Phase 3: ground the pylon pulse, then dodge the Warden's marked attacks.";
+            default -> "Phase 4: cleanse the final pylon. Its inner pocket shields sneaking players from pulses.";
         };
         for (ServerPlayerEntity p : participants(world, a)) {
             p.sendMessage(Text.literal("NULL WARDEN // " + phaseName(a.phase)), true);
@@ -1141,7 +1236,7 @@ public final class NullWardenManager {
         });
         if (a.echoes.size() >= Math.min(3, a.phase)) return;
 
-        WardenEntity echo = EntityType.WARDEN.create(world);
+        var echo = ModEntities.RIFT_SENTINEL.create(world);
         if (echo == null) return;
         double angle = a.ticks * .045;
         echo.refreshPositionAndAngles(Math.cos(angle) * 11, 81,
@@ -1175,6 +1270,9 @@ public final class NullWardenManager {
         a.boss.setInvulnerable(true);
         a.boss.setAiDisabled(true);
         a.boss.setVisualState(a.phase, 0, 0, true);
+        a.boss.setCinematic(2);
+        for (UUID id : a.echoes) { Entity e = world.getEntity(id); if (e != null) e.discard(); }
+        a.echoes.clear();
         if (a.bar != null) a.bar.setVisible(false);
 
         world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_DEATH,
@@ -1209,7 +1307,10 @@ public final class NullWardenManager {
         p.getInventory().offerOrDrop(new ItemStack(ModItems.NULLBLADE));
         p.getInventory().offerOrDrop(new ItemStack(ModItems.NULL_RELIC));
         p.sendMessage(Text.literal("THE NULL WARDEN HAS FALLEN"), false);
-        p.sendMessage(Text.literal("A Null Realm reward has been claimed."), false);
+        p.getInventory().offerOrDrop(new ItemStack(ModItems.RESONANT_SHARD, 4));
+        p.addExperience(500);
+        p.sendMessage(Text.translatable("message.myfirstmod.victory_rewards"), false);
+        p.sendMessage(Text.translatable("message.myfirstmod.after_victory"), false);
     }
 
     private static void reset(ServerWorld world, ArenaState a) {
@@ -1222,6 +1323,7 @@ public final class NullWardenManager {
         }
         a.boss = null;
         a.bossUuid = null;
+        a.awaitingBossTicks = 0;
         a.bar = null;
         a.participants.clear();
         a.activeParticipants.clear();
@@ -1232,6 +1334,7 @@ public final class NullWardenManager {
         a.defeated = false;
         a.returnPortalBuilt = false;
         a.phase = 1;
+        a.transitionTicks = 0;
         a.activePylons = 0;
         a.cleansedPylons = 0;
         a.pylonProgress = new int[4];
@@ -1253,6 +1356,13 @@ public final class NullWardenManager {
     }
 
     private static void buildArena(ServerWorld world) {
+        // An outer promenade joins the causeway even on seeds with steep local terrain.
+        for (int x=-28;x<=28;x++) for (int z=-28;z<=28;z++) {
+            int distance=x*x+z*z;
+            if (distance<=ARENA_RADIUS*ARENA_RADIUS || distance>28*28) continue;
+            world.setBlockState(new BlockPos(x,80,z),Blocks.SMOOTH_BASALT.getDefaultState(),Block.NOTIFY_LISTENERS);
+            for (int y=81;y<=100;y++) world.setBlockState(new BlockPos(x,y,z),Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
+        }
         // A deliberately constructed ritual arena instead of a flat boss platform.
         for (int x = -ARENA_RADIUS; x <= ARENA_RADIUS; x++) {
             for (int z = -ARENA_RADIUS; z <= ARENA_RADIUS; z++) {
@@ -1280,10 +1390,7 @@ public final class NullWardenManager {
                 if (x * x + z * z <= 36) {
                     world.setBlockState(new BlockPos(x, 81, z),
                             Blocks.POLISHED_BLACKSTONE.getDefaultState());
-                    if (x * x + z * z <= 9) {
-                        world.setBlockState(new BlockPos(x, 82, z),
-                                Blocks.CRYING_OBSIDIAN.getDefaultState());
-                    }
+
                 }
             }
         }
@@ -1376,13 +1483,11 @@ public final class NullWardenManager {
             for (int side = -3; side <= 3; side++) {
                 int x = dx * 22 + (dz != 0 ? side : 0);
                 int z = dz * 22 + (dx != 0 ? side : 0);
-                world.setBlockState(new BlockPos(x, 81, z), Blocks.REINFORCED_DEEPSLATE.getDefaultState());
-                world.setBlockState(new BlockPos(x, 82, z), Blocks.POLISHED_BLACKSTONE_BRICKS.getDefaultState());
+                world.setBlockState(new BlockPos(x, 80, z), Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+                for (int y=81;y<=88;y++) world.setBlockState(new BlockPos(x,y,z),
+                        Math.abs(side)==3 || y==88 ? Blocks.POLISHED_BLACKSTONE_BRICKS.getDefaultState() : Blocks.AIR.getDefaultState());
             }
-            for (int y = 82; y <= 88; y++) {
-                world.setBlockState(new BlockPos(dx * 22, y, dz * 22),
-                        Blocks.REINFORCED_DEEPSLATE.getDefaultState());
-            }
+
         }
 
         buildRealmLandmarks(world);
@@ -1586,13 +1691,13 @@ public final class NullWardenManager {
 
     private enum Attack {
         NONE(0, 0, 0, "IDLE"),
-        VOID_CLEAVE(24, 90, 5, "VOID CLEAVE"),
-        SCULK_RING(28, 92, 6, "SCULK RING"),
+        VOID_CLEAVE(32, 90, 5, "VOID CLEAVE"),
+        SCULK_RING(36, 92, 6, "SCULK RING"),
         VOID_RAIN(30, 100, 2.5, "VOID RAIN"),
-        NULL_DASH(24, 86, 4, "NULL DASH"),
-        GRAVITY_WELL(26, 95, 7, "GRAVITY WELL"),
-        REALITY_TEAR(20, 72, 8, "REALITY TEAR"),
-        COLLAPSE(30, 70, 9, "REALITY COLLAPSE");
+        NULL_DASH(32, 86, 4, "NULL DASH"),
+        GRAVITY_WELL(32, 95, 3.5, "GRAVITY WELL"),
+        REALITY_TEAR(28, 72, 4, "REALITY TEAR"),
+        COLLAPSE(40, 70, 5, "REALITY COLLAPSE");
 
         final int windup, recovery;
         final double radius;
@@ -1617,7 +1722,7 @@ public final class NullWardenManager {
         final Set<UUID> echoes = new HashSet<>();
         final Map<UUID, Integer> joinTicks = new HashMap<>();
         int ticks, intro, phase = 1, idleTicks, nextAttackTick = 40, attackWindup;
-        int victoryTicks, targetRotation;
+        int victoryTicks, targetRotation, transitionTicks, awaitingBossTicks;
         int hazardTicks, hazardPattern = -1;
         int recoveryTicks, exposeTicks, attackStep;
         int activePylons, cleansedPylons;

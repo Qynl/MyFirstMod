@@ -2,10 +2,101 @@
   "type": "myfirstmod:null_realm",
   "generator": {
     "type": "minecraft:noise",
-    "settings": "minecraft:end",
+    "settings": "myfirstmod:null_realm",
     "biome_source": {
-      "type": "minecraft:fixed",
-      "biome": "minecraft:the_end"
+      "type": "minecraft:multi_noise",
+      "biomes": [
+        {
+          "biome": "myfirstmod:hushed_grove",
+          "parameters": {
+            "temperature": [
+              -1,
+              -0.2
+            ],
+            "humidity": [
+              -1,
+              1
+            ],
+            "continentalness": [
+              -1,
+              1
+            ],
+            "erosion": [
+              -1,
+              1
+            ],
+            "depth": [
+              -1,
+              1
+            ],
+            "weirdness": [
+              -1,
+              1
+            ],
+            "offset": 0
+          }
+        },
+        {
+          "biome": "myfirstmod:prism_wastes",
+          "parameters": {
+            "temperature": [
+              -0.2,
+              0.35
+            ],
+            "humidity": [
+              -1,
+              1
+            ],
+            "continentalness": [
+              -1,
+              1
+            ],
+            "erosion": [
+              -1,
+              1
+            ],
+            "depth": [
+              -1,
+              1
+            ],
+            "weirdness": [
+              -1,
+              1
+            ],
+            "offset": 0
+          }
+        },
+        {
+          "biome": "myfirstmod:cinder_steps",
+          "parameters": {
+            "temperature": [
+              0.35,
+              1
+            ],
+            "humidity": [
+              -1,
+              1
+            ],
+            "continentalness": [
+              -1,
+              1
+            ],
+            "erosion": [
+              -1,
+              1
+            ],
+            "depth": [
+              -1,
+              1
+            ],
+            "weirdness": [
+              -1,
+              1
+            ],
+            "offset": 0
+          }
+        }
+      ]
     }
   }
 }

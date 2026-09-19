@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "id": "myfirstmod:null_relic"
+    },
+    "title": {
+      "text": "The Silence Breaks"
+    },
+    "description": {
+      "text": "Claim the Heart of the Null. Ascended courts now await."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "heart": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:null_relic"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "parent": "myfirstmod:enter_realm"
+}

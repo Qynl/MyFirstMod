@@ -120,9 +120,12 @@ public final class VoidPortalManager {
                 player, returnWorld, returnPos, returnYaw, returnPitch
         );
 
-        player.teleport(target, 0.5, 82.0, 0.5, player.getYaw(), player.getPitch());
-        NullWardenManager.enterArena(target, player);
+        dev.qynl.myfirstmod.realm.RealmExpedition.prepare(target);
+        player.teleport(target, 0.5, 81.0, 160.5, 180, 0);
+        dev.qynl.myfirstmod.realm.RealmExpedition.welcome(player);
     }
+
+    public static void clear() { COOLDOWNS.clear(); }
 
     public static void tick(MinecraftServer server) {
         COOLDOWNS.replaceAll((uuid, value) -> Math.max(0, value - 1));

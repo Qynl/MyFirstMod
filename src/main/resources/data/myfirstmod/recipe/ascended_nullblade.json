@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": {
+    "item": "minecraft:echo_shard"
+  },
+  "base": {
+    "item": "myfirstmod:nullblade"
+  },
+  "addition": {
+    "item": "myfirstmod:resonance_matrix"
+  },
+  "result": {
+    "id": "myfirstmod:ascended_nullblade",
+    "count": 1
+  }
+}

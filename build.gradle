@@ -2,6 +2,9 @@ plugins {
     id 'fabric-loom' version '1.9.2'
 }
 
+group = project.maven_group
+version = project.mod_version
+
 repositories {
     maven { name = "Fabric"; url = "https://maven.fabricmc.net/" }
     mavenCentral()

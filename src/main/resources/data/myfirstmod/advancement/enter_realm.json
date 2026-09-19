@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "id": "myfirstmod:arena_compass"
+    },
+    "title": {
+      "text": "Beyond the Seal"
+    },
+    "description": {
+      "text": "Enter the Null Realm and follow the resonance."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false,
+    "background": "minecraft:textures/block/sculk.png"
+  },
+  "criteria": {
+    "enter": {
+      "trigger": "minecraft:changed_dimension",
+      "conditions": {
+        "to": "myfirstmod:null_realm"
+      }
+    }
+  }
+}

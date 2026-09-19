@@ -24,5 +24,24 @@ public class MyFirstModClient implements ClientModInitializer {
         NullWardenTexture.GLOW_TEXTURE = NullWardenTexture.registerGlow();
 
         EntityRendererRegistry.register(ModEntities.NULL_WARDEN, NullWardenRenderer::new);
+        EntityRendererRegistry.register(ModEntities.RIFT_SENTINEL, dev.qynl.myfirstmod.client.render.RiftSentinelRenderer::new);
+        EntityRendererRegistry.register(ModEntities.SHARDSTALKER, dev.qynl.myfirstmod.client.render.ShardstalkerRenderer::new);
+        dev.qynl.myfirstmod.client.RealmHud.register();
+        net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
+            if (net.minecraft.registry.Registries.ITEM.getId(stack.getItem()).getNamespace().equals("myfirstmod")) {
+                String key = stack.getTranslationKey() + ".tooltip";
+                if (net.minecraft.client.resource.language.I18n.hasTranslation(key))
+                    lines.add(net.minecraft.text.Text.translatable(key).formatted(net.minecraft.util.Formatting.GRAY));
+            }
+        });
+        net.minecraft.client.item.ModelPredicateProviderRegistry.register(
+                dev.qynl.myfirstmod.item.ModItems.ARENA_COMPASS, net.minecraft.util.Identifier.ofVanilla("angle"),
+                (stack, world, entity, seed) -> {
+                    if (entity == null) return 0;
+                    if (!entity.getWorld().getRegistryKey().equals(dev.qynl.myfirstmod.portal.VoidPortalManager.NULL_REALM))
+                        return (entity.age % 64) / 64f;
+                    double bearing = Math.atan2(entity.getX(), -entity.getZ()) - Math.toRadians(entity.getYaw());
+                    return (float) ((bearing / (Math.PI * 2) % 1 + 1) % 1);
+                });
     }
 }

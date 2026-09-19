@@ -485,6 +485,28 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
             headBack.pivotZ += fracture * 0.12f;
         }
 
+        if (entity.getCinematic() == 1) {
+            float rise = MathHelper.clamp(entity.age / 100f, 0, 1);
+            float kneel = (1-rise)*(1-rise);
+            torso.pivotY += kneel * 7;
+            torso.pitch += kneel * .55f;
+            head.pitch += kneel * .4f;
+            leftLeg.pitch -= kneel * .7f;
+            rightLeg.pitch -= kneel * .7f;
+            leftArm.pitch -= kneel * .8f;
+            rightArm.pitch -= kneel * .8f;
+            crown.pivotY -= rise * 1.3f;
+        } else if (entity.getCinematic() == 3) {
+            float surge = .5f + MathHelper.sin(animationProgress * .16f) * .5f;
+            shardLeft.pivotX += surge * 1.8f;
+            shardRight.pivotX -= surge * 1.8f;
+            chestPlate.pivotZ -= surge * .8f;
+            shoulderLeft.roll -= surge * .4f;
+            shoulderRight.roll += surge * .4f;
+            head.pitch -= .3f;
+            coreRing.yaw += animationProgress * .1f;
+        }
+
         switch (attack) {
             case 1 -> { // VOID CLEAVE: huge one-sided wind-up.
                 torso.yaw += -0.16f * charge;

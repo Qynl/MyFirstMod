@@ -3,8 +3,10 @@
   "id": "myfirstmod",
   "version": "${version}",
   "name": "The Null Warden",
-  "description": "A handcrafted Ancient City boss encounter built around the Null Warden, its realm, and the Nullblade.",
-  "authors": ["Qynl"],
+  "description": "Explore the Null Realm, restore Resonance Courts, face a cinematic four-phase guardian, and awaken the Nullblade.",
+  "authors": [
+    "Qynl"
+  ],
   "contact": {
     "sources": "https://github.com/Qynl/MyFirstMod"
   },

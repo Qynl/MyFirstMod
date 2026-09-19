@@ -1,0 +1,35 @@
+{
+  "display": {
+    "icon": {
+      "id": "myfirstmod:resonance_matrix"
+    },
+    "title": {
+      "text": "What Remains"
+    },
+    "description": {
+      "text": "Gather eight Resonant Shards for a Resonance Matrix."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "shards": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:resonant_shard"
+            ],
+            "count": {
+              "min": 8
+            }
+          }
+        ]
+      }
+    }
+  },
+  "parent": "myfirstmod:claim_heart"
+}
