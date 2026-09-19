@@ -329,6 +329,8 @@ public final class NullWardenManager {
         a.boss.setAiDisabled(a.attack != Attack.NONE);
         a.boss.setInvulnerable(a.activePylons != 0);
 
+        applyPhaseMovement(world, a);
+
         a.boss.setVisualState(a.phase, attackVisualId(a.attack),
                 a.attack == Attack.NONE ? 0 : (int) Math.min(100,
                         100.0 * a.attackWindup / Math.max(1, a.attack.windup)), false);
@@ -554,6 +556,43 @@ public final class NullWardenManager {
      * Hazards always telegraph first and only resolve while the Warden is between
      * attacks, keeping the arena readable instead of turning the fight into noise.
      */
+    private static void applyPhaseMovement(ServerWorld world, ArenaState a) {
+        if (a.boss == null || a.attack != Attack.NONE || a.intro > 0 || a.recoveryTicks > 0) return;
+
+        double angle = Math.atan2(a.boss.getZ() - .5, a.boss.getX() - .5);
+        double radius = switch (a.phase) {
+            case 1 -> 2.0;
+            case 2 -> 7.0;
+            case 3 -> 11.0;
+            default -> 14.0;
+        };
+
+        double desiredAngle = angle + (a.phase % 2 == 0 ? 0.018 : -0.018);
+        double targetX = .5 + Math.cos(desiredAngle) * radius;
+        double targetZ = .5 + Math.sin(desiredAngle) * radius;
+        double dx = targetX - a.boss.getX();
+        double dz = targetZ - a.boss.getZ();
+        double len = Math.sqrt(dx * dx + dz * dz);
+
+        if (len > .15) {
+            double speed = switch (a.phase) {
+                case 1 -> .025;
+                case 2 -> .045;
+                case 3 -> .065;
+                default -> .08;
+            };
+            a.boss.addVelocity(dx / len * speed, 0, dz / len * speed);
+            a.boss.setVelocity(a.boss.getVelocity().multiply(.82, 1.0, .82));
+            a.boss.velocityModified = true;
+        }
+
+        if (a.ticks % 10 == 0) {
+            world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                    a.boss.getX(), a.boss.getY() + .15, a.boss.getZ(),
+                    2 + a.phase, .25, .05, .25, .004);
+        }
+    }
+
     private static void tickPhaseArena(ServerWorld world, ArenaState a) {
         if (a.phase < 2 || a.defeated || a.attack != Attack.NONE) {
             if (a.hazardTicks > 0) {
@@ -711,8 +750,14 @@ public final class NullWardenManager {
         a.attackZ = target.getZ();
         a.attackWindup = a.attack.windup;
         a.boss.setVisualState(a.phase, attackVisualId(a.attack), 100, false);
-        a.nextAttackTick = a.ticks + a.attack.windup + a.attack.recovery;
-        a.recoveryTicks = a.attack.recovery;
+        int phaseDelay = switch (a.phase) {
+            case 1 -> 12;
+            case 2 -> 10;
+            case 3 -> 8;
+            default -> 6;
+        };
+        a.nextAttackTick = a.ticks + a.attack.windup + a.attack.recovery + phaseDelay;
+        a.recoveryTicks = a.attack.recovery + phaseDelay;
 
         for (ServerPlayerEntity p : participants(world, a))
             p.sendMessage(Text.literal("NULL WARDEN // " + a.attack.name), true);
