@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="700" viewBox="0 0 800 700" role="img" aria-labelledby="title desc">
+<title id="title">Hollow Keep expedition map</title><desc id="desc">Schematic of the 63 by 63 fortress. Enter from the south, enroll at the heart, clear west, east and north ward chambers, then fight the Regent in the central hall. All interaction anchors are at Y 65.</desc>
+<defs><pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" stroke="#2b2931" stroke-width=".5"/></pattern></defs>
+<rect width="800" height="700" fill="#111019"/>
+<text x="400" y="40" fill="#dfc49a" text-anchor="middle" font-family="Georgia,serif" font-size="28" letter-spacing="4">THE HOLLOW KEEP</text>
+<text x="400" y="64" fill="#a89daa" text-anchor="middle" font-family="sans-serif" font-size="12" letter-spacing="2">EXPEDITION FIELD MAP · NORTH IS −Z</text>
+<rect x="142" y="92" width="496" height="496" fill="#1d1b24" stroke="#8a735b" stroke-width="4"/>
+<rect x="145" y="95" width="490" height="490" fill="url(#grid)"/>
+<path d="M230 340H550M390 180V564" stroke="#57504c" stroke-width="25"/>
+<g fill="#38313b" stroke="#b39772" stroke-width="2">
+<rect x="174" y="284" width="112" height="112"/><rect x="494" y="284" width="112" height="112"/>
+<rect x="334" y="124" width="112" height="112"/><rect x="310" y="260" width="160" height="160"/>
+</g>
+<g stroke="#57504c" stroke-width="24"><path d="M280 340H292M488 340H500M390 230V266M390 414V426M304 340H316M464 340H476"/></g>
+<g fill="#24232c" stroke="#766458"><rect x="158" y="108" width="24" height="24"/><rect x="598" y="108" width="24" height="24"/><rect x="158" y="548" width="24" height="24"/><rect x="598" y="548" width="24" height="24"/></g>
+<g fill="#adccbf"><circle cx="170" cy="120" r="4"/><circle cx="610" cy="120" r="4"/><circle cx="170" cy="560" r="4"/><circle cx="610" cy="560" r="4"/></g>
+<g font-family="sans-serif" text-anchor="middle">
+<g fill="#e6d4bb" font-size="14"><text x="230" y="315">WEST WARD</text><text x="550" y="315">EAST WARD</text><text x="390" y="153">NORTH WARD</text></g>
+<g fill="#b5a7b6" font-size="11"><text x="230" y="332">Sentinels</text><text x="550" y="332">Shardstalkers</text><text x="390" y="170">Mixed guardians</text></g>
+<g fill="#dca18b"><circle cx="230" cy="352" r="6"/><circle cx="550" cy="352" r="6"/><circle cx="390" cy="190" r="6"/></g>
+<g fill="#bbb0ba" font-size="11"><text x="230" y="379">−20, 65, 0</text><text x="550" y="379">20, 65, 0</text><text x="390" y="218">0, 65, −20</text></g>
+<text x="390" y="287" fill="#d9bc90" font-family="Georgia,serif" font-size="17">GREAT HALL</text>
+<path d="M376 325L381 331L390 316L399 331L404 325L401 345H379Z" fill="#cfa36e"/>
+<text x="390" y="369" fill="#e1c4a1" font-size="13">GRAVE REGENT</text><text x="390" y="393" fill="#ada0af" font-size="11">After all three wards</text>
+<text x="230" y="486" fill="#716879" font-size="11">GRAVE GARDEN</text><text x="550" y="486" fill="#716879" font-size="11">GRAVE GARDEN</text>
+<circle cx="390" cy="516" r="8" fill="#dec183"/><text x="490" y="520" fill="#dec183" font-size="12">HEART · START RUN</text>
+<rect x="382" y="556" width="16" height="16" fill="#a9d6ca"/><text x="308" y="568" fill="#a9d6ca" font-size="12">RETURN GATE</text>
+<circle cx="422" cy="564" r="5" fill="#91b9cf"/><text x="500" y="568" fill="#91b9cf" font-size="12">REST WAYSTONE</text>
+</g>
+<text x="400" y="620" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#d6c7b6">GATHER → ENROLL → THREE WARDS → REGENT → RETURN FOR REWARDS</text>
+<text x="400" y="646" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#a699ad">One shared expedition. Clear wards in any order, one chamber at a time.</text>
+<text x="400" y="671" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#796d83">Navigation schematic, not an in-game screenshot. All anchors are at Y=65.</text>
+</svg>

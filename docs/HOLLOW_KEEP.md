@@ -2,6 +2,8 @@
 
 A separate **shared dungeon dimension**, with a hand-designed 63×63 fortress, three ward chambers, a ribbed central great hall, four towers, and a new original-model boss. This is not a procedural room randomizer or one private instance per party.
 
+![Hollow Keep navigation schematic](images/hollow-keep-map.svg)
+
 ## Enter and prepare
 
 After the Null Warden has fallen at least once in the realm, use the **Hollow Gate at (-6,81,158)** in the sanctuary. The migration adds it only if the block is empty. If an old build occupies the gate spot, its owner can clear that block and re-enter the realm to install the gate. No occupied block is overwritten.

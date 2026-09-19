@@ -38,6 +38,8 @@ A separate dungeon dimension with a **63×63 fortress**, three ward chambers, a 
 
 After the Warden has fallen, use the Hollow Gate at **(-6,81,158)**. The first use prepares the fortress; use it again once ready. Your existing flasks, vows, and Resonite set bonus work there. Read the guide before starting a party expedition.
 
+![Hollow Keep expedition map — a navigation schematic, not an in-game screenshot](docs/images/hollow-keep-map.svg)
+
 ## What is new in 1.6?
 
 This update connects exploration to long-term preparation rather than adding only another boss:
