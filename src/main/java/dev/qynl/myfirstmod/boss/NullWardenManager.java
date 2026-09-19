@@ -267,7 +267,8 @@ public final class NullWardenManager {
                         SoundCategory.HOSTILE, 3.5f, .7f);
             }
             if (v == 25 || v == 50) {
-                world.playSound(null, a.boss.getBlockPos(), SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE,
+                world.playSound(null, a.boss.getX(), a.boss.getY(), a.boss.getZ(),
+                        SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE.value(),
                         SoundCategory.HOSTILE, 1.8f, .55f);
             }
             if (v == 70) {
