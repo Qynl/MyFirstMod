@@ -354,6 +354,7 @@ public final class NullWardenManager {
         }
 
         tickPylons(world, a);
+        tickPylonPressure(world, a);
 
         if (a.attack != Attack.NONE) {
             a.attackWindup--;
@@ -370,7 +371,12 @@ public final class NullWardenManager {
             beginAttack(world, a);
         }
 
-        if (a.phase >= 2 && a.ticks % 260 == 0) summonEcho(world, a);
+        int echoInterval = switch (a.phase) {
+            case 2 -> 300;
+            case 3 -> 220;
+            default -> 160;
+        };
+        if (a.phase >= 2 && a.ticks % echoInterval == 0) summonEcho(world, a);
         if (a.ticks % 40 == 0) persist(world, a);
     }
 
@@ -451,6 +457,69 @@ public final class NullWardenManager {
             } else if (a.pylonProgress[i] > 0 && a.ticks % 10 == 0) {
                 a.pylonProgress[i] = Math.max(0, a.pylonProgress[i] - 2);
             }
+        }
+    }
+
+    /**
+     * Active pylons are deliberately dangerous to stand beside. Their pressure
+     * scales with the phase, turning cleansing into a real contested objective:
+     * players must commit to the pylon while managing a local hazard.
+     */
+    private static void tickPylonPressure(ServerWorld world, ArenaState a) {
+        if (a.activePylons == 0) return;
+
+        int interval = switch (a.phase) {
+            case 2 -> 45;
+            case 3 -> 35;
+            default -> 25;
+        };
+        if (a.ticks % interval != 0) return;
+
+        float damage = switch (a.phase) {
+            case 2 -> 5.0f;
+            case 3 -> 7.0f;
+            default -> 9.0f;
+        };
+        double radius = switch (a.phase) {
+            case 2 -> 3.5;
+            case 3 -> 4.25;
+            default -> 5.0;
+        };
+
+        for (int i = 0; i < 4; i++) {
+            if ((a.activePylons & (1 << i)) == 0) continue;
+
+            BlockPos p = PYLONS[i];
+            world.spawnParticles(ParticleTypes.SCULK_SOUL,
+                    p.getX() + .5, p.getY() + 12.2, p.getZ() + .5,
+                    16, .6, .7, .6, .025);
+
+            for (ServerPlayerEntity player : activePlayers(world, a)) {
+                double distance = player.squaredDistanceTo(
+                        p.getX() + .5, player.getY(), p.getZ() + .5);
+                if (distance <= radius * radius) {
+                    player.damage(world.getDamageSources().mobAttack(a.boss), damage);
+
+                    if (a.phase >= 3) {
+                        Vec3d pull = new Vec3d(
+                                p.getX() + .5 - player.getX(),
+                                0,
+                                p.getZ() + .5 - player.getZ());
+                        double length = Math.sqrt(pull.x * pull.x + pull.z * pull.z);
+                        if (length > .1) {
+                            double strength = a.phase == 3 ? .16 : .24;
+                            player.addVelocity(
+                                    pull.x / length * strength,
+                                    .04,
+                                    pull.z / length * strength);
+                            player.velocityModified = true;
+                        }
+                    }
+                }
+            }
+
+            ring(world, p.getX() + .5, 81.2, p.getZ() + .5,
+                    radius, ParticleTypes.REVERSE_PORTAL, 40);
         }
     }
 
@@ -646,9 +715,15 @@ public final class NullWardenManager {
                 a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 120, 5, 2.5, 5, .035);
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
                 a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 100, 4, 3, 4, .045);
+        String rule = switch (a.phase) {
+            case 2 -> "Phase 2: pylon fields pulse. Commit carefully while cleansing.";
+            case 3 -> "Phase 3: pylon fields pull you inward. Movement is the price of cleansing.";
+            default -> "Phase 4: all pylons resonate faster. Cleanse them before the arena overwhelms you.";
+        };
         for (ServerPlayerEntity p : participants(world, a)) {
             p.sendMessage(Text.literal("NULL WARDEN // PHASE " + a.phase), true);
             p.sendMessage(Text.literal("The pylons are feeding it. Sneak beside each one to cleanse it."), false);
+            p.sendMessage(Text.literal(rule), false);
         }
     }
 
