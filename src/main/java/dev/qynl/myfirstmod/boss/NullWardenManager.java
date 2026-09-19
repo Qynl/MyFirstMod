@@ -62,6 +62,7 @@ public final class NullWardenManager {
         a.defeated = data.defeated;
         a.phase = Math.max(1, data.phase);
         a.activePylons = data.activePylons;
+        a.cleansedPylons = data.cleansedPylons;
         a.pylonProgress = data.pylonProgress.clone();
         a.bossUuid = data.bossUuid;
         a.returnPortalBuilt = data.returnPortalBuilt;
@@ -116,6 +117,7 @@ public final class NullWardenManager {
         data.returnPortalBuilt = a.returnPortalBuilt;
         data.phase = a.phase;
         data.activePylons = a.activePylons;
+        data.cleansedPylons = a.cleansedPylons;
         data.pylonProgress = a.pylonProgress.clone();
         data.dirty();
     }
@@ -132,6 +134,7 @@ public final class NullWardenManager {
         data.returnPortalBuilt = false;
         data.phase = 1;
         data.activePylons = 0;
+        data.cleansedPylons = 0;
         data.pylonProgress = new int[4];
         data.dirty();
     }
@@ -200,6 +203,7 @@ public final class NullWardenManager {
         a.intro = 100;
         a.phase = 1;
         a.activePylons = 0;
+        a.cleansedPylons = 0;
         a.pylonProgress = new int[4];
         a.attack = Attack.NONE;
         a.attackTarget = null;
@@ -374,7 +378,7 @@ public final class NullWardenManager {
             a.attackTarget = null;
             a.attackX = a.attackY = a.attackZ = 0;
             a.attackWindup = 0;
-            a.activePylons = (1 << phase) - 1;
+            a.activePylons = ((1 << phase) - 1) & ~a.cleansedPylons;
             a.pylonProgress = new int[4];
             a.hazardTicks = 0;
             a.hazardPattern = -1;
@@ -483,6 +487,7 @@ public final class NullWardenManager {
                 }
                 if (a.pylonProgress[i] >= 50) {
                     a.activePylons &= ~(1 << i);
+                    a.cleansedPylons |= (1 << i);
                     a.pylonProgress[i] = 0;
                     world.setBlockState(p.up(11), Blocks.AIR.getDefaultState());
                     world.playSound(null, p, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
