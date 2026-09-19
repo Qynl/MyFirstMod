@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:memory_shard"
+    },
+    {
+      "item": "myfirstmod:memory_shard"
+    },
+    {
+      "item": "myfirstmod:resonite_ingot"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:iron_vow",
+    "count": 1
+  }
+}

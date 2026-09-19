@@ -14,6 +14,8 @@ public final class Waystones {
         if(!world.getRegistryKey().equals(VoidPortalManager.NULL_REALM) || !world.getBlockState(pos).isOf(ModBlocks.WAYSTONE))
             return ActionResult.PASS;
         if(player.isSpectator()) return ActionResult.PASS;
+        if(player.getMainHandStack().getItem() instanceof dev.qynl.myfirstmod.item.VowSealItem
+                || player.getMainHandStack().isOf(dev.qynl.myfirstmod.item.ModItems.PILGRIM_ATLAS)) return ActionResult.PASS;
         if(player.isSneaking() && player.getMainHandStack().isOf(dev.qynl.myfirstmod.item.ModItems.ASHEN_FLASK)) return ActionResult.PASS;
         var state=RealmState.get(world);var record=state.expedition(player.getUuid());
         record.boundWaystone=pos.asLong();record.hasWaystone=true;state.markDirty();

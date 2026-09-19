@@ -55,6 +55,12 @@ public final class ModItems {
     public static final Item ASHEN_FLASK=register("ashen_flask",new AshenFlaskItem(new Item.Settings().maxCount(1).fireproof().rarity(Rarity.RARE)));
     public static final Item PILGRIM_STEP=register("pilgrim_step",new PilgrimStepItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item MOURNING_EMBER=register("mourning_ember",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
+    public static final Item MEMORY_SHARD=register("memory_shard",new Item(new Item.Settings().fireproof().rarity(Rarity.UNCOMMON)));
+    public static final Item PILGRIM_ATLAS=register("pilgrim_atlas",new PilgrimAtlasItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+    public static final Item IRON_VOW=register("iron_vow",new VowSealItem(new Item.Settings().maxCount(16),1));
+    public static final Item EMBER_VOW=register("ember_vow",new VowSealItem(new Item.Settings().maxCount(16),2));
+    public static final Item MIST_VOW=register("mist_vow",new VowSealItem(new Item.Settings().maxCount(16),3));
+    public static final Item SILENT_VOW=register("silent_vow",new VowSealItem(new Item.Settings().maxCount(16),0));
     public static void register() {
         net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(dev.qynl.myfirstmod.block.ModBlocks.HUSHWOOD,300);
         Registry.register(Registries.ITEM_GROUP,Identifier.of(MyFirstMod.MOD_ID,"null_realm"),

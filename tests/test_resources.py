@@ -46,7 +46,7 @@ class ResourceTests(unittest.TestCase):
                 for feature in stage:
                     placed=load(DATA/('worldgen/placed_feature/'+feature.split(':')[1]+'.json'))
                     configured=load(DATA/('worldgen/configured_feature/'+placed['feature'].split(':')[1]+'.json'))
-                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral'])
+                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial'])
             self.assertEqual({s['type'] for s in biome['spawners']['monster']},
                              {'myfirstmod:rift_sentinel','myfirstmod:shardstalker'})
 
@@ -125,7 +125,7 @@ class ResourceTests(unittest.TestCase):
     def test_wilds_blocks_are_complete(self):
         source=(ROOT/'src/main/java/dev/qynl/myfirstmod/block/ModBlocks.java').read_text()
         names=set(re.findall(r'(?:stone|building)\("([a-z_]+)"',source))
-        self.assertEqual(len(names),17)
+        self.assertEqual(len(names),18)
         language=load(ASSETS/'lang/en_us.json')
         for name in names:
             self.assertTrue((ASSETS/f'blockstates/{name}.json').exists(),name)
@@ -193,10 +193,21 @@ class ResourceTests(unittest.TestCase):
         self.assertTrue((DATA/'loot_table/chests/pilgrim_cache.json').exists())
         self.assertFalse((DATA/'recipe/mourning_ember.json').exists(),'Embers must remain exploration rewards')
 
+    def test_remembrance_contracts(self):
+        for biome in (DATA/'worldgen/biome').glob('*.json'):
+            self.assertIn('myfirstmod:forgotten_memorial',json.dumps(load(biome)))
+        lang=load(ASSETS/'lang/en_us.json')
+        for i in range(7):self.assertIn('contract.myfirstmod.'+str(i),lang)
+        for i in range(6):self.assertIn('memory.myfirstmod.'+str(i),lang)
+        for i in range(4):self.assertIn('vow.myfirstmod.'+str(i),lang)
+        self.assertTrue((DATA/'loot_table/chests/memorial_cache.json').exists())
+        for seal in ['iron_vow','ember_vow','mist_vow']:
+            self.assertEqual(json.dumps(load(DATA/f'recipe/{seal}.json')).count('myfirstmod:memory_shard'),2)
+
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))
         before={str(p.relative_to(RES)):p.read_bytes() for p in paths if p.is_file()}
-        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py','generate_pilgrimage.py']:
+        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py','generate_pilgrimage.py','generate_remembrance.py']:
             subprocess.run([sys.executable,str(ROOT/'scripts'/script)],check=True)
         after={str(p.relative_to(RES)):p.read_bytes() for p in RES.rglob('*') if p.is_file()}
         self.assertEqual(before,after)

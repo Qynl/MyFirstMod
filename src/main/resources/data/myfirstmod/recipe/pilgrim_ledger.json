@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "item": "myfirstmod:hush_planks"
+    },
+    {
+      "item": "myfirstmod:resonite_ingot"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:pilgrim_ledger",
+    "count": 1
+  }
+}

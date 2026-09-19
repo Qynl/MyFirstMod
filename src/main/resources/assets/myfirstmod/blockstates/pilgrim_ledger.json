@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "myfirstmod:block/pilgrim_ledger"
+    }
+  }
+}

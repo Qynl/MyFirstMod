@@ -41,6 +41,19 @@ public final class PilgrimageHud {
                     draw.drawCenteredTextWithShadow(c.textRenderer,Text.translatable("region.myfirstmod."+title),w/2,y+23,(alpha<<24)|0xB7ABA0);
                 }
             }
+            var atlas=c.player.getMainHandStack().isOf(ModItems.PILGRIM_ATLAS)?c.player.getMainHandStack():c.player.getOffHandStack();
+            if(realm && atlas.isOf(ModItems.PILGRIM_ATLAS)) {
+                int x=8,y=55;
+                draw.fill(x,y,x+190,y+37,0xD015141B);
+                draw.drawTextWithShadow(c.textRenderer,Text.translatable("landmark.myfirstmod."+PilgrimAtlasItem.KINDS[PilgrimAtlasItem.mode(atlas)]),x+7,y+6,0xE5C88A);
+                if(atlas.contains(DataComponentTypes.LODESTONE_TRACKER)) {
+                    var p=ArenaCompassItem.target(atlas);int distance=(int)Math.hypot(c.player.getX()-p.getX(),c.player.getZ()-p.getZ());
+                    double relative=Math.toDegrees(Math.atan2(p.getZ()+.5-c.player.getZ(),p.getX()+.5-c.player.getX()))-90-c.player.getYaw();
+                    relative=net.minecraft.util.math.MathHelper.wrapDegrees((float)relative);
+                    String direction=Math.abs(relative)<30?"ahead":Math.abs(relative)>150?"behind":relative>0?"right":"left";
+                    draw.drawTextWithShadow(c.textRenderer,Text.translatable("hud.myfirstmod.atlas",distance,Text.translatable("bearing.myfirstmod."+direction)),x+7,y+23,0xD9D1C2);
+                } else draw.drawTextWithShadow(c.textRenderer,Text.translatable("hud.myfirstmod.atlas_unknown"),x+7,y+23,0xD9D1C2);
+            }
             var stack=c.player.getMainHandStack().isOf(ModItems.ASHEN_FLASK)?c.player.getMainHandStack():c.player.getOffHandStack();
             if(stack.isOf(ModItems.ASHEN_FLASK)) {
                 var data=stack.getOrDefault(DataComponentTypes.CUSTOM_DATA,NbtComponent.DEFAULT).copyNbt();

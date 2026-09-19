@@ -21,6 +21,7 @@ public class MyFirstMod implements ModInitializer {
         ModBlocks.register();
         ModItems.register();
         ModEntities.register();
+        dev.qynl.myfirstmod.remembrance.RemembranceFeature.register();
         dev.qynl.myfirstmod.pilgrimage.CathedralFeature.register();
         dev.qynl.myfirstmod.realm.RealmFeatures.register();
         dev.qynl.myfirstmod.realm.WildsFeatures.register();
@@ -42,6 +43,9 @@ public class MyFirstMod implements ModInitializer {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
             if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;
             if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
+            dev.qynl.myfirstmod.remembrance.LandmarkAtlas.remember(serverPlayer,hit.getBlockPos());
+            ActionResult ledger=dev.qynl.myfirstmod.remembrance.RemembranceLedger.interact(serverPlayer,hit.getBlockPos());
+            if(ledger!=ActionResult.PASS) return ledger;
             ActionResult rite=dev.qynl.myfirstmod.pilgrimage.CathedralRite.interact(serverPlayer,hit.getBlockPos());
             if(rite!=ActionResult.PASS) return rite;
             ActionResult harvest=dev.qynl.myfirstmod.block.HushNurseryBlock.harvest(serverPlayer,hit.getBlockPos());
@@ -63,6 +67,7 @@ public class MyFirstMod implements ModInitializer {
         });
 
         ServerTickEvents.END_SERVER_TICK.register(VoidPortalManager::tick);
+        ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.remembrance.PilgrimVows::tick);
         ServerTickEvents.END_SERVER_TICK.register(NullbladeItem::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.item.ResoniteArmor::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.item.AshenFlaskItem::tick);

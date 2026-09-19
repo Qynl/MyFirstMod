@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:memory_shard"
+    },
+    {
+      "item": "myfirstmod:memory_shard"
+    },
+    {
+      "item": "myfirstmod:dusk_fiber"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:mist_vow",
+    "count": 1
+  }
+}

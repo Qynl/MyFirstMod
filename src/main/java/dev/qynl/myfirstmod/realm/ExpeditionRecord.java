@@ -8,6 +8,15 @@ import java.util.Set;
 
 /** Per-player expedition progress. Bounded discovery storage keeps saves small. */
 public final class ExpeditionRecord {
+    public int vow,contractsClaimed,ledgerOffer;
+    public long vowReadyAt;
+    public final Set<Long> memories=new LinkedHashSet<>();
+    public final java.util.Map<Long,String> landmarks=new java.util.LinkedHashMap<>();
+    public void rememberLandmark(long pos,String kind) {
+        if(!java.util.Set.of("waystone","court","rift","cathedral","memory").contains(kind)) return;
+        if(landmarks.size()>=128 && !landmarks.containsKey(pos)) landmarks.remove(landmarks.keySet().iterator().next());
+        landmarks.put(pos,kind);
+    }
     public int flaskCharges=3,flaskUpgrades,cathedralsOpened;
     public boolean pilgrimKit;
     public int trials, highestTier, victories, pendingNormal, pendingEcho;
@@ -23,6 +32,14 @@ public final class ExpeditionRecord {
     }
     public static ExpeditionRecord read(NbtCompound nbt) {
         ExpeditionRecord record = new ExpeditionRecord();
+        record.vow=dev.qynl.myfirstmod.remembrance.RemembranceRules.vow(nbt.getInt("Vow"));
+        record.vowReadyAt=Math.max(0,nbt.getLong("VowReadyAt"));
+        record.contractsClaimed=nbt.getInt("ContractsClaimed")&127;record.ledgerOffer=Math.floorMod(nbt.getInt("LedgerOffer"),4);
+        long[] memories=nbt.getLongArray("Memories");for(int i=0;i<Math.min(256,memories.length);i++) record.memories.add(memories[i]);
+        var landmarks=nbt.getList("Landmarks",10);
+        for(int i=Math.max(0,landmarks.size()-128);i<landmarks.size();i++) {
+            var entry=landmarks.getCompound(i);record.rememberLandmark(entry.getLong("Pos"),entry.getString("Kind"));
+        }
         record.pilgrimKit=nbt.getBoolean("PilgrimKit");
         record.flaskUpgrades=Math.max(0,Math.min(2,nbt.getInt("FlaskUpgrades")));
         record.flaskCharges=dev.qynl.myfirstmod.pilgrimage.PilgrimageRules.charges(nbt.contains("FlaskCharges")?nbt.getInt("FlaskCharges"):3,record.flaskUpgrades);
@@ -45,6 +62,10 @@ public final class ExpeditionRecord {
     }
     public NbtCompound write() {
         NbtCompound nbt = new NbtCompound();
+        nbt.putInt("Vow",vow);nbt.putLong("VowReadyAt",vowReadyAt);nbt.putInt("ContractsClaimed",contractsClaimed);nbt.putInt("LedgerOffer",ledgerOffer);
+        nbt.putLongArray("Memories",memories.stream().mapToLong(Long::longValue).toArray());
+        var landmarksNbt=new NbtList();landmarks.forEach((pos,kind)->{var entry=new NbtCompound();entry.putLong("Pos",pos);entry.putString("Kind",kind);landmarksNbt.add(entry);});
+        nbt.put("Landmarks",landmarksNbt);
         nbt.putBoolean("PilgrimKit",pilgrimKit);nbt.putInt("FlaskCharges",flaskCharges);nbt.putInt("FlaskUpgrades",flaskUpgrades);
         nbt.putInt("CathedralsOpened",cathedralsOpened);
         nbt.putInt("RiftsClosed",riftsClosed);nbt.putInt("PendingRiftCores",pendingRiftCores);

@@ -55,13 +55,15 @@ public final class RealmExpedition {
         state.markDirty();
     }
     private static void prepareForge(ServerWorld world,RealmState state) {
-        if(state.contentVersion>=4) return;
+        if(state.contentVersion>=5) return;
         BlockPos pos=new BlockPos(-6,81,160);
         // Upgrade old sanctuaries without overwriting an occupied player block.
         if(world.getBlockState(pos).isAir()) put(world,pos,ModBlocks.ATTUNEMENT_FORGE);
         BlockPos rest=new BlockPos(6,81,160);
         if(world.getBlockState(rest).isAir()) put(world,rest,ModBlocks.WAYSTONE);
-        state.contentVersion=4;state.markDirty();
+        BlockPos ledger=new BlockPos(6,81,158);
+        if(world.getBlockState(ledger).isAir()) put(world,ledger,ModBlocks.PILGRIM_LEDGER);
+        state.contentVersion=5;state.markDirty();
     }
     private static void prepareAltar(ServerWorld world,RealmState state) {
         if(state.contentVersion>=2) return;

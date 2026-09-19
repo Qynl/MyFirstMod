@@ -61,5 +61,7 @@ public final class ModBlocks {
             new FunerarySealBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->s.get(FunerarySealBlock.RITE)==3?12:2)));
     public static final Block MOURNING_RELIQUARY=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"mourning_reliquary"),
             new FunerarySealBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->s.get(FunerarySealBlock.RITE)==3?14:3)));
+    public static final Block MEMORY_STELE=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"memory_stele"),new Block(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->7)));
+    public static final Block PILGRIM_LEDGER=building("pilgrim_ledger",new Block(AbstractBlock.Settings.copy(Blocks.LECTERN).strength(3).luminance(s->4)));
     public static void register() {}
 }

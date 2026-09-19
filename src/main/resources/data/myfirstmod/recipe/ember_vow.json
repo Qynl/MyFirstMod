@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "myfirstmod:memory_shard"
+    },
+    {
+      "item": "myfirstmod:memory_shard"
+    },
+    {
+      "item": "myfirstmod:cinder_pearl"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:ember_vow",
+    "count": 1
+  }
+}

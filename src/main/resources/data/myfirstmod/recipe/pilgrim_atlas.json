@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:compass"
+    },
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "item": "myfirstmod:prism_dust"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:pilgrim_atlas",
+    "count": 1
+  }
+}

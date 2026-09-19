@@ -130,6 +130,18 @@ def main():
             connection.command(prefix+'setblock 1048 65 1048 myfirstmod:mourning_reliquary[rite=3]')
             connection.command(prefix+'summon minecraft:item 1048 84 1048 {Item:{id:"myfirstmod:ashen_flask",count:1}}')
             connection.command(prefix+'summon minecraft:item 1048 84 1048 {Item:{id:"myfirstmod:pilgrim_step",count:1}}')
+            # Repeat placements exercise memorial variants without relying on player interaction.
+            for attempt in range(3):
+                connection.command(prefix+'fill 1041 60 1041 1055 200 1055 minecraft:air')
+                connection.command(prefix+'fill 1041 80 1041 1055 80 1055 myfirstmod:hushed_moss')
+                connection.command(prefix+'place feature myfirstmod:forgotten_memorial 1048 81 1048')
+                connection.command(prefix+'execute if block 1048 81 1048 myfirstmod:memory_stele run say SMOKE_MEMORY_OK')
+            connection.command(prefix+'setblock 1049 81 1048 myfirstmod:pilgrim_ledger')
+            connection.command(prefix+'loot spawn 1049 83 1048 mine 1049 81 1048 minecraft:iron_axe')
+            connection.command(prefix+'execute if entity @e[type=minecraft:item,nbt={Item:{id:"myfirstmod:pilgrim_ledger"}}] run say SMOKE_LEDGER_OK')
+            connection.command(prefix+'loot spawn 1048 83 1048 loot myfirstmod:chests/memorial_cache')
+            for item in ['pilgrim_atlas','memory_shard','iron_vow','ember_vow','mist_vow','silent_vow']:
+                connection.command(prefix+'summon minecraft:item 1048 84 1048 {Item:{id:"myfirstmod:'+item+'",count:1}}')
             connection.command('save-all flush')
             connection.command('stop')
             code=proc.wait(timeout=120)
