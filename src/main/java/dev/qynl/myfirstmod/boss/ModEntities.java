@@ -17,7 +17,7 @@ public final class ModEntities {
                     .dimensions(1.0f, 3.5f)
                     .maxTrackingRange(64)
                     .trackingTickInterval(1)
-                    .build(Identifier.of(MyFirstMod.MOD_ID, "null_warden"))
+                    .build("myfirstmod:null_warden")
     );
 
     public static void register() {}
