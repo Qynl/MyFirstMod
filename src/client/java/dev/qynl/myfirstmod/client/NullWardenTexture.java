@@ -77,6 +77,10 @@ public final class NullWardenTexture {
         // Cyan core glyph in the UV region used by the chest core.
         paintGlowGlyph(image, 0, 60, 28, 10, 33, 236, 255);
 
+        // Signature narrow eye slit.
+        fillRect(image, 0, 104, 8, 2, 255, 39, 214, 229);
+        fillRect(image, 10, 104, 4, 1, 255, 98, 242, 255);
+
         // Head/crown accent regions.
         paintGlowGlyph(image, 96, 0, 32, 22, 96, 42, 255);
         paintGlowGlyph(image, 52, 35, 10, 20, 39, 194, 210);
@@ -89,6 +93,8 @@ public final class NullWardenTexture {
 
         // Transparent by default. Only the model's core, crown and horn UV islands glow.
         fillRect(image, 0, 60, 28, 10, 255, 38, 245, 255);
+        fillRect(image, 0, 104, 8, 2, 255, 48, 235, 255);
+        fillRect(image, 10, 104, 4, 1, 255, 120, 255, 255);
         fillRect(image, 20, 60, 6, 6, 255, 84, 255, 255);
         fillRect(image, 36, 60, 2, 2, 255, 255, 255, 255);
 
