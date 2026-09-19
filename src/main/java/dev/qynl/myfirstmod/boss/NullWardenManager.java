@@ -735,7 +735,19 @@ public final class NullWardenManager {
     }
 
     private static void resolveWedge(ServerWorld world, ArenaState a) {
-        double centerAngle = a.hazardPattern * Math.PI / 2.0 + Math.PI / 4.0;
+        int sector = a.hazardPattern / 2;
+        // A cleansed pylon permanently creates a sanctuary in its quadrant.
+        // This turns the pylon objective into lasting arena control instead of
+        // merely being a temporary damage gate.
+        if ((a.activePylons & (1 << sector)) == 0) {
+            world.playSound(null, PYLONS[sector], SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
+                    SoundCategory.HOSTILE, .8f, 1.5f);
+            ring(world, PYLONS[sector].getX() + .5, 80.3, PYLONS[sector].getZ() + .5,
+                    4.5, ParticleTypes.END_ROD, 32);
+            return;
+        }
+
+        double centerAngle = sector * Math.PI / 2.0 + Math.PI / 4.0;
         for (ServerPlayerEntity p : activePlayers(world, a)) {
             double dx = p.getX() - .5;
             double dz = p.getZ() - .5;
