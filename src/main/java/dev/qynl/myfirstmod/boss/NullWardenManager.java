@@ -10,6 +10,7 @@ import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
@@ -33,876 +34,687 @@ public final class NullWardenManager {
     private static final Map<RegistryKey<World>, ArenaState> ARENAS = new HashMap<>();
     private static final BlockPos CENTER = new BlockPos(0, 80, 0);
     private static final int ARENA_RADIUS = 22;
-    private static final int SOFT_BOUNDARY = 26;
     private static final int HARD_BOUNDARY = 34;
-    private static final BlockPos RETURN_PORTAL_ORIGIN = new BlockPos(13, 81, 13);
-
+    private static final BlockPos RETURN_PORTAL = new BlockPos(13, 81, 13);
     private static final BlockPos[] PYLONS = {
-            new BlockPos(15, 81, 0),
-            new BlockPos(0, 81, 15),
-            new BlockPos(-15, 81, 0),
-            new BlockPos(0, 81, -15)
+            new BlockPos(15, 81, 0), new BlockPos(0, 81, 15),
+            new BlockPos(-15, 81, 0), new BlockPos(0, 81, -15)
     };
 
     private NullWardenManager() {}
 
-    private static NullWardenState state(ServerWorld world) {
+    private static NullWardenState saved(ServerWorld world) {
         return world.getPersistentStateManager().getOrCreate(
-                NullWardenState.type(),
-                NullWardenState.ID
-        );
+                NullWardenState.type(), NullWardenState.ID);
     }
 
-    private static ArenaState arena(ServerWorld world) {
-        return ARENAS.computeIfAbsent(world.getRegistryKey(), key -> loadArena(world));
+    private static ArenaState getArena(ServerWorld world) {
+        return ARENAS.computeIfAbsent(world.getRegistryKey(), key -> load(world));
     }
 
-    private static ArenaState loadArena(ServerWorld world) {
-        NullWardenState saved = state(world);
-        ArenaState arena = new ArenaState();
-        arena.participants.addAll(saved.participants);
-        arena.rewardedPlayers.addAll(saved.rewardedPlayers);
-        arena.echoes.addAll(saved.echoes);
-        arena.defeated = saved.defeated;
-        arena.rewarded = saved.rewarded;
-        arena.returnPortalBuilt = saved.returnPortalBuilt;
-        arena.phase = Math.max(1, saved.phase);
-        arena.activePylons = saved.activePylons;
-        arena.bossUuid = saved.bossUuid;
+    private static ArenaState load(ServerWorld world) {
+        NullWardenState data = saved(world);
+        ArenaState a = new ArenaState();
+        a.participants.addAll(data.participants);
+        a.rewardedPlayers.addAll(data.rewardedPlayers);
+        a.echoes.addAll(data.echoes);
+        a.defeated = data.defeated;
+        a.phase = Math.max(1, data.phase);
+        a.activePylons = data.activePylons;
+        a.bossUuid = data.bossUuid;
+        a.returnPortalBuilt = data.returnPortalBuilt;
 
-        if (arena.bossUuid != null) {
-            Entity entity = world.getEntity(arena.bossUuid);
-            if (entity instanceof WardenEntity warden && warden.isAlive()) {
-                arena.boss = warden;
-                restoreEchoes(world, arena);
-                rebuildBossBar(world, arena);
-                return arena;
+        if (a.bossUuid != null) {
+            Entity entity = world.getEntity(a.bossUuid);
+            if (entity instanceof WardenEntity w && w.isAlive()) {
+                a.boss = w;
+                a.bar = createBar();
+                a.bar.setPercent(w.getHealth() / w.getMaxHealth());
+                for (UUID id : a.participants) {
+                    ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
+                    if (p != null && p.getServerWorld() == world) a.bar.addPlayer(p);
+                }
+                return a;
             }
         }
 
-        if (arena.defeated) {
-            if (arena.returnPortalBuilt) buildReturnPortal(world, arena);
-            return arena;
+        if (a.defeated) {
+            if (a.returnPortalBuilt) buildReturnPortal(world, a);
+            return a;
         }
 
-        if (arena.bossUuid != null || !arena.echoes.isEmpty()) {
-            cleanupOrphans(world, arena);
-            clearSavedEncounter(world);
-        }
-
+        cleanup(world, a);
+        clearSaved(world);
         return new ArenaState();
     }
 
-    private static void restoreEchoes(ServerWorld world, ArenaState arena) {
-        arena.echoes.removeIf(uuid -> {
-            Entity entity = world.getEntity(uuid);
-            return !(entity instanceof WardenEntity) || !entity.isAlive();
-        });
+    private static ServerBossBar createBar() {
+        ServerBossBar bar = new ServerBossBar(
+                Text.literal("THE NULL WARDEN"),
+                ServerBossBar.Color.PURPLE,
+                ServerBossBar.Style.NOTCHED_20);
+        bar.setDarkenSky(true);
+        bar.setThickenFog(true);
+        return bar;
     }
 
-    private static void cleanupOrphans(ServerWorld world, ArenaState arena) {
-        if (arena.bossUuid != null) {
-            Entity boss = world.getEntity(arena.bossUuid);
-            if (boss != null) boss.discard();
-        }
-        for (UUID uuid : arena.echoes) {
-            Entity echo = world.getEntity(uuid);
-            if (echo != null) echo.discard();
-        }
-        arena.echoes.clear();
+    private static void persist(ServerWorld world, ArenaState a) {
+        NullWardenState data = saved(world);
+        data.bossUuid = a.boss == null ? a.bossUuid : a.boss.getUuid();
+        data.participants.clear();
+        data.participants.addAll(a.participants);
+        data.rewardedPlayers.clear();
+        data.rewardedPlayers.addAll(a.rewardedPlayers);
+        data.echoes.clear();
+        data.echoes.addAll(a.echoes);
+        data.defeated = a.defeated;
+        data.rewarded = a.rewardedPlayers.containsAll(a.participants);
+        data.returnPortalBuilt = a.returnPortalBuilt;
+        data.phase = a.phase;
+        data.activePylons = a.activePylons;
+        data.dirty();
     }
 
-    private static void clearSavedEncounter(ServerWorld world) {
-        NullWardenState saved = state(world);
-        saved.bossUuid = null;
-        saved.participants.clear();
-        saved.rewardedPlayers.clear();
-        saved.echoes.clear();
-        saved.defeated = false;
-        saved.rewarded = false;
-        saved.returnPortalBuilt = false;
-        saved.phase = 1;
-        saved.activePylons = 0;
-        saved.dirty();
-    }
-
-    private static void persist(ServerWorld world, ArenaState arena) {
-        NullWardenState saved = state(world);
-        saved.bossUuid = arena.boss == null ? arena.bossUuid : arena.boss.getUuid();
-        saved.participants.clear();
-        saved.participants.addAll(arena.participants);
-        saved.rewardedPlayers.clear();
-        saved.rewardedPlayers.addAll(arena.rewardedPlayers);
-        saved.echoes.clear();
-        saved.echoes.addAll(arena.echoes);
-        saved.defeated = arena.defeated;
-        saved.rewarded = arena.rewarded;
-        saved.returnPortalBuilt = arena.returnPortalBuilt;
-        saved.phase = arena.phase;
-        saved.activePylons = arena.activePylons;
-        saved.dirty();
+    private static void clearSaved(ServerWorld world) {
+        NullWardenState data = saved(world);
+        data.bossUuid = null;
+        data.participants.clear();
+        data.rewardedPlayers.clear();
+        data.echoes.clear();
+        data.defeated = false;
+        data.rewarded = false;
+        data.returnPortalBuilt = false;
+        data.phase = 1;
+        data.activePylons = 0;
+        data.dirty();
     }
 
     public static void enterArena(ServerWorld world, ServerPlayerEntity player) {
-        ArenaState arena = arena(world);
+        ArenaState a = getArena(world);
+        a.participants.add(player.getUuid());
 
-        if (arena.defeated) {
-            arena.participants.add(player.getUuid());
-            rewardIfEligible(player, arena);
-            buildReturnPortal(world, arena);
-            persist(world, arena);
+        if (a.defeated) {
+            rewardIfEligible(player, a);
+            buildReturnPortal(world, a);
+            persist(world, a);
             return;
         }
 
-        arena.participants.add(player.getUuid());
-
-        if (arena.boss != null && arena.boss.isAlive()) {
-            if (arena.bar != null) arena.bar.addPlayer(player);
+        if (a.boss != null && a.boss.isAlive()) {
+            if (a.bar != null) a.bar.addPlayer(player);
             player.sendMessage(Text.literal("The Null Warden is already awake."), true);
-            persist(world, arena);
+            persist(world, a);
             return;
         }
 
-        startEncounter(world, player, arena);
+        start(world, player, a);
     }
 
     public static void tick(MinecraftServer server) {
-        ARENAS.entrySet().removeIf(entry -> server.getWorld(entry.getKey()) == null);
-
+        ARENAS.entrySet().removeIf(e -> server.getWorld(e.getKey()) == null);
         for (Map.Entry<RegistryKey<World>, ArenaState> entry : ARENAS.entrySet()) {
             ServerWorld world = server.getWorld(entry.getKey());
             if (world != null) tickArena(server, world, entry.getValue());
         }
     }
 
-    private static void startEncounter(ServerWorld world, ServerPlayerEntity player, ArenaState arena) {
+    private static void start(ServerWorld world, ServerPlayerEntity player, ArenaState a) {
         buildArena(world);
-
-        arena.boss = EntityType.WARDEN.create(world);
-        if (arena.boss == null) {
-            arena.participants.clear();
+        a.boss = EntityType.WARDEN.create(world);
+        if (a.boss == null) {
+            a.participants.clear();
             return;
         }
 
-        var maxHealth = arena.boss.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
-        if (maxHealth != null) maxHealth.setBaseValue(500.0);
-        var attackDamage = arena.boss.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
-        if (attackDamage != null) attackDamage.setBaseValue(18.0);
-        var movement = arena.boss.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        if (movement != null) movement.setBaseValue(0.38);
+        var hp = a.boss.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+        var damage = a.boss.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+        var speed = a.boss.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+        if (hp != null) hp.setBaseValue(500);
+        if (damage != null) damage.setBaseValue(18);
+        if (speed != null) speed.setBaseValue(.38);
 
-        arena.boss.setHealth(500.0F);
-        arena.boss.refreshPositionAndAngles(0.5, 81, 0.5, 180, 0);
-        arena.boss.setCustomName(Text.literal("THE NULL WARDEN"));
-        arena.boss.setCustomNameVisible(false);
-        arena.boss.setAiDisabled(true);
-        arena.boss.setInvulnerable(true);
-        world.spawnEntity(arena.boss);
+        a.boss.setHealth(500);
+        a.boss.refreshPositionAndAngles(.5, 81, .5, 180, 0);
+        a.boss.setCustomName(Text.literal("THE NULL WARDEN"));
+        a.boss.setCustomNameVisible(false);
+        a.boss.setAiDisabled(true);
+        a.boss.setInvulnerable(true);
+        world.spawnEntity(a.boss);
 
-        arena.bossUuid = arena.boss.getUuid();
-        arena.bar = new ServerBossBar(
-                Text.literal("THE NULL WARDEN"),
-                ServerBossBar.Color.PURPLE,
-                ServerBossBar.Style.NOTCHED_20
-        );
-        arena.bar.setDarkenSky(true);
-        arena.bar.setThickenFog(true);
-
-        for (UUID uuid : arena.participants) {
-            ServerPlayerEntity participant = world.getServer().getPlayerManager().getPlayer(uuid);
-            if (participant != null && participant.getServerWorld() == world) {
-                arena.bar.addPlayer(participant);
-            }
+        a.bossUuid = a.boss.getUuid();
+        a.bar = createBar();
+        for (UUID id : a.participants) {
+            ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
+            if (p != null && p.getServerWorld() == world) a.bar.addPlayer(p);
         }
 
-        arena.intro = 100;
-        arena.ticks = 0;
-        arena.phase = 1;
-        arena.attack = Attack.NONE;
-        arena.attackWindup = 0;
-        arena.attackTarget = null;
-        arena.nextAttackTick = 40;
-        arena.arenaPulse = 0;
-        arena.idleTicks = 0;
-        arena.defeated = false;
-        arena.rewarded = false;
-        arena.returnPortalBuilt = false;
-        arena.activePylons = 0;
+        a.ticks = 0;
+        a.intro = 100;
+        a.phase = 1;
+        a.activePylons = 0;
+        a.attack = Attack.NONE;
+        a.attackTarget = null;
+        a.nextAttackTick = 40;
+        a.idleTicks = 0;
+        a.defeated = false;
+        a.rewardedPlayers.clear();
+        a.returnPortalBuilt = false;
 
         world.playSound(null, CENTER, SoundEvents.ENTITY_WARDEN_EMERGE,
-                SoundCategory.HOSTILE, 5.0F, 0.5F);
-        world.spawnParticles(ParticleTypes.SCULK_SOUL,
-                0.5, 82, 0.5, 180, 4, 2, 4, 0.04);
-
+                SoundCategory.HOSTILE, 5, .5f);
+        world.spawnParticles(ParticleTypes.SCULK_SOUL, .5, 82, .5,
+                180, 4, 2, 4, .04);
         player.sendMessage(Text.literal("THE NULL WARDEN"), false);
         player.sendMessage(Text.literal("The city was never meant to open this door."), false);
-        persist(world, arena);
+        persist(world, a);
     }
 
-    private static void rebuildBossBar(ServerWorld world, ArenaState arena) {
-        if (arena.boss == null || arena.defeated) return;
-
-        arena.bar = new ServerBossBar(
-                Text.literal("THE NULL WARDEN"),
-                ServerBossBar.Color.PURPLE,
-                ServerBossBar.Style.NOTCHED_20
-        );
-        arena.bar.setDarkenSky(true);
-        arena.bar.setThickenFog(true);
-        arena.bar.setPercent(arena.boss.getHealth() / arena.boss.getMaxHealth());
-
-        for (UUID uuid : arena.participants) {
-            ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
-            if (player != null && player.getServerWorld() == world) arena.bar.addPlayer(player);
-        }
-    }
-
-    private static void tickArena(MinecraftServer server, ServerWorld world, ArenaState arena) {
-        if (arena.boss == null) {
-            if (arena.defeated) {
-                for (UUID uuid : arena.participants) {
-                    ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
-                    if (player != null && player.getServerWorld() == world) rewardIfEligible(player, arena);
-                }
-                return;
-            }
+    private static void tickArena(MinecraftServer server, ServerWorld world, ArenaState a) {
+        if (a.boss == null) {
+            if (a.defeated) rewardPending(server, world, a);
             return;
         }
 
-        updateActiveParticipants(server, world, arena);
-        if (arena.activeParticipants.isEmpty()) {
-            arena.idleTicks++;
-            if (arena.idleTicks >= 600) resetEncounter(world, arena);
+        updatePlayers(server, world, a);
+        if (a.activeParticipants.isEmpty()) {
+            if (++a.idleTicks >= 600) reset(world, a);
             return;
         }
-        arena.idleTicks = 0;
+        a.idleTicks = 0;
 
-        if (arena.defeated) {
-            for (UUID uuid : arena.participants) {
-                ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
-                if (player != null && player.getServerWorld() == world) rewardIfEligible(player, arena);
-            }
-            if (!arena.returnPortalBuilt) buildReturnPortal(world, arena);
+        if (a.defeated) {
+            rewardPending(server, world, a);
+            if (!a.returnPortalBuilt) buildReturnPortal(world, a);
             return;
         }
 
-        if (!arena.boss.isAlive()) {
-            finish(world, arena);
+        if (!a.boss.isAlive()) {
+            finish(world, a);
             return;
         }
 
-        arena.ticks++;
+        a.ticks++;
 
-        if (arena.intro > 0) {
-            arena.intro--;
-            arena.boss.setAiDisabled(true);
-            arena.boss.setInvulnerable(true);
-            arena.boss.setVelocity(Vec3d.ZERO);
-
-            if (arena.intro % 10 == 0) {
-                world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_HEARTBEAT,
-                        SoundCategory.HOSTILE, 2.0F, 0.5F + arena.intro / 250.0F);
+        if (a.intro > 0) {
+            a.intro--;
+            a.boss.setAiDisabled(true);
+            a.boss.setInvulnerable(true);
+            a.boss.setVelocity(Vec3d.ZERO);
+            if (a.intro % 10 == 0) {
+                world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_HEARTBEAT,
+                        SoundCategory.HOSTILE, 2, .5f + a.intro / 250f);
                 world.spawnParticles(ParticleTypes.SCULK_SOUL,
-                        arena.boss.getX(), arena.boss.getY() + 1, arena.boss.getZ(),
-                        24, 1.3, 1.2, 1.3, 0.02);
+                        a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(),
+                        24, 1.3, 1.2, 1.3, .02);
             }
-
-            if (arena.intro == 0) {
-                arena.boss.setInvulnerable(false);
-                arena.boss.setAiDisabled(false);
-                world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_ROAR,
-                        SoundCategory.HOSTILE, 4.0F, 0.55F);
+            if (a.intro == 0) {
+                a.boss.setInvulnerable(false);
+                a.boss.setAiDisabled(false);
+                world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_ROAR,
+                        SoundCategory.HOSTILE, 4, .55f);
             }
             return;
         }
 
-        arena.boss.setAiDisabled(arena.attack != Attack.NONE);
-        arena.boss.setInvulnerable(arena.activePylons != 0);
+        a.boss.setAiDisabled(a.attack != Attack.NONE);
+        a.boss.setInvulnerable(a.activePylons != 0);
 
-        float hp = arena.boss.getHealth() / arena.boss.getMaxHealth();
-        if (arena.bar != null) arena.bar.setPercent(Math.max(0.0F, hp));
+        float health = a.boss.getHealth() / a.boss.getMaxHealth();
+        if (a.bar != null) a.bar.setPercent(Math.max(0, health));
 
-        int newPhase = hp > 0.75F ? 1 : hp > 0.50F ? 2 : hp > 0.20F ? 3 : 4;
-        if (newPhase != arena.phase) {
-            arena.phase = newPhase;
-            arena.attack = Attack.NONE;
-            arena.attackWindup = 0;
-            arena.attackTarget = null;
-            activatePylons(arena, newPhase);
-            phaseShift(world, arena);
-            persist(world, arena);
+        int phase = health > .75f ? 1 : health > .50f ? 2 : health > .20f ? 3 : 4;
+        if (phase != a.phase) {
+            a.phase = phase;
+            a.attack = Attack.NONE;
+            a.attackTarget = null;
+            a.attackWindup = 0;
+            a.activePylons = (1 << phase) - 1;
+            a.pylonProgress = new int[4];
+            phaseShift(world, a);
+            persist(world, a);
         }
 
-        tickPylons(world, arena);
+        tickPylons(world, a);
 
-        if (arena.ticks % 4 == 0) {
-            int amount = arena.phase == 4 ? 12 : arena.phase >= 3 ? 8 : 4;
-            world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
-                    arena.boss.getX(), arena.boss.getY() + 1, arena.boss.getZ(),
-                    amount, .65, .9, .65, .02);
-        }
-
-        arena.arenaPulse++;
-        if (arena.arenaPulse >= (arena.phase == 4 ? 90 : 150)) {
-            arena.arenaPulse = 0;
-            arenaEvent(world, arena);
-        }
-
-        if (arena.attack != Attack.NONE) {
-            arena.attackWindup--;
-            telegraph(world, arena);
-            if (arena.attackWindup <= 0) {
-                resolveAttack(world, arena);
-                arena.attack = Attack.NONE;
-                arena.attackTarget = null;
-                arena.boss.setAiDisabled(false);
+        if (a.attack != Attack.NONE) {
+            a.attackWindup--;
+            telegraph(world, a);
+            if (a.attackWindup <= 0) {
+                resolveAttack(world, a);
+                a.attack = Attack.NONE;
+                a.attackTarget = null;
+                a.boss.setAiDisabled(false);
             }
-        } else if (arena.activePylons == 0 && arena.ticks >= arena.nextAttackTick) {
-            beginAttack(world, arena);
+        } else if (a.activePylons == 0 && a.ticks >= a.nextAttackTick) {
+            beginAttack(world, a);
         }
 
-        if (arena.phase >= 2 && arena.ticks % 260 == 0) summonEcho(world, arena);
-
-        if (arena.ticks % 40 == 0) persist(world, arena);
+        if (a.phase >= 2 && a.ticks % 260 == 0) summonEcho(world, a);
+        if (a.ticks % 40 == 0) persist(world, a);
     }
 
-    private static void updateActiveParticipants(MinecraftServer server, ServerWorld world, ArenaState arena) {
-        arena.activeParticipants.clear();
-
-        for (UUID uuid : arena.participants) {
-            ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
-            if (player != null && player.getServerWorld() == world && player.isAlive()
-                    && player.squaredDistanceTo(CENTER.getX() + .5, CENTER.getY() + 1, CENTER.getZ() + .5)
-                    <= HARD_BOUNDARY * HARD_BOUNDARY) {
-                double distance = Math.sqrt(player.squaredDistanceTo(
-                        CENTER.getX() + .5, CENTER.getY() + 1, CENTER.getZ() + .5));
-
-                if (distance > SOFT_BOUNDARY && player.age % 20 == 0) {
-                    player.sendMessage(Text.literal("The Null Realm is collapsing at the edge."), true);
-                }
-
-                arena.activeParticipants.add(uuid);
-                if (arena.bar != null) arena.bar.addPlayer(player);
-            } else if (arena.bar != null && player != null) {
-                arena.bar.removePlayer(player);
+    private static void updatePlayers(MinecraftServer server, ServerWorld world, ArenaState a) {
+        a.activeParticipants.clear();
+        for (UUID id : a.participants) {
+            ServerPlayerEntity p = server.getPlayerManager().getPlayer(id);
+            if (p != null && p.getServerWorld() == world && p.isAlive()
+                    && p.squaredDistanceTo(.5, 81, .5) <= HARD_BOUNDARY * HARD_BOUNDARY) {
+                a.activeParticipants.add(id);
+                if (a.bar != null) a.bar.addPlayer(p);
+            } else if (p != null && a.bar != null) {
+                a.bar.removePlayer(p);
             }
         }
     }
 
-    private static void activatePylons(ArenaState arena, int phase) {
-        int count = phase == 2 ? 2 : phase == 3 ? 3 : 4;
-        arena.activePylons = (1 << count) - 1;
-        arena.pylonProgress = new int[4];
-    }
-
-    private static void tickPylons(ServerWorld world, ArenaState arena) {
-        if (arena.activePylons == 0) return;
+    private static void tickPylons(ServerWorld world, ArenaState a) {
+        if (a.activePylons == 0) return;
 
         for (int i = 0; i < 4; i++) {
-            if ((arena.activePylons & (1 << i)) == 0) continue;
-
-            BlockPos pylon = PYLONS[i];
+            if ((a.activePylons & (1 << i)) == 0) continue;
+            BlockPos p = PYLONS[i];
             boolean cleansing = false;
-
-            for (UUID uuid : arena.activeParticipants) {
-                ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
+            for (UUID id : a.activeParticipants) {
+                ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(id);
                 if (player != null && player.isSneaking()
-                        && player.squaredDistanceTo(pylon.getX() + .5, pylon.getY() + 1, pylon.getZ() + .5) <= 3.0 * 3.0) {
+                        && player.squaredDistanceTo(p.getX() + .5, p.getY() + 1, p.getZ() + .5) <= 9) {
                     cleansing = true;
                     break;
                 }
             }
 
             if (cleansing) {
-                arena.pylonProgress[i]++;
-                if (arena.pylonProgress[i] % 10 == 0) {
-                    world.playSound(null, pylon, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
-                            SoundCategory.BLOCKS, 0.8F, 1.3F);
+                a.pylonProgress[i]++;
+                if (a.pylonProgress[i] % 10 == 0) {
+                    world.playSound(null, p, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
+                            SoundCategory.BLOCKS, .8f, 1.3f);
                     world.spawnParticles(ParticleTypes.SCULK_SOUL,
-                            pylon.getX() + .5, pylon.getY() + 1.5, pylon.getZ() + .5,
+                            p.getX() + .5, p.getY() + 12, p.getZ() + .5,
                             12, .35, .5, .35, .02);
                 }
-
-                if (arena.pylonProgress[i] >= 50) {
-                    arena.activePylons &= ~(1 << i);
-                    arena.pylonProgress[i] = 0;
-                    world.setBlockState(pylon.up(11), Blocks.AIR.getDefaultState());
-                    world.playSound(null, pylon, SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE,
-                            SoundCategory.BLOCKS, 1.5F, .6F);
+                if (a.pylonProgress[i] >= 50) {
+                    a.activePylons &= ~(1 << i);
+                    a.pylonProgress[i] = 0;
+                    world.setBlockState(p.up(11), Blocks.AIR.getDefaultState());
+                    world.playSound(null, p, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
+                            SoundCategory.BLOCKS, 1.5f, .55f);
                     world.spawnParticles(ParticleTypes.EXPLOSION,
-                            pylon.getX() + .5, pylon.getY() + 1, pylon.getZ() + .5,
+                            p.getX() + .5, p.getY() + 12, p.getZ() + .5,
                             8, .6, 1.2, .6, .03);
-
-                    if (arena.activePylons == 0) {
-                        arena.boss.setInvulnerable(false);
-                        for (ServerPlayerEntity player : participants(world, arena)) {
-                            player.sendMessage(Text.literal("The Null Warden is exposed."), true);
-                        }
+                    for (ServerPlayerEntity player : participants(world, a)) {
+                        player.sendMessage(Text.literal(a.activePylons == 0
+                                ? "The Null Warden is exposed."
+                                : "Pylon cleansed. Keep moving."), true);
                     }
-                    persist(world, arena);
+                    persist(world, a);
                 }
-            } else if (arena.pylonProgress[i] > 0 && arena.ticks % 10 == 0) {
-                arena.pylonProgress[i] = Math.max(0, arena.pylonProgress[i] - 2);
-            }
-
-            if (arena.activePylons != 0 && arena.ticks % 10 == 0) {
-                world.spawnParticles(ParticleTypes.SCULK_SOUL,
-                        pylon.getX() + .5, pylon.getY() + 11.5, pylon.getZ() + .5,
-                        4, .3, .2, .3, .01);
+            } else if (a.pylonProgress[i] > 0 && a.ticks % 10 == 0) {
+                a.pylonProgress[i] = Math.max(0, a.pylonProgress[i] - 2);
             }
         }
     }
 
-    private static void beginAttack(ServerWorld world, ArenaState arena) {
-        ServerPlayerEntity target = selectTarget(world, arena);
+    private static void beginAttack(ServerWorld world, ArenaState a) {
+        ServerPlayerEntity target = selectTarget(world, a);
         if (target == null) return;
 
-        arena.attack = switch (arena.phase) {
+        a.attack = switch (a.phase) {
             case 1 -> Attack.VOID_CLEAVE;
-            case 2 -> arena.ticks % 2 == 0 ? Attack.SCULK_RING : Attack.VOID_RAIN;
-            case 3 -> arena.ticks % 2 == 0 ? Attack.NULL_DASH : Attack.GRAVITY_WELL;
-            default -> switch ((arena.ticks / 42) % 3) {
+            case 2 -> a.ticks % 2 == 0 ? Attack.SCULK_RING : Attack.VOID_RAIN;
+            case 3 -> a.ticks % 2 == 0 ? Attack.NULL_DASH : Attack.GRAVITY_WELL;
+            default -> switch ((a.ticks / 42) % 3) {
                 case 0 -> Attack.REALITY_TEAR;
                 case 1 -> Attack.GRAVITY_WELL;
                 default -> Attack.COLLAPSE;
             };
         };
+        a.attackTarget = target.getUuid();
+        a.attackWindup = a.attack.windup;
+        a.nextAttackTick = a.ticks + a.attack.windup + a.attack.recovery;
 
-        arena.attackTarget = target.getUuid();
-        arena.attackWindup = arena.attack.windupTicks;
-        arena.nextAttackTick = arena.ticks + arena.attack.recoveryTicks + arena.attack.windupTicks;
+        for (ServerPlayerEntity p : participants(world, a))
+            p.sendMessage(Text.literal("NULL WARDEN // " + a.attack.name), true);
 
-        String name = arena.attack.displayName;
-        for (ServerPlayerEntity player : participants(world, arena)) {
-            player.sendMessage(Text.literal("NULL WARDEN // " + name), true);
-        }
-
-        world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_HEARTBEAT,
-                SoundCategory.HOSTILE, 2.5F, 0.75F);
+        world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_HEARTBEAT,
+                SoundCategory.HOSTILE, 2.5f, .75f);
     }
 
-    private static ServerPlayerEntity attackTarget(ServerWorld world, ArenaState arena) {
-        if (arena.attackTarget != null) {
-            ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(arena.attackTarget);
-            if (player != null && arena.activeParticipants.contains(player.getUuid())) return player;
-        }
-        return selectTarget(world, arena);
-    }
-
-    private static ServerPlayerEntity selectTarget(ServerWorld world, ArenaState arena) {
+    private static ServerPlayerEntity selectTarget(ServerWorld world, ArenaState a) {
         ServerPlayerEntity best = null;
         double bestDistance = Double.MAX_VALUE;
-        int offset = arena.ticks / 20;
-
+        int offset = a.ticks / 20;
         int index = 0;
-        for (UUID uuid : arena.activeParticipants) {
-            ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
-            if (player == null) continue;
 
-            if (arena.phase >= 2 && (index + offset) % 3 == 0) {
-                return player;
-            }
-
-            double distance = player.squaredDistanceTo(arena.boss);
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                best = player;
+        for (UUID id : a.activeParticipants) {
+            ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
+            if (p == null) continue;
+            if (a.phase >= 2 && (index + offset) % 3 == 0) return p;
+            double d = p.squaredDistanceTo(a.boss);
+            if (d < bestDistance) {
+                bestDistance = d;
+                best = p;
             }
             index++;
         }
-
         return best;
     }
 
-    private static void telegraph(ServerWorld world, ArenaState arena) {
-        ServerPlayerEntity target = attackTarget(world, arena);
-        if (target == null) return;
+    private static ServerPlayerEntity target(ServerWorld world, ArenaState a) {
+        if (a.attackTarget != null) {
+            ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(a.attackTarget);
+            if (p != null && a.activeParticipants.contains(p.getUuid())) return p;
+        }
+        return selectTarget(world, a);
+    }
 
-        int remaining = arena.attackWindup;
-        float size = remaining < 7 ? 1.8F : 1.1F;
-
-        switch (arena.attack) {
+    private static void telegraph(ServerWorld world, ArenaState a) {
+        ServerPlayerEntity t = target(world, a);
+        if (t == null) return;
+        int left = a.attackWindup;
+        switch (a.attack) {
             case VOID_CLEAVE -> {
-                Vec3d forward = arena.boss.getRotationVector().normalize();
+                Vec3d f = a.boss.getRotationVector().normalize();
                 for (int i = 0; i < 20; i++) {
-                    double distance = 1.5 + i * 0.25;
-                    double spread = (i % 5 - 2) * 0.35;
-                    world.spawnParticles(new DustParticleEffect(new Vector3f(.65F, .1F, .9F), size),
-                            arena.boss.getX() + forward.x * distance - forward.z * spread,
-                            arena.boss.getY() + .15,
-                            arena.boss.getZ() + forward.z * distance + forward.x * spread,
+                    double d = 1.5 + i * .25;
+                    double spread = (i % 5 - 2) * .35;
+                    world.spawnParticles(new DustParticleEffect(
+                                    new Vector3f(.65f, .1f, .9f), left < 7 ? 1.8f : 1.1f),
+                            a.boss.getX() + f.x * d - f.z * spread,
+                            a.boss.getY() + .15,
+                            a.boss.getZ() + f.z * d + f.x * spread,
                             1, 0, 0, 0, 0);
                 }
             }
-            case SCULK_RING -> ringParticles(world, arena.boss.getX(), arena.boss.getY() + .1,
-                    arena.boss.getZ(), 6.0, ParticleTypes.SCULK_SOUL, 64);
+            case SCULK_RING -> ring(world, a.boss.getX(), a.boss.getY() + .1, a.boss.getZ(),
+                    6, ParticleTypes.SCULK_SOUL, 64);
             case VOID_RAIN -> {
-                for (UUID uuid : arena.activeParticipants) {
-                    ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
-                    if (player != null) {
-                        world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
-                                player.getX(), player.getY() + .1, player.getZ(),
-                                remaining < 7 ? 20 : 8, .7, .05, .7, .01);
-                    }
+                for (UUID id : a.activeParticipants) {
+                    ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
+                    if (p != null) ring(world, p.getX(), p.getY() + .1, p.getZ(),
+                            left < 7 ? 2.7 : 2.2, ParticleTypes.REVERSE_PORTAL, 36);
                 }
             }
-            case NULL_DASH -> {
-                world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
-                        target.getX(), target.getY() + 1, target.getZ(),
-                        remaining < 7 ? 30 : 10, .5, .8, .5, .03);
-            }
-            case GRAVITY_WELL, REALITY_TEAR, COLLAPSE -> ringParticles(
-                    world, target.getX(), target.getY() + .08, target.getZ(),
-                    arena.attack.radius,
-                    remaining < 7 ? ParticleTypes.EXPLOSION : ParticleTypes.REVERSE_PORTAL,
-                    arena.attack == Attack.COLLAPSE ? 72 : 48
-            );
+            case NULL_DASH -> ring(world, t.getX(), t.getY() + .1, t.getZ(),
+                    left < 7 ? 3.5 : 2.5, ParticleTypes.REVERSE_PORTAL, 48);
+            case GRAVITY_WELL, REALITY_TEAR, COLLAPSE ->
+                    ring(world, t.getX(), t.getY() + .08, t.getZ(), a.attack.radius,
+                            left < 7 ? ParticleTypes.EXPLOSION : ParticleTypes.REVERSE_PORTAL,
+                            a.attack == Attack.COLLAPSE ? 72 : 48);
             default -> {}
         }
     }
 
-    private static void resolveAttack(ServerWorld world, ArenaState arena) {
-        ServerPlayerEntity target = attackTarget(world, arena);
-        if (target == null || arena.boss == null) return;
+    private static void resolveAttack(ServerWorld world, ArenaState a) {
+        ServerPlayerEntity t = target(world, a);
+        if (t == null || a.boss == null) return;
 
-        switch (arena.attack) {
+        switch (a.attack) {
             case VOID_CLEAVE -> {
-                Vec3d forward = arena.boss.getRotationVector().normalize();
-                Vec3d toTarget = target.getPos().subtract(arena.boss.getPos());
-                double distance = Math.sqrt(toTarget.x * toTarget.x + toTarget.z * toTarget.z);
-                double dot = distance < .01 ? 1 : (forward.x * toTarget.x + forward.z * toTarget.z) / distance;
-                if (distance <= 5.0 && dot > .55) target.damage(world.getDamageSources().mobAttack(arena.boss), 12);
-                shockwave(world, target, 3.0);
+                Vec3d f = a.boss.getRotationVector().normalize();
+                Vec3d delta = t.getPos().subtract(a.boss.getPos());
+                double d = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
+                double dot = d < .01 ? 1 : (f.x * delta.x + f.z * delta.z) / d;
+                if (d <= 5 && dot > .55) t.damage(world.getDamageSources().mobAttack(a.boss), 12);
+                shockwave(world, t, 3);
             }
             case SCULK_RING -> {
-                for (ServerPlayerEntity player : activePlayers(world, arena)) {
-                    double d = player.distanceTo(arena.boss);
-                    if (d > 4.0 && d < 8.0) player.damage(world.getDamageSources().mobAttack(arena.boss), 13);
+                for (ServerPlayerEntity p : activePlayers(world, a)) {
+                    double d = p.distanceTo(a.boss);
+                    if (d > 4 && d < 8) p.damage(world.getDamageSources().mobAttack(a.boss), 13);
                 }
-                ringParticles(world, arena.boss.getX(), arena.boss.getY() + .15, arena.boss.getZ(),
-                        6.0, ParticleTypes.SCULK_SOUL, 80);
+                ring(world, a.boss.getX(), a.boss.getY() + .15, a.boss.getZ(),
+                        6, ParticleTypes.SCULK_SOUL, 80);
             }
             case VOID_RAIN -> {
-                for (ServerPlayerEntity player : activePlayers(world, arena)) {
-                    if (player.squaredDistanceTo(target) <= 2.5 * 2.5) {
-                        player.damage(world.getDamageSources().mobAttack(arena.boss), 10);
-                    }
+                for (ServerPlayerEntity p : activePlayers(world, a)) {
+                    if (p.squaredDistanceTo(p.getX(), p.getY(), p.getZ()) < 0) continue;
+                    p.damage(world.getDamageSources().mobAttack(a.boss), 10);
                 }
             }
             case NULL_DASH -> {
-                Vec3d from = arena.boss.getPos();
-                arena.boss.lookAt(net.minecraft.entity.EntityAnchorArgumentType.EntityAnchor.EYES, target.getPos());
-                arena.boss.teleport(target.getX(), target.getY(), target.getZ(), false);
-                for (ServerPlayerEntity player : activePlayers(world, arena)) {
-                    if (player.squaredDistanceTo(from.x, from.y, from.z) < 2.5 * 2.5
-                            || player.squaredDistanceTo(arena.boss) < 3.5 * 3.5) {
-                        player.damage(world.getDamageSources().mobAttack(arena.boss), 16);
-                    }
+                Vec3d from = a.boss.getPos();
+                a.boss.teleport(t.getX(), t.getY(), t.getZ(), false);
+                for (ServerPlayerEntity p : activePlayers(world, a)) {
+                    if (p.squaredDistanceTo(from.x, from.y, from.z) < 6.25
+                            || p.squaredDistanceTo(a.boss) < 12.25)
+                        p.damage(world.getDamageSources().mobAttack(a.boss), 16);
                 }
-                shockwave(world, target, 3.5);
+                shockwave(world, t, 3.5);
             }
             case GRAVITY_WELL -> {
-                gravityPulse(world, arena, .6);
-                for (ServerPlayerEntity player : activePlayers(world, arena)) {
-                    if (player.squaredDistanceTo(target) < 3.5 * 3.5) {
-                        player.damage(world.getDamageSources().mobAttack(arena.boss), 12);
-                    }
-                }
+                gravity(world, a, .6);
+                for (ServerPlayerEntity p : activePlayers(world, a))
+                    if (p.squaredDistanceTo(t) < 12.25)
+                        p.damage(world.getDamageSources().mobAttack(a.boss), 12);
             }
             case REALITY_TEAR -> {
-                for (ServerPlayerEntity player : activePlayers(world, arena)) {
-                    if (player.squaredDistanceTo(target) < 4.0 * 4.0) {
-                        player.damage(world.getDamageSources().mobAttack(arena.boss), 14);
-                    }
-                }
-                world.playSound(null, target.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_SPAWN,
-                        SoundCategory.HOSTILE, 1.6F, .7F);
+                for (ServerPlayerEntity p : activePlayers(world, a))
+                    if (p.squaredDistanceTo(t) < 16)
+                        p.damage(world.getDamageSources().mobAttack(a.boss), 14);
+                world.playSound(null, t.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_SPAWN,
+                        SoundCategory.HOSTILE, 1.6f, .7f);
             }
             case COLLAPSE -> {
-                for (ServerPlayerEntity player : activePlayers(world, arena)) {
-                    if (player.squaredDistanceTo(target) < 5.0 * 5.0) {
-                        player.damage(world.getDamageSources().mobAttack(arena.boss), 20);
-                    }
-                }
-                gravityPulse(world, arena, .85);
-                shockwave(world, target, 9.0);
+                for (ServerPlayerEntity p : activePlayers(world, a))
+                    if (p.squaredDistanceTo(t) < 25)
+                        p.damage(world.getDamageSources().mobAttack(a.boss), 20);
+                gravity(world, a, .85);
+                shockwave(world, t, 9);
             }
             default -> {}
         }
     }
 
-    private static void gravityPulse(ServerWorld world, ArenaState arena, double strength) {
-        for (ServerPlayerEntity player : activePlayers(world, arena)) {
-            Vec3d delta = arena.boss.getPos().subtract(player.getPos());
-            double length = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-            if (length > .1 && length < 15) {
-                double scale = Math.min(strength, .9);
-                player.addVelocity(delta.x / length * scale, .12, delta.z / length * scale);
-                player.velocityModified = true;
+    private static void gravity(ServerWorld world, ArenaState a, double strength) {
+        for (ServerPlayerEntity p : activePlayers(world, a)) {
+            Vec3d d = a.boss.getPos().subtract(p.getPos());
+            double len = Math.sqrt(d.x * d.x + d.z * d.z);
+            if (len > .1 && len < 15) {
+                p.addVelocity(d.x / len * Math.min(strength, .9), .12,
+                        d.z / len * Math.min(strength, .9));
+                p.velocityModified = true;
             }
         }
     }
 
-    private static void phaseShift(ServerWorld world, ArenaState arena) {
-        world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_ROAR,
-                SoundCategory.HOSTILE, 3.5F, 0.45F);
+    private static void phaseShift(ServerWorld world, ArenaState a) {
+        world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_ROAR,
+                SoundCategory.HOSTILE, 3.5f, .45f);
         world.spawnParticles(ParticleTypes.EXPLOSION,
-                arena.boss.getX(), arena.boss.getY() + 1, arena.boss.getZ(),
-                14, 1.5, 1.5, 1.5, .04);
-        world.spawnParticles(ParticleTypes.SCULK_SOUL,
-                arena.boss.getX(), arena.boss.getY() + 1, arena.boss.getZ(),
-                160, 3, 2, 3, .06);
-
-        for (ServerPlayerEntity player : participants(world, arena)) {
-            player.sendMessage(Text.literal("NULL WARDEN // PHASE " + arena.phase), true);
-            player.sendMessage(Text.literal("The pylons are feeding it. Sneak beside each one to cleanse it."), false);
+                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 14, 1.5, 1.5, 1.5, .04);
+        for (ServerPlayerEntity p : participants(world, a)) {
+            p.sendMessage(Text.literal("NULL WARDEN // PHASE " + a.phase), true);
+            p.sendMessage(Text.literal("The pylons are feeding it. Sneak beside each one to cleanse it."), false);
         }
     }
 
-    private static void arenaEvent(ServerWorld world, ArenaState arena) {
-        if (arena.phase >= 2) {
-            for (int i = 0; i < 8; i++) {
-                double angle = i * Math.PI / 4.0 + arena.ticks * 0.01;
-                world.spawnParticles(ParticleTypes.SCULK_SOUL,
-                        Math.cos(angle) * 15, 81, Math.sin(angle) * 15,
-                        10, .3, .2, .3, .02);
-            }
-        }
-        if (arena.phase >= 3) {
-            for (int i = 0; i < 4; i++) {
-                double angle = i * Math.PI / 2.0 + arena.ticks * 0.02;
-                world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
-                        Math.cos(angle) * 10, 82, Math.sin(angle) * 10,
-                        20, .5, .4, .5, .03);
-            }
-        }
-    }
-
-    private static void summonEcho(ServerWorld world, ArenaState arena) {
-        arena.echoes.removeIf(uuid -> {
-            Entity entity = world.getEntity(uuid);
-            return entity == null || !entity.isAlive();
+    private static void summonEcho(ServerWorld world, ArenaState a) {
+        a.echoes.removeIf(id -> {
+            Entity e = world.getEntity(id);
+            return e == null || !e.isAlive();
         });
-
-        if (arena.echoes.size() >= Math.min(3, arena.phase)) return;
+        if (a.echoes.size() >= Math.min(3, a.phase)) return;
 
         WardenEntity echo = EntityType.WARDEN.create(world);
         if (echo == null) return;
-
-        double angle = arena.ticks * 0.045;
-        echo.refreshPositionAndAngles(
-                Math.cos(angle) * 11, 81, Math.sin(angle) * 11, 0, 0
-        );
+        double angle = a.ticks * .045;
+        echo.refreshPositionAndAngles(Math.cos(angle) * 11, 81,
+                Math.sin(angle) * 11, 0, 0);
         echo.setCustomName(Text.literal("NULL ECHO"));
         echo.setCustomNameVisible(false);
-        echo.setPersistent(true);
+        echo.setPersistent();
 
         var max = echo.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
-        if (max != null) max.setBaseValue(65.0);
-        var damage = echo.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
-        if (damage != null) damage.setBaseValue(8.0);
-        echo.setHealth(65.0F);
-
+        var dmg = echo.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
+        if (max != null) max.setBaseValue(65);
+        if (dmg != null) dmg.setBaseValue(8);
+        echo.setHealth(65);
         world.spawnEntity(echo);
-        arena.echoes.add(echo.getUuid());
-
+        a.echoes.add(echo.getUuid());
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
-                echo.getX(), echo.getY() + 1, echo.getZ(),
-                90, .8, 1, .8, .06);
-        persist(world, arena);
+                echo.getX(), echo.getY() + 1, echo.getZ(), 90, .8, 1, .8, .06);
+        persist(world, a);
     }
 
-    private static void finish(ServerWorld world, ArenaState arena) {
-        if (arena.defeated) return;
+    private static void finish(ServerWorld world, ArenaState a) {
+        if (a.defeated) return;
+        a.defeated = true;
+        a.attack = Attack.NONE;
+        a.attackTarget = null;
+        a.attackWindup = 0;
+        a.activePylons = 0;
+        a.boss.setHealth(1);
+        a.boss.setInvulnerable(true);
+        a.boss.setAiDisabled(true);
+        if (a.bar != null) a.bar.setVisible(false);
 
-        arena.defeated = true;
-        arena.attack = Attack.NONE;
-        arena.attackTarget = null;
-        arena.attackWindup = 0;
-        arena.activePylons = 0;
-
-        arena.boss.setHealth(1.0F);
-        arena.boss.setInvulnerable(true);
-        arena.boss.setAiDisabled(true);
-
-        if (arena.bar != null) arena.bar.setVisible(false);
-
-        world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_DEATH,
-                SoundCategory.HOSTILE, 5.0F, .45F);
+        world.playSound(null, a.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_DEATH,
+                SoundCategory.HOSTILE, 5, .45f);
         world.spawnParticles(ParticleTypes.EXPLOSION,
-                arena.boss.getX(), arena.boss.getY() + 1, arena.boss.getZ(),
-                48, 2, 2, 2, .08);
+                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 48, 2, 2, 2, .08);
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
-                arena.boss.getX(), arena.boss.getY() + 1, arena.boss.getZ(),
-                300, 4, 3, 4, .08);
+                a.boss.getX(), a.boss.getY() + 1, a.boss.getZ(), 300, 4, 3, 4, .08);
 
-        for (ServerPlayerEntity player : activePlayers(world, arena)) {
-            rewardIfEligible(player, arena);
-        }
-
-        arena.rewarded = arena.rewardedPlayers.containsAll(arena.participants);
-        buildReturnPortal(world, arena);
-        persist(world, arena);
+        rewardPending(world.getServer(), world, a);
+        buildReturnPortal(world, a);
+        persist(world, a);
     }
 
-    private static void rewardIfEligible(ServerPlayerEntity player, ArenaState arena) {
-        if (!arena.participants.contains(player.getUuid())) return;
-        if (!arena.rewardedPlayers.add(player.getUuid())) return;
-
-        player.getInventory().offerOrDrop(new ItemStack(ModItems.NULLBLADE));
-        player.getInventory().offerOrDrop(new ItemStack(ModItems.NULL_RELIC));
-        player.sendMessage(Text.literal("THE NULL WARDEN HAS FALLEN"), false);
-        player.sendMessage(Text.literal("The Nullblade answers to you now."), false);
+    private static void rewardPending(MinecraftServer server, ServerWorld world, ArenaState a) {
+        for (UUID id : a.participants) {
+            ServerPlayerEntity p = server.getPlayerManager().getPlayer(id);
+            if (p != null && p.getServerWorld() == world) rewardIfEligible(p, a);
+        }
+        persist(world, a);
     }
 
-    private static void resetEncounter(ServerWorld world, ArenaState arena) {
-        cleanupOrphans(world, arena);
-        removeReturnPortal(world, arena);
-        clearSavedEncounter(world);
+    private static void rewardIfEligible(ServerPlayerEntity p, ArenaState a) {
+        if (!a.participants.contains(p.getUuid())) return;
+        if (!a.rewardedPlayers.add(p.getUuid())) return;
+        p.getInventory().offerOrDrop(new ItemStack(ModItems.NULLBLADE));
+        p.getInventory().offerOrDrop(new ItemStack(ModItems.NULL_RELIC));
+        p.sendMessage(Text.literal("THE NULL WARDEN HAS FALLEN"), false);
+        p.sendMessage(Text.literal("A Null Realm reward has been claimed."), false);
+    }
 
-        if (arena.bar != null) {
-            for (UUID uuid : arena.participants) {
-                ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
-                if (player != null) arena.bar.removePlayer(player);
-            }
+    private static void reset(ServerWorld world, ArenaState a) {
+        cleanup(world, a);
+        removeReturnPortal(world);
+        clearSaved(world);
+        if (a.bar != null) for (UUID id : a.participants) {
+            ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
+            if (p != null) a.bar.removePlayer(p);
         }
+        a.boss = null;
+        a.bossUuid = null;
+        a.bar = null;
+        a.participants.clear();
+        a.activeParticipants.clear();
+        a.rewardedPlayers.clear();
+        a.echoes.clear();
+        a.defeated = false;
+        a.returnPortalBuilt = false;
+        a.phase = 1;
+        a.activePylons = 0;
+        a.attack = Attack.NONE;
+        a.attackTarget = null;
+    }
 
-        arena.boss = null;
-        arena.bossUuid = null;
-        arena.bar = null;
-        arena.participants.clear();
-        arena.activeParticipants.clear();
-        arena.rewardedPlayers.clear();
-        arena.echoes.clear();
-        arena.attack = Attack.NONE;
-        arena.attackTarget = null;
-        arena.attackWindup = 0;
-        arena.defeated = false;
-        arena.rewarded = false;
-        arena.returnPortalBuilt = false;
-        arena.activePylons = 0;
-        arena.ticks = 0;
-        arena.idleTicks = 0;
-        arena.nextAttackTick = 40;
-        arena.arenaPulse = 0;
+    private static void cleanup(ServerWorld world, ArenaState a) {
+        if (a.bossUuid != null) {
+            Entity e = world.getEntity(a.bossUuid);
+            if (e != null) e.discard();
+        }
+        for (UUID id : a.echoes) {
+            Entity e = world.getEntity(id);
+            if (e != null) e.discard();
+        }
+        a.echoes.clear();
     }
 
     private static void buildArena(ServerWorld world) {
         for (int x = -ARENA_RADIUS; x <= ARENA_RADIUS; x++) {
             for (int z = -ARENA_RADIUS; z <= ARENA_RADIUS; z++) {
-                double radius = Math.sqrt(x * x + z * z);
-                if (radius <= ARENA_RADIUS) {
-                    world.setBlockState(new BlockPos(x, 80, z),
-                            radius < 17
-                                    ? Blocks.POLISHED_BLACKSTONE.getDefaultState()
-                                    : Blocks.CRYING_OBSIDIAN.getDefaultState());
-
-                    for (int y = 81; y <= 100; y++) {
-                        world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
-                    }
-                }
+                if (Math.sqrt(x * x + z * z) > ARENA_RADIUS) continue;
+                world.setBlockState(new BlockPos(x, 80, z),
+                        x * x + z * z < 17 * 17
+                                ? Blocks.POLISHED_BLACKSTONE.getDefaultState()
+                                : Blocks.CRYING_OBSIDIAN.getDefaultState());
+                for (int y = 81; y <= 100; y++)
+                    world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
             }
         }
 
         for (int i = 0; i < 4; i++) {
-            BlockPos pylon = PYLONS[i];
-            for (int y = 0; y < 11; y++) {
-                world.setBlockState(pylon.add(0, y, 0), Blocks.REINFORCED_DEEPSLATE.getDefaultState());
-                world.setBlockState(pylon.add(i % 2, y, 1), Blocks.POLISHED_BLACKSTONE.getDefaultState());
-            }
-            world.setBlockState(pylon.up(11), Blocks.SCULK_CATALYST.getDefaultState());
-        }
-
-        for (int i = 0; i < 32; i++) {
-            double angle = i * Math.PI * 2.0 / 32.0;
-            world.setBlockState(
-                    new BlockPos(
-                            (int) Math.round(Math.cos(angle) * 9),
-                            81,
-                            (int) Math.round(Math.sin(angle) * 9)
-                    ),
-                    Blocks.CRYING_OBSIDIAN.getDefaultState()
-            );
+            BlockPos p = PYLONS[i];
+            for (int y = 0; y < 11; y++)
+                world.setBlockState(p.add(0, y, 0), Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+            world.setBlockState(p.up(11), Blocks.SCULK_CATALYST.getDefaultState());
         }
     }
 
-    private static void buildReturnPortal(ServerWorld world, ArenaState arena) {
-        if (arena.returnPortalBuilt) return;
-
-        for (int x = -1; x <= 1; x++) {
-            for (int y = 0; y < 4; y++) {
-                world.setBlockState(
-                        RETURN_PORTAL_ORIGIN.add(x, y, 0),
-                        ModBlocks.VOID_PORTAL.getDefaultState()
-                );
-            }
-        }
-
-        arena.returnPortalBuilt = true;
+    private static void buildReturnPortal(ServerWorld world, ArenaState a) {
+        if (a.returnPortalBuilt) return;
+        for (int x = -1; x <= 1; x++)
+            for (int y = 0; y < 4; y++)
+                world.setBlockState(RETURN_PORTAL.add(x, y, 0), ModBlocks.VOID_PORTAL.getDefaultState());
+        a.returnPortalBuilt = true;
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
                 13.5, 83, 13.5, 160, 1.5, 2.2, 1.5, .12);
     }
 
-    private static void removeReturnPortal(ServerWorld world, ArenaState arena) {
-        for (int x = -1; x <= 1; x++) {
+    private static void removeReturnPortal(ServerWorld world) {
+        for (int x = -1; x <= 1; x++)
             for (int y = 0; y < 4; y++) {
-                BlockPos pos = RETURN_PORTAL_ORIGIN.add(x, y, 0);
-                if (world.getBlockState(pos).isOf(ModBlocks.VOID_PORTAL)) {
-                    world.setBlockState(pos, Blocks.AIR.getDefaultState());
-                }
+                BlockPos p = RETURN_PORTAL.add(x, y, 0);
+                if (world.getBlockState(p).isOf(ModBlocks.VOID_PORTAL))
+                    world.setBlockState(p, Blocks.AIR.getDefaultState());
             }
-        }
-        arena.returnPortalBuilt = false;
     }
 
-    private static void ringParticles(ServerWorld world, double x, double y, double z,
-                                      double radius, net.minecraft.particle.ParticleEffect particle, int points) {
+    private static void ring(ServerWorld world, double x, double y, double z,
+                             double radius, ParticleEffect effect, int points) {
         for (int i = 0; i < points; i++) {
-            double angle = i * Math.PI * 2.0 / points;
-            world.spawnParticles(particle,
-                    x + Math.cos(angle) * radius,
-                    y,
-                    z + Math.sin(angle) * radius,
-                    1, 0, 0, 0, 0);
+            double angle = i * Math.PI * 2 / points;
+            world.spawnParticles(effect, x + Math.cos(angle) * radius, y,
+                    z + Math.sin(angle) * radius, 1, 0, 0, 0, 0);
         }
     }
 
-    private static void shockwave(ServerWorld world, ServerPlayerEntity center, double radius) {
-        ringParticles(world, center.getX(), center.getY() + .15, center.getZ(),
-                radius, ParticleTypes.PORTAL, 80);
+    private static void shockwave(ServerWorld world, ServerPlayerEntity p, double radius) {
+        ring(world, p.getX(), p.getY() + .15, p.getZ(), radius, ParticleTypes.PORTAL, 80);
     }
 
-    private static Set<ServerPlayerEntity> activePlayers(ServerWorld world, ArenaState arena) {
+    private static Set<ServerPlayerEntity> activePlayers(ServerWorld world, ArenaState a) {
         Set<ServerPlayerEntity> result = new HashSet<>();
-        for (UUID uuid : arena.activeParticipants) {
-            ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
-            if (player != null && player.getServerWorld() == world && player.isAlive()) result.add(player);
+        for (UUID id : a.activeParticipants) {
+            ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
+            if (p != null && p.getServerWorld() == world && p.isAlive()) result.add(p);
         }
         return result;
     }
 
-    private static Set<ServerPlayerEntity> participants(ServerWorld world, ArenaState arena) {
+    private static Set<ServerPlayerEntity> participants(ServerWorld world, ArenaState a) {
         Set<ServerPlayerEntity> result = new HashSet<>();
-        for (UUID uuid : arena.participants) {
-            ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(uuid);
-            if (player != null && player.getServerWorld() == world) result.add(player);
+        for (UUID id : a.participants) {
+            ServerPlayerEntity p = world.getServer().getPlayerManager().getPlayer(id);
+            if (p != null && p.getServerWorld() == world) result.add(p);
         }
         return result;
     }
 
     public static void saveReturnPoint(ServerPlayerEntity player, RegistryKey<World> worldKey,
                                        BlockPos pos, float yaw, float pitch) {
-        NullWardenState state = state(player.getServerWorld());
-        state.returnPoints.put(player.getUuid(), new NullWardenState.ReturnPointData(
-                worldKey.getValue().toString(), pos.getX(), pos.getY(), pos.getZ(), yaw, pitch
-        ));
-        state.dirty();
+        NullWardenState data = saved(player.getServerWorld());
+        data.returnPoints.put(player.getUuid(), new NullWardenState.ReturnPointData(
+                worldKey.getValue().toString(), pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
+        data.dirty();
     }
 
     public static NullWardenState.ReturnPointData takeReturnPoint(ServerPlayerEntity player) {
-        NullWardenState state = state(player.getServerWorld());
-        NullWardenState.ReturnPointData point = state.returnPoints.remove(player.getUuid());
-        state.dirty();
+        NullWardenState data = saved(player.getServerWorld());
+        NullWardenState.ReturnPointData point = data.returnPoints.remove(player.getUuid());
+        data.dirty();
         return point;
     }
 
@@ -916,16 +728,15 @@ public final class NullWardenManager {
         REALITY_TEAR(20, 72, 8, "REALITY TEAR"),
         COLLAPSE(30, 70, 9, "REALITY COLLAPSE");
 
-        final int windupTicks;
-        final int recoveryTicks;
+        final int windup, recovery;
         final double radius;
-        final String displayName;
+        final String name;
 
-        Attack(int windupTicks, int recoveryTicks, double radius, String displayName) {
-            this.windupTicks = windupTicks;
-            this.recoveryTicks = recoveryTicks;
+        Attack(int windup, int recovery, double radius, String name) {
+            this.windup = windup;
+            this.recovery = recovery;
             this.radius = radius;
-            this.displayName = displayName;
+            this.name = name;
         }
     }
 
@@ -933,28 +744,15 @@ public final class NullWardenManager {
         WardenEntity boss;
         UUID bossUuid;
         ServerBossBar bar;
-
         final Set<UUID> participants = new HashSet<>();
         final Set<UUID> activeParticipants = new HashSet<>();
         final Set<UUID> rewardedPlayers = new HashSet<>();
         final Set<UUID> echoes = new HashSet<>();
-
-        int ticks;
-        int phase = 1;
-        int intro;
-        int arenaPulse;
-        int idleTicks;
-        int nextAttackTick = 40;
-        int attackWindup;
-
+        int ticks, intro, phase = 1, idleTicks, nextAttackTick = 40, attackWindup;
         int activePylons;
         int[] pylonProgress = new int[4];
-
         UUID attackTarget;
         Attack attack = Attack.NONE;
-
-        boolean defeated;
-        boolean rewarded;
-        boolean returnPortalBuilt;
+        boolean defeated, returnPortalBuilt;
     }
 }
