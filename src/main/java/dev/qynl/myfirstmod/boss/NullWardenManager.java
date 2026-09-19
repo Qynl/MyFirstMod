@@ -171,6 +171,7 @@ public final class NullWardenManager {
         if (newPhase != arena.phase) {
             arena.phase = newPhase;
             arena.attack = Attack.NONE;
+            arena.attackWindup = 0;
             phaseShift(world, arena);
         }
 
@@ -188,9 +189,9 @@ public final class NullWardenManager {
         }
 
         if (arena.attack != Attack.NONE) {
-            arena.attack.windup--;
+            arena.attackWindup--;
             telegraph(world, arena);
-            if (arena.attack.windup <= 0) {
+            if (arena.attackWindup <= 0) {
                 resolveAttack(world, arena);
                 arena.attack = Attack.NONE;
             }
@@ -233,7 +234,7 @@ public final class NullWardenManager {
             };
         };
 
-        arena.attack.windup = arena.attack.windupTicks;
+        arena.attackWindup = arena.attack.windupTicks;
         arena.nextAttackTick = arena.ticks + arena.attack.recoveryTicks + arena.attack.windupTicks;
 
         world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_HEARTBEAT,
@@ -246,7 +247,7 @@ public final class NullWardenManager {
 
         double radius = arena.attack.radius;
         int points = arena.attack == Attack.COLLAPSE ? 72 : 48;
-        float size = arena.attack.windup < 7 ? 1.8F : 1.1F;
+        float size = arena.attackWindup < 7 ? 1.8F : 1.1F;
 
         for (int i = 0; i < points; i++) {
             double angle = i * Math.PI * 2.0 / points;
@@ -260,9 +261,9 @@ public final class NullWardenManager {
         }
 
         world.spawnParticles(
-                arena.attack.windup < 7 ? ParticleTypes.EXPLOSION : ParticleTypes.REVERSE_PORTAL,
+                arena.attackWindup < 7 ? ParticleTypes.EXPLOSION : ParticleTypes.REVERSE_PORTAL,
                 target.getX(), target.getY() + 0.4, target.getZ(),
-                arena.attack.windup < 7 ? 3 : 12, .5, .15, .5, .02
+                arena.attackWindup < 7 ? 3 : 12, .5, .15, .5, .02
         );
     }
 
@@ -443,6 +444,7 @@ public final class NullWardenManager {
 
         arena.defeated = true;
         arena.attack = Attack.NONE;
+        arena.attackWindup = 0;
         arena.boss.setHealth(1.0F);
         arena.boss.setInvulnerable(true);
         arena.boss.setAi(false);
@@ -477,6 +479,7 @@ public final class NullWardenManager {
         arena.bar = null;
         arena.participants.clear();
         arena.attack = Attack.NONE;
+        arena.attackWindup = 0;
         arena.defeated = false;
         arena.rewarded = false;
         arena.ticks = 0;
@@ -557,7 +560,6 @@ public final class NullWardenManager {
         final int windupTicks;
         final int recoveryTicks;
         final double radius;
-        int windup;
 
         Attack(int windupTicks, int recoveryTicks, double radius) {
             this.windupTicks = windupTicks;
@@ -578,6 +580,7 @@ public final class NullWardenManager {
         int idleTicks;
         int nextAttackTick;
         int portalCooldown;
+        int attackWindup;
 
         Attack attack = Attack.NONE;
         boolean defeated;
