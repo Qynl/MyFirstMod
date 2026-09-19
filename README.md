@@ -6,7 +6,7 @@ A darker overhaul of the Null Realm: three-level Mourning Cathedrals, a funerary
 
 Your first visit after upgrading grants a flask and Pilgrim’s Step. Sneak-use the flask near a safe waystone to rest. Seek cathedral embers before harder encounters. New landmarks require new chunks; back up your world.
 
-# The Null Warden — Wilds & Relics (1.3.0)
+# The Null Warden — core systems
 
 A Minecraft **1.21.1 / Fabric / Java 21** exploration and boss mod.
 
@@ -21,7 +21,7 @@ The realm now has its own gathering and equipment progression, not just combat c
 - **Luminous Fen**, a fourth biome with glowing moss, shallow pools, and luminous growths.
 - **Underground fracture caves** between roughly Y=-40 and Y=48, beneath custom Nullstone terrain.
 - **Three mineable ores:** Resonite, Prism, and Cinder. Resonite is smelted into ingots; the other ores drop useful magical materials.
-- **17 collectible custom blocks:** stone, bricks, moss, Hushwood, planks, foliage, ores, metal storage, and lamps. Original textures and mining/loot tags are included.
+- **15 collectible custom blocks in 1.3 (17 with Convergence):** stone, bricks, moss, Hushwood, planks, foliage, ores, metal storage, and lamps. Original textures and mining/loot tags are included.
 - **21 new items**, including a complete custom-textured armor set, three tools, two weapons, surveying/stealth/repair/recall equipment, and expedition food.
 - **Waystone shrines:** attune to a discovered shrine and return using a channeled Wayfarer Thread.
 - A dedicated Creative tab, recipe unlocks, expanded journal pages, wrapped tooltips, staff-ammunition display, and recall progress bar.

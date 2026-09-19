@@ -13,7 +13,8 @@ public class NullWardenEntity extends WardenEntity {
     public boolean isCounterWindow() {return getDataTracker().get(COUNTER_WINDOW);}
     public void setCounterWindow(boolean open) {getDataTracker().set(COUNTER_WINDOW,open);}
     @Override public boolean damage(net.minecraft.entity.damage.DamageSource source,float amount) {
-        boolean counter=isCounterWindow() && getCinematic()==0 && !isInvulnerable()
+        boolean counter=isCounterWindow() && getVisualAttack()==0 && getCinematic()==0 && !isInvulnerable()
+                && source.isOf(net.minecraft.entity.damage.DamageTypes.PLAYER_ATTACK)
                 && source.getSource() instanceof net.minecraft.entity.player.PlayerEntity;
         boolean hit=super.damage(source,counter?amount*1.2f:amount);
         if(hit && counter && getWorld() instanceof net.minecraft.server.world.ServerWorld world)
@@ -47,6 +48,7 @@ public class NullWardenEntity extends WardenEntity {
     }
 
     public void setVisualState(int phase, int attack, int attackProgress, boolean defeated) {
+        if(attack!=0 || defeated) setCounterWindow(false);
         getDataTracker().set(PHASE, (byte) Math.max(1, Math.min(4, phase)));
         getDataTracker().set(ATTACK, (byte) Math.max(0, Math.min(7, attack)));
         getDataTracker().set(ATTACK_PROGRESS, (byte) Math.max(0, Math.min(127, attackProgress)));

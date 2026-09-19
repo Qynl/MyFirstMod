@@ -123,8 +123,9 @@ def main():
             for x,y,z,block in [(1048,65,1048,'mourning_reliquary'),(1048,81,1044,'funerary_seal'),(1048,73,1052,'funerary_seal'),(1052,65,1048,'funerary_seal')]:
                 connection.command(prefix+f'execute if block {x} {y} {z} myfirstmod:{block}[rite=0] run say SMOKE_CATHEDRAL_OK')
             connection.command(prefix+'execute if block 1048 73 1043 minecraft:spawner run say SMOKE_CRYPT_SPAWNER_OK')
-            connection.command(prefix+'data get block 1048 73 1043 SpawnData.entity.id')
-            connection.command(prefix+'data get block 1048 65 1043 SpawnData.entity.id')
+            for y,expected in [(73,'rift_sentinel'),(65,'shardstalker')]:
+                response=connection.command(prefix+f'data get block 1048 {y} 1043 SpawnData.entity.id')
+                if 'myfirstmod:'+expected not in response:raise RuntimeError('Wrong cathedral spawner actor: '+response)
             connection.command(prefix+'loot spawn 1048 83 1048 loot myfirstmod:chests/pilgrim_cache')
             connection.command(prefix+'setblock 1048 65 1048 myfirstmod:mourning_reliquary[rite=3]')
             connection.command(prefix+'summon minecraft:item 1048 84 1048 {Item:{id:"myfirstmod:ashen_flask",count:1}}')
@@ -137,7 +138,7 @@ def main():
             bad=[line for line in text.splitlines() if re.search(
                 r'Failed to (?:parse|load)|Couldn.t (?:parse|load)|Error loading|Exception in server tick|Unbound values|Missing referenced',line,re.I)]
             if bad:raise RuntimeError('Resource/runtime errors:\n'+'\n'.join(bad))
-            print('PASS: server startup, realm chunks, ruins/vault/shrine, ore drops, caches, mobs, save and shutdown.',flush=True)
+            print('PASS: server startup, realm chunks, ruins/vault/shrine/observatory/cathedral, spawner IDs, nursery/ore drops, caches, mobs, save and shutdown.',flush=True)
         finally:
             if connection:connection.socket.close()
             if proc.poll() is None:

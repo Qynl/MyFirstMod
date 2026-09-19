@@ -55,7 +55,7 @@ public final class PilgrimageHud {
                     draw.fill(w/2-60,h-68,w/2+60,h-64,0xB0302832);draw.fill(w/2-60,h-68,w/2-60+progress,h-64,0xFFE5C88A);
                 }
             }
-            if(c.targetedEntity instanceof HostileEntity enemy && enemy.getType().getTranslationKey().startsWith("entity.myfirstmod.") && enemy.isAlive()) {
+            if(c.targetedEntity instanceof HostileEntity enemy && !(enemy instanceof dev.qynl.myfirstmod.boss.NullWardenEntity) && enemy.getType().getTranslationKey().startsWith("entity.myfirstmod.") && enemy.isAlive()) {
                 int x=w/2-70,y=54;
                 draw.drawCenteredTextWithShadow(c.textRenderer,enemy.getDisplayName(),w/2,y,0xD5C3B0);
                 draw.fill(x,y+12,x+140,y+15,0xC0352932);draw.fill(x,y+12,x+(int)(140*Math.max(0,Math.min(1,enemy.getHealth()/enemy.getMaxHealth()))),y+15,0xFFA5675E);

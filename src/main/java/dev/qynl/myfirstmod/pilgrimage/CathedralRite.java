@@ -50,7 +50,7 @@ public final class CathedralRite {
                 }
             }
             player.sendMessage(Text.translatable(next==0?"message.myfirstmod.cathedral_wrong":next==3?"message.myfirstmod.cathedral_open":"message.myfirstmod.cathedral_seal",Text.translatable("seal.myfirstmod."+i)),false);
-            world.playSound(null,pos,next==0?SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE:SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,SoundCategory.BLOCKS,1,next==0?.5f:.7f+next*.2f);
+            world.playSound(null,pos,next==0?SoundEvents.ENTITY_WARDEN_HEARTBEAT:SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,SoundCategory.BLOCKS,1,next==0?.5f:.7f+next*.2f);
             return ActionResult.SUCCESS;
         }
         player.sendMessage(Text.translatable("message.myfirstmod.cathedral_spent"),true);return ActionResult.SUCCESS;

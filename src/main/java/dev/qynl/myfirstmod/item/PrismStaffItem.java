@@ -45,7 +45,7 @@ public final class PrismStaffItem extends Item {
             }
             boolean landed=false;
             if(closest!=null) {
-                landed=closest.damage(server.getDamageSources().playerAttack(user),8);
+                landed=closest.damage(server.getDamageSources().indirectMagic(user,user),8);
                 if(landed) closest.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING,100,0));
                 end=start.add(end.subtract(start).normalize().multiply(Math.sqrt(best)));
             }

@@ -53,7 +53,7 @@ Both mobs retain vanilla-derived navigation and spawning foundations; they are n
 Use to evade up to three blocks in your horizontal look direction; **sneak-use backsteps**. Grounded only, 2.5-second cooldown, modest hunger exhaustion. It samples the path in quarter-block increments and stops at obstruction, unloaded chunks, fluid, unsafe ground, or ledges. No invulnerability, wall phasing, or extra damage. It is an item ability, not a new keybinding.
 
 ### Null Warden
-Its existing four phases and rematch progression remain. **Recovery openings grant +20% melee damage**, communicated through the HUD and hit particles; ranged hits do not gain this bonus. Invulnerability/pylon phases remain protected. The arena's cardinal gateways now have pointed gothic profiles.
+Its existing four phases and rematch progression remain. **Recovery openings grant +20% melee damage**, communicated through the HUD and hit particles; ranged hits do not gain this bonus. The Prism Staff now uses attributed indirect-magic damage rather than masquerading as a melee hit (and therefore follows magic armor-bypass rules). Invulnerability/pylon phases remain protected. The arena's cardinal gateways now have pointed gothic profiles.
 
 ## Realm and presentation
 
