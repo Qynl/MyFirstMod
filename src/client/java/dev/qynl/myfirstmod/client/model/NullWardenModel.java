@@ -22,6 +22,10 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
     private final ModelPart rightLeg;
     private final ModelPart leftHorn;
     private final ModelPart rightHorn;
+    private final ModelPart shoulderLeft;
+    private final ModelPart shoulderRight;
+    private final ModelPart waist;
+    private final ModelPart mantle;
 
     public NullWardenModel(ModelPart root) {
         this.root = root;
@@ -34,6 +38,10 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         this.rightLeg = root.getChild("right_leg");
         this.leftHorn = head.getChild("left_horn");
         this.rightHorn = head.getChild("right_horn");
+        this.shoulderLeft = torso.getChild("shoulder_left");
+        this.shoulderRight = torso.getChild("shoulder_right");
+        this.waist = torso.getChild("waist");
+        this.mantle = torso.getChild("mantle");
     }
 
     public static TexturedModelData getTexturedModelData() {
@@ -55,6 +63,23 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(0, 48).cuboid(-4, -4, -5, 8, 8, 2)
                         .uv(20, 48).cuboid(-3, -3, -6, 6, 6, 2),
                 ModelTransform.pivot(0, 0, -1));
+
+        t.addChild("shoulder_left", ModelPartBuilder.create()
+                        .uv(0, 78).cuboid(-2, -2, -5, 9, 5, 10)
+                        .uv(38, 78).cuboid(5, -1, -4, 4, 3, 8),
+                ModelTransform.pivot(7, -6, 0));
+        t.addChild("shoulder_right", ModelPartBuilder.create()
+                        .uv(0, 78).cuboid(-7, -2, -5, 9, 5, 10)
+                        .uv(38, 78).cuboid(-9, -1, -4, 4, 3, 8),
+                ModelTransform.pivot(-7, -6, 0));
+        t.addChild("waist", ModelPartBuilder.create()
+                        .uv(48, 58).cuboid(-8, -1, -5, 16, 4, 10)
+                        .uv(48, 72).cuboid(-6, 2, -6, 12, 3, 12),
+                ModelTransform.pivot(0, 7, 0));
+        t.addChild("mantle", ModelPartBuilder.create()
+                        .uv(76, 0).cuboid(-9, -5, 3, 18, 12, 3)
+                        .uv(76, 15).cuboid(-7, 6, 3, 14, 7, 3),
+                ModelTransform.pivot(0, -4, 0));
 
         t.addChild("left_arm", ModelPartBuilder.create()
                         .uv(68, 32).cuboid(0, -3, -3, 6, 15, 6)
@@ -107,6 +132,10 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         torso.pivotY += hover;
         leftHorn.roll = MathHelper.sin(animationProgress * 0.045f) * 0.08f;
         rightHorn.roll = -leftHorn.roll;
+        shoulderLeft.roll = MathHelper.sin(animationProgress * 0.05f) * 0.025f;
+        shoulderRight.roll = -shoulderLeft.roll;
+        waist.yaw = MathHelper.sin(animationProgress * 0.035f) * 0.035f;
+        mantle.pitch = MathHelper.sin(animationProgress * 0.055f) * 0.035f;
         core.pitch = MathHelper.sin(animationProgress * 0.12f) * 0.05f;
     }
 }
