@@ -4,7 +4,6 @@ import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.PersistentState;
 
 import java.util.HashMap;
@@ -18,6 +17,7 @@ public final class NullWardenState extends PersistentState {
 
     public UUID bossUuid;
     public final Set<UUID> participants = new HashSet<>();
+    public final Set<UUID> eligiblePlayers = new HashSet<>();
     public final Set<UUID> rewardedPlayers = new HashSet<>();
     public final Set<UUID> echoes = new HashSet<>();
     public final Map<UUID, ReturnPointData> returnPoints = new HashMap<>();
@@ -39,7 +39,10 @@ public final class NullWardenState extends PersistentState {
         NullWardenState state = new NullWardenState();
 
         if (nbt.contains("BossUuid")) {
-            state.bossUuid = UUID.fromString(nbt.getString("BossUuid"));
+            try {
+                state.bossUuid = UUID.fromString(nbt.getString("BossUuid"));
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
         state.defeated = nbt.getBoolean("Defeated");
@@ -49,6 +52,7 @@ public final class NullWardenState extends PersistentState {
         state.activePylons = nbt.getInt("ActivePylons");
 
         readUuidList(nbt, "Participants", state.participants);
+        readUuidList(nbt, "EligiblePlayers", state.eligiblePlayers);
         readUuidList(nbt, "RewardedPlayers", state.rewardedPlayers);
         readUuidList(nbt, "Echoes", state.echoes);
 
@@ -99,6 +103,7 @@ public final class NullWardenState extends PersistentState {
         nbt.putInt("ActivePylons", activePylons);
 
         writeUuidList(nbt, "Participants", participants);
+        writeUuidList(nbt, "EligiblePlayers", eligiblePlayers);
         writeUuidList(nbt, "RewardedPlayers", rewardedPlayers);
         writeUuidList(nbt, "Echoes", echoes);
 
