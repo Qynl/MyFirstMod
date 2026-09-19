@@ -8,6 +8,7 @@ import java.util.Set;
 
 /** Per-player expedition progress. Bounded discovery storage keeps saves small. */
 public final class ExpeditionRecord {
+    public int keepClears,pendingKeepRewards;
     public int vow,contractsClaimed,ledgerOffer;
     public long vowReadyAt;
     public final Set<Long> memories=new LinkedHashSet<>();
@@ -32,6 +33,7 @@ public final class ExpeditionRecord {
     }
     public static ExpeditionRecord read(NbtCompound nbt) {
         ExpeditionRecord record = new ExpeditionRecord();
+        record.keepClears=Math.max(0,nbt.getInt("KeepClears"));record.pendingKeepRewards=Math.max(0,Math.min(64,nbt.getInt("PendingKeepRewards")));
         record.vow=dev.qynl.myfirstmod.remembrance.RemembranceRules.vow(nbt.getInt("Vow"));
         record.vowReadyAt=Math.max(0,nbt.getLong("VowReadyAt"));
         record.contractsClaimed=nbt.getInt("ContractsClaimed")&127;record.ledgerOffer=Math.floorMod(nbt.getInt("LedgerOffer"),4);
@@ -62,6 +64,7 @@ public final class ExpeditionRecord {
     }
     public NbtCompound write() {
         NbtCompound nbt = new NbtCompound();
+        nbt.putInt("KeepClears",keepClears);nbt.putInt("PendingKeepRewards",pendingKeepRewards);
         nbt.putInt("Vow",vow);nbt.putLong("VowReadyAt",vowReadyAt);nbt.putInt("ContractsClaimed",contractsClaimed);nbt.putInt("LedgerOffer",ledgerOffer);
         nbt.putLongArray("Memories",memories.stream().mapToLong(Long::longValue).toArray());
         var landmarksNbt=new NbtList();landmarks.forEach((pos,kind)->{var entry=new NbtCompound();entry.putLong("Pos",pos);entry.putString("Kind",kind);landmarksNbt.add(entry);});

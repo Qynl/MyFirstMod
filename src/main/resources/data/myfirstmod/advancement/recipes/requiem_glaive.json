@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "crest": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:regent_crest"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "myfirstmod:requiem_glaive"
+    ]
+  }
+}

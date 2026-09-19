@@ -21,6 +21,9 @@ public class MyFirstMod implements ModInitializer {
         ModBlocks.register();
         ModItems.register();
         ModEntities.register();
+        dev.qynl.myfirstmod.keep.HollowKeep.registerCommands();
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(dev.qynl.myfirstmod.keep.HollowKeep::resetTickets);
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register(dev.qynl.myfirstmod.keep.HollowKeep::resetTickets);
         dev.qynl.myfirstmod.remembrance.RemembranceFeature.register();
         dev.qynl.myfirstmod.pilgrimage.CathedralFeature.register();
         dev.qynl.myfirstmod.realm.RealmFeatures.register();
@@ -28,6 +31,7 @@ public class MyFirstMod implements ModInitializer {
         dev.qynl.myfirstmod.rift.RiftObservatoryFeature.register();
         dev.qynl.myfirstmod.realm.ExpeditionJournal.register();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            dev.qynl.myfirstmod.keep.HollowKeep.clear();
             dev.qynl.myfirstmod.realm.RealmTrials.clear();
             dev.qynl.myfirstmod.rift.RealmRifts.clear();
             dev.qynl.myfirstmod.boss.NullWardenManager.clear();
@@ -35,6 +39,7 @@ public class MyFirstMod implements ModInitializer {
         });
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             dev.qynl.myfirstmod.boss.NullWardenManager.entityLoaded(entity, world);
+            if(entity.getCommandTags().contains("hollow_keep")&&!dev.qynl.myfirstmod.keep.HollowKeep.owns(entity.getUuid()))entity.discard();
             if(entity.getCommandTags().contains("null_rift") && !dev.qynl.myfirstmod.rift.RealmRifts.owns(entity.getUuid())) entity.discard();
             if (entity.getCommandTags().contains("null_trial")
                     && !dev.qynl.myfirstmod.realm.RealmTrials.owns(entity.getUuid())) entity.discard();
@@ -43,6 +48,8 @@ public class MyFirstMod implements ModInitializer {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
             if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;
             if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
+            ActionResult keep=dev.qynl.myfirstmod.keep.HollowKeep.interact(serverPlayer,hit.getBlockPos());
+            if(keep!=ActionResult.PASS)return keep;
             dev.qynl.myfirstmod.remembrance.LandmarkAtlas.remember(serverPlayer,hit.getBlockPos());
             ActionResult ledger=dev.qynl.myfirstmod.remembrance.RemembranceLedger.interact(serverPlayer,hit.getBlockPos());
             if(ledger!=ActionResult.PASS) return ledger;
@@ -67,6 +74,7 @@ public class MyFirstMod implements ModInitializer {
         });
 
         ServerTickEvents.END_SERVER_TICK.register(VoidPortalManager::tick);
+        ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.keep.HollowKeep::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.remembrance.PilgrimVows::tick);
         ServerTickEvents.END_SERVER_TICK.register(NullbladeItem::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.item.ResoniteArmor::tick);

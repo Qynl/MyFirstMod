@@ -23,6 +23,13 @@ public final class ExpeditionRewards {
     public static void claim(ServerPlayerEntity player) {
         RealmState state=RealmState.get(player.getServerWorld());
         var record=state.expedition(player.getUuid());
+        if(record.pendingKeepRewards>0) {
+            int clears=record.pendingKeepRewards;boolean first=record.keepClears==0;
+            record.pendingKeepRewards=0;record.keepClears+=clears;state.markDirty();
+            offer(player,ModItems.REGENT_CREST,clears);offer(player,ModItems.ASTRAL_CORE,clears);offer(player,ModItems.RESONANT_SHARD,clears*8);
+            if(first)offer(player,ModItems.REQUIEM_GLAIVE,1);player.addExperience(clears*300);
+            player.sendMessage(Text.translatable("message.myfirstmod.keep_mail",clears),false);
+        }
         int normal=record.pendingNormal,echo=record.pendingEcho;
         if(record.pendingRiftCores>0) {
             int cores=record.pendingRiftCores;record.pendingRiftCores=0;state.markDirty();

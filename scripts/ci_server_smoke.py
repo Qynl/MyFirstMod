@@ -142,6 +142,19 @@ def main():
             connection.command(prefix+'loot spawn 1048 83 1048 loot myfirstmod:chests/memorial_cache')
             for item in ['pilgrim_atlas','memory_shard','iron_vow','ember_vow','mist_vow','silent_vow']:
                 connection.command(prefix+'summon minecraft:item 1048 84 1048 {Item:{id:"myfirstmod:'+item+'",count:1}}')
+            # Exercise the actual incremental fortress builder, not a substitute fixture.
+            build_deadline=time.monotonic()+120
+            while 'KEEP_READY' not in connection.command('hollowkeep prepare'):
+                if time.monotonic()>build_deadline:raise TimeoutError('Keep construction did not finish')
+                time.sleep(1)
+            keep='execute in myfirstmod:hollow_keep run '
+            connection.command(keep+'forceload add -32 -32 31 31')
+            for x,z,block in [(-20,0,'keep_ward'),(20,0,'keep_ward'),(0,-20,'keep_ward'),(0,22,'keep_heart'),(0,28,'keep_gate')]:
+                connection.command(keep+f'execute if block {x} 65 {z} myfirstmod:{block} run say SMOKE_KEEP_ROOM_OK')
+            connection.command(keep+'execute if block 28 85 28 myfirstmod:prism_lamp run say SMOKE_KEEP_TOWER_OK')
+            connection.command(keep+'summon myfirstmod:grave_regent 0 65 0')
+            connection.command(keep+'summon minecraft:item 0 66 22 {Item:{id:"myfirstmod:requiem_glaive",count:1}}')
+            connection.command(keep+'loot spawn 0 66 22 loot myfirstmod:entities/grave_regent')
             connection.command('save-all flush')
             connection.command('stop')
             code=proc.wait(timeout=120)

@@ -1,5 +1,5 @@
 # The Null Warden
-## 1.6 — Remembrance
+## 1.7 — The Hollow Keep
 
 **A dark-fantasy expedition through a ruined dimension: prepare at a sanctuary, recover forgotten memories, descend beneath cathedrals, and challenge the guardian of a broken kingdom.**
 
@@ -31,6 +31,12 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes a custom d
 - [Troubleshooting and limitations](#troubleshooting-and-limitations)
 - [Build, tests, and repository guide](#build-tests-and-repository-guide)
 
+## New in 1.7 — The Hollow Keep
+
+A separate dungeon dimension with a **63×63 fortress**, three ward chambers, a large central hall, and the **Grave Regent**, an original custom-modeled boss. The first clear awards the **Requiem Glaive**. This is a shared, repeatable expedition—not another small worldgen ruin. See [the complete Keep guide](docs/HOLLOW_KEEP.md).
+
+After the Warden has fallen, use the Hollow Gate at **(-6,81,158)**. The first use prepares the fortress; use it again once ready. Your existing flasks, vows, and Resonite set bonus work there. Read the guide before starting a party expedition.
+
 ## What is new in 1.6?
 
 This update connects exploration to long-term preparation rather than adding only another boss:
@@ -54,7 +60,7 @@ Everything from earlier updates remains: Ashen Flasks, cathedral embers, Converg
 | Mod loader | **Fabric Loader 0.16.10** development target; metadata accepts 0.16.10+ |
 | Fabric API | Built against **0.116.17+1.21.1**; install a compatible 1.21.1 build |
 | Java | **21** |
-| Mod version | **1.6.0** |
+| Mod version | **1.7.0** |
 
 1. Install Fabric for Minecraft 1.21.1.
 2. Open a **successful** [build workflow run](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml).
@@ -465,6 +471,7 @@ python3 scripts/generate_wilds.py
 python3 scripts/generate_convergence.py
 python3 scripts/generate_pilgrimage.py
 python3 scripts/generate_remembrance.py
+python3 scripts/generate_keep.py
 python3 -m unittest discover -s tests -v
 ```
 

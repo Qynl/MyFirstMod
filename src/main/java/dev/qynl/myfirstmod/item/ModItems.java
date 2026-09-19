@@ -61,6 +61,8 @@ public final class ModItems {
     public static final Item EMBER_VOW=register("ember_vow",new VowSealItem(new Item.Settings().maxCount(16),2));
     public static final Item MIST_VOW=register("mist_vow",new VowSealItem(new Item.Settings().maxCount(16),3));
     public static final Item SILENT_VOW=register("silent_vow",new VowSealItem(new Item.Settings().maxCount(16),0));
+    public static final Item REGENT_CREST=register("regent_crest",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
+    public static final Item REQUIEM_GLAIVE=register("requiem_glaive",new RequiemGlaiveItem(new Item.Settings().maxDamage(2400).fireproof().rarity(Rarity.EPIC)));
     public static void register() {
         net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(dev.qynl.myfirstmod.block.ModBlocks.HUSHWOOD,300);
         Registry.register(Registries.ITEM_GROUP,Identifier.of(MyFirstMod.MOD_ID,"null_realm"),

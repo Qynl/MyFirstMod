@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "  C",
+    " I ",
+    "S  "
+  ],
+  "key": {
+    "C": {
+      "item": "myfirstmod:regent_crest"
+    },
+    "I": {
+      "item": "myfirstmod:resonite_ingot"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:requiem_glaive",
+    "count": 1
+  }
+}

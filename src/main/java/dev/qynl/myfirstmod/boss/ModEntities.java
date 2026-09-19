@@ -33,7 +33,9 @@ public final class ModEntities {
             Registries.ENTITY_TYPE,Identifier.of(MyFirstMod.MOD_ID,"rift_herald"),
             EntityType.Builder.create(dev.qynl.myfirstmod.mob.RiftHeraldEntity::new,SpawnGroup.MONSTER)
                     .dimensions(1.3f,2.4f).maxTrackingRange(48).trackingTickInterval(2).build("myfirstmod:rift_herald"));
+    public static final EntityType<dev.qynl.myfirstmod.keep.GraveRegentEntity> GRAVE_REGENT=Registry.register(Registries.ENTITY_TYPE,Identifier.of(MyFirstMod.MOD_ID,"grave_regent"),EntityType.Builder.create(dev.qynl.myfirstmod.keep.GraveRegentEntity::new,SpawnGroup.MONSTER).dimensions(1.5f,3.5f).maxTrackingRange(64).trackingTickInterval(1).build("myfirstmod:grave_regent"));
     public static void register() {
+        net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(GRAVE_REGENT,dev.qynl.myfirstmod.keep.GraveRegentEntity.attributes());
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
                 RIFT_HERALD,dev.qynl.myfirstmod.mob.RiftHeraldEntity.attributes());
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(

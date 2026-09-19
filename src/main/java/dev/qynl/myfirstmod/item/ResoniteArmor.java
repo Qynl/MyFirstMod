@@ -26,7 +26,8 @@ public final class ResoniteArmor {
     public static void tick(MinecraftServer server) {
         var world=server.getWorld(VoidPortalManager.NULL_REALM);
         if(world==null || world.getTime()%20!=0) return;
-        for(var player:world.getPlayers()) {
+        for(var player:server.getPlayerManager().getPlayerList()) {
+            if(!dev.qynl.myfirstmod.keep.HollowKeep.expedition(player.getWorld()))continue;
             if(!player.isAlive() || player.isSpectator()) continue;
             if(player.getEquippedStack(EquipmentSlot.HEAD).isOf(ModItems.RESONITE_HELMET)
                     && player.getEquippedStack(EquipmentSlot.CHEST).isOf(ModItems.RESONITE_CHESTPLATE)

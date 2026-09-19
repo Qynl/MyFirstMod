@@ -26,6 +26,8 @@ public class MyFirstModClient implements ClientModInitializer {
 
         EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.RiftSentinelRenderer.LAYER,dev.qynl.myfirstmod.client.model.RiftSentinelModel::data);
         EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.ShardstalkerRenderer.LAYER,dev.qynl.myfirstmod.client.model.ShardstalkerModel::data);
+        EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.GraveRegentRenderer.LAYER,dev.qynl.myfirstmod.client.model.GraveRegentModel::data);
+        EntityRendererRegistry.register(ModEntities.GRAVE_REGENT,dev.qynl.myfirstmod.client.render.GraveRegentRenderer::new);
         EntityRendererRegistry.register(ModEntities.NULL_WARDEN, NullWardenRenderer::new);
         EntityRendererRegistry.register(ModEntities.RIFT_SENTINEL, dev.qynl.myfirstmod.client.render.RiftSentinelRenderer::new);
         EntityRendererRegistry.register(ModEntities.SHARDSTALKER, dev.qynl.myfirstmod.client.render.ShardstalkerRenderer::new);

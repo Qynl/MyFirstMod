@@ -217,10 +217,22 @@ class ResourceTests(unittest.TestCase):
         self.assertEqual(recipe['result'],{'id':'minecraft:reinforced_deepslate','count':4})
         self.assertEqual(recipe['key']['E']['item'],'minecraft:echo_shard')
 
+    def test_hollow_keep_resources(self):
+        dimension=load(DATA/'dimension/hollow_keep.json')
+        self.assertEqual(dimension['generator']['type'],'minecraft:flat')
+        self.assertEqual(dimension['generator']['settings']['structure_overrides'],[])
+        self.assertEqual(load(DATA/'loot_table/entities/grave_regent.json')['pools'],[])
+        self.assertIn('myfirstmod:regent_crest',json.dumps(load(DATA/'recipe/requiem_glaive.json')))
+        self.assertEqual(struct.unpack('>II',(ASSETS/'textures/entity/grave_regent.png').read_bytes()[16:24]),(128,128))
+        for name in ['keep_gate','keep_ward','keep_heart']:
+            self.assertTrue((ASSETS/f'blockstates/{name}.json').exists())
+        lang=load(ASSETS/'lang/en_us.json')
+        for attack in range(1,4):self.assertIn('regent.myfirstmod.attack.'+str(attack),lang)
+
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))
         before={str(p.relative_to(RES)):p.read_bytes() for p in paths if p.is_file()}
-        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py','generate_pilgrimage.py','generate_remembrance.py']:
+        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py','generate_pilgrimage.py','generate_remembrance.py','generate_keep.py']:
             subprocess.run([sys.executable,str(ROOT/'scripts'/script)],check=True)
         after={str(p.relative_to(RES)):p.read_bytes() for p in RES.rglob('*') if p.is_file()}
         self.assertEqual(before,after)

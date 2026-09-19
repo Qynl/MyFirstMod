@@ -14,7 +14,7 @@ public final class PilgrimVows {
         if(!AshenFlaskItem.safeRest(player)) {
             player.sendMessage(Text.translatable("message.myfirstmod.vow_unsafe"),true);return false;
         }
-        var state=RealmState.get(player.getServerWorld());var record=state.expedition(player.getUuid());
+        var state=dev.qynl.myfirstmod.keep.HollowKeep.playerState(player);var record=state.expedition(player.getUuid());
         long now=player.getServer().getOverworld().getTime();
         if(record.vow==choice || now<record.vowReadyAt) {
             player.sendMessage(Text.translatable("message.myfirstmod.vow_wait"),true);return false;
@@ -26,7 +26,7 @@ public final class PilgrimVows {
     public static void tick(MinecraftServer server) {
         var world=server.getWorld(VoidPortalManager.NULL_REALM);if(world==null || world.getTime()%20!=0) return;
         var state=RealmState.get(world);
-        for(var player:world.getPlayers()) if(player.isAlive() && !player.isSpectator() && !player.isCreative()) {
+        for(var player:server.getPlayerManager().getPlayerList()) if(dev.qynl.myfirstmod.keep.HollowKeep.expedition(player.getWorld())&&player.isAlive() && !player.isSpectator() && !player.isCreative()) {
             int vow=state.expedition(player.getUuid()).vow;
             if(vow==1) {effect(player,StatusEffects.RESISTANCE);effect(player,StatusEffects.SLOWNESS);}
             if(vow==2) {effect(player,StatusEffects.STRENGTH);effect(player,StatusEffects.HUNGER);}

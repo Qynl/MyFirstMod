@@ -26,7 +26,7 @@ public final class RelicAttunements {
         return switch(value) {case "vigor","gale","focus"->value;default->"";};
     }
     public static boolean accepts(ItemStack stack) {
-        return stack.isOf(ModItems.NULLBLADE)||stack.isOf(ModItems.ASCENDED_NULLBLADE)||stack.isOf(ModItems.PRISM_STAFF)
+        return stack.isOf(ModItems.REQUIEM_GLAIVE)||stack.isOf(ModItems.NULLBLADE)||stack.isOf(ModItems.ASCENDED_NULLBLADE)||stack.isOf(ModItems.PRISM_STAFF)
                 ||stack.isOf(ModItems.CINDER_MAUL)||stack.isOf(ModItems.RIFT_AEGIS);
     }
     public static ActionResult interact(ServerPlayerEntity player,BlockPos pos) {

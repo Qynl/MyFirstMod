@@ -27,7 +27,7 @@ public final class AshenFlaskItem extends Item {
     public AshenFlaskItem(Settings settings) {super(settings);}
     public static boolean safeRest(ServerPlayerEntity player) {
         var world=player.getServerWorld();
-        if(!world.getRegistryKey().equals(VoidPortalManager.NULL_REALM) || Waystones.combatLocked(player)
+        if(!dev.qynl.myfirstmod.keep.HollowKeep.expedition(world) || (Waystones.combatLocked(player)||dev.qynl.myfirstmod.keep.HollowKeep.enrolled(player.getUuid()))
                 || player.hurtTime>0 || !player.isOnGround()) return false;
         if(!world.getEntitiesByClass(HostileEntity.class,player.getBoundingBox().expand(12),e->e.isAlive()).isEmpty()) return false;
         for(BlockPos pos:BlockPos.iterate(player.getBlockPos().add(-3,-2,-3),player.getBlockPos().add(3,2,3)))
@@ -36,10 +36,10 @@ public final class AshenFlaskItem extends Item {
     }
     @Override public TypedActionResult<ItemStack> use(World world,PlayerEntity player,Hand hand) {
         var stack=player.getStackInHand(hand);
-        if(!world.getRegistryKey().equals(VoidPortalManager.NULL_REALM) || player.getItemCooldownManager().isCoolingDown(this))
+        if(!dev.qynl.myfirstmod.keep.HollowKeep.expedition(world) || player.getItemCooldownManager().isCoolingDown(this))
             return TypedActionResult.fail(stack);
         if(player instanceof ServerPlayerEntity server) {
-            var record=RealmState.get(server.getServerWorld()).expedition(player.getUuid());
+            var record=dev.qynl.myfirstmod.keep.HollowKeep.playerState(server).expedition(player.getUuid());
             boolean rest=player.isSneaking();
             if(rest ? !safeRest(server) : record.flaskCharges<=0 || player.getHealth()>=player.getMaxHealth()) {
                 player.sendMessage(Text.translatable(rest?"message.myfirstmod.rest_unsafe":"message.myfirstmod.flask_empty"),true);
@@ -61,8 +61,8 @@ public final class AshenFlaskItem extends Item {
         if(remaining%10==0) player.getServerWorld().spawnParticles(ParticleTypes.SOUL,player.getX(),player.getY()+.6,player.getZ(),5,.3,.5,.3,.015);
     }
     @Override public ItemStack finishUsing(ItemStack stack,World world,LivingEntity user) {
-        if(!(user instanceof ServerPlayerEntity player) || player.hurtTime>0 || !world.getRegistryKey().equals(VoidPortalManager.NULL_REALM)) return stack;
-        var state=RealmState.get(player.getServerWorld());var record=state.expedition(player.getUuid());
+        if(!(user instanceof ServerPlayerEntity player) || player.hurtTime>0 || !dev.qynl.myfirstmod.keep.HollowKeep.expedition(world)) return stack;
+        var state=dev.qynl.myfirstmod.keep.HollowKeep.playerState(player);var record=state.expedition(player.getUuid());
         if(resting(stack)) {
             if(!player.isSneaking() || !safeRest(player)) return stack;
             var ember=player.getOffHandStack();
