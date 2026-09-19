@@ -1381,6 +1381,76 @@ public final class NullWardenManager {
                         Blocks.REINFORCED_DEEPSLATE.getDefaultState());
             }
         }
+
+        buildRealmLandmarks(world);
+    }
+
+    private static void buildRealmLandmarks(ServerWorld world) {
+        // The Null Realm should have a horizon with silhouettes, not an empty End
+        // backdrop. These distant fragments stay outside the combat boundary.
+        int[][] towers = {
+                {38, 72, 0, 8}, {-40, 76, 12, 11},
+                {8, 70, 39, 9}, {-14, 74, -41, 13},
+                {31, 69, -30, 7}, {-33, 78, -27, 10}
+        };
+
+        for (int[] t : towers) {
+            BlockPos base = new BlockPos(t[0], t[1], t[2]);
+            int height = t[3];
+            int radius = Math.max(1, height / 5);
+
+            // Broken obelisk core.
+            for (int y = 0; y < height; y++) {
+                int wobble = ((y * 7 + Math.abs(t[0]) + Math.abs(t[2])) % 3) - 1;
+                BlockPos p = base.add(wobble, y, 0);
+                world.setBlockState(p, Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+                if (y > 2 && y % 3 == 0) {
+                    world.setBlockState(p.add(1, 0, 0), Blocks.CRYING_OBSIDIAN.getDefaultState());
+                }
+            }
+
+            // A fractured crown gives each silhouette a readable top.
+            int crownY = base.getY() + height;
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    if (Math.abs(dx) + Math.abs(dz) <= radius) {
+                        world.setBlockState(new BlockPos(base.getX() + dx, crownY, base.getZ() + dz),
+                                ((dx + dz) & 1) == 0
+                                        ? Blocks.REINFORCED_DEEPSLATE.getDefaultState()
+                                        : Blocks.SCULK.getDefaultState());
+                    }
+                }
+            }
+
+            // Hanging sculk strands make the structures feel suspended.
+            if (height >= 9) {
+                for (int y = crownY - 4; y < crownY; y++) {
+                    if ((y + base.getX()) % 2 == 0) {
+                        world.setBlockState(new BlockPos(base.getX() + radius + 1, y, base.getZ()),
+                                Blocks.SCULK.getDefaultState());
+                    }
+                }
+            }
+        }
+
+        // Four broken approach islands imply that the arena is the center of a
+        // much larger place without creating a second combat space.
+        int[][] islands = {{0, 42}, {0, -44}, {44, 4}, {-45, -6}};
+        for (int[] island : islands) {
+            int cx = island[0], cz = island[1];
+            for (int dx = -4; dx <= 4; dx++) {
+                for (int dz = -4; dz <= 4; dz++) {
+                    if (dx * dx + dz * dz <= 18) {
+                        int y = 73 + ((Math.abs(dx) + Math.abs(dz)) % 2);
+                        world.setBlockState(new BlockPos(cx + dx, y, cz + dz),
+                                (dx + dz) % 3 == 0
+                                        ? Blocks.CRYING_OBSIDIAN.getDefaultState()
+                                        : Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+                    }
+                }
+            }
+            world.setBlockState(new BlockPos(cx, 75, cz), Blocks.SCULK_CATALYST.getDefaultState());
+        }
     }
 
     private static void buildReturnPortal(ServerWorld world, ArenaState a) {
