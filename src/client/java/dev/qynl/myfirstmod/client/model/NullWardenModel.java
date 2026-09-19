@@ -81,8 +81,8 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(32, 92).cuboid(-5, -1, -6, 10, 4, 2),
                 ModelTransform.pivot(0, 0, 0));
         t.addChild("back_spine", ModelPartBuilder.create()
-                        .uv(44, 92).cuboid(-2, -8, 4, 4, 16, 4)
-                        .uv(60, 92).cuboid(-4, -3, 6, 8, 4, 3),
+                        .uv(44, 78).cuboid(-2, -8, 4, 4, 16, 4)
+                        .uv(60, 88).cuboid(-4, -3, 6, 8, 4, 3),
                 ModelTransform.pivot(0, 0, 0));
 
         t.addChild("shoulder_left", ModelPartBuilder.create()
