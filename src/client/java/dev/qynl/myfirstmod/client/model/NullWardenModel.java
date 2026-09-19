@@ -53,6 +53,11 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
     private final ModelPart rightCrownShard;
     private final ModelPart jawPlate;
     private final ModelPart mantleShard;
+    private final ModelPart leftFoot;
+    private final ModelPart rightFoot;
+    private final ModelPart backShardLeft;
+    private final ModelPart backShardRight;
+    private final ModelPart headBack;
 
     public NullWardenModel(ModelPart root) {
         this.root = root;
@@ -96,6 +101,11 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         this.rightCrownShard = head.getChild("right_crown_shard");
         this.jawPlate = head.getChild("jaw_plate");
         this.mantleShard = torso.getChild("mantle_shard");
+        this.leftFoot = root.getChild("left_foot");
+        this.rightFoot = root.getChild("right_foot");
+        this.backShardLeft = torso.getChild("back_shard_left");
+        this.backShardRight = torso.getChild("back_shard_right");
+        this.headBack = head.getChild("head_back");
     }
 
     public static TexturedModelData getTexturedModelData() {
@@ -312,6 +322,31 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(106, 70).cuboid(-9, -4, -2, 5, 2, 4),
                 ModelTransform.pivot(-6, -9, 0));
 
+        r.addChild("left_foot", ModelPartBuilder.create()
+                        .uv(0, 112).cuboid(-4.5f, -1, -6, 9, 4, 12)
+                        .uv(22, 112).cuboid(-3.5f, -2, -4, 7, 2, 7),
+                ModelTransform.pivot(4, 31, 0));
+
+        r.addChild("right_foot", ModelPartBuilder.create()
+                        .uv(0, 112).cuboid(-4.5f, -1, -6, 9, 4, 12)
+                        .uv(22, 112).cuboid(-3.5f, -2, -4, 7, 2, 7),
+                ModelTransform.pivot(-4, 31, 0));
+
+        t.addChild("back_shard_left", ModelPartBuilder.create()
+                        .uv(32, 112).cuboid(-1, -7, 0, 2, 10, 4)
+                        .uv(38, 112).cuboid(-2, -2, 1, 3, 5, 3),
+                ModelTransform.of(-5, -6, 5, 0.08f, -0.08f, -0.18f));
+
+        t.addChild("back_shard_right", ModelPartBuilder.create()
+                        .uv(44, 112).cuboid(-1, -9, 0, 2, 12, 4)
+                        .uv(50, 112).cuboid(-1, -3, 1, 3, 5, 3),
+                ModelTransform.of(5, -5, 5, -0.05f, 0.07f, 0.15f));
+
+        h.addChild("head_back", ModelPartBuilder.create()
+                        .uv(56, 112).cuboid(-4, -5, 4, 8, 6, 3)
+                        .uv(68, 112).cuboid(-2, -8, 5, 4, 4, 3),
+                ModelTransform.pivot(0, 0, 0));
+
         return TexturedModelData.of(data, 128, 128);
     }
 
@@ -387,6 +422,17 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         ankleLeft.pitch = leftLeg.pitch * -0.12f;
         ankleRight.pitch = rightLeg.pitch * -0.12f;
 
+        leftFoot.pitch = leftLeg.pitch * -0.18f;
+        rightFoot.pitch = rightLeg.pitch * -0.18f;
+        leftFoot.yaw = leftLeg.pitch * 0.035f;
+        rightFoot.yaw = rightLeg.pitch * -0.035f;
+
+        backShardLeft.pitch = MathHelper.sin(animationProgress * 0.043f + 0.8f) * 0.10f;
+        backShardLeft.roll += MathHelper.sin(animationProgress * 0.061f) * 0.035f;
+        backShardRight.pitch = MathHelper.sin(animationProgress * 0.051f + 1.4f) * 0.13f;
+        backShardRight.roll += MathHelper.sin(animationProgress * 0.057f + 1.1f) * 0.045f;
+        headBack.pitch = MathHelper.sin(animationProgress * 0.048f) * 0.025f;
+
         core.pitch = pulse * (0.055f + phase * 0.012f);
         coreRing.yaw = animationProgress * (0.012f + phase * 0.002f);
         coreRing.pitch = pulse * 0.06f;
@@ -432,6 +478,11 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
             mantleShard.pivotY += fractureFast * 0.20f;
             chestSpine.roll += fractureFast * 0.035f;
             eyeSlit.roll += fracture * 0.018f;
+            backShardLeft.pivotX += fractureFast * 0.13f;
+            backShardLeft.pivotY += fracture * 0.16f;
+            backShardRight.pivotX -= fracture * 0.11f;
+            backShardRight.pivotY += fractureFast * 0.18f;
+            headBack.pivotZ += fracture * 0.12f;
         }
 
         switch (attack) {
