@@ -158,3 +158,4 @@ for name,pattern in armor.items():
 for tag in ['stone_crafting_materials','stone_tool_materials']:
     put(vanilla,'tags/item/'+tag+'.json',{'replace':False,'values':['myfirstmod:nullstone']})
 data('recipe/prism_glass.json',{'type':'minecraft:smelting','category':'blocks','ingredient':ingredient('prismstone'),'result':{'id':'minecraft:glass'},'experience':.1,'cookingtime':200})
+data('advancement/recipes/prism_glass.json',{'criteria':{'prismstone':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':['myfirstmod:prismstone']}]}}},'rewards':{'recipes':['myfirstmod:prism_glass']}})

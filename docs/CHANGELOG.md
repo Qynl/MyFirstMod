@@ -1,3 +1,34 @@
+# 1.3.0 — Wilds & Relics
+
+## Dimension
+
+- Added Luminous Fen with glowing moss and shallow, contained pools.
+- Replaced new-chunk base terrain/surfaces with a custom Nullstone, moss, Prismstone, and Cinderstone palette.
+- Added underground fracture caves bounded above bedrock and below the usual surface.
+- Added three ore types with biome-weighted distributions, iron-tier harvesting, Fortune, and Silk Touch drops.
+- Hushwood and Hush Leaves supply wood, fiber, and food. Flora positions now vary within chunks instead of always sharing the same center.
+- Added permanent waystone shrines with original block art and supply caches.
+
+## Equipment and progression
+
+- Added 21 items: five materials, three foods/drinks, three tools, four armor pieces, two weapons, and four utility items.
+- Added a custom Resonite armor material, two worn texture layers, and a full-set realm exploration bonus.
+- Added dust-powered, wall-clipped staff attacks; grounded maul slams; a bounded ore survey; stealth; consumable repairs; and interruptible recall.
+- Added 15 collectible custom blocks, crafting/smelting recipes, recipe-book unlocks, mining tags, plank/stone crafting compatibility, and a Creative tab.
+- Added staff-ammunition and recall HUD readouts. Wrapped all custom item tooltips to keep long ability instructions readable.
+- Expanded the live journal and persistent record for the fourth biome and personal bound waystone. Older records default to sanctuary recall.
+
+## Validation
+
+- Expanded resource checks from 11 to 15, including custom block completeness, recipe item references, mining/ore-loot contracts, caves, and armor assets.
+- Expanded Java tests from 10 to 12 with waystone round trips, all four biome discoveries, and legacy defaults.
+- Extended dedicated-server smoke tests to prepare and place a shrine, inspect its core, roll all three ore drop tables, and roll shrine supplies.
+- Smoke fixtures wait for surrounding chunks to load before issuing block/feature commands. RCON command transcripts are saved with the validation artifact.
+
+See [WILDS.md](WILDS.md) for the full equipment guide and deliberate limitations.
+
+---
+
 # 1.2.0 — Echoes
 
 ## Content

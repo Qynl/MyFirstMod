@@ -163,5 +163,7 @@
   "item.myfirstmod.resonite_leggings": "Resonite Leggings",
   "item.myfirstmod.resonite_leggings.tooltip": "Full Resonite set in the Null Realm: night vision and haste I. Repair with ingots.",
   "item.myfirstmod.resonite_boots": "Resonite Boots",
-  "item.myfirstmod.resonite_boots.tooltip": "Full Resonite set in the Null Realm: night vision and haste I. Repair with ingots."
+  "item.myfirstmod.resonite_boots.tooltip": "Full Resonite set in the Null Realm: night vision and haste I. Repair with ingots.",
+  "hud.myfirstmod.recall": "WAYFARER · %s%%",
+  "hud.myfirstmod.staff_ammo": "PRISM DUST · %s"
 }

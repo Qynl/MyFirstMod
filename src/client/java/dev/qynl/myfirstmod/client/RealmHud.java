@@ -38,6 +38,22 @@ public final class RealmHud {
             draw.fill(x,y,x+120*charge/100,y+4,0xFF8BF2E6);
             draw.drawCenteredTextWithShadow(client.textRenderer,Text.translatable("hud.myfirstmod.charge",charge),width/2,y-12,0xD0FFF6);
         }
+        if(player.isUsingItem() && player.getActiveItem().isOf(ModItems.WAYFARER_THREAD)) {
+            int charge=Math.min(100,player.getItemUseTime()*100/60);
+            int x=width/2-60,y=height-68;
+            draw.fill(x,y,x+120,y+4,0xC020213A);
+            draw.fill(x,y,x+120*charge/100,y+4,0xFFD1ADF8);
+            draw.drawCenteredTextWithShadow(client.textRenderer,Text.translatable("hud.myfirstmod.recall",charge),width/2,y-12,0xE0D2FF);
+        }
+        if(player.getMainHandStack().isOf(ModItems.PRISM_STAFF) || player.getOffHandStack().isOf(ModItems.PRISM_STAFF)) {
+            int dust=0;
+            for(int i=0;i<player.getInventory().size();i++) {
+                var stack=player.getInventory().getStack(i);
+                if(stack.isOf(ModItems.PRISM_DUST)) dust+=stack.getCount();
+            }
+            draw.fill(8,height-52,156,height-24,0xD0101725);
+            draw.drawTextWithShadow(client.textRenderer,Text.translatable("hud.myfirstmod.staff_ammo",dust),16,height-42,0xC8B5F3);
+        }
         if(!client.world.getRegistryKey().equals(VoidPortalManager.NULL_REALM)) return;
         NullWardenEntity boss=null;
         double nearest=48*48;

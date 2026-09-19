@@ -46,7 +46,7 @@ class Rcon:
         print('>',text,'\n',response,flush=True)
         with (LOG.parent/'server-commands.log').open('a') as commands:
             commands.write('> '+text+'\n'+response+'\n')
-        if not allow_failure and re.search(r'unknown or incomplete|incorrect argument|failed|not found|does not exist|not loaded',response,re.I):
+        if re.search(r'unknown or incomplete|incorrect argument|does not exist',response,re.I) or (not allow_failure and re.search(r'failed|not found|not loaded',response,re.I)):
             raise RuntimeError('Smoke command failed: '+response)
         return response
 
@@ -89,7 +89,7 @@ def main():
             chunk_deadline=time.monotonic()+60
             while True:
                 ready=all('passed' in connection.command(
-                    prefix+f'if loaded {x} 80 {z}',allow_failure=True).lower()
+                    prefix+f'execute if loaded {x} 80 {z}',allow_failure=True).lower()
                     for x in [1032,1048,1064] for z in [1032,1048,1064])
                 if ready:break
                 if time.monotonic()>chunk_deadline:raise TimeoutError('Shrine fixture chunks did not load')
@@ -97,14 +97,14 @@ def main():
             connection.command(prefix+'fill 1042 60 1042 1054 200 1054 minecraft:air')
             connection.command(prefix+'fill 1042 80 1042 1054 80 1054 myfirstmod:hushed_moss')
             connection.command(prefix+'place feature myfirstmod:waystone_shrine 1048 81 1048')
-            connection.command(prefix+'if block 1048 81 1048 myfirstmod:waystone run say SMOKE_WAYSTONE_OK')
+            connection.command(prefix+'execute if block 1048 81 1048 myfirstmod:waystone run say SMOKE_WAYSTONE_OK')
             # Exercise the actual block-loot codecs, not just JSON parsing.
             for index,(ore,drop) in enumerate([('resonite_ore','raw_resonite'),('prism_ore','prism_dust'),('cinder_ore','cinder_pearl')]):
                 x=8+index
                 connection.command(prefix+f'setblock {x} 110 155 myfirstmod:{ore}')
                 connection.command(prefix+f'loot spawn {x} 120 155 mine {x} 110 155 minecraft:iron_pickaxe')
                 selector='@e[type=minecraft:item,nbt={Item:{id:"myfirstmod:'+drop+'"}}]'
-                connection.command(prefix+'if entity '+selector+' run say SMOKE_ORE_OK')
+                connection.command(prefix+'execute if entity '+selector+' run say SMOKE_ORE_OK')
             connection.command(prefix+'loot spawn 8 120 155 loot myfirstmod:chests/waystone_cache')
             connection.command('save-all flush')
             connection.command('stop')

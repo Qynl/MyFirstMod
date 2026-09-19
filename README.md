@@ -1,10 +1,26 @@
-# The Null Warden — Echoes update (1.2.0)
+# The Null Warden — Wilds & Relics (1.3.0)
 
 A Minecraft **1.21.1 / Fabric / Java 21** exploration and boss mod.
 
-The Null Realm now has its own noise terrain and three custom biomes, an arrival sanctuary, procedural ruin courts, two realm enemies, a four-phase guardian, and a repeatable post-boss progression loop.
+The Null Realm now has its own noise terrain and four custom biomes, an arrival sanctuary, procedural ruin courts, two realm enemies, a four-phase guardian, and a repeatable post-boss progression loop.
 
 > **Development build.** CI compiles the mod and runs automated checks, including a dedicated-server worldgen smoke test. Visual presentation, combat balance, and multiplayer still require hands-on playtesting; see [validation scope](docs/TESTING.md). Back up existing worlds. Use a fresh test world for the complete terrain update: existing chunks never regenerate automatically.
+
+## New in 1.3 — Wilds & Relics
+
+The realm now has its own gathering and equipment progression, not just combat courts:
+
+- **Luminous Fen**, a fourth biome with glowing moss, shallow pools, and luminous growths.
+- **Underground fracture caves** between roughly Y=-40 and Y=48, beneath custom Nullstone terrain.
+- **Three mineable ores:** Resonite, Prism, and Cinder. Resonite is smelted into ingots; the other ores drop useful magical materials.
+- **15 collectible custom blocks:** stone, bricks, moss, Hushwood, planks, foliage, ores, metal storage, and lamps. Original textures and mining/loot tags are included.
+- **21 new items**, including a complete custom-textured armor set, three tools, two weapons, surveying/stealth/repair/recall equipment, and expedition food.
+- **Waystone shrines:** attune to a discovered shrine and return using a channeled Wayfarer Thread.
+- A dedicated Creative tab, recipe unlocks, expanded journal pages, wrapped tooltips, staff-ammunition display, and recall progress bar.
+
+**Existing saves:** new terrain, plants, ores, and shrines appear in newly generated chunks. New stone and climate distribution can create visible seams against old chunks. Back up your world; a fresh world gives the most consistent generation. Existing inventory items, trial progress, and boss progression are retained.
+
+See [the Wilds equipment guide](docs/WILDS.md) for stats, crafting, and controls.
 
 ## New in 1.2 — Echoes
 
@@ -37,11 +53,12 @@ The dimension no longer uses the End's noise settings or biome.
 
 | Biome | Identity |
 | --- | --- |
-| **Hushed Grove** | Sculk-covered ridges, branching basalt growths, luminous crowns, drifting souls |
-| **Prism Wastes** | Pale calcite surfaces, amethyst formations, violet fog, floating motes |
-| **Cinder Steps** | Dark basalt terraces, ash, fractured spires |
+| **Hushed Grove** | Custom moss, harvestable Hushwood and Hush Leaves, luminous crowns, drifting souls |
+| **Prism Wastes** | Custom Prismstone, amethyst formations, violet fog, floating motes |
+| **Cinder Steps** | Custom Cinderstone terraces, ash, fractured spires |
+| **Luminous Fen** | Glowing moss, shallow pools, luminous growths, spore-filled teal fog |
 
-Seeded terrain combines layered ridges with smaller three-dimensional fractures. Procedural decoration places three ruin layouts: an enclosed **reliquary**, an open **observatory**, and a two-storey **archive** with a sunken treasure vault. These are code-generated, chunk-contained features, not copied vanilla structure templates. Courts contain a loot cache and an opt-in trial core. They do not currently integrate with `/locate structure`.
+Seeded terrain combines layered ridges with smaller three-dimensional fractures and underground tunnels. Biome-local resource weighting makes Cinder Pearls more common under Cinder Steps and Prism Dust more common elsewhere; all three ore types can occur throughout the realm. Procedural decoration places three ruin layouts: an enclosed **reliquary**, an open **observatory**, and a two-storey **archive** with a sunken treasure vault. Waystone shrines add a separate exploration landmark with an attunement stone and supplies. These are code-generated, chunk-contained features, not copied vanilla structure templates. Courts contain a loot cache and an opt-in trial core. They do not currently integrate with `/locate structure`.
 
 The sanctuary includes a nearby introductory court and a lit approach to the arena. Exploration features are excluded from the protected central approach. Sanctuary construction happens once per world; arena resets rebuild the combat footprint. Do not build a permanent base inside that footprint.
 
@@ -147,7 +164,7 @@ Windows: `gradlew.bat build`. Output: `build/libs/`.
 
 CI runs resource tests, JUnit balancing tests, the Loom build, and a real dedicated-server smoke test for main/arena pushes and pull requests. It uploads the installable JAR separately from test reports. Download the `Null-Warden-<commit>` artifact from a successful [Actions run](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml).
 
-The smoke test boots Fabric, generates realm chunks, places a ruin and an explicit archive vault, spawns both realm mobs, saves, and shuts down cleanly. It is not a combat bot or a visual/multiplayer test. The smoke-test script owns the disposable `run/ci-smoke` world and overwrites `run/server.properties`/`eula.txt`; never point it at a production server.
+The smoke test boots Fabric, generates realm chunks, places a ruin, archive vault, and shrine, checks actual ore drops and a shrine loot table, spawns both realm mobs, saves, and shuts down cleanly. It is not a combat bot or a visual/multiplayer test. The smoke-test script owns the disposable `run/ci-smoke` world and overwrites `run/server.properties`/`eula.txt`; never point it at a production server.
 
 Original pixel textures and worldgen resources are reproducible:
 
@@ -155,6 +172,7 @@ Original pixel textures and worldgen resources are reproducible:
 python3 scripts/generate_art.py
 python3 scripts/generate_realm_data.py
 python3 scripts/generate_loot.py
+python3 scripts/generate_wilds.py
 ```
 
 The Gradle wrapper is sourced from the official Gradle 8.12 repository (Apache-2.0). The mod retains its existing declared MIT license.

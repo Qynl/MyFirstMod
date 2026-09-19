@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "prismstone": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:prismstone"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "myfirstmod:prism_glass"
+    ]
+  }
+}

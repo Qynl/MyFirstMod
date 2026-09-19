@@ -30,8 +30,13 @@ public class MyFirstModClient implements ClientModInitializer {
         net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
             if (net.minecraft.registry.Registries.ITEM.getId(stack.getItem()).getNamespace().equals("myfirstmod")) {
                 String key = stack.getTranslationKey() + ".tooltip";
-                if (net.minecraft.client.resource.language.I18n.hasTranslation(key))
-                    lines.add(net.minecraft.text.Text.translatable(key).formatted(net.minecraft.util.Formatting.GRAY));
+                if (net.minecraft.client.resource.language.I18n.hasTranslation(key)) {
+                    var client=net.minecraft.client.MinecraftClient.getInstance();
+                    int width=Math.max(100,Math.min(240,client.getWindow().getScaledWidth()-24));
+                    for(var line:client.textRenderer.getTextHandler().wrapLines(
+                            net.minecraft.text.Text.translatable(key),width,net.minecraft.text.Style.EMPTY))
+                        lines.add(net.minecraft.text.Text.literal(line.getString()).formatted(net.minecraft.util.Formatting.GRAY));
+                }
             }
         });
         net.minecraft.client.item.ModelPredicateProviderRegistry.register(

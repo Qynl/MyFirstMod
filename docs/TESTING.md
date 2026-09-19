@@ -2,11 +2,11 @@
 
 ## Automated validation
 
-- Local Python resource suite: **11 passing tests**.
+- Local Python resource suite: **15 passing tests**.
 - `git diff --check`: clean.
 - Java builds run in **GitHub Actions** because this workspace has no Java installation.
-- CI compiles main/client sources, runs **ten JUnit tests**, creates the remapped JAR, and executes `scripts/ci_server_smoke.py`.
-- The smoke test launches a real Fabric dedicated server, loads the custom dimension codecs, generates chunks, places a ruin and forced archive vault, spawns both realm mobs, saves, and shuts down. Logs and JUnit reports are uploaded as `Validation-<commit>`; the mod is in `Null-Warden-<commit>`.
+- CI compiles main/client sources, runs **twelve JUnit tests**, creates the remapped JAR, and executes `scripts/ci_server_smoke.py`.
+- The smoke test launches a real Fabric dedicated server, loads the custom dimension codecs, generates chunks, places a ruin, forced archive vault, and shrine, checks shrine placement and three ore drop tables, spawns both realm mobs, saves, and shuts down. Logs and JUnit reports are uploaded as `Validation-<commit>`; the mod is in `Null-Warden-<commit>`.
 
 Check the final Actions run for the exact revision under test. Compilation is not a playtest, and the smoke test does not simulate a connected player or a complete boss/trial encounter.
 
@@ -83,3 +83,19 @@ This is a substantial development iteration, not a finished expansion. The new m
 - [ ] Discover multiple courts. Cycle compass routes, put the nearest court on cooldown, and refresh the route.
 - [ ] Reflect skeleton arrows with the Aegis. Player-owned projectiles, projectiles behind the player, and projectiles behind walls must not be reflected.
 - [ ] Enter an archive vault naturally. Walk the entire staircase both ways; check overhead clearance and loot.
+
+## Wilds & Relics-specific playtest checklist
+
+- [ ] Find all four biomes across multiple seeds, inspect cave height/depth transitions, and check for feature overlaps or chunk-border writes.
+- [ ] Mine every ore with hand, stone, iron, and diamond-tier tools. Verify correct-tool requirements, Fortune, and Silk Touch behavior.
+- [ ] Make a furnace from Nullstone, use Hushwood as fuel, smelt Resonite, and smelt Prismstone into glass.
+- [ ] Harvest fiber/berries from leaves, eat stew, and drink tonic with full and partially filled inventories. Check returned containers and Creative behavior.
+- [ ] Equip every Resonite armor piece. Inspect both worn texture layers, durability, repair ingredients, enchantments, and realm-only set bonuses.
+- [ ] Shoot the staff through doorways and at walls, allies, pets, players, and enemies touching the player. Verify ammunition, nearest-hit selection, cooldowns, and glowing.
+- [ ] Slam the maul while grounded/in the air; check range, line of sight, teammate filtering, and durability.
+- [ ] Survey near unloaded chunk boundaries and outside the realm. Only existing realm ore blocks should be reported, and no chunks should generate.
+- [ ] Use repair kits in both hands on damaged, undamaged, foreign, stacked, and nearly broken items.
+- [ ] Bind different waystones with two players. Test per-player destinations, restart persistence, sanctuary fallback, blocked landings, damage interruption, and combat locks.
+- [ ] Verify recall does not clear player blocks, land in fluid, or consume its cooldown after a failed landing.
+- [ ] Inspect every new inventory icon, the Creative tab, all journal pages, ammo/recall HUD, and wrapped tooltips at small and large GUI scales.
+- [ ] Upgrade a backup of a 1.2 world. Existing records and inventory must load; new ores/shrines only appear in new chunks. Terrain seams are expected.
