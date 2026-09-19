@@ -48,6 +48,11 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
     private final ModelPart kneeRight;
     private final ModelPart ankleLeft;
     private final ModelPart ankleRight;
+    private final ModelPart coreRing;
+    private final ModelPart leftCrownShard;
+    private final ModelPart rightCrownShard;
+    private final ModelPart jawPlate;
+    private final ModelPart mantleShard;
 
     public NullWardenModel(ModelPart root) {
         this.root = root;
@@ -86,6 +91,11 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         this.kneeRight = root.getChild("knee_right");
         this.ankleLeft = root.getChild("ankle_left");
         this.ankleRight = root.getChild("ankle_right");
+        this.coreRing = torso.getChild("core_ring");
+        this.leftCrownShard = head.getChild("left_crown_shard");
+        this.rightCrownShard = head.getChild("right_crown_shard");
+        this.jawPlate = head.getChild("jaw_plate");
+        this.mantleShard = torso.getChild("mantle_shard");
     }
 
     public static TexturedModelData getTexturedModelData() {
@@ -116,6 +126,12 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(20, 60).cuboid(-3, -3, -6, 6, 6, 2)
                         .uv(36, 60).cuboid(-1, -1, -7, 2, 2, 2),
                 ModelTransform.pivot(0, 0, -1));
+
+        t.addChild("core_ring", ModelPartBuilder.create()
+                        .uv(24, 104).cuboid(-5, -5, -5.5f, 10, 1, 1)
+                        .uv(24, 106).cuboid(-5, 4, -5.5f, 10, 1, 1)
+                        .uv(40, 104).cuboid(-5.5f, -5, -5.5f, 1, 10, 1),
+                ModelTransform.pivot(0, 0, 0));
 
         t.addChild("chest_plate", ModelPartBuilder.create()
                         .uv(0, 72).cuboid(-7, -8, -5, 14, 9, 2)
@@ -162,6 +178,10 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(76, 18).cuboid(-9, -5, 3, 18, 12, 3)
                         .uv(76, 33).cuboid(-7, 6, 3, 14, 7, 3),
                 ModelTransform.pivot(0, -4, 0));
+
+        t.addChild("mantle_shard", ModelPartBuilder.create()
+                        .uv(112, 104).cuboid(-1, -5, 3, 2, 9, 3),
+                ModelTransform.of(9, -1, 0, 0, 0, -0.12f));
 
         t.addChild("left_arm", ModelPartBuilder.create()
                         .uv(68, 48).cuboid(0, -3, -3, 6, 15, 6)
@@ -252,6 +272,20 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(96, 12).cuboid(-7, -7, -1, 5, 3, 3)
                         .uv(108, 12).cuboid(2, -7, -1, 5, 3, 3)
                         .uv(96, 18).cuboid(-2, -14, -1, 4, 5, 2),
+                ModelTransform.pivot(0, 0, 0));
+
+        h.addChild("left_crown_shard", ModelPartBuilder.create()
+                        .uv(72, 104).cuboid(-1, -8, -1, 2, 7, 2)
+                        .uv(80, 104).cuboid(-2, -4, -1, 3, 2, 2),
+                ModelTransform.of(5, -7, 0, 0, 0, -0.18f));
+
+        h.addChild("right_crown_shard", ModelPartBuilder.create()
+                        .uv(88, 104).cuboid(-1, -7, -1, 2, 6, 2)
+                        .uv(96, 104).cuboid(-1, -3, -1, 3, 2, 2),
+                ModelTransform.of(-5, -7, 0, 0, 0, 0.14f));
+
+        h.addChild("jaw_plate", ModelPartBuilder.create()
+                        .uv(104, 104).cuboid(-5, 0, -5.5f, 10, 2, 1),
                 ModelTransform.pivot(0, 0, 0));
 
         t.addChild("shard_left", ModelPartBuilder.create()
@@ -354,6 +388,16 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         ankleRight.pitch = rightLeg.pitch * -0.12f;
 
         core.pitch = pulse * (0.055f + phase * 0.012f);
+        coreRing.yaw = animationProgress * (0.012f + phase * 0.002f);
+        coreRing.pitch = pulse * 0.06f;
+        coreRing.scaleX = 1.0f + Math.max(0.0f, pulse) * 0.08f;
+        coreRing.scaleY = 1.0f + Math.max(0.0f, pulse) * 0.08f;
+        leftCrownShard.pitch = fastPulse * 0.08f;
+        leftCrownShard.roll += MathHelper.sin(animationProgress * 0.071f) * 0.045f;
+        rightCrownShard.pitch = -fastPulse * 0.07f;
+        rightCrownShard.roll += MathHelper.sin(animationProgress * 0.064f + 1.2f) * 0.04f;
+        jawPlate.pitch = pulse * 0.025f;
+        mantleShard.roll += MathHelper.sin(animationProgress * 0.058f) * 0.08f;
         core.yaw = fastPulse * 0.035f;
         core.pivotZ = -1.0f - Math.max(0.0f, pulse) * 0.16f;
         eyeSlit.pivotZ = -0.02f - Math.max(0.0f, fastPulse) * 0.03f;
@@ -385,6 +429,9 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
             collarLeft.pivotY += fracture * 0.12f;
             collarRight.pivotY -= fractureFast * 0.12f;
             crown.yaw += fracture * 0.045f;
+            leftCrownShard.pivotX += fracture * 0.16f;
+            rightCrownShard.pivotX -= fractureFast * 0.14f;
+            mantleShard.pivotY += fractureFast * 0.20f;
             chestSpine.roll += fractureFast * 0.035f;
             eyeSlit.roll += fracture * 0.018f;
         }
