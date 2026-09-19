@@ -655,10 +655,20 @@ public final class NullWardenManager {
 
         if (a.hazardTicks <= 0) {
             if (a.ticks % interval != 0) return;
-            a.hazardTicks = warning;
+
+            // The arena hazard follows a phase-specific rhythm instead of a
+            // repeating global timer. This lets players learn what comes next.
             a.hazardPattern++;
             int patterns = a.phase == 3 ? 8 : 4;
             if (a.hazardPattern >= patterns) a.hazardPattern = 0;
+            a.hazardTicks = warning;
+
+            // Phase 2 alternates a quadrant warning with a safe recovery beat.
+            // Phase 3 walks the ring clockwise. Phase 4 always collapses inward.
+            if (a.phase == 2 && a.hazardPattern % 2 == 1) {
+                a.hazardTicks = warning + 10;
+            }
+
             world.playSound(null, CENTER, SoundEvents.BLOCK_SCULK_SENSOR_CLICKING,
                     SoundCategory.HOSTILE, .8f, 1.0f + a.phase * .12f);
         }
@@ -675,7 +685,15 @@ public final class NullWardenManager {
             }
         } else {
             if (a.phase == 2) {
-                resolveWedge(world, a);
+                if (a.hazardPattern % 2 == 0) {
+                    resolveWedge(world, a);
+                } else {
+                    // A deliberate safe beat. The arena still signals the pattern,
+                    // but there is no damage, giving players a readable reposition window.
+                    world.playSound(null, CENTER, SoundEvents.BLOCK_SCULK_CATALYST_BLOOM,
+                            SoundCategory.HOSTILE, .7f, 1.35f);
+                    ring(world, .5, 80.25, .5, 20, ParticleTypes.SCULK_SOUL, 64);
+                }
             } else if (a.phase == 3) {
                 resolveRingSegment(world, a);
             } else {
