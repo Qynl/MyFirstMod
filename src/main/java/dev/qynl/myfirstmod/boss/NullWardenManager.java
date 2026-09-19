@@ -31,6 +31,8 @@ public final class NullWardenManager {
     private static final Map<RegistryKey<World>, ArenaState> ARENAS = new HashMap<>();
     private static final BlockPos CENTER = new BlockPos(0, 80, 0);
     private static final int ARENA_RADIUS = 22;
+    private static final int SOFT_BOUNDARY = 26;
+    private static final int HARD_BOUNDARY = 34;
 
     private NullWardenManager() {}
 
@@ -212,7 +214,11 @@ public final class NullWardenManager {
         for (UUID uuid : arena.participants) {
             ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
             if (player != null && player.getServerWorld() == world && player.isAlive()
-                    && player.squaredDistanceTo(CENTER.getX() + .5, CENTER.getY() + 1, CENTER.getZ() + .5) <= 28 * 28) {
+                    && player.squaredDistanceTo(CENTER.getX() + .5, CENTER.getY() + 1, CENTER.getZ() + .5) <= HARD_BOUNDARY * HARD_BOUNDARY) {
+                double distance = Math.sqrt(player.squaredDistanceTo(CENTER.getX() + .5, CENTER.getY() + 1, CENTER.getZ() + .5));
+                if (distance > SOFT_BOUNDARY && player.age % 20 == 0) {
+                    player.sendMessage(Text.literal("The Null Realm is collapsing at the edge."), true);
+                }
                 active.add(uuid);
                 if (arena.bar != null) arena.bar.addPlayer(player);
             } else if (arena.bar != null && player != null) {
