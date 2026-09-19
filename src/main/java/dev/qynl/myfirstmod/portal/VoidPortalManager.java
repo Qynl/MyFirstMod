@@ -3,6 +3,7 @@ package dev.qynl.myfirstmod.portal;
 import dev.qynl.myfirstmod.MyFirstMod;
 import dev.qynl.myfirstmod.block.ModBlocks;
 import dev.qynl.myfirstmod.boss.NullWardenManager;
+import dev.qynl.myfirstmod.boss.NullWardenState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleTypes;
@@ -28,7 +29,6 @@ public final class VoidPortalManager {
 
     private static final int TELEPORT_COOLDOWN = 80;
     private static final Map<UUID, Integer> COOLDOWNS = new HashMap<>();
-    private static final Map<UUID, ReturnPoint> RETURN_POINTS = new HashMap<>();
 
     private VoidPortalManager() {}
 
@@ -94,9 +94,8 @@ public final class VoidPortalManager {
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
-        COOLDOWNS.put(player.getUuid(), TELEPORT_COOLDOWN);
-
         if (player.getServerWorld().getRegistryKey().equals(NULL_REALM)) {
+            COOLDOWNS.put(player.getUuid(), TELEPORT_COOLDOWN);
             returnPlayer(player);
             return;
         }
@@ -107,12 +106,15 @@ public final class VoidPortalManager {
             return;
         }
 
-        RETURN_POINTS.put(player.getUuid(), new ReturnPoint(
+        COOLDOWNS.put(player.getUuid(), TELEPORT_COOLDOWN);
+
+        NullWardenManager.saveReturnPoint(
+                player,
                 player.getServerWorld().getRegistryKey(),
                 player.getBlockPos(),
                 player.getYaw(),
                 player.getPitch()
-        ));
+        );
 
         player.teleport(target, 0.5, 82.0, 0.5, player.getYaw(), player.getPitch());
         NullWardenManager.enterArena(target, player);
@@ -122,22 +124,25 @@ public final class VoidPortalManager {
         COOLDOWNS.replaceAll((uuid, value) -> Math.max(0, value - 1));
         COOLDOWNS.entrySet().removeIf(entry -> entry.getValue() == 0);
 
-        RETURN_POINTS.entrySet().removeIf(entry -> server.getPlayerManager().getPlayer(entry.getKey()) == null);
-
         NullWardenManager.tick(server);
     }
 
     public static void returnPlayer(ServerPlayerEntity player) {
         MinecraftServer server = player.getServer();
-        ReturnPoint point = RETURN_POINTS.remove(player.getUuid());
+        NullWardenState.ReturnPointData point = NullWardenManager.takeReturnPoint(player);
 
-        ServerWorld destination = point == null
-                ? server.getOverworld()
-                : server.getWorld(point.world());
+        ServerWorld destination = server.getOverworld();
+        if (point != null) {
+            Identifier id = Identifier.tryParse(point.worldId());
+            if (id != null) {
+                ServerWorld stored = server.getWorld(RegistryKey.of(RegistryKeys.WORLD, id));
+                if (stored != null) destination = stored;
+            }
+        }
 
-        if (destination == null) destination = server.getOverworld();
-
-        BlockPos spawn = point == null ? destination.getSpawnPos() : point.pos();
+        BlockPos spawn = point == null
+                ? destination.getSpawnPos()
+                : new BlockPos(point.x(), point.y(), point.z());
 
         player.teleport(destination,
                 spawn.getX() + 0.5,
@@ -148,11 +153,4 @@ public final class VoidPortalManager {
 
         player.sendMessage(Text.literal("The gate closes behind you."), true);
     }
-
-    private record ReturnPoint(
-            RegistryKey<World> world,
-            BlockPos pos,
-            float yaw,
-            float pitch
-    ) {}
 }
