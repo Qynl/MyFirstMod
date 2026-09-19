@@ -203,6 +203,7 @@ public final class NullWardenManager {
         a.pylonProgress = new int[4];
         a.attack = Attack.NONE;
         a.attackTarget = null;
+        a.attackStep = 0;
         a.nextAttackTick = 40;
         a.idleTicks = 0;
         a.victoryTicks = 0;
@@ -377,6 +378,7 @@ public final class NullWardenManager {
             a.pylonProgress = new int[4];
             a.hazardTicks = 0;
             a.hazardPattern = -1;
+            a.attackStep = 0;
             phaseShift(world, a);
             persist(world, a);
         }
@@ -772,16 +774,30 @@ public final class NullWardenManager {
         ServerPlayerEntity target = selectTarget(world, a);
         if (target == null) return;
 
-        a.attack = switch (a.phase) {
-            case 1 -> Attack.VOID_CLEAVE;
-            case 2 -> a.ticks % 2 == 0 ? Attack.SCULK_RING : Attack.VOID_RAIN;
-            case 3 -> a.ticks % 2 == 0 ? Attack.NULL_DASH : Attack.GRAVITY_WELL;
-            default -> switch ((a.ticks / 42) % 3) {
+        Attack selected = switch (a.phase) {
+            case 1 -> switch (a.attackStep % 3) {
+                case 0, 1 -> Attack.VOID_CLEAVE;
+                default -> Attack.VOID_RAIN;
+            };
+            case 2 -> switch (a.attackStep % 3) {
+                case 0 -> Attack.SCULK_RING;
+                case 1 -> Attack.VOID_RAIN;
+                default -> Attack.SCULK_RING;
+            };
+            case 3 -> switch (a.attackStep % 3) {
+                case 0 -> Attack.NULL_DASH;
+                case 1 -> Attack.GRAVITY_WELL;
+                default -> Attack.VOID_RAIN;
+            };
+            default -> switch (a.attackStep % 4) {
                 case 0 -> Attack.REALITY_TEAR;
                 case 1 -> Attack.GRAVITY_WELL;
-                default -> Attack.COLLAPSE;
+                case 2 -> Attack.COLLAPSE;
+                default -> Attack.REALITY_TEAR;
             };
         };
+        a.attack = selected;
+        a.attackStep++;
         a.attackTarget = target.getUuid();
         a.attackX = target.getX();
         a.attackY = target.getY();
@@ -1084,6 +1100,7 @@ public final class NullWardenManager {
         a.pylonProgress = new int[4];
         a.attack = Attack.NONE;
         a.attackTarget = null;
+        a.attackStep = 0;
     }
 
     private static void cleanup(ServerWorld world, ArenaState a) {
@@ -1299,7 +1316,7 @@ public final class NullWardenManager {
         int ticks, intro, phase = 1, idleTicks, nextAttackTick = 40, attackWindup;
         int victoryTicks, targetRotation;
         int hazardTicks, hazardPattern = -1;
-        int recoveryTicks, exposeTicks;
+        int recoveryTicks, exposeTicks, attackStep;
         int activePylons;
         int[] pylonProgress = new int[4];
         double attackX, attackY, attackZ;
