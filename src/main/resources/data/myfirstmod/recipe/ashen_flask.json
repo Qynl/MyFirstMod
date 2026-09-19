@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "minecraft:glass_bottle"
+    },
+    {
+      "item": "myfirstmod:resonite_ingot"
+    },
+    {
+      "item": "myfirstmod:hushberry"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:ashen_flask",
+    "count": 1
+  }
+}

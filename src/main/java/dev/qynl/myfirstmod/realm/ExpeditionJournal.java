@@ -47,6 +47,11 @@ public final class ExpeditionJournal {
         ExpeditionRecord record=state.expedition(player.getUuid());
         List<RawFilteredPair<Text>> pages=new ArrayList<>();
         page(pages,"journal.myfirstmod.progress",record.biomes.size(),record.courts.size(),record.trials,record.highestTier,record.victories);
+        page(pages,"journal.myfirstmod.pilgrimage");
+        page(pages,"journal.myfirstmod.flask",record.flaskCharges,dev.qynl.myfirstmod.pilgrimage.PilgrimageRules.capacity(record.flaskUpgrades));
+        page(pages,"journal.myfirstmod.cathedral",record.cathedralsOpened);
+        page(pages,"journal.myfirstmod.funeral");
+        page(pages,"journal.myfirstmod.combat");
         page(pages,"journal.myfirstmod.exploration");
         page(pages,"journal.myfirstmod.convergence",record.riftsClosed);
         page(pages,"journal.myfirstmod.attunement");

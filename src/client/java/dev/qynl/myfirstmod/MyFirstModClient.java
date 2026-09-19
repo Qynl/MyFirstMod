@@ -24,6 +24,8 @@ public class MyFirstModClient implements ClientModInitializer {
         NullWardenTexture.TEXTURE = NullWardenTexture.register();
         NullWardenTexture.GLOW_TEXTURE = NullWardenTexture.registerGlow();
 
+        EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.RiftSentinelRenderer.LAYER,dev.qynl.myfirstmod.client.model.RiftSentinelModel::data);
+        EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.ShardstalkerRenderer.LAYER,dev.qynl.myfirstmod.client.model.ShardstalkerModel::data);
         EntityRendererRegistry.register(ModEntities.NULL_WARDEN, NullWardenRenderer::new);
         EntityRendererRegistry.register(ModEntities.RIFT_SENTINEL, dev.qynl.myfirstmod.client.render.RiftSentinelRenderer::new);
         EntityRendererRegistry.register(ModEntities.SHARDSTALKER, dev.qynl.myfirstmod.client.render.ShardstalkerRenderer::new);
@@ -31,6 +33,7 @@ public class MyFirstModClient implements ClientModInitializer {
                 dev.qynl.myfirstmod.client.model.RiftHeraldModel::data);
         EntityRendererRegistry.register(ModEntities.RIFT_HERALD,dev.qynl.myfirstmod.client.render.RiftHeraldRenderer::new);
         dev.qynl.myfirstmod.client.RealmHud.register();
+        dev.qynl.myfirstmod.client.PilgrimageHud.register();
         net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
             if (net.minecraft.registry.Registries.ITEM.getId(stack.getItem()).getNamespace().equals("myfirstmod")) {
                 String key = stack.getTranslationKey() + ".tooltip";

@@ -70,6 +70,8 @@ public final class RealmHud {
             String key=switch(cinematic) {case 1->"awakening";case 2->"victory";default->"transition";};
             draw.drawCenteredTextWithShadow(client.textRenderer,Text.translatable("cinematic.myfirstmod."+key),width/2,bar/2-4,0xB1F7EF);
             draw.drawCenteredTextWithShadow(client.textRenderer,Text.translatable("cinematic.myfirstmod."+key+".subtitle"),width/2,height-bar/2-4,0xE1D9F2);
+        } else if(boss.isCounterWindow()) {
+            draw.drawCenteredTextWithShadow(client.textRenderer,Text.translatable("hud.myfirstmod.warden_open"),width/2,Math.max(90,height/5),0xABD6BC);
         } else if(boss.getVisualAttack()!=0) {
             // Text counterplay also communicates the tells without relying on particle color.
             draw.drawCenteredTextWithShadow(client.textRenderer,Text.translatable("attack.myfirstmod."+boss.getVisualAttack()),

@@ -39,16 +39,16 @@
       "type": "minecraft:add",
       "argument1": {
         "type": "minecraft:y_clamped_gradient",
-        "from_y": 24,
-        "to_y": 128,
-        "from_value": 1.5,
-        "to_value": -1.5
+        "from_y": 16,
+        "to_y": 150,
+        "from_value": 1.7,
+        "to_value": -1.7
       },
       "argument2": {
         "type": "minecraft:add",
         "argument1": {
           "type": "minecraft:mul",
-          "argument1": 0.8,
+          "argument1": 1.05,
           "argument2": {
             "type": "minecraft:noise",
             "noise": "myfirstmod:strata",
@@ -58,7 +58,7 @@
         },
         "argument2": {
           "type": "minecraft:mul",
-          "argument1": 0.22,
+          "argument1": 0.28,
           "argument2": {
             "type": "minecraft:noise",
             "noise": "myfirstmod:fractures",
@@ -89,16 +89,16 @@
               "type": "minecraft:add",
               "argument1": {
                 "type": "minecraft:y_clamped_gradient",
-                "from_y": 24,
-                "to_y": 128,
-                "from_value": 1.5,
-                "to_value": -1.5
+                "from_y": 16,
+                "to_y": 150,
+                "from_value": 1.7,
+                "to_value": -1.7
               },
               "argument2": {
                 "type": "minecraft:add",
                 "argument1": {
                   "type": "minecraft:mul",
-                  "argument1": 0.8,
+                  "argument1": 1.05,
                   "argument2": {
                     "type": "minecraft:noise",
                     "noise": "myfirstmod:strata",
@@ -108,7 +108,7 @@
                 },
                 "argument2": {
                   "type": "minecraft:mul",
-                  "argument1": 0.22,
+                  "argument1": 0.28,
                   "argument2": {
                     "type": "minecraft:noise",
                     "noise": "myfirstmod:fractures",
@@ -140,16 +140,16 @@
             "type": "minecraft:add",
             "argument1": {
               "type": "minecraft:y_clamped_gradient",
-              "from_y": 24,
-              "to_y": 128,
-              "from_value": 1.5,
-              "to_value": -1.5
+              "from_y": 16,
+              "to_y": 150,
+              "from_value": 1.7,
+              "to_value": -1.7
             },
             "argument2": {
               "type": "minecraft:add",
               "argument1": {
                 "type": "minecraft:mul",
-                "argument1": 0.8,
+                "argument1": 1.05,
                 "argument2": {
                   "type": "minecraft:noise",
                   "noise": "myfirstmod:strata",
@@ -159,7 +159,7 @@
               },
               "argument2": {
                 "type": "minecraft:mul",
-                "argument1": 0.22,
+                "argument1": 0.28,
                 "argument2": {
                   "type": "minecraft:noise",
                   "noise": "myfirstmod:fractures",

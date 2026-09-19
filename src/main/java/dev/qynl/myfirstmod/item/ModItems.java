@@ -52,6 +52,9 @@ public final class ModItems {
     public static final Item VIGOR_RUNE=register("vigor_rune",new Item(new Item.Settings().maxCount(16).fireproof().rarity(Rarity.RARE)));
     public static final Item GALE_RUNE=register("gale_rune",new Item(new Item.Settings().maxCount(16).fireproof().rarity(Rarity.RARE)));
     public static final Item FOCUS_RUNE=register("focus_rune",new Item(new Item.Settings().maxCount(16).fireproof().rarity(Rarity.RARE)));
+    public static final Item ASHEN_FLASK=register("ashen_flask",new AshenFlaskItem(new Item.Settings().maxCount(1).fireproof().rarity(Rarity.RARE)));
+    public static final Item PILGRIM_STEP=register("pilgrim_step",new PilgrimStepItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+    public static final Item MOURNING_EMBER=register("mourning_ember",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
     public static void register() {
         net.fabricmc.fabric.api.registry.FuelRegistry.INSTANCE.add(dev.qynl.myfirstmod.block.ModBlocks.HUSHWOOD,300);
         Registry.register(Registries.ITEM_GROUP,Identifier.of(MyFirstMod.MOD_ID,"null_realm"),

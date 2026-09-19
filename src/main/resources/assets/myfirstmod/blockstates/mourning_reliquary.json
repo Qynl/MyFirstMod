@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "rite=0": {
+      "model": "myfirstmod:block/mourning_reliquary"
+    },
+    "rite=1": {
+      "model": "myfirstmod:block/mourning_reliquary"
+    },
+    "rite=2": {
+      "model": "myfirstmod:block/mourning_reliquary"
+    },
+    "rite=3": {
+      "model": "myfirstmod:block/mourning_reliquary_lit"
+    }
+  }
+}

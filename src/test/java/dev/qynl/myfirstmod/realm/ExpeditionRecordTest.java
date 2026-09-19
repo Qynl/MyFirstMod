@@ -5,6 +5,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExpeditionRecordTest {
+    @Test void pilgrimReservoirPersistsAndOldSavesGetThreeCharges() {
+        var old=ExpeditionRecord.read(new NbtCompound());assertEquals(3,old.flaskCharges);assertEquals(0,old.flaskUpgrades);assertFalse(old.pilgrimKit);
+        old.flaskCharges=2;old.flaskUpgrades=2;old.pilgrimKit=true;old.cathedralsOpened=4;
+        var restored=ExpeditionRecord.read(old.write());assertEquals(2,restored.flaskCharges);assertEquals(2,restored.flaskUpgrades);
+        assertTrue(restored.pilgrimKit);assertEquals(4,restored.cathedralsOpened);
+        var invalid=new NbtCompound();invalid.putInt("FlaskCharges",999);invalid.putInt("FlaskUpgrades",999);
+        assertEquals(5,ExpeditionRecord.read(invalid).flaskCharges);
+    }
+
     @Test void convergenceMailAndTimersSurviveRestart() {
         ExpeditionRecord record=new ExpeditionRecord();
         record.riftsClosed=7;record.pendingRiftCores=3;record.vigorReadyAt=81234;record.galeReadyAt=81555;

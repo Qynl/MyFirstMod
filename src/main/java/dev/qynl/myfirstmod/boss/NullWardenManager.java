@@ -528,6 +528,7 @@ public final class NullWardenManager {
             return;
         }
         a.boss.setInvulnerable(a.activePylons != 0);
+        a.boss.setCounterWindow(a.attack==Attack.NONE && a.activePylons==0 && a.ticks<a.nextAttackTick);
 
         if (a.exposeTicks > 0) {
             a.exposeTicks--;
@@ -1552,8 +1553,8 @@ public final class NullWardenManager {
                 int x = dx * 22 + (dz != 0 ? side : 0);
                 int z = dz * 22 + (dx != 0 ? side : 0);
                 world.setBlockState(new BlockPos(x, 80, z), Blocks.REINFORCED_DEEPSLATE.getDefaultState());
-                for (int y=81;y<=88;y++) world.setBlockState(new BlockPos(x,y,z),
-                        Math.abs(side)==3 || y==88 ? Blocks.POLISHED_BLACKSTONE_BRICKS.getDefaultState() : Blocks.AIR.getDefaultState());
+                for (int y=81;y<=91;y++) world.setBlockState(new BlockPos(x,y,z),
+                        (Math.abs(side)==3 && y<=88) || y==91-Math.abs(side) ? Blocks.POLISHED_BLACKSTONE_BRICKS.getDefaultState() : Blocks.AIR.getDefaultState());
             }
 
         }

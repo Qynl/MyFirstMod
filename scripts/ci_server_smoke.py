@@ -116,6 +116,19 @@ def main():
                 selector='@e[type=minecraft:item,nbt={Item:{id:"myfirstmod:'+drop+'"}}]'
                 connection.command(prefix+'execute if entity '+selector+' run say SMOKE_ORE_OK')
             connection.command(prefix+'loot spawn 8 120 155 loot myfirstmod:chests/waystone_cache')
+            # Full three-level cathedral fixture with actual custom spawner codecs.
+            connection.command(prefix+'fill 1041 60 1041 1055 200 1055 minecraft:air')
+            connection.command(prefix+'fill 1041 80 1041 1055 80 1055 myfirstmod:hushed_moss')
+            connection.command(prefix+'place feature myfirstmod:mourning_cathedral 1048 81 1048')
+            for x,y,z,block in [(1048,65,1048,'mourning_reliquary'),(1048,81,1044,'funerary_seal'),(1048,73,1052,'funerary_seal'),(1052,65,1048,'funerary_seal')]:
+                connection.command(prefix+f'execute if block {x} {y} {z} myfirstmod:{block}[rite=0] run say SMOKE_CATHEDRAL_OK')
+            connection.command(prefix+'execute if block 1048 73 1043 minecraft:spawner run say SMOKE_CRYPT_SPAWNER_OK')
+            connection.command(prefix+'data get block 1048 73 1043 SpawnData.entity.id')
+            connection.command(prefix+'data get block 1048 65 1043 SpawnData.entity.id')
+            connection.command(prefix+'loot spawn 1048 83 1048 loot myfirstmod:chests/pilgrim_cache')
+            connection.command(prefix+'setblock 1048 65 1048 myfirstmod:mourning_reliquary[rite=3]')
+            connection.command(prefix+'summon minecraft:item 1048 84 1048 {Item:{id:"myfirstmod:ashen_flask",count:1}}')
+            connection.command(prefix+'summon minecraft:item 1048 84 1048 {Item:{id:"myfirstmod:pilgrim_step",count:1}}')
             connection.command('save-all flush')
             connection.command('stop')
             code=proc.wait(timeout=120)

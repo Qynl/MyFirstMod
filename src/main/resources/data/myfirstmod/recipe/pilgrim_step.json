@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "myfirstmod:dusk_fiber"
+    },
+    {
+      "item": "myfirstmod:resonite_ingot"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:pilgrim_step",
+    "count": 1
+  }
+}

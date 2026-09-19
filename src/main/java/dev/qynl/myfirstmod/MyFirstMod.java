@@ -21,6 +21,7 @@ public class MyFirstMod implements ModInitializer {
         ModBlocks.register();
         ModItems.register();
         ModEntities.register();
+        dev.qynl.myfirstmod.pilgrimage.CathedralFeature.register();
         dev.qynl.myfirstmod.realm.RealmFeatures.register();
         dev.qynl.myfirstmod.realm.WildsFeatures.register();
         dev.qynl.myfirstmod.rift.RiftObservatoryFeature.register();
@@ -41,6 +42,8 @@ public class MyFirstMod implements ModInitializer {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
             if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;
             if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
+            ActionResult rite=dev.qynl.myfirstmod.pilgrimage.CathedralRite.interact(serverPlayer,hit.getBlockPos());
+            if(rite!=ActionResult.PASS) return rite;
             ActionResult harvest=dev.qynl.myfirstmod.block.HushNurseryBlock.harvest(serverPlayer,hit.getBlockPos());
             if(harvest!=ActionResult.PASS) return harvest;
             ActionResult forge=dev.qynl.myfirstmod.item.RelicAttunements.interact(serverPlayer,hit.getBlockPos());
@@ -62,6 +65,7 @@ public class MyFirstMod implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(VoidPortalManager::tick);
         ServerTickEvents.END_SERVER_TICK.register(NullbladeItem::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.item.ResoniteArmor::tick);
+        ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.item.AshenFlaskItem::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.realm.RealmExpedition::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.realm.RealmTrials::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.rift.RealmRifts::tick);

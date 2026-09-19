@@ -55,11 +55,13 @@ public final class RealmExpedition {
         state.markDirty();
     }
     private static void prepareForge(ServerWorld world,RealmState state) {
-        if(state.contentVersion>=3) return;
+        if(state.contentVersion>=4) return;
         BlockPos pos=new BlockPos(-6,81,160);
         // Upgrade old sanctuaries without overwriting an occupied player block.
         if(world.getBlockState(pos).isAir()) put(world,pos,ModBlocks.ATTUNEMENT_FORGE);
-        state.contentVersion=3;state.markDirty();
+        BlockPos rest=new BlockPos(6,81,160);
+        if(world.getBlockState(rest).isAir()) put(world,rest,ModBlocks.WAYSTONE);
+        state.contentVersion=4;state.markDirty();
     }
     private static void prepareAltar(ServerWorld world,RealmState state) {
         if(state.contentVersion>=2) return;
@@ -109,6 +111,13 @@ public final class RealmExpedition {
                 world.getEntitiesByClass(net.minecraft.entity.mob.HostileEntity.class,
                         new net.minecraft.util.math.Box(ARRIVAL).expand(10),
                         e->!e.getCommandTags().contains("null_trial")).forEach(net.minecraft.entity.Entity::discard);
+            }
+            var progress=RealmState.get(world).expedition(p.getUuid());
+            if(!progress.pilgrimKit && !p.isSpectator()) {
+                progress.pilgrimKit=true;RealmState.get(world).markDirty();
+                p.getInventory().offerOrDrop(new net.minecraft.item.ItemStack(ModItems.ASHEN_FLASK));
+                p.getInventory().offerOrDrop(new net.minecraft.item.ItemStack(ModItems.PILGRIM_STEP));
+                p.sendMessage(net.minecraft.text.Text.translatable("message.myfirstmod.pilgrim_kit"),false);
             }
             if(p.age%100==0) world.spawnParticles(ParticleTypes.END_ROD,p.getX(),p.getY()+3,p.getZ(),3,6,2,6,.01);
         }

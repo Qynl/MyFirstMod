@@ -1,0 +1,32 @@
+{
+  "parent": "myfirstmod:enter_realm",
+  "display": {
+    "icon": {
+      "id": "myfirstmod:mourning_ember"
+    },
+    "title": {
+      "text": "A Light for the Nameless"
+    },
+    "description": {
+      "text": "Complete a cathedral rite and recover a Mourning Ember."
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ember": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:mourning_ember"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

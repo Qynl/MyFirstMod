@@ -9,6 +9,17 @@ import net.minecraft.world.World;
 
 public class NullWardenEntity extends WardenEntity {
     private boolean defeatPending;
+    private static final TrackedData<Boolean> COUNTER_WINDOW=DataTracker.registerData(NullWardenEntity.class,TrackedDataHandlerRegistry.BOOLEAN);
+    public boolean isCounterWindow() {return getDataTracker().get(COUNTER_WINDOW);}
+    public void setCounterWindow(boolean open) {getDataTracker().set(COUNTER_WINDOW,open);}
+    @Override public boolean damage(net.minecraft.entity.damage.DamageSource source,float amount) {
+        boolean counter=isCounterWindow() && getCinematic()==0 && !isInvulnerable()
+                && source.getSource() instanceof net.minecraft.entity.player.PlayerEntity;
+        boolean hit=super.damage(source,counter?amount*1.2f:amount);
+        if(hit && counter && getWorld() instanceof net.minecraft.server.world.ServerWorld world)
+            world.spawnParticles(net.minecraft.particle.ParticleTypes.CRIT,getX(),getY()+2,getZ(),14,.7,.8,.7,.08);
+        return hit;
+    }
     private static final TrackedData<Byte> CINEMATIC =
             DataTracker.registerData(NullWardenEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Byte> PHASE =
@@ -27,6 +38,7 @@ public class NullWardenEntity extends WardenEntity {
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
+        builder.add(COUNTER_WINDOW,false);
         builder.add(CINEMATIC, (byte) 0);
         builder.add(PHASE, (byte) 1);
         builder.add(ATTACK, (byte) 0);

@@ -57,5 +57,9 @@ public final class ModBlocks {
             new Block(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->12)));
     public static final Block ATTUNEMENT_FORGE=building("attunement_forge",new Block(AbstractBlock.Settings.copy(Blocks.SMITHING_TABLE).strength(4).luminance(s->7)));
     public static final Block HUSH_NURSERY=building("hush_nursery",new HushNurseryBlock(AbstractBlock.Settings.copy(Blocks.WHEAT).ticksRandomly().luminance(s->2)));
+    public static final Block FUNERARY_SEAL=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"funerary_seal"),
+            new FunerarySealBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->s.get(FunerarySealBlock.RITE)==3?12:2)));
+    public static final Block MOURNING_RELIQUARY=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"mourning_reliquary"),
+            new FunerarySealBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->s.get(FunerarySealBlock.RITE)==3?14:3)));
     public static void register() {}
 }

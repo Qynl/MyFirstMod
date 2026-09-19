@@ -8,6 +8,8 @@ import java.util.Set;
 
 /** Per-player expedition progress. Bounded discovery storage keeps saves small. */
 public final class ExpeditionRecord {
+    public int flaskCharges=3,flaskUpgrades,cathedralsOpened;
+    public boolean pilgrimKit;
     public int trials, highestTier, victories, pendingNormal, pendingEcho;
     public int riftsClosed,pendingRiftCores;
     public long vigorReadyAt,galeReadyAt;
@@ -21,6 +23,10 @@ public final class ExpeditionRecord {
     }
     public static ExpeditionRecord read(NbtCompound nbt) {
         ExpeditionRecord record = new ExpeditionRecord();
+        record.pilgrimKit=nbt.getBoolean("PilgrimKit");
+        record.flaskUpgrades=Math.max(0,Math.min(2,nbt.getInt("FlaskUpgrades")));
+        record.flaskCharges=dev.qynl.myfirstmod.pilgrimage.PilgrimageRules.charges(nbt.contains("FlaskCharges")?nbt.getInt("FlaskCharges"):3,record.flaskUpgrades);
+        record.cathedralsOpened=Math.max(0,nbt.getInt("CathedralsOpened"));
         record.hasWaystone=nbt.getBoolean("HasWaystone");
         record.boundWaystone=nbt.getLong("BoundWaystone");
         record.riftsClosed=Math.max(0,nbt.getInt("RiftsClosed"));
@@ -39,6 +45,8 @@ public final class ExpeditionRecord {
     }
     public NbtCompound write() {
         NbtCompound nbt = new NbtCompound();
+        nbt.putBoolean("PilgrimKit",pilgrimKit);nbt.putInt("FlaskCharges",flaskCharges);nbt.putInt("FlaskUpgrades",flaskUpgrades);
+        nbt.putInt("CathedralsOpened",cathedralsOpened);
         nbt.putInt("RiftsClosed",riftsClosed);nbt.putInt("PendingRiftCores",pendingRiftCores);
         nbt.putLong("VigorReadyAt",vigorReadyAt);nbt.putLong("GaleReadyAt",galeReadyAt);
         nbt.putBoolean("HasWaystone",hasWaystone);nbt.putLong("BoundWaystone",boundWaystone);

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "rite=0": {
+      "model": "myfirstmod:block/funerary_seal"
+    },
+    "rite=1": {
+      "model": "myfirstmod:block/funerary_seal"
+    },
+    "rite=2": {
+      "model": "myfirstmod:block/funerary_seal"
+    },
+    "rite=3": {
+      "model": "myfirstmod:block/funerary_seal_lit"
+    }
+  }
+}

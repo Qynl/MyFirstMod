@@ -143,16 +143,31 @@ public final class RealmFeatures {
                 }
                 return true;
             }
-            for (int y=0;y<height;y++) {
-                place(world,p.up(y),crystal ? Blocks.AMETHYST_BLOCK : grove ? ModBlocks.HUSHWOOD : ModBlocks.CINDERSTONE);
-                if (y < height/2) for (int d : new int[]{-1,1})
-                    place(world,p.add(d,y,0),crystal ? ModBlocks.PRISMSTONE : grove ? ModBlocks.HUSHWOOD : ModBlocks.CINDERSTONE);
+            if(grove) {
+                height+=4;
+                // Leaning trunk, roots, reaching limbs, and a layered, broken canopy.
+                for(int y=0;y<height;y++) {
+                    int bend=y>height/2?1:0;
+                    place(world,p.add(bend,y,0),ModBlocks.HUSHWOOD);
+                    if(y<2) for(int d:new int[]{-1,1}) place(world,p.add(d,y,0),ModBlocks.HUSHWOOD);
+                }
+                for(int side:new int[]{-1,1}) for(int length=1;length<=3;length++)
+                    place(world,p.add(side*length,height-4+length/2,side),ModBlocks.HUSHWOOD);
+                for(int dy=-2;dy<=1;dy++) for(int dx=-3;dx<=3;dx++) for(int dz=-3;dz<=3;dz++) {
+                    if(Math.abs(dx)+Math.abs(dz)>5-Math.abs(dy) || context.getRandom().nextInt(8)==0) continue;
+                    if(world.getBlockState(p.add(dx,height+dy,dz)).isAir()) place(world,p.add(dx,height+dy,dz),ModBlocks.HUSH_LEAVES);
+                }
+                place(world,p.add(-2,height-3,1),Blocks.SOUL_LANTERN);
+            } else {
+                // Unequal clustered spears replace single, rectangular decoration poles.
+                for(int[] spire:new int[][]{{0,0,height+3},{-2,1,height},{2,-1,height-2}}) {
+                    for(int y=0;y<spire[2];y++) {
+                        place(world,p.add(spire[0],y,spire[1]),crystal?Blocks.AMETHYST_BLOCK:Blocks.BASALT);
+                        if(y<spire[2]/3) place(world,p.add(spire[0],y,spire[1]+1),crystal?ModBlocks.PRISMSTONE:ModBlocks.CINDERSTONE);
+                    }
+                    place(world,p.add(spire[0],spire[2],spire[1]),crystal?Blocks.SMALL_AMETHYST_BUD:Blocks.SOUL_LANTERN);
+                }
             }
-            if (grove) {
-                for (int x=-3;x<=3;x++) for (int z=-3;z<=3;z++) if (Math.abs(x)+Math.abs(z)<=4)
-                    place(world,p.add(x,height-1,z), ModBlocks.HUSH_LEAVES);
-                place(world,p.up(height),ModBlocks.PRISM_LAMP);
-            } else place(world,p.up(height),Blocks.SEA_LANTERN);
             return true;
         }
     }
