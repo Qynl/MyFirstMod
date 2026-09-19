@@ -1285,6 +1285,44 @@ public final class NullWardenManager {
             world.setBlockState(base.up(9), Blocks.SCULK_CATALYST.getDefaultState());
         }
 
+        // Suspended Null fragments make the upper arena read as a broken
+        // chamber rather than an ordinary open cylinder. They are intentionally
+        // sparse so the boss remains the visual focal point.
+        int[][] fragments = {
+                {10, 93, 0, 2}, {-11, 96, 3, 1},
+                {0, 94, 12, 3}, {4, 91, -14, 2},
+                {-14, 89, -5, 1}, {15, 92, 6, 2}
+        };
+        for (int[] f : fragments) {
+            BlockPos base = new BlockPos(f[0], f[1], f[2]);
+            int size = f[3];
+            for (int dx = -size; dx <= size; dx++) {
+                for (int dz = -size; dz <= size; dz++) {
+                    if (Math.abs(dx) + Math.abs(dz) > size + 1) continue;
+                    Block block = ((dx + dz) & 1) == 0
+                            ? Blocks.REINFORCED_DEEPSLATE
+                            : Blocks.CRYING_OBSIDIAN;
+                    world.setBlockState(base.add(dx, 0, dz), block.getDefaultState());
+                }
+            }
+            world.setBlockState(base.up(), Blocks.SCULK.getDefaultState());
+        }
+
+        // Four diagonal floor scars point toward the central dais. These become
+        // visual navigation landmarks when the arena starts filling with hazards.
+        for (int diagonal = 0; diagonal < 4; diagonal++) {
+            int sx = diagonal == 0 || diagonal == 3 ? 1 : -1;
+            int sz = diagonal == 0 || diagonal == 1 ? 1 : -1;
+            for (int d = 8; d <= 18; d++) {
+                int x = Math.round(sx * d * .72f);
+                int z = Math.round(sz * d * .72f);
+                world.setBlockState(new BlockPos(x, 80, z),
+                        d % 3 == 0
+                                ? Blocks.CRYING_OBSIDIAN.getDefaultState()
+                                : Blocks.REINFORCED_DEEPSLATE.getDefaultState());
+            }
+        }
+
         // Cardinal arches frame the boss without closing the sky.
         for (int[] dir : new int[][]{{1,0},{-1,0},{0,1},{0,-1}}) {
             int dx = dir[0], dz = dir[1];
