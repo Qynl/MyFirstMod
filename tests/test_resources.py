@@ -32,6 +32,11 @@ class ResourceTests(unittest.TestCase):
         self.assertEqual(len(noise['noise_router']),15)
         kind=load(DATA/'dimension_type/null_realm.json')
         self.assertTrue(kind['infiniburn'].startswith('#'))
+        self.assertIn('has_ceiling',kind)
+        light=kind['monster_spawn_light_level']
+        self.assertIn('min_inclusive',light)
+        self.assertIn('max_inclusive',light)
+        self.assertNotIn('value',light)
 
     def test_biome_features_resolve(self):
         for path in (DATA/'worldgen/biome').glob('*.json'):
@@ -89,6 +94,33 @@ class ResourceTests(unittest.TestCase):
         self.assertEqual(load(DATA/'loot_table/entities/null_warden.json')['pools'],[])
         for entity in ['rift_sentinel','shardstalker']:
             self.assertTrue((DATA/f'loot_table/entities/{entity}.json').exists())
+
+    def test_endgame_recipes_and_journal_components(self):
+        journal=load(DATA/'recipe/expedition_journal.json')['result']
+        self.assertEqual(journal['id'],'minecraft:written_book')
+        self.assertTrue(journal['components']['minecraft:custom_data']['NullJournal'])
+        self.assertIn('minecraft:written_book_content',journal['components'])
+        aegis=load(DATA/'recipe/rift_aegis.json')
+        self.assertEqual({entry['item'] for entry in aegis['ingredients']},
+                         {'minecraft:shield','myfirstmod:warden_crest','myfirstmod:resonance_matrix'})
+        self.assertEqual(aegis['result']['id'],'myfirstmod:rift_aegis')
+        self.assertTrue((DATA/'loot_table/chests/vault_cache.json').exists())
+
+    def test_advancement_and_recipe_links(self):
+        for path in (DATA/'advancement').rglob('*.json'):
+            advancement=load(path)
+            parent=advancement.get('parent','')
+            if parent.startswith('myfirstmod:'):
+                self.assertTrue((DATA/('advancement/'+parent.split(':')[1]+'.json')).exists())
+            for recipe in advancement.get('rewards',{}).get('recipes',[]):
+                self.assertTrue((DATA/('recipe/'+recipe.split(':')[1]+'.json')).exists())
+
+    def test_dynamic_hud_translation_parameters(self):
+        language=load(ASSETS/'lang/en_us.json')
+        for key in ['hud.myfirstmod.trial_active','hud.myfirstmod.trial_rest','journal.myfirstmod.progress']:
+            self.assertEqual(language[key].count('%s'),5,key)
+        for oath in range(4):self.assertIn('oath.myfirstmod.'+str(oath),language)
+        for route in range(3):self.assertIn('route.myfirstmod.'+str(route),language)
 
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))

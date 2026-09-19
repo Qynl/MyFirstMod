@@ -8,7 +8,7 @@ import java.util.Set;
 
 /** Per-player expedition progress. Bounded discovery storage keeps saves small. */
 public final class ExpeditionRecord {
-    public int trials, highestTier, victories;
+    public int trials, highestTier, victories, pendingNormal, pendingEcho;
     public final Set<String> biomes = new LinkedHashSet<>();
     public final Set<Long> courts = new LinkedHashSet<>();
     public void discoverCourt(long pos) {
@@ -20,6 +20,8 @@ public final class ExpeditionRecord {
         record.trials = Math.max(0, nbt.getInt("Trials"));
         record.highestTier = Math.max(0, Math.min(5, nbt.getInt("Tier")));
         record.victories = Math.max(0, nbt.getInt("Victories"));
+        record.pendingNormal = Math.max(0,Math.min(64,nbt.getInt("PendingNormal")));
+        record.pendingEcho = Math.max(0,Math.min(64,nbt.getInt("PendingEcho")));
         NbtList biomes = nbt.getList("Biomes", 8);
         for (int i=0; i<Math.min(3, biomes.size()); i++) record.biomes.add(biomes.getString(i));
         long[] courts = nbt.getLongArray("Courts");
@@ -28,6 +30,7 @@ public final class ExpeditionRecord {
     }
     public NbtCompound write() {
         NbtCompound nbt = new NbtCompound();
+        nbt.putInt("PendingNormal",pendingNormal);nbt.putInt("PendingEcho",pendingEcho);
         nbt.putInt("Trials", trials); nbt.putInt("Tier", highestTier); nbt.putInt("Victories", victories);
         NbtList list = new NbtList();
         biomes.forEach(b -> list.add(NbtString.of(b)));

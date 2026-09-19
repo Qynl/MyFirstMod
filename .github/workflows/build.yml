@@ -53,9 +53,14 @@ jobs:
           for filename in ['ci-build.log', 'build/ci/server-smoke.log']:
               p = Path(filename)
               if p.exists():
-                  text = '\n'.join(p.read_text().splitlines()[-120:])
-                  escaped = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-                  print(f'::error title={filename}::{escaped}')
+                  text = p.read_text()
+                  if filename == 'ci-build.log' and 'BUILD SUCCESSFUL' in text:
+                      continue
+                  text = text[-18000:]
+                  for offset in range(0, len(text), 3000):
+                      chunk = text[offset:offset+3000]
+                      escaped = chunk.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+                      print(f'::error title={filename} part {offset//3000+1}::{escaped}')
           PYCODE
 
       - name: Upload JAR

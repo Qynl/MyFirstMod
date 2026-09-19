@@ -22,7 +22,7 @@ public final class NullWardenState extends PersistentState {
     public final Set<UUID> echoes = new HashSet<>();
     public final Map<UUID, ReturnPointData> returnPoints = new HashMap<>();
     public boolean defeated;
-    public boolean everDefeated, rematch;
+    public boolean everDefeated, rematch, rewardsQueued;
     public int challengeTier;
     public boolean rewarded;
     public boolean returnPortalBuilt;
@@ -52,6 +52,7 @@ public final class NullWardenState extends PersistentState {
         state.defeated = nbt.getBoolean("Defeated");
         state.everDefeated = nbt.getBoolean("EverDefeated") || state.defeated;
         state.rematch = nbt.getBoolean("Rematch");
+        state.rewardsQueued = nbt.getBoolean("RewardsQueued");
         state.challengeTier = Math.max(0,Math.min(3,nbt.getInt("ChallengeTier")));
         state.rewarded = nbt.getBoolean("Rewarded");
         state.returnPortalBuilt = nbt.getBoolean("ReturnPortalBuilt");
@@ -113,6 +114,7 @@ public final class NullWardenState extends PersistentState {
         nbt.putBoolean("Defeated", defeated);
         nbt.putBoolean("EverDefeated", everDefeated);
         nbt.putBoolean("Rematch", rematch);
+        nbt.putBoolean("RewardsQueued",rewardsQueued);
         nbt.putInt("ChallengeTier", challengeTier);
         nbt.putBoolean("Rewarded", rewarded);
         nbt.putBoolean("ReturnPortalBuilt", returnPortalBuilt);

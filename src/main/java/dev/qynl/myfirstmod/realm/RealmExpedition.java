@@ -82,6 +82,7 @@ public final class RealmExpedition {
         if(world==null || world.getTime()%20!=0) return;
         for(ServerPlayerEntity p:world.getPlayers()) {
             if(p.isSpectator() || !p.isAlive()) continue;
+            ExpeditionRewards.claim(p);
             if(p.age % 100 == 0) {
                 var state=RealmState.get(world);
                 world.getBiome(p.getBlockPos()).getKey().ifPresent(key -> {

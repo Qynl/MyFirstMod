@@ -26,7 +26,7 @@ for name,temp,fog,sky,particle in [('hushed_grove',[-1,-.2],0x102F38,0x132535,'s
     put('worldgen/biome/'+name+'.json',{'has_precipitation':False,'temperature':.4,'downfall':0,'effects':{'fog_color':fog,'sky_color':sky,'water_color':0x31667F,'water_fog_color':0x122333,'particle':{'options':{'type':'minecraft:'+particle},'probability':.004},'mood_sound':{'sound':'minecraft:ambient.cave','tick_delay':8000,'block_search_extent':8,'offset':2}},'spawners':{'monster':[{'type':'myfirstmod:rift_sentinel','weight':25,'minCount':1,'maxCount':2},{'type':'myfirstmod:shardstalker','weight':35,'minCount':1,'maxCount':2}]},'spawn_costs':{},'carvers':{},'features':[[],[],[],[],['myfirstmod:realm_ruins'],[],[],[],[],['myfirstmod:realm_flora'],[]]})
 put('dimension/null_realm.json',{'type':'myfirstmod:null_realm','generator':{'type':'minecraft:noise','settings':'myfirstmod:null_realm','biome_source':{'type':'minecraft:multi_noise','biomes':biomes}}})
 p=ROOT/'dimension_type/null_realm.json'
-d=json.loads(p.read_text());d.update(ambient_light=.16,effects='minecraft:overworld',fixed_time=18000,infiniburn='#minecraft:infiniburn_overworld')
+d=json.loads(p.read_text());d.update(ambient_light=.16,effects='minecraft:overworld',fixed_time=18000,has_ceiling=False,infiniburn='#minecraft:infiniburn_overworld',monster_spawn_light_level={'type':'minecraft:uniform','min_inclusive':0,'max_inclusive':7})
 p.write_text(json.dumps(d,indent=2)+'\n')
 for name,chance in [('realm_ruins',12),('realm_flora',1)]:
     put('worldgen/configured_feature/'+name+'.json',{'type':'myfirstmod:'+name,'config':{}})

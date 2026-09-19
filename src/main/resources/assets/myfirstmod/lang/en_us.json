@@ -87,5 +87,7 @@
   "journal.myfirstmod.warden": "THE NULL WARDEN\n\nAttacks commit to marked locations. Dodge the marks, then strike in recovery.\n\nSneak near a glowing pylon to cleanse it. Its inner pocket grounds pylon pulses, NOT boss attacks.",
   "journal.myfirstmod.equipment": "RELICS\n\nHold then release the Nullblade to rend. Sneak-use to step safely forward.\n\nUse the Heart for healing and slow falling.\n\nSmith your blade with a Matrix and echo shard to awaken it.",
   "journal.myfirstmod.endgame": "THE ECHO RITUAL\n\nOffer an Echo Sigil at 8, 81, 30 after victory. Tier 2+ courts and vaults grant sigils.\n\nRematches award crests. Craft a crest, shield, and Matrix into the projectile-deflecting Rift Aegis.",
-  "journal.myfirstmod.courts": "KNOWN COURTS\n\n%s"
+  "journal.myfirstmod.courts": "KNOWN COURTS\n\n%s",
+  "message.myfirstmod.reward_mail": "EXPEDITION REWARDS // %s victories claimed: %s shards, %s Warden Crests, and experience.",
+  "message.myfirstmod.first_relics": "First victory: the Nullblade and Heart of the Null are yours."
 }

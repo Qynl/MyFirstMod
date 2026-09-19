@@ -121,6 +121,12 @@ public final class NullWardenManager {
         a.echoes.addAll(data.echoes);
         a.defeated = data.defeated;
         a.rematch = data.rematch;
+        a.rewardsQueued = data.rewardsQueued;
+        if(a.defeated && !a.rewardsQueued) {
+            Set<UUID> pending=new HashSet<>(a.eligiblePlayers);pending.removeAll(a.rewardedPlayers);
+            dev.qynl.myfirstmod.realm.ExpeditionRewards.enqueue(world,pending,a.rematch);
+            a.rewardsQueued=true;data.rewardsQueued=true;data.dirty();
+        }
         a.challengeTier = data.challengeTier;
         a.phase = Math.max(1, data.phase);
         a.activePylons = data.activePylons;
@@ -191,6 +197,7 @@ public final class NullWardenManager {
         data.echoes.addAll(a.echoes);
         data.defeated = a.defeated;
         data.rematch = a.rematch;
+        data.rewardsQueued = a.rewardsQueued;
         data.challengeTier = a.challengeTier;
         data.rewarded = a.rewardedPlayers.containsAll(a.eligiblePlayers);
         data.returnPortalBuilt = a.returnPortalBuilt;
@@ -209,6 +216,7 @@ public final class NullWardenManager {
         data.rewardedPlayers.clear();
         data.echoes.clear();
         data.defeated = false;
+        data.rewardsQueued = false;
         data.rewarded = false;
         data.returnPortalBuilt = false;
         data.phase = 1;
@@ -298,6 +306,7 @@ public final class NullWardenManager {
         a.targetRotation = 0;
         a.recoveryTicks = 0;
         a.defeated = false;
+        a.rewardsQueued = false;
         a.rewardedPlayers.clear();
         a.eligiblePlayers.clear();
         a.returnPortalBuilt = false;
@@ -1297,6 +1306,8 @@ public final class NullWardenManager {
         if (a.defeated) return;
         a.defeated = true;
         saved(world).everDefeated = true;
+        dev.qynl.myfirstmod.realm.ExpeditionRewards.enqueue(world,a.eligiblePlayers,a.rematch);
+        a.rewardsQueued = true;
         var expeditionState=dev.qynl.myfirstmod.realm.RealmState.get(world);
         expeditionState.bossClears++;
         expeditionState.rematchReadyAt=world.getTime()+3600;
@@ -1345,18 +1356,7 @@ public final class NullWardenManager {
     private static void rewardIfEligible(ServerPlayerEntity p, ArenaState a) {
         if (!a.eligiblePlayers.contains(p.getUuid())) return;
         if (!a.rewardedPlayers.add(p.getUuid())) return;
-        var state=dev.qynl.myfirstmod.realm.RealmState.get(p.getServerWorld());
-        var record=state.expedition(p.getUuid());
-        if(record.victories==0) {
-            p.getInventory().offerOrDrop(new ItemStack(ModItems.NULLBLADE));
-            p.getInventory().offerOrDrop(new ItemStack(ModItems.NULL_RELIC));
-        }
-        record.victories++;state.markDirty();
-        p.getInventory().offerOrDrop(new ItemStack(ModItems.RESONANT_SHARD,a.rematch?8:4));
-        if(a.rematch) p.getInventory().offerOrDrop(new ItemStack(ModItems.WARDEN_CREST));
-        p.addExperience(a.rematch?350:500);
-        p.sendMessage(Text.translatable(a.rematch?"message.myfirstmod.rematch_rewards":"message.myfirstmod.victory_rewards"),false);
-        p.sendMessage(Text.translatable("message.myfirstmod.after_victory"),false);
+        dev.qynl.myfirstmod.realm.ExpeditionRewards.claim(p);
     }
 
     private static void reset(ServerWorld world, ArenaState a) {
@@ -1780,7 +1780,7 @@ public final class NullWardenManager {
         double attackX, attackY, attackZ;
         UUID attackTarget;
         Attack attack = Attack.NONE;
-        boolean defeated, returnPortalBuilt, rematch;
+        boolean defeated, returnPortalBuilt, rematch, rewardsQueued;
         int challengeTier;
     }
 }
