@@ -74,6 +74,32 @@ public final class NullWardenTexture {
             paintLine(image, x0, y0, x0 + 3, y0 + 2, 63, 18, 82);
         }
 
+        // Signature fractured armor seams. They are deliberately angular and
+        // asymmetrical so the silhouette reads as damaged Null-forged armor.
+        int[][] fractures = {
+                {16, 12, 25, 18}, {33, 9, 38, 20}, {46, 24, 54, 17},
+                {64, 8, 72, 14}, {78, 20, 86, 13}, {91, 31, 103, 25},
+                {7, 43, 18, 37}, {23, 52, 31, 61}, {42, 45, 51, 39},
+                {58, 54, 67, 64}, {73, 47, 82, 55}, {96, 60, 111, 51},
+                {12, 74, 24, 68}, {36, 72, 45, 81}, {66, 76, 77, 70},
+                {84, 80, 94, 88}, {105, 72, 118, 78}
+        };
+        for (int i = 0; i < fractures.length; i++) {
+            int[] f = fractures[i];
+            paintLine(image, f[0], f[1], f[2], f[3], 36, 11, 48);
+            if ((i & 1) == 0) {
+                paintLine(image, f[2], f[3], f[2] + 2, f[3] + 4, 24, 76, 83);
+            }
+        }
+
+        // Small cyan stress points make the core energy appear to leak through
+        // seams instead of looking like a flat emissive decal.
+        for (int i = 0; i < 12; i++) {
+            int x = 8 + (i * 31) % 112;
+            int y = 8 + (i * 17) % 80;
+            fillRect(image, x, y, 1 + (i % 2), 1, 28, 28, 190, 202);
+        }
+
         // Cyan core glyph in the UV region used by the chest core.
         paintGlowGlyph(image, 0, 60, 28, 10, 33, 236, 255);
 
