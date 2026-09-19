@@ -16,6 +16,7 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
     private final ModelPart torso;
     private final ModelPart neck;
     private final ModelPart head;
+    private final ModelPart eyeSlit;
     private final ModelPart core;
     private final ModelPart leftArm;
     private final ModelPart rightArm;
@@ -46,6 +47,7 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         this.torso = root.getChild("torso");
         this.neck = torso.getChild("neck");
         this.head = torso.getChild("head");
+        this.eyeSlit = head.getChild("eye_slit");
         this.core = torso.getChild("core");
         this.leftArm = torso.getChild("left_arm");
         this.rightArm = torso.getChild("right_arm");
@@ -203,6 +205,11 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
                         .uv(58, 49).cuboid(-5, -15, -1, 2, 4, 2),
                 ModelTransform.pivot(-4, -2, 0));
 
+        h.addChild("eye_slit", ModelPartBuilder.create()
+                        .uv(0, 104).cuboid(-4, -2, -5.25f, 8, 2, 1)
+                        .uv(10, 104).cuboid(-2, -1, -5.35f, 4, 1, 1),
+                ModelTransform.pivot(0, 0, 0));
+
         h.addChild("jaw", ModelPartBuilder.create()
                         .uv(76, 0).cuboid(-4, 1, -5, 8, 4, 10)
                         .uv(76, 42).cuboid(-3, 4, -4, 6, 2, 8),
@@ -276,6 +283,8 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
         ribLeft.pitch = -pulse * 0.025f;
         ribRight.pitch = pulse * 0.025f;
         jaw.pitch = MathHelper.sin(animationProgress * 0.095f) * 0.022f;
+        eyeSlit.yaw = fastPulse * 0.012f;
+        eyeSlit.pitch = pulse * 0.008f;
 
         crown.roll = MathHelper.sin(animationProgress * 0.047f) * 0.035f;
         crown.pitch = fastPulse * 0.018f;
@@ -290,6 +299,8 @@ public class NullWardenModel extends SinglePartEntityModel<NullWardenEntity> {
 
         core.pitch = pulse * (0.055f + phase * 0.012f);
         core.yaw = fastPulse * 0.035f;
+        core.pivotZ = -1.0f - Math.max(0.0f, pulse) * 0.16f;
+        eyeSlit.pivotZ = -0.02f - Math.max(0.0f, fastPulse) * 0.03f;
 
         if (entity.hurtTime > 0) {
             float hit = MathHelper.sin(entity.hurtTime * 0.65f) * 0.08f;
