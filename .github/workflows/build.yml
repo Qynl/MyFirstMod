@@ -40,9 +40,9 @@ jobs:
           from pathlib import Path
           p = Path('ci-build.log')
           if p.exists():
-              for line in p.read_text().splitlines()[-100:]:
-                  escaped = line.replace('%', '%25').replace('\r', '%0D')
-                  print(f'::error title=Build diagnostics::{escaped}')
+              text = '\n'.join(p.read_text().splitlines()[-120:])
+              escaped = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::error title=Build diagnostics::{escaped}')
           PYCODE
 
       - name: Upload JAR

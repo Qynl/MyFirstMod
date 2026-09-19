@@ -31,7 +31,7 @@ public final class ModEntities {
 
     public static void register() {
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
-                NULL_WARDEN, net.minecraft.entity.mob.WardenEntity.createWardenAttributes());
+                NULL_WARDEN, net.minecraft.entity.mob.WardenEntity.addAttributes());
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
                 RIFT_SENTINEL, dev.qynl.myfirstmod.mob.RiftSentinelEntity.attributes());
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(
