@@ -40,11 +40,13 @@ class Rcon:
         body=self.read(size)
         ident,kind=struct.unpack('<ii',body[:8])
         return ident,kind,body[8:-2].decode(errors='replace')
-    def command(self,text):
+    def command(self,text,allow_failure=False):
         self.send(2,text)
         _,_,response=self.receive()
         print('>',text,'\n',response,flush=True)
-        if re.search(r'unknown or incomplete|incorrect argument|failed|not found|does not exist',response,re.I):
+        with (LOG.parent/'server-commands.log').open('a') as commands:
+            commands.write('> '+text+'\n'+response+'\n')
+        if not allow_failure and re.search(r'unknown or incomplete|incorrect argument|failed|not found|does not exist|not loaded',response,re.I):
             raise RuntimeError('Smoke command failed: '+response)
         return response
 
@@ -82,7 +84,16 @@ def main():
             connection.command(prefix+'summon myfirstmod:rift_sentinel 8 120 152')
             connection.command(prefix+'summon myfirstmod:shardstalker 10 120 154')
             # Deterministic shrine fixture, independent of random trees or steep terrain.
-            connection.command(prefix+'forceload add 1040 1040')
+            connection.command(prefix+'forceload add 1024 1024 1056 1056')
+            # Tickets load asynchronously. /place feature also needs the surrounding chunks.
+            chunk_deadline=time.monotonic()+60
+            while True:
+                ready=all('passed' in connection.command(
+                    prefix+f'if loaded {x} 80 {z}',allow_failure=True).lower()
+                    for x in [1032,1048,1064] for z in [1032,1048,1064])
+                if ready:break
+                if time.monotonic()>chunk_deadline:raise TimeoutError('Shrine fixture chunks did not load')
+                time.sleep(1)
             connection.command(prefix+'fill 1042 60 1042 1054 200 1054 minecraft:air')
             connection.command(prefix+'fill 1042 80 1042 1054 80 1054 myfirstmod:hushed_moss')
             connection.command(prefix+'place feature myfirstmod:waystone_shrine 1048 81 1048')
@@ -111,4 +122,9 @@ def main():
                 try:proc.wait(timeout=20)
                 except subprocess.TimeoutExpired:os.killpg(proc.pid,9);proc.wait()
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    try:main()
+    except Exception as error:
+        message=str(error).replace('%','%25').replace('\n','%0A').replace('\r','%0D')
+        print('::error title=Server smoke failure::'+message,flush=True)
+        raise

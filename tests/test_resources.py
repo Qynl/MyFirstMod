@@ -122,6 +122,55 @@ class ResourceTests(unittest.TestCase):
         for oath in range(4):self.assertIn('oath.myfirstmod.'+str(oath),language)
         for route in range(3):self.assertIn('route.myfirstmod.'+str(route),language)
 
+    def test_wilds_blocks_are_complete(self):
+        source=(ROOT/'src/main/java/dev/qynl/myfirstmod/block/ModBlocks.java').read_text()
+        names=set(re.findall(r'(?:stone|building)\("([a-z_]+)"',source))
+        self.assertEqual(len(names),15)
+        language=load(ASSETS/'lang/en_us.json')
+        for name in names:
+            self.assertTrue((ASSETS/f'blockstates/{name}.json').exists(),name)
+            self.assertTrue((ASSETS/f'models/block/{name}.json').exists(),name)
+            self.assertTrue((ASSETS/f'models/item/{name}.json').exists(),name)
+            self.assertTrue((DATA/f'loot_table/blocks/{name}.json').exists(),name)
+            self.assertIn('block.myfirstmod.'+name,language)
+
+    def test_ore_harvesting_contracts(self):
+        mineable=load(RES/'data/minecraft/tags/block/mineable/pickaxe.json')['values']
+        iron=load(RES/'data/minecraft/tags/block/needs_iron_tool.json')['values']
+        for ore,material in [('resonite_ore','raw_resonite'),('prism_ore','prism_dust'),('cinder_ore','cinder_pearl')]:
+            self.assertIn('myfirstmod:'+ore,mineable)
+            self.assertIn('myfirstmod:'+ore,iron)
+            table=load(DATA/f'loot_table/blocks/{ore}.json')
+            children=table['pools'][0]['entries'][0]['children']
+            self.assertEqual(children[0]['name'],'myfirstmod:'+ore)
+            self.assertIn('minecraft:silk_touch',json.dumps(children[0]))
+            self.assertEqual(children[1]['name'],'myfirstmod:'+material)
+            self.assertIn('minecraft:fortune',json.dumps(children[1]))
+
+    def test_all_custom_recipe_items_exist(self):
+        source=(ROOT/'src/main/java/dev/qynl/myfirstmod/item/ModItems.java').read_text()
+        blocks=(ROOT/'src/main/java/dev/qynl/myfirstmod/block/ModBlocks.java').read_text()
+        known=set(re.findall(r'register\("([a-z_]+)"',source)) | set(re.findall(r'(?:stone|building)\("([a-z_]+)"',blocks))
+        def check(value):
+            if isinstance(value,dict):
+                for key,entry in value.items():
+                    if key in ['id','item'] and isinstance(entry,str) and entry.startswith('myfirstmod:'):
+                        self.assertIn(entry.split(':')[1],known)
+                    check(entry)
+            elif isinstance(value,list):
+                for entry in value:check(entry)
+        for recipe in (DATA/'recipe').glob('*.json'):check(load(recipe))
+
+    def test_caves_and_armor_assets(self):
+        noise=load(DATA/'worldgen/noise_settings/null_realm.json')
+        self.assertEqual(noise['default_block']['Name'],'myfirstmod:nullstone')
+        cave=noise['noise_router']['final_density']['argument']['argument']
+        self.assertEqual(cave['type'],'minecraft:range_choice')
+        self.assertGreater(cave['min_inclusive'],-59)
+        for layer in [1,2]:
+            self.assertTrue((ASSETS/f'textures/models/armor/resonite_layer_{layer}.png').exists())
+        self.assertTrue((DATA/'worldgen/configured_feature/waystone_shrine.json').exists())
+
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))
         before={str(p.relative_to(RES)):p.read_bytes() for p in paths if p.is_file()}

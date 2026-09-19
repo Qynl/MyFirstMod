@@ -5,6 +5,23 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ExpeditionRecordTest {
+    @Test void boundWaystoneSurvivesRestartAtNegativeCoordinates() {
+        ExpeditionRecord record=new ExpeditionRecord();
+        record.hasWaystone=true;
+        record.boundWaystone=new net.minecraft.util.math.BlockPos(-312,78,680).asLong();
+        record.biomes.add("myfirstmod:luminous_fen");
+        record.biomes.add("myfirstmod:hushed_grove");
+        record.biomes.add("myfirstmod:prism_wastes");
+        record.biomes.add("myfirstmod:cinder_steps");
+        ExpeditionRecord restored=ExpeditionRecord.read(record.write());
+        assertTrue(restored.hasWaystone);assertEquals(record.boundWaystone,restored.boundWaystone);
+        assertEquals(4,restored.biomes.size());
+    }
+    @Test void legacyJournalDefaultsToSanctuaryRecall() {
+        ExpeditionRecord restored=ExpeditionRecord.read(new NbtCompound());
+        assertFalse(restored.hasWaystone);
+    }
+
     @Test void progressAndRewardMailboxRoundTrip() {
         ExpeditionRecord record=new ExpeditionRecord();
         record.trials=17;record.highestTier=4;record.victories=3;

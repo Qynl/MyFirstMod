@@ -50,7 +50,7 @@ jobs:
         run: |
           python3 - <<'PYCODE'
           from pathlib import Path
-          for filename in ['ci-build.log', 'build/ci/server-smoke.log']:
+          for filename in ['ci-build.log', 'build/ci/server-smoke.log', 'build/ci/server-commands.log']:
               p = Path(filename)
               if p.exists():
                   text = p.read_text()
@@ -80,5 +80,6 @@ jobs:
           path: |
             ci-build.log
             build/ci/server-smoke.log
+            build/ci/server-commands.log
             build/reports/tests/
           retention-days: 14
