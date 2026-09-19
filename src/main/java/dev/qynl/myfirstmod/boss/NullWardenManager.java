@@ -19,6 +19,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public final class NullWardenManager {
         arena.boss.refreshPositionAndAngles(0.5, 81, 0.5, 180, 0);
         arena.boss.setCustomName(Text.literal("THE NULL WARDEN"));
         arena.boss.setCustomNameVisible(false);
-        arena.boss.setAi(false);
+        arena.boss.setAiDisabled(true);
         world.spawnEntity(arena.boss);
 
         arena.bar = new ServerBossBar(
@@ -161,7 +162,7 @@ public final class NullWardenManager {
 
             if (arena.intro == 0) {
                 arena.boss.setInvulnerable(false);
-                arena.boss.setAi(true);
+                arena.boss.setAiDisabled(false);
                 world.playSound(null, arena.boss.getBlockPos(), SoundEvents.ENTITY_WARDEN_ROAR,
                         SoundCategory.HOSTILE, 4.0F, 0.55F);
             }
@@ -262,7 +263,7 @@ public final class NullWardenManager {
         for (int i = 0; i < points; i++) {
             double angle = i * Math.PI * 2.0 / points;
             world.spawnParticles(
-                    new DustParticleEffect(0x6A22CC, size),
+                    new DustParticleEffect(new Vector3f(0.416F, 0.133F, 0.8F), size),
                     target.getX() + Math.cos(angle) * radius,
                     target.getY() + 0.08,
                     target.getZ() + Math.sin(angle) * radius,
