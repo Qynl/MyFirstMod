@@ -9,6 +9,8 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public final class ModItems {
+    public static final Item UNIT_CREATOR = Registry.register(Registries.ITEM, Identifier.of(MyFirstMod.MOD_ID, "unit_creator"), new UnitCreatorItem(new Item.Settings().maxCount(1)));
+
     public static final Item NULL_RELIC = Registry.register(
             Registries.ITEM,
             Identifier.of(MyFirstMod.MOD_ID, "null_relic"),

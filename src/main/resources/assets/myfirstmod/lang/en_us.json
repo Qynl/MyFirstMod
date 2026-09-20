@@ -1,5 +1,7 @@
 {
   "item.myfirstmod.null_relic": "Heart of the Null",
   "item.myfirstmod.nullblade": "Nullblade",
-  "block.myfirstmod.void_portal": "Void Gate"
+  "block.myfirstmod.void_portal": "Void Gate",
+  "item.myfirstmod.unit_creator": "Unit Creator",
+  "screen.myfirstmod.creator": "Unit Creator"
 }

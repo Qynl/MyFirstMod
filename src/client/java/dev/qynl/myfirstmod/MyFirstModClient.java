@@ -5,6 +5,9 @@ import dev.qynl.myfirstmod.boss.ModEntities;
 import dev.qynl.myfirstmod.client.NullWardenTexture;
 import dev.qynl.myfirstmod.client.model.NullWardenModel;
 import dev.qynl.myfirstmod.client.render.NullWardenRenderer;
+import dev.qynl.myfirstmod.client.CreatorScreen;
+import dev.qynl.myfirstmod.gui.ModScreenHandlers;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -14,6 +17,7 @@ import net.minecraft.client.render.RenderLayer;
 public class MyFirstModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        HandledScreens.register(ModScreenHandlers.CREATOR, CreatorScreen::new);
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.VOID_PORTAL, RenderLayer.getTranslucent());
 
         EntityModelLayerRegistry.registerModelLayer(
