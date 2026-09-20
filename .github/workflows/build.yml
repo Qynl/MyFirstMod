@@ -27,10 +27,14 @@ jobs:
 
       - name: Build Mod with Gradle
         run: |
-          gradle build --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
+          gradle build remapJar --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
           echo "### Gradle Build Output" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -n 120 gradle-build.log >> $GITHUB_STEP_SUMMARY
+          cat gradle-build.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "### Built Files" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          find build -type f >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           if [ "$BUILD_FAILED" = "1" ]; then
             while IFS= read -r line; do
@@ -44,4 +48,5 @@ jobs:
         if: always()
         with:
           name: LegionsAndFactions-1.21.1
-          path: build/libs/*.jar
+          path: build/libs/
+          if-no-files-found: warn
