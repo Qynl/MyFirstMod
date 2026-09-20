@@ -132,7 +132,7 @@ public final class KingdomLandmarks {
             for(int y=0;y<2;y++)put(w,s.add(0,y,-2),ModBlocks.OXIDIZED_TRIM);
             put(w,s.add(0,2,-2),ModBlocks.PRISM_LAMP);
             chest(c,w,s.add(2,0,2),"chapel_cache");
-            spawner(w,s.add(-3,0,-3),"minecraft:drowned");
+            spawner(w,s.add(-3,0,-3),"minecraft:drowned",brineKeeper());
             return true;
         }
     }
@@ -197,7 +197,7 @@ public final class KingdomLandmarks {
             }
             put(w,s.add(1,0,0),Blocks.SOUL_FIRE);put(w,s.add(-1,0,0),Blocks.SOUL_FIRE);
             chest(c,w,s.add(0,-2,0),"fissure_cache");
-            spawner(w,s.add(0,-2,2),"myfirstmod:rift_sentinel");
+            spawner(w,s.add(0,-2,2),"myfirstmod:rift_sentinel",fissureWarden());
             return true;
         }
     }
