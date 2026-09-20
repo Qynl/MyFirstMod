@@ -7,6 +7,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -20,10 +23,28 @@ public final class UnitSystem {
     public static void tick(MinecraftServer server) { if (server.getTicks()%10 != 0) return; for (ServerWorld world: server.getWorlds()) for (var e: world.iterateEntities()) if (e instanceof MobEntity mob) simulate(server, world, mob); }
     private static void simulate(MinecraftServer server, ServerWorld world, MobEntity mob) {
         String unitId = tagValue(mob,"unit:"); if(unitId==null)return; UnitDefinition unit=UnitWorldData.get(server).units.get(unitId); if(unit==null)return;
-        if (!mob.isAlive()) return; LivingEntity target = mob.getTarget(); if (!valid(server, unit, mob, target)) {
+        if (!mob.isAlive()) return;
+        if (unit.healAllies && (unit.role.equalsIgnoreCase("medic") || unit.role.equalsIgnoreCase("support")) && mob.age % 20 == 0) healNearbyAlly(world, mob, unit);
+        if (unit.role.equalsIgnoreCase("medic") || unit.role.equalsIgnoreCase("support")) useSupportPotion(mob, unit);
+        LivingEntity target = mob.getTarget(); if (!valid(server, unit, mob, target)) {
             target = world.getEntitiesByClass(LivingEntity.class, mob.getBoundingBox().expand(unit.followRange), e -> e != mob && valid(server, unit, mob, e)).stream().min((a,b)->Double.compare(mob.squaredDistanceTo(a),mob.squaredDistanceTo(b))).orElse(null); mob.setTarget(target);
         }
         if(target!=null){ if(unit.retreatHealth > 0 && mob.getHealth() <= mob.getMaxHealth() * unit.retreatHealth){ double dx=mob.getX()-target.getX(), dz=mob.getZ()-target.getZ(); mob.getNavigation().startMovingTo(mob.getX()+dx*4, mob.getY(), mob.getZ()+dz*4, 1.15); return; } double distance=mob.squaredDistanceTo(target); if(unit.role.equalsIgnoreCase("ranged")){ if(distance<64) mob.getNavigation().startMovingTo(target.getX(),target.getY(),target.getZ(),0.8); else if(distance>256) mob.getNavigation().startMovingTo(target,1.0); } else if(distance>4.0) mob.getNavigation().startMovingTo(target,1.0); else if(mob.age%10==0) mob.tryAttack(target); }
+    }
+    private static void healNearbyAlly(ServerWorld world, MobEntity medic, UnitDefinition unit) {
+        String faction=tagValue(medic,"faction:");
+        LivingEntity ally=world.getEntitiesByClass(LivingEntity.class, medic.getBoundingBox().expand(unit.healRange), e -> e!=medic && e.isAlive() && tagValue(e,"faction:")!=null && tagValue(e,"faction:").equals(faction) && e.getHealth()<e.getMaxHealth()).stream().min((a,b)->Float.compare(a.getHealth()/a.getMaxHealth(),b.getHealth()/b.getMaxHealth())).orElse(null);
+        if(ally!=null){ ally.heal(2.0f); ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,50,0)); medic.getLookControl().lookAt(ally); }
+    }
+    private static void useSupportPotion(MobEntity medic, UnitDefinition unit) {
+        if(medic.age%100!=0)return;
+        for(net.minecraft.entity.EquipmentSlot slot : new net.minecraft.entity.EquipmentSlot[]{net.minecraft.entity.EquipmentSlot.MAINHAND,net.minecraft.entity.EquipmentSlot.OFFHAND}){
+            var stack=medic.getEquippedStack(slot);
+            if(stack.isOf(Items.POTION)||stack.isOf(Items.SPLASH_POTION)||stack.isOf(Items.LINGERING_POTION)){
+                medic.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,100,1));
+                stack.decrement(1); medic.equipStack(slot,stack); return;
+            }
+        }
     }
     private static boolean valid(MinecraftServer server, UnitDefinition unit, MobEntity self, LivingEntity target) {
         if(target==null||!target.isAlive()||target.isSpectator())return false; if(target instanceof PlayerEntity && !unit.attackPlayers)return false;

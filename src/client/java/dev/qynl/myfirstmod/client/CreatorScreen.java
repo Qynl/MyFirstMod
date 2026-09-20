@@ -18,7 +18,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         addDrawableChild(ButtonWidget.builder(Text.literal("FACTIONS"),b->{tab=1;rebuild();}).dimensions(x+112,y+10,95,22).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("BATTLE"),b->{tab=2;rebuild();}).dimensions(x+212,y+10,95,22).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("SETTINGS"),b->{tab=3;rebuild();}).dimensions(x+312,y+10,95,22).build());
-        if(tab==0){button("New Guard",0,left,top);button("New Archer",1,left,top+27);button("Create Faction",2,left,top+54);button("Equip First",3,left,top+81);button("Duplicate First",4,left+205,top);button("Delete First",5,left+205,top+27);button("Save Equipment",7,left+205,top+54);}
+        if(tab==0){button("New Guard",0,left,top);button("New Archer",1,left,top+27);button("New Medic",8,left,top+54);button("Create Faction",2,left,top+81);button("Equip First",3,left,top+108);button("Duplicate First",4,left+205,top);button("Delete First",5,left+205,top+27);button("Save Equipment",7,left+205,top+54);}
         else if(tab==1){button("Create Kingdom + Raiders",2,left,top);button("Equip First Unit",3,left,top+27);}
         else if(tab==2){button("Start Sample Battle",6,left,top);}
     }

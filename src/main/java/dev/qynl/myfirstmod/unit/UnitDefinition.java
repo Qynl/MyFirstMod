@@ -34,6 +34,8 @@ public final class UnitDefinition {
     public boolean attackHostile = true;
     public boolean protectAllies = true;
     public boolean attackPlayers = false;
+    public boolean healAllies = true;
+    public float healRange = 12;
     public float retreatHealth = 0.0f;
     public final Map<EquipmentSlot, ItemStack> equipment = new LinkedHashMap<>();
     public final ArrayList<ItemStack> inventory = new ArrayList<>();
@@ -43,13 +45,13 @@ public final class UnitDefinition {
         id = nbt.getString("id"); name = nbt.getString("name"); description = nbt.getString("description");
         entityId = Identifier.tryParse(nbt.getString("entity")); factionId = nbt.getString("faction");
         maxHealth = nbt.getFloat("health"); movementSpeed = nbt.getFloat("speed"); attackDamage = nbt.getFloat("damage"); followRange = nbt.getFloat("range"); armor = nbt.getFloat("armor"); armorToughness = nbt.getFloat("toughness"); knockbackResistance = nbt.getFloat("knockback"); role = nbt.getString("role");
-        attackHostile = nbt.getBoolean("attack_hostile"); protectAllies = nbt.getBoolean("protect_allies"); attackPlayers = nbt.getBoolean("attack_players"); retreatHealth = nbt.getFloat("retreat");
+        attackHostile = nbt.getBoolean("attack_hostile"); protectAllies = nbt.getBoolean("protect_allies"); attackPlayers = nbt.getBoolean("attack_players"); healAllies = nbt.getBoolean("heal_allies"); healRange = nbt.getFloat("heal_range"); retreatHealth = nbt.getFloat("retreat");
         for (EquipmentSlot slot : EquipmentSlot.values()) if (nbt.contains("item_" + slot.getName())) equipment.put(slot, ItemStack.fromNbtOrEmpty(Registries.ITEM.getReadOnlyWrapper(), nbt.getCompound("item_" + slot.getName())));
         var list=nbt.getList("inventory",10); for(int i=0;i<list.size();i++) inventory.add(ItemStack.fromNbtOrEmpty(Registries.ITEM.getReadOnlyWrapper(),list.getCompound(i)));
     }
     public NbtCompound toNbt() {
         NbtCompound n = new NbtCompound(); n.putString("id", id); n.putString("name", name); n.putString("description", description == null ? "" : description); n.putString("entity", entityId.toString()); n.putString("faction", factionId);
-        n.putFloat("health", maxHealth); n.putFloat("speed", movementSpeed); n.putFloat("damage", attackDamage); n.putFloat("range", followRange); n.putFloat("armor", armor); n.putFloat("toughness", armorToughness); n.putFloat("knockback", knockbackResistance); n.putString("role", role); n.putBoolean("attack_hostile", attackHostile); n.putBoolean("protect_allies", protectAllies); n.putBoolean("attack_players", attackPlayers); n.putFloat("retreat", retreatHealth);
+        n.putFloat("health", maxHealth); n.putFloat("speed", movementSpeed); n.putFloat("damage", attackDamage); n.putFloat("range", followRange); n.putFloat("armor", armor); n.putFloat("toughness", armorToughness); n.putFloat("knockback", knockbackResistance); n.putString("role", role); n.putBoolean("attack_hostile", attackHostile); n.putBoolean("protect_allies", protectAllies); n.putBoolean("attack_players", attackPlayers); n.putBoolean("heal_allies", healAllies); n.putFloat("heal_range", healRange); n.putFloat("retreat", retreatHealth);
         for (var e : equipment.entrySet()) n.put("item_" + e.getKey().getName(), e.getValue().encode(Registries.ITEM.getReadOnlyWrapper())); var list=new net.minecraft.nbt.NbtList(); for(var stack:inventory) list.add(stack.encode(Registries.ITEM.getReadOnlyWrapper())); n.put("inventory",list); return n;
     }
     public void apply(LivingEntity entity) {

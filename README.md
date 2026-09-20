@@ -44,3 +44,7 @@ This repository is now exclusively the Unit & Faction Sandbox. The former boss, 
 ## Build
 
 Minecraft 1.21.1, Fabric Loader 0.16.10+, Fabric API, and Java 21 are required. Run `gradle build` with a Gradle installation or use the repository's CI workflow.
+
+## Support and potion behavior
+
+Medic and support roles are active gameplay roles. They search a bounded area for injured members of their own faction, heal the most injured ally, apply regeneration, and consume potion items on a cooldown. Use the GUI's **New Medic** action or configure a saved template with `/unit set <id> role medic`. Potion, food, weapon, shield, ranged weapon, ammunition, tool, and block capability classification is centralized so future behaviors can add real world interactions without adding item-name special cases.
