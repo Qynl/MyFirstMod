@@ -43,7 +43,7 @@ public final class TankAI {
             if (nearbyEnemies.size() >= 3) {
                 tank.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 60, 1, false, false));
                 world.spawnParticles(ParticleTypes.ENCHANTED_HIT, tank.getX(), tank.getY() + 0.8, tank.getZ(), 8, 0.4, 0.4, 0.4, 0.05);
-                world.playSound(null, tank.getX(), tank.getY(), tank.getZ(), SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.NEUTRAL, 0.6f, 0.8f);
+                world.playSound(null, tank.getX(), tank.getY(), tank.getZ(), SoundEvents.ITEM_SHIELD_BLOCK.value(), SoundCategory.NEUTRAL, 0.6f, 0.8f);
             }
         }
     }

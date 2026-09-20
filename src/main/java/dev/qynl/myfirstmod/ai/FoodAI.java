@@ -1,5 +1,6 @@
 package dev.qynl.myfirstmod.ai;
 
+import dev.qynl.myfirstmod.equipment.ItemCapabilities;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.InventoryOwner;
@@ -18,14 +19,14 @@ public final class FoodAI {
 
         // Check main hand
         ItemStack mainHand = mob.getMainHandStack();
-        if (mainHand.isFood()) {
+        if (ItemCapabilities.isFood(mainHand)) {
             consumeFood(world, mob, mainHand, EquipmentSlot.MAINHAND, -1);
             return;
         }
 
         // Check off hand
         ItemStack offHand = mob.getOffHandStack();
-        if (offHand.isFood()) {
+        if (ItemCapabilities.isFood(offHand)) {
             consumeFood(world, mob, offHand, EquipmentSlot.OFFHAND, -1);
             return;
         }
@@ -34,7 +35,7 @@ public final class FoodAI {
         if (mob instanceof InventoryOwner owner) {
             for (int i = 0; i < owner.getInventory().size(); i++) {
                 ItemStack stack = owner.getInventory().getStack(i);
-                if (stack.isFood()) {
+                if (ItemCapabilities.isFood(stack)) {
                     consumeFood(world, mob, stack, null, i);
                     return;
                 }
@@ -44,7 +45,7 @@ public final class FoodAI {
 
     private static void consumeFood(ServerWorld world, MobEntity mob, ItemStack stack, EquipmentSlot slot, int invIndex) {
         mob.heal(5.0f);
-        world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.NEUTRAL, 0.8f, 1.0f);
+        world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 0.8f, 1.0f);
         world.spawnParticles(ParticleTypes.ITEM_SNOWBALL, mob.getX(), mob.getEyeY(), mob.getZ(), 6, 0.2, 0.2, 0.2, 0.05);
 
         stack.decrement(1);

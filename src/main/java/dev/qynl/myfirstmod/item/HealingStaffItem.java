@@ -56,9 +56,9 @@ public class HealingStaffItem extends Item {
             }
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 1.4f, 1.3f);
+                    SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 1.4f, 1.3f);
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0f, 1.6f);
+                    SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP.value(), SoundCategory.PLAYERS, 1.0f, 1.6f);
 
             serverPlayer.sendMessage(
                     Text.literal("💖 Divine Restoration: ").formatted(Formatting.GREEN, Formatting.BOLD)

@@ -42,7 +42,7 @@ public final class SpecialEntityAI {
                     ally.heal(3.0f);
                     ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 80, 0, false, false));
                     world.spawnParticles(ParticleTypes.HEART, ally.getX(), ally.getBodyY(0.6), ally.getZ(), 4, 0.2, 0.2, 0.2, 0.05);
-                    world.playSound(null, ally.getX(), ally.getY(), ally.getZ(), SoundEvents.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.NEUTRAL, 1.0f, 1.4f);
+                    world.playSound(null, ally.getX(), ally.getY(), ally.getZ(), SoundEvents.ENTITY_ALLAY_ITEM_TAKEN.value(), SoundCategory.NEUTRAL, 1.0f, 1.4f);
                 }
             }
             return true;
@@ -57,7 +57,7 @@ public final class SpecialEntityAI {
 
                 // Sonic Boom shockwave
                 world.spawnParticles(ParticleTypes.SONIC_BOOM, target.getX(), target.getY() + 1.0, target.getZ(), 1, 0, 0, 0, 0);
-                world.playSound(null, warden.getX(), warden.getY(), warden.getZ(), SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.HOSTILE, 2.0f, 1.0f);
+                world.playSound(null, warden.getX(), warden.getY(), warden.getZ(), SoundEvents.ENTITY_WARDEN_SONIC_BOOM.value(), SoundCategory.HOSTILE, 2.0f, 1.0f);
 
                 target.damage(world.getDamageSources().sonicBoom(warden), 16.0f);
                 target.takeKnockback(1.5, -dx, -dz);
@@ -68,7 +68,7 @@ public final class SpecialEntityAI {
         // 3. Blaze Firestorm Volley
         if (mob instanceof BlazeEntity blaze && target != null && target.isAlive()) {
             if (mob.age % 30 == 0) {
-                world.playSound(null, blaze.getX(), blaze.getY(), blaze.getZ(), SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.HOSTILE, 1.0f, 1.0f);
+                world.playSound(null, blaze.getX(), blaze.getY(), blaze.getZ(), SoundEvents.ENTITY_BLAZE_SHOOT.value(), SoundCategory.HOSTILE, 1.0f, 1.0f);
                 target.setOnFireFor(5.0f);
                 target.damage(world.getDamageSources().onFire(), 5.0f);
                 world.spawnParticles(ParticleTypes.FLAME, target.getX(), target.getBodyY(0.5), target.getZ(), 12, 0.3, 0.3, 0.3, 0.1);
@@ -82,7 +82,7 @@ public final class SpecialEntityAI {
             if (distSq < 16.0 && mob.age % 35 == 0) {
                 golem.swingHand(net.minecraft.util.Hand.MAIN_HAND);
                 world.spawnParticles(ParticleTypes.EXPLOSION, golem.getX(), golem.getY(), golem.getZ(), 1, 0, 0, 0, 0);
-                world.playSound(null, golem.getX(), golem.getY(), golem.getZ(), SoundEvents.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.NEUTRAL, 1.5f, 0.8f);
+                world.playSound(null, golem.getX(), golem.getY(), golem.getZ(), SoundEvents.ENTITY_IRON_GOLEM_ATTACK.value(), SoundCategory.NEUTRAL, 1.5f, 0.8f);
 
                 List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, golem.getBoundingBox().expand(4.0),
                         e -> e != golem && e.isAlive() && FactionManager.isHostile(server, myFaction, UnitSystem.getTagValue(e, "faction:")));

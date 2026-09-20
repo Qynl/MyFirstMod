@@ -36,7 +36,7 @@ public final class ScoutAI {
 
                 // Alert particle effect
                 world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, scout.getX(), scout.getY() + 1.2, scout.getZ(), 8, 0.3, 0.4, 0.3, 0.05);
-                world.playSound(null, scout.getX(), scout.getY(), scout.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.8f, 1.6f);
+                world.playSound(null, scout.getX(), scout.getY(), scout.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP.value(), SoundCategory.NEUTRAL, 0.8f, 1.6f);
 
                 // Alert nearby squad members
                 List<MobEntity> squadAllies = world.getEntitiesByClass(MobEntity.class, scout.getBoundingBox().expand(20.0),

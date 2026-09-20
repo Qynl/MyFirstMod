@@ -76,7 +76,7 @@ public final class ThrowablePotionAI {
         potion.setVelocity(dx, dy + dist * 0.12, dz, 0.9f, 2.0f);
 
         world.spawnEntity(potion);
-        world.playSound(null, thrower.getX(), thrower.getY(), thrower.getZ(), SoundEvents.ENTITY_SPLASH_POTION_THROW, SoundCategory.NEUTRAL, 0.8f, 1.0f);
+        world.playSound(null, thrower.getX(), thrower.getY(), thrower.getZ(), SoundEvents.ENTITY_SPLASH_POTION_THROW.value(), SoundCategory.NEUTRAL, 0.8f, 1.0f);
     }
 
     private static ItemStack getOffensivePotionStack(MobEntity mob) {

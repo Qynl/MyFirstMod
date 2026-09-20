@@ -70,7 +70,7 @@ public class TransmutationWandItem extends Item {
                 // Recruitment visual effect
                 world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, entity.getX(), entity.getY() + 1.0, entity.getZ(), 30, 0.4, 0.6, 0.4, 0.15);
                 world.spawnParticles(ParticleTypes.ENCHANTED_HIT, entity.getX(), entity.getY() + 0.5, entity.getZ(), 20, 0.5, 0.5, 0.5, 0.1);
-                world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.0f, 1.4f);
+                world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ITEM_TOTEM_USE.value(), SoundCategory.PLAYERS, 1.0f, 1.4f);
 
                 serverPlayer.sendMessage(
                         Text.literal("✨ Unit Recruited: ").formatted(Formatting.GOLD, Formatting.BOLD)

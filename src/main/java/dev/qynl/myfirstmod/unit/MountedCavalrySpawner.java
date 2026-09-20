@@ -54,7 +54,7 @@ public final class MountedCavalrySpawner {
         }
 
         world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.x, pos.y + 1.0, pos.z, 15, 0.4, 0.6, 0.4, 0.05);
-        world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_HORSE_GALLOP, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+        world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_HORSE_GALLOP.value(), SoundCategory.NEUTRAL, 1.0f, 1.0f);
 
         return rider;
     }

@@ -43,7 +43,7 @@ public class AssassinDaggerItem extends Item {
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 80, 2));
 
             serverWorld.playSound(null, targetPos.x, targetPos.y, targetPos.z,
-                    SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.4f);
+                    SoundEvents.ENTITY_ENDERMAN_TELEPORT.value(), SoundCategory.PLAYERS, 1.0f, 1.4f);
 
             player.getItemCooldownManager().set(this, 80); // 4s cooldown
         }

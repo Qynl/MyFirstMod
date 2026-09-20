@@ -116,7 +116,7 @@ public final class UnitSpawner {
         // Visual and auditory spawn effects
         world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.x, pos.y + 0.8, pos.z, 12, 0.4, 0.5, 0.4, 0.05);
         world.spawnParticles(ParticleTypes.PORTAL, pos.x, pos.y + 0.5, pos.z, 15, 0.3, 0.4, 0.3, 0.1);
-        world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.NEUTRAL, 0.75f, 1.4f);
+        world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_BEACON_ACTIVATE.value(), SoundCategory.NEUTRAL, 0.75f, 1.4f);
 
         return living;
     }

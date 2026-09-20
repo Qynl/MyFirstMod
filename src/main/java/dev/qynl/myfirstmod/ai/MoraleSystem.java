@@ -41,7 +41,7 @@ public final class MoraleSystem {
             world.spawnParticles(ParticleTypes.SPLASH, mob.getX(), mob.getEyeY() + 0.3, mob.getZ(), 6, 0.2, 0.2, 0.2, 0.05);
 
             if (mob.age % 160 == 0) {
-                world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_VILLAGER_NO, SoundCategory.NEUTRAL, 0.8f, 1.2f);
+                world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_VILLAGER_NO.value(), SoundCategory.NEUTRAL, 0.8f, 1.2f);
             }
         }
     }

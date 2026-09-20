@@ -87,6 +87,6 @@ public final class NecromancerAI {
         // Visual summoning pentagram & portal burst
         world.spawnParticles(ParticleTypes.PORTAL, sx, sy + 0.8, sz, 30, 0.4, 0.6, 0.4, 0.15);
         world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, sx, sy + 0.2, sz, 15, 0.3, 0.3, 0.3, 0.05);
-        world.playSound(null, sx, sy, sz, SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 1.2f, 0.9f);
+        world.playSound(null, sx, sy, sz, SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON.value(), SoundCategory.HOSTILE, 1.2f, 0.9f);
     }
 }

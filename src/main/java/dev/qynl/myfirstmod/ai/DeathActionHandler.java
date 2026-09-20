@@ -34,7 +34,7 @@ public final class DeathActionHandler {
             case "healing_mist" -> {
                 world.spawnParticles(ParticleTypes.HEART, x, y + 1.0, z, 25, 1.5, 0.8, 1.5, 0.1);
                 world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, x, y + 0.5, z, 30, 2.0, 1.0, 2.0, 0.1);
-                world.playSound(null, x, y, z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.5f, 1.5f);
+                world.playSound(null, x, y, z, SoundEvents.BLOCK_BEACON_ACTIVATE.value(), SoundCategory.PLAYERS, 1.5f, 1.5f);
 
                 List<LivingEntity> allies = world.getEntitiesByClass(LivingEntity.class, entity.getBoundingBox().expand(8.0),
                         e -> e.isAlive() && FactionManager.isAllied(world.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
@@ -54,7 +54,7 @@ public final class DeathActionHandler {
             }
             case "fireworks" -> {
                 world.spawnParticles(ParticleTypes.FIREWORK, x, y + 1.0, z, 50, 0.5, 0.8, 0.5, 0.25);
-                world.playSound(null, x, y, z, SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 2.0f, 1.0f);
+                world.playSound(null, x, y, z, SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST.value(), SoundCategory.PLAYERS, 2.0f, 1.0f);
             }
             case "poison_cloud" -> {
                 world.spawnParticles(ParticleTypes.EFFECT, x, y + 0.5, z, 40, 2.0, 0.5, 2.0, 0.05);

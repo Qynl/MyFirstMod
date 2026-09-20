@@ -25,7 +25,7 @@ public final class BerserkerAI {
 
                 world.spawnParticles(ParticleTypes.ANGRY_VILLAGER, berserker.getX(), berserker.getY() + 1.2, berserker.getZ(), 8, 0.4, 0.4, 0.4, 0.05);
                 world.spawnParticles(ParticleTypes.FLAME, berserker.getX(), berserker.getBodyY(0.5), berserker.getZ(), 15, 0.3, 0.5, 0.3, 0.08);
-                world.playSound(null, berserker.getX(), berserker.getY(), berserker.getZ(), SoundEvents.ENTITY_PIGLIN_BRUTE_ANGRY, SoundCategory.HOSTILE, 1.3f, 0.8f);
+                world.playSound(null, berserker.getX(), berserker.getY(), berserker.getZ(), SoundEvents.ENTITY_PIGLIN_BRUTE_ANGRY.value(), SoundCategory.HOSTILE, 1.3f, 0.8f);
             } else if (berserker.age % 15 == 0) {
                 // Bloodrage aura particles while enraged
                 world.spawnParticles(ParticleTypes.FLAME, berserker.getX(), berserker.getBodyY(0.5), berserker.getZ(), 3, 0.2, 0.3, 0.2, 0.02);

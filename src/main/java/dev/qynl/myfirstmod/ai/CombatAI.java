@@ -56,7 +56,7 @@ public final class CombatAI {
             target.damage(world.getDamageSources().mobAttack(mob), damage);
 
             // Hit sound and particles
-            world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.NEUTRAL, 0.8f, 1.0f);
+            world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG.value(), SoundCategory.NEUTRAL, 0.8f, 1.0f);
             world.spawnParticles(ParticleTypes.ENCHANTED_HIT, target.getX(), target.getBodyY(0.5), target.getZ(), 5, 0.2, 0.2, 0.2, 0.05);
 
             // Record battle damage & kills
