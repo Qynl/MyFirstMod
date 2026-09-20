@@ -24,6 +24,9 @@ public final class UnitDefinition {
     public float movementSpeed = 0.1f;
     public float attackDamage = 2;
     public float followRange = 16;
+    public float armor = 0;
+    public float armorToughness = 0;
+    public float knockbackResistance = 0;
     public String role = "melee";
     public boolean attackHostile = true;
     public boolean protectAllies = true;
@@ -35,17 +38,17 @@ public final class UnitDefinition {
     public UnitDefinition(NbtCompound nbt) {
         id = nbt.getString("id"); name = nbt.getString("name"); description = nbt.getString("description");
         entityId = Identifier.tryParse(nbt.getString("entity")); factionId = nbt.getString("faction");
-        maxHealth = nbt.getFloat("health"); movementSpeed = nbt.getFloat("speed"); attackDamage = nbt.getFloat("damage"); followRange = nbt.getFloat("range"); role = nbt.getString("role");
+        maxHealth = nbt.getFloat("health"); movementSpeed = nbt.getFloat("speed"); attackDamage = nbt.getFloat("damage"); followRange = nbt.getFloat("range"); armor = nbt.getFloat("armor"); armorToughness = nbt.getFloat("toughness"); knockbackResistance = nbt.getFloat("knockback"); role = nbt.getString("role");
         attackHostile = nbt.getBoolean("attack_hostile"); protectAllies = nbt.getBoolean("protect_allies"); attackPlayers = nbt.getBoolean("attack_players"); retreatHealth = nbt.getFloat("retreat");
         for (EquipmentSlot slot : EquipmentSlot.values()) if (nbt.contains("item_" + slot.getName())) equipment.put(slot, ItemStack.fromNbtOrEmpty(Registries.ITEM.getReadOnlyWrapper(), nbt.getCompound("item_" + slot.getName())));
     }
     public NbtCompound toNbt() {
         NbtCompound n = new NbtCompound(); n.putString("id", id); n.putString("name", name); n.putString("description", description == null ? "" : description); n.putString("entity", entityId.toString()); n.putString("faction", factionId);
-        n.putFloat("health", maxHealth); n.putFloat("speed", movementSpeed); n.putFloat("damage", attackDamage); n.putFloat("range", followRange); n.putString("role", role); n.putBoolean("attack_hostile", attackHostile); n.putBoolean("protect_allies", protectAllies); n.putBoolean("attack_players", attackPlayers); n.putFloat("retreat", retreatHealth);
+        n.putFloat("health", maxHealth); n.putFloat("speed", movementSpeed); n.putFloat("damage", attackDamage); n.putFloat("range", followRange); n.putFloat("armor", armor); n.putFloat("toughness", armorToughness); n.putFloat("knockback", knockbackResistance); n.putString("role", role); n.putBoolean("attack_hostile", attackHostile); n.putBoolean("protect_allies", protectAllies); n.putBoolean("attack_players", attackPlayers); n.putFloat("retreat", retreatHealth);
         for (var e : equipment.entrySet()) n.put("item_" + e.getKey().getName(), e.getValue().encode(Registries.ITEM.getReadOnlyWrapper())); return n;
     }
     public void apply(LivingEntity entity) {
-        set(EntityAttributes.MAX_HEALTH, maxHealth, entity); set(EntityAttributes.MOVEMENT_SPEED, movementSpeed, entity); set(EntityAttributes.ATTACK_DAMAGE, attackDamage, entity); set(EntityAttributes.FOLLOW_RANGE, followRange, entity);
+        set(EntityAttributes.MAX_HEALTH, maxHealth, entity); set(EntityAttributes.MOVEMENT_SPEED, movementSpeed, entity); set(EntityAttributes.ATTACK_DAMAGE, attackDamage, entity); set(EntityAttributes.FOLLOW_RANGE, followRange, entity); set(EntityAttributes.ARMOR, armor, entity); set(EntityAttributes.ARMOR_TOUGHNESS, armorToughness, entity); set(EntityAttributes.KNOCKBACK_RESISTANCE, knockbackResistance, entity);
         entity.setHealth(Math.min(maxHealth, entity.getMaxHealth()));
         for (var e : equipment.entrySet()) entity.equipStack(e.getKey(), e.getValue().copy());
     }

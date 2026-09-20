@@ -1,6 +1,7 @@
 package dev.qynl.myfirstmod;
 
 import dev.qynl.myfirstmod.block.ModBlocks;
+import dev.qynl.myfirstmod.command.UnitCommands;
 import dev.qynl.myfirstmod.boss.ModEntities;
 import dev.qynl.myfirstmod.item.ModItems;
 import dev.qynl.myfirstmod.item.NullbladeItem;
@@ -9,6 +10,8 @@ import dev.qynl.myfirstmod.gui.ModScreenHandlers;
 import dev.qynl.myfirstmod.unit.UnitSystem;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.item.ItemGroups;
 import dev.qynl.myfirstmod.portal.VoidPortalManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -25,8 +28,10 @@ public class MyFirstMod implements ModInitializer {
     public void onInitialize() {
         ModBlocks.register();
         ModItems.register();
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(ModItems.UNIT_CREATOR));
         ModEntities.register();
         ModScreenHandlers.register();
+        UnitCommands.register();
         UnitSystem.register();
 
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {

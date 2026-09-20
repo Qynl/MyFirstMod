@@ -22,7 +22,7 @@ public final class UnitSystem {
         if (!mob.isAlive()) return; LivingEntity target = mob.getTarget(); if (!valid(server, unit, mob, target)) {
             target = world.getEntitiesByClass(LivingEntity.class, mob.getBoundingBox().expand(unit.followRange), e -> e != mob && valid(server, unit, mob, e)).stream().min((a,b)->Double.compare(mob.squaredDistanceTo(a),mob.squaredDistanceTo(b))).orElse(null); mob.setTarget(target);
         }
-        if(target!=null){ double distance=mob.squaredDistanceTo(target); if(distance>4.0) mob.getNavigation().startMovingTo(target, unit.role.equalsIgnoreCase("ranged")?1.05:1.0); else if(mob.age%10==0) mob.tryAttack(target); }
+        if(target!=null){ double distance=mob.squaredDistanceTo(target); if(unit.role.equalsIgnoreCase("ranged")){ if(distance<64) mob.getNavigation().startMovingTo(target.getX(),target.getY(),target.getZ(),0.8); else if(distance>256) mob.getNavigation().startMovingTo(target,1.0); } else if(distance>4.0) mob.getNavigation().startMovingTo(target,1.0); else if(mob.age%10==0) mob.tryAttack(target); }
     }
     private static boolean valid(MinecraftServer server, UnitDefinition unit, MobEntity self, LivingEntity target) {
         if(target==null||!target.isAlive()||target.isSpectator())return false; if(target instanceof PlayerEntity && !unit.attackPlayers)return false;
