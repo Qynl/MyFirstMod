@@ -16,7 +16,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.Undead;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
@@ -57,8 +56,13 @@ public final class UnitSystem {
 
         String factionId = unit.factionId;
 
-        // Prevent custom undead units from catching fire in sunlight
+        // Prevent custom undead units from burning in daytime sunlight
         if (mob.isOnFire() && world.isDay() && mob.isUndead()) {
+            mob.extinguish();
+        }
+
+        // Fire mastery perk: clear fire and immune
+        if (FactionManager.hasPerk(server, factionId, FactionPerk.FIRE_MASTERY) && mob.isOnFire()) {
             mob.extinguish();
         }
 
@@ -92,6 +96,18 @@ public final class UnitSystem {
 
         if (role.equals("tank")) {
             TankAI.executeTank(world, mob, unit);
+        }
+
+        if (role.equals("necromancer") || FactionManager.hasPerk(server, factionId, FactionPerk.NECROMANCY)) {
+            NecromancerAI.executeNecromancer(world, mob, unit);
+        }
+
+        if (role.equals("berserker") || FactionManager.hasPerk(server, factionId, FactionPerk.BERSERK_FURY)) {
+            BerserkerAI.executeBerserker(world, mob, unit);
+        }
+
+        if (role.equals("bard") || FactionManager.hasPerk(server, factionId, FactionPerk.WAR_SONG)) {
+            BardAI.executeBard(world, mob, unit);
         }
 
         if (unit.commander) {

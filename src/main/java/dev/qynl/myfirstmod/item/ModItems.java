@@ -25,6 +25,12 @@ public final class ModItems {
             new FactionBannerItem(new Item.Settings().maxCount(1))
     );
 
+    public static final Item FACTION_SCEPTER = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "faction_scepter"),
+            new FactionScepterItem(new Item.Settings().maxCount(1))
+    );
+
     private ModItems() {}
 
     public static void register() {}

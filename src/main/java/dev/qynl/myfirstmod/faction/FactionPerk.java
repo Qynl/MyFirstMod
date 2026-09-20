@@ -13,7 +13,11 @@ public enum FactionPerk {
     VETERANS("veterans", "Hardened Veterans", "Surviving warriors gain permanent bonus max health and attack.", 0xD97706),
     PYROTECHNICS("pyrotechnics", "Pyrotechnics", "Artillery fireworks deal +50% explosive splash damage.", 0xEF4444),
     HOLY_MIGHT("holy_might", "Holy Might", "Healers & medics heal +50% more HP with wider reach.", 0x06B6D4),
-    FORTIFICATION("fortification", "Iron Fortification", "Reduces all incoming damage taken by 15%.", 0x475569);
+    FORTIFICATION("fortification", "Iron Fortification", "Reduces all incoming damage taken by 15%.", 0x475569),
+    NECROMANCY("necromancy", "Dark Necromancy", "Slain warriors rise as friendly undead thralls.", 0x7C3AED),
+    BERSERK_FURY("berserk_fury", "Berserk Fury", "Injured units enter Bloodrage (+50% attack & speed).", 0xDC2626),
+    WAR_SONG("war_song", "Harmonic War Song", "Allied units in battle gain passive speed & regen.", 0x14B8A6),
+    FIRE_MASTERY("fire_mastery", "Fire Mastery", "Attacks ignite targets and units are immune to fire.", 0xF97316);
 
     private final String id;
     private final String displayName;

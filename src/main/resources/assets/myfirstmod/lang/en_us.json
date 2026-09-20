@@ -2,6 +2,7 @@
   "item.myfirstmod.unit_creator": "Unit Creator",
   "item.myfirstmod.commander_horn": "Commander's War Horn",
   "item.myfirstmod.faction_banner": "Faction Outpost Standard",
+  "item.myfirstmod.faction_scepter": "Faction Commander's Scepter",
   "itemGroup.myfirstmod.units": "Unit & Faction Sandbox",
   "screen.myfirstmod.creator": "Unit & Faction Sandbox",
 
@@ -15,6 +16,10 @@
   "perk.myfirstmod.pyrotechnics": "Pyrotechnics",
   "perk.myfirstmod.holy_might": "Holy Might",
   "perk.myfirstmod.fortification": "Iron Fortification",
+  "perk.myfirstmod.necromancy": "Dark Necromancy",
+  "perk.myfirstmod.berserk_fury": "Berserk Fury",
+  "perk.myfirstmod.war_song": "Harmonic War Song",
+  "perk.myfirstmod.fire_mastery": "Fire Mastery",
 
   "role.myfirstmod.melee": "Melee Frontline",
   "role.myfirstmod.ranged": "Ranged Marksman",
@@ -24,5 +29,8 @@
   "role.myfirstmod.tank": "Heavy Tank",
   "role.myfirstmod.assassin": "Flanking Assassin",
   "role.myfirstmod.scout": "Recon Scout",
+  "role.myfirstmod.necromancer": "Dark Necromancer",
+  "role.myfirstmod.berserker": "Raging Berserker",
+  "role.myfirstmod.bard": "Battlefield Bard",
   "role.myfirstmod.support": "Combat Support"
 }

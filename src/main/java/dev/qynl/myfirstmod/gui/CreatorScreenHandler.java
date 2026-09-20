@@ -45,12 +45,15 @@ public class CreatorScreenHandler extends ScreenHandler {
     };
 
     private static final String[] ROLE_CYCLE = {
-            "melee", "ranged", "medic", "pyrotechnic", "engineer", "tank", "assassin", "support"
+            "melee", "ranged", "medic", "pyrotechnic", "engineer", "tank", "assassin", "scout", "necromancer", "berserker", "bard", "support"
     };
 
     private static final String[] RANK_CYCLE = {
             "soldier", "veteran", "captain", "commander", "specialist", "recruit"
     };
+
+    private static int battleFactionAIdx = 0;
+    private static int battleFactionBIdx = 1;
 
     public final SimpleInventory equipmentInventory = new SimpleInventory(6);
     public final SimpleInventory unitInventory = new SimpleInventory(9);
@@ -216,7 +219,10 @@ public class CreatorScreenHandler extends ScreenHandler {
                 }
             }
             case 10 -> { // Start standard battle (8 vs 8)
-                BattleSandbox.startBattle(serverPlayer, "kingdom", "raiders", 8);
+                List<String> fKeys = new ArrayList<>(data.factions.keySet());
+                String fa = fKeys.get(Math.abs(battleFactionAIdx) % fKeys.size());
+                String fb = fKeys.get(Math.abs(battleFactionBIdx) % fKeys.size());
+                BattleSandbox.startBattle(serverPlayer, fa, fb, 8);
             }
             case 11 -> { // Clear all battle mobs
                 BattleSandbox.clearAllBattleMobs(serverPlayer.getServerWorld());
@@ -225,10 +231,22 @@ public class CreatorScreenHandler extends ScreenHandler {
                 BattleStats.get(serverPlayer.getServer()).reset();
             }
             case 20 -> { // Start large battle (16 vs 16)
-                BattleSandbox.startBattle(serverPlayer, "kingdom", "raiders", 16);
+                List<String> fKeys = new ArrayList<>(data.factions.keySet());
+                String fa = fKeys.get(Math.abs(battleFactionAIdx) % fKeys.size());
+                String fb = fKeys.get(Math.abs(battleFactionBIdx) % fKeys.size());
+                BattleSandbox.startBattle(serverPlayer, fa, fb, 16);
             }
             case 21 -> { // Start massive battle (24 vs 24)
-                BattleSandbox.startBattle(serverPlayer, "kingdom", "raiders", 24);
+                List<String> fKeys = new ArrayList<>(data.factions.keySet());
+                String fa = fKeys.get(Math.abs(battleFactionAIdx) % fKeys.size());
+                String fb = fKeys.get(Math.abs(battleFactionBIdx) % fKeys.size());
+                BattleSandbox.startBattle(serverPlayer, fa, fb, 24);
+            }
+            case 65 -> { // Cycle Faction A for battle
+                battleFactionAIdx++;
+            }
+            case 66 -> { // Cycle Faction B for battle
+                battleFactionBIdx++;
             }
             case 30 -> { // Restore default presets
                 data.units.clear();

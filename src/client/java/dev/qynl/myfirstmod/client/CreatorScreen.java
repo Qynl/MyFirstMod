@@ -64,7 +64,6 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         int rightX = x + 250;
 
         if (tab == 0) { // UNIT EDITOR
-            // Unit navigation & quick editing buttons
             addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Next Unit"), b -> sendButton(3))
                     .dimensions(leftX, y + 36, 110, 18).build());
 
@@ -133,20 +132,26 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                     .dimensions(rightX, y + 115, 160, 20).build());
 
         } else if (tab == 3) { // BATTLE SANDBOX
+            addDrawableChild(ButtonWidget.builder(Text.literal("Faction A: Cycle"), b -> sendButton(65))
+                    .dimensions(leftX, y + 36, 102, 20).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Faction B: Cycle"), b -> sendButton(66))
+                    .dimensions(leftX + 106, y + 36, 102, 20).build());
+
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ START BATTLE (8 vs 8) ⚔"), b -> sendButton(10))
-                    .dimensions(leftX, y + 36, 210, 22).build());
+                    .dimensions(leftX, y + 58, 210, 22).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ LARGE BATTLE (16 vs 16) ⚔"), b -> sendButton(20))
-                    .dimensions(leftX, y + 60, 210, 20).build());
-
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ MASSIVE BATTLE (24 vs 24) ⚔"), b -> sendButton(21))
                     .dimensions(leftX, y + 82, 210, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 CLEAR ALL BATTLE MOBS"), b -> sendButton(11))
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ MASSIVE BATTLE (24 vs 24) ⚔"), b -> sendButton(21))
                     .dimensions(leftX, y + 104, 210, 20).build());
 
+            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 CLEAR ALL BATTLE MOBS"), b -> sendButton(11))
+                    .dimensions(leftX, y + 126, 210, 20).build());
+
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Battle Stats"), b -> sendButton(12))
-                    .dimensions(leftX, y + 126, 210, 18).build());
+                    .dimensions(rightX, y + 126, 160, 20).build());
 
         } else if (tab == 4) { // SETTINGS
             addDrawableChild(ButtonWidget.builder(Text.literal("Building AI: " + (buildingEnabled ? "ON" : "OFF")), b -> {
@@ -261,13 +266,17 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                 drawUnitCard(context, leftX, cardY, "Royal Pyrotechnic", "PILLAGER • FIREWORKS ARTILLERY • 30 HP", 0xffef4444);
                 cardY += 34;
             }
+            if (matches(q, "undead necromancer evoker summoner")) {
+                drawUnitCard(context, leftX, cardY, "Undead Necromancer", "EVOKER • DARK NECROMANCER • 45 HP", 0xff8b5cf6);
+                cardY += 34;
+            }
             if (matches(q, "combat engineer villager barricade builder")) {
-                drawUnitCard(context, leftX, cardY, "Combat Engineer", "VILLAGER • BARRICADE BUILDER • 32 HP", 0xff8b5cf6);
+                drawUnitCard(context, leftX, cardY, "Combat Engineer", "VILLAGER • BARRICADE BUILDER • 32 HP", 0xff06b6d4);
                 cardY += 34;
             }
 
         } else if (tab == 2) { // FACTIONS
-            drawFactionCard(context, leftX, y + 36, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Iron Raiders", 0xff3b82f6);
+            drawFactionCard(context, leftX, y + 36, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Raiders, Undead", 0xff3b82f6);
             drawFactionCard(context, leftX, y + 74, "Iron Raiders", "Red (#EF4444) • 3 Units • Hostile: Kingdom, Village", 0xffef4444);
             drawFactionCard(context, leftX, y + 112, "Village Alliance", "Green (#10B981) • 3 Units • Allied: Kingdom", 0xff10b981);
 
@@ -282,15 +291,14 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             int statsY = y + 36;
 
             context.drawTextWithShadow(textRenderer, Text.literal("LIVE BATTLE SANDBOX").formatted(Formatting.BOLD, Formatting.GOLD), statsX, statsY, 0xffffd700);
-            context.drawText(textRenderer, Text.literal("Side A: ").formatted(Formatting.GRAY).append(Text.literal("Kingdom of Eldoria").formatted(Formatting.BLUE, Formatting.BOLD)), statsX, statsY + 16, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Side B: ").formatted(Formatting.GRAY).append(Text.literal("Iron Raiders").formatted(Formatting.RED, Formatting.BOLD)), statsX, statsY + 28, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Formation: Frontline Tanks, Ranged, Medics, Pyro").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
-            context.drawText(textRenderer, Text.literal("Tactical AI: Shield Block, Potions & Artillery Salvos").formatted(Formatting.AQUA), statsX, statsY + 58, 0xff38bdf8, false);
+            context.drawText(textRenderer, Text.literal("Side A / B: Select Any Two Factions").formatted(Formatting.AQUA), statsX, statsY + 16, 0xff38bdf8, false);
+            context.drawText(textRenderer, Text.literal("Formation: Frontline, Ranged, Medics, Pyro").formatted(Formatting.GRAY), statsX, statsY + 30, 0xff94a3b8, false);
+            context.drawText(textRenderer, Text.literal("Tactical AI: Shield Block, Potions & Artillery").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
 
-            context.fill(leftX, y + 152, x + backgroundWidth - 16, y + backgroundHeight - 16, COLOR_PANEL_MAIN);
-            context.drawTextWithShadow(textRenderer, Text.literal("REAL-TIME BATTLE SIMULATION ACTIVE").formatted(Formatting.GREEN), leftX + 8, y + 158, 0xff4ade80);
-            context.drawText(textRenderer, Text.literal("Select army size (8v8, 16v16, 24v24) to spawn structured battlefield formations.").formatted(Formatting.GRAY), leftX + 8, y + 172, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Healers cast divine rays while Pyrotechnics launch fireworks salvos!").formatted(Formatting.YELLOW), leftX + 8, y + 186, 0xfffde047, false);
+            context.fill(leftX, y + 150, x + backgroundWidth - 16, y + backgroundHeight - 16, COLOR_PANEL_MAIN);
+            context.drawTextWithShadow(textRenderer, Text.literal("REAL-TIME BATTLE SIMULATION ACTIVE").formatted(Formatting.GREEN), leftX + 8, y + 156, 0xff4ade80);
+            context.drawText(textRenderer, Text.literal("Cycle factions, choose army size, and deploy structured armies instantly!").formatted(Formatting.GRAY), leftX + 8, y + 170, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("Healers cast divine rays, Pyrotechnics launch fireworks, and Bards play songs!").formatted(Formatting.YELLOW), leftX + 8, y + 184, 0xfffde047, false);
 
         } else if (tab == 4) { // SETTINGS
             int infoX = x + 215;

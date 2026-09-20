@@ -132,33 +132,62 @@ public final class UnitWorldData extends PersistentState {
 
     public void initDefaultsIfEmpty() {
         if (factions.isEmpty()) {
-            Faction kingdom = new Faction("kingdom", "Kingdom of Eldoria", "#3B82F6", "Noble kingdom defenders and knights.");
+            Faction kingdom = new Faction("kingdom", "Kingdom of Eldoria", "#3B82F6", "Noble kingdom defenders, royal knights, and archers.");
             kingdom.perks.add("military_discipline");
             kingdom.perks.add("heavy_armor");
             kingdom.perks.add("rally");
             kingdom.perks.add("regeneration");
 
-            Faction raiders = new Faction("raiders", "Iron Raiders", "#EF4444", "Savage raiders, warlords, and pyrotechnicians.");
+            Faction raiders = new Faction("raiders", "Iron Raiders", "#EF4444", "Savage raiders, berserkers, warlords, and pyrotechnicians.");
             raiders.perks.add("swift_army");
             raiders.perks.add("pyrotechnics");
             raiders.perks.add("veterans");
+            raiders.perks.add("berserk_fury");
 
-            Faction villagers = new Faction("villagers", "Village Alliance", "#10B981", "Local militia and civilian guards.");
+            Faction villagers = new Faction("villagers", "Village Alliance", "#10B981", "Local militia, civil guards, and healers.");
             villagers.perks.add("holy_might");
             villagers.perks.add("fortification");
 
+            Faction undead = new Faction("undead", "Undead Legion", "#8B5CF6", "Cursed legion of necromancers, dread knights, and snipers.");
+            undead.perks.add("necromancy");
+            undead.perks.add("night_fighters");
+            undead.perks.add("heavy_armor");
+
+            Faction arcane = new Faction("arcane", "Arcane Order", "#06B6D4", "Mystic order of bards, battle mages, and golems.");
+            arcane.perks.add("war_song");
+            arcane.perks.add("fire_mastery");
+            arcane.perks.add("holy_might");
+
+            // Relations setup
             kingdom.relations.put("raiders", FactionRelation.HOSTILE);
+            kingdom.relations.put("undead", FactionRelation.HOSTILE);
             kingdom.relations.put("villagers", FactionRelation.ALLIED);
+            kingdom.relations.put("arcane", FactionRelation.ALLIED);
 
             raiders.relations.put("kingdom", FactionRelation.HOSTILE);
             raiders.relations.put("villagers", FactionRelation.HOSTILE);
+            raiders.relations.put("undead", FactionRelation.NEUTRAL);
+            raiders.relations.put("arcane", FactionRelation.HOSTILE);
 
             villagers.relations.put("kingdom", FactionRelation.ALLIED);
             villagers.relations.put("raiders", FactionRelation.HOSTILE);
+            villagers.relations.put("undead", FactionRelation.HOSTILE);
+            villagers.relations.put("arcane", FactionRelation.ALLIED);
+
+            undead.relations.put("kingdom", FactionRelation.HOSTILE);
+            undead.relations.put("villagers", FactionRelation.HOSTILE);
+            undead.relations.put("arcane", FactionRelation.HOSTILE);
+
+            arcane.relations.put("kingdom", FactionRelation.ALLIED);
+            arcane.relations.put("villagers", FactionRelation.ALLIED);
+            arcane.relations.put("raiders", FactionRelation.HOSTILE);
+            arcane.relations.put("undead", FactionRelation.HOSTILE);
 
             factions.put(kingdom.id, kingdom);
             factions.put(raiders.id, raiders);
             factions.put(villagers.id, villagers);
+            factions.put(undead.id, undead);
+            factions.put(arcane.id, arcane);
         }
 
         if (units.isEmpty()) {
@@ -219,7 +248,38 @@ public final class UnitWorldData extends PersistentState {
             medic.inventory.add(new ItemStack(Items.GOLDEN_APPLE, 2));
             units.put(medic.id, medic);
 
-            // 4. Royal Commander
+            // 4. Royal Pyrotechnic (Fireworks Artillery)
+            UnitDefinition pyro = new UnitDefinition("royal_pyro", "Royal Pyrotechnic", Identifier.of("minecraft", "pillager"));
+            pyro.description = "Heavy artillery specialist bombarding enemies with explosive fireworks.";
+            pyro.factionId = "kingdom";
+            pyro.role = "pyrotechnic";
+            pyro.rank = "artillery";
+            pyro.maxHealth = 30.0f;
+            pyro.canShootFireworks = true;
+            pyro.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            pyro.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+            pyro.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.CROSSBOW));
+            pyro.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.FIREWORK_ROCKET));
+            pyro.inventory.add(new ItemStack(Items.FIREWORK_ROCKET, 64));
+            units.put(pyro.id, pyro);
+
+            // 5. Combat Engineer
+            UnitDefinition engineer = new UnitDefinition("combat_engineer", "Combat Engineer", Identifier.of("minecraft", "villager"));
+            engineer.description = "Field fortification builder placing defensive barricades and torches.";
+            engineer.factionId = "kingdom";
+            engineer.role = "engineer";
+            engineer.rank = "engineer";
+            engineer.maxHealth = 32.0f;
+            engineer.canBuild = true;
+            engineer.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            engineer.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+            engineer.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
+            engineer.inventory.add(new ItemStack(Items.COBBLESTONE, 64));
+            engineer.inventory.add(new ItemStack(Items.TORCH, 16));
+            engineer.inventory.add(new ItemStack(Items.LADDER, 8));
+            units.put(engineer.id, engineer);
+
+            // 6. Royal Commander
             UnitDefinition commander = new UnitDefinition("royal_commander", "Royal Commander", Identifier.of("minecraft", "vindicator"));
             commander.description = "Tactical leader rallying troops with war horn buffs.";
             commander.factionId = "kingdom";
@@ -238,44 +298,13 @@ public final class UnitWorldData extends PersistentState {
             commander.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
             units.put(commander.id, commander);
 
-            // 5. Royal Pyrotechnic (Fireworks Artillery)
-            UnitDefinition pyro = new UnitDefinition("royal_pyro", "Royal Pyrotechnic", Identifier.of("minecraft", "pillager"));
-            pyro.description = "Heavy artillery specialist bombarding enemies with explosive fireworks.";
-            pyro.factionId = "kingdom";
-            pyro.role = "pyrotechnic";
-            pyro.rank = "artillery";
-            pyro.maxHealth = 30.0f;
-            pyro.canShootFireworks = true;
-            pyro.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
-            pyro.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
-            pyro.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.CROSSBOW));
-            pyro.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.FIREWORK_ROCKET));
-            pyro.inventory.add(new ItemStack(Items.FIREWORK_ROCKET, 64));
-            units.put(pyro.id, pyro);
-
-            // 6. Combat Engineer
-            UnitDefinition engineer = new UnitDefinition("combat_engineer", "Combat Engineer", Identifier.of("minecraft", "villager"));
-            engineer.description = "Field fortification builder placing defensive barricades and torches.";
-            engineer.factionId = "kingdom";
-            engineer.role = "engineer";
-            engineer.rank = "engineer";
-            engineer.maxHealth = 32.0f;
-            engineer.canBuild = true;
-            engineer.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
-            engineer.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
-            engineer.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
-            engineer.inventory.add(new ItemStack(Items.COBBLESTONE, 64));
-            engineer.inventory.add(new ItemStack(Items.TORCH, 16));
-            engineer.inventory.add(new ItemStack(Items.LADDER, 8));
-            units.put(engineer.id, engineer);
-
             // 7. Raider Berserker
             UnitDefinition berserker = new UnitDefinition("raider_berserker", "Raider Berserker", Identifier.of("minecraft", "piglin_brute"));
-            berserker.description = "Furious warrior charging fearlessly into battle.";
+            berserker.description = "Furious warrior charging fearlessly in Bloodrage.";
             berserker.factionId = "raiders";
-            berserker.role = "melee";
+            berserker.role = "berserker";
             berserker.rank = "soldier";
-            berserker.maxHealth = 38.0f;
+            berserker.maxHealth = 40.0f;
             berserker.attackDamage = 8.5f;
             berserker.armor = 10.0f;
             berserker.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
@@ -296,7 +325,7 @@ public final class UnitWorldData extends PersistentState {
             crossbowman.inventory.add(new ItemStack(Items.ARROW, 64));
             units.put(crossbowman.id, crossbowman);
 
-            // 9. Raider Alchemist (Throwable Potions)
+            // 9. Raider Alchemist
             UnitDefinition alchemist = new UnitDefinition("raider_alchemist", "Raider Alchemist", Identifier.of("minecraft", "witch"));
             alchemist.description = "Sinister potion thrower launching poison and harm flasks.";
             alchemist.factionId = "raiders";
@@ -307,6 +336,30 @@ public final class UnitWorldData extends PersistentState {
             alchemist.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.SPLASH_POTION));
             alchemist.inventory.add(new ItemStack(Items.SPLASH_POTION, 8));
             units.put(alchemist.id, alchemist);
+
+            // 10. Undead Necromancer
+            UnitDefinition necro = new UnitDefinition("undead_necromancer", "Undead Necromancer", Identifier.of("minecraft", "evoker"));
+            necro.description = "Dark summoner raising undead thralls to overwhelm foes.";
+            necro.factionId = "undead";
+            necro.role = "necromancer";
+            necro.rank = "commander";
+            necro.maxHealth = 45.0f;
+            necro.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.NETHERITE_HELMET));
+            necro.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.CHAINMAIL_CHESTPLATE));
+            necro.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.TOTEM_OF_UNDYING));
+            units.put(necro.id, necro);
+
+            // 11. Arcane Bard
+            UnitDefinition bard = new UnitDefinition("arcane_bard", "Arcane Bard", Identifier.of("minecraft", "villager"));
+            bard.description = "Musical spellcaster playing harmonic war songs that buff allies.";
+            bard.factionId = "arcane";
+            bard.role = "bard";
+            bard.rank = "specialist";
+            bard.maxHealth = 30.0f;
+            bard.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
+            bard.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
+            bard.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.GOAT_HORN));
+            units.put(bard.id, bard);
         }
     }
 
