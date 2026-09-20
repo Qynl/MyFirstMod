@@ -51,34 +51,41 @@ public class ReinforcementBeaconItem extends Item {
 
             // Spawn 4 reinforcement units around target point
             Vec3d center = new Vec3d(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-            int count = Math.min(4, Math.max(1, factionUnits.size()));
+
+            // Orbital beam descent particles from the sky
+            for (double dy = 0; dy <= 24; dy += 1.0) {
+                world.spawnParticles(ParticleTypes.END_ROD, center.x, center.y + dy, center.z, 2, 0.1, 0.1, 0.1, 0.01);
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, center.x, center.y + dy, center.z, 2, 0.2, 0.2, 0.2, 0.05);
+            }
 
             for (int i = 0; i < 4; i++) {
                 UnitDefinition def = factionUnits.get(i % factionUnits.size());
-                double ox = (i % 2 == 0 ? 1 : -1) * 1.5;
-                double oz = (i / 2 == 0 ? 1 : -1) * 1.5;
+                double ox = (i % 2 == 0 ? 1 : -1) * 1.8;
+                double oz = (i / 2 == 0 ? 1 : -1) * 1.8;
                 Vec3d sPos = center.add(ox, 0, oz);
                 UnitSpawner.spawn(world, def, sPos, serverPlayer.getYaw());
             }
 
-            // Epic visual lightning & beacon activation
-            world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y + 1.0, center.z, 2, 0.2, 0.2, 0.2, 0.0);
-            world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, center.x, center.y + 1.5, center.z, 40, 0.8, 1.2, 0.8, 0.15);
-            world.playSound(null, center.x, center.y, center.z, SoundEvents.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.4f, 1.2f);
-            world.playSound(null, center.x, center.y, center.z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.5f, 1.0f);
+            // Epic visual landing shockwave & beacon activation
+            world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y + 0.5, center.z, 3, 0.3, 0.3, 0.3, 0.0);
+            world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, center.x, center.y + 1.2, center.z, 60, 1.2, 1.5, 1.2, 0.2);
+            world.spawnParticles(ParticleTypes.FLASH, center.x, center.y + 1.0, center.z, 2, 0.1, 0.1, 0.1, 0.0);
+            world.playSound(null, center.x, center.y, center.z, SoundEvents.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.5f, 1.2f);
+            world.playSound(null, center.x, center.y, center.z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.8f, 1.0f);
+            world.playSound(null, center.x, center.y, center.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.9f, 1.4f);
 
             int colorRgb = faction != null ? faction.getParsedColor() : 0x3B82F6;
             String fName = faction != null ? faction.name : "Army";
 
             serverPlayer.sendMessage(
-                    Text.literal("⚡ Reinforcements Deployed: ").formatted(Formatting.GOLD, Formatting.BOLD)
+                    Text.literal("⚡ Orbital Reinforcements Deployed: ").formatted(Formatting.GOLD, Formatting.BOLD)
                             .append(Text.literal("4 elite units of ").formatted(Formatting.GRAY))
-                            .append(Text.literal(fName).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(colorRgb))))
-                            .append(Text.literal(" have arrived!").formatted(Formatting.YELLOW)),
+                            .append(Text.literal(fName).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(colorRgb)).withBold(true)))
+                            .append(Text.literal(" dropped into combat!").formatted(Formatting.YELLOW)),
                     false
             );
 
-            player.getItemCooldownManager().set(this, 200); // 10 second cooldown
+            player.getItemCooldownManager().set(this, 160); // 8 second cooldown
             return ActionResult.SUCCESS;
         }
 
@@ -88,8 +95,9 @@ public class ReinforcementBeaconItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         tooltip.add(Text.literal("Reinforcement Drop Beacon").formatted(Formatting.GOLD, Formatting.BOLD));
-        tooltip.add(Text.literal("Right-Click on Block: ").formatted(Formatting.YELLOW).append(Text.literal("Deploy 4-unit tactical reinforcement wave").formatted(Formatting.GRAY)));
-        tooltip.add(Text.literal("Cooldown: 10s").formatted(Formatting.DARK_GRAY));
+        tooltip.add(Text.literal("Right-Click on Ground: ").formatted(Formatting.YELLOW).append(Text.literal("Call down 4 elite drop-pod reinforcements").formatted(Formatting.GRAY)));
+        tooltip.add(Text.literal("Features orbital beam VFX and instantaneous tactical deployment").formatted(Formatting.AQUA));
+        tooltip.add(Text.literal("Cooldown: 8s").formatted(Formatting.DARK_GRAY));
         super.appendTooltip(stack, context, tooltip, type);
     }
 }

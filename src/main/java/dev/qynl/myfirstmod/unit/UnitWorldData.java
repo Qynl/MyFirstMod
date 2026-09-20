@@ -600,11 +600,16 @@ public final class UnitWorldData extends PersistentState {
     }
 
     public String cycleEquippedUnit(UUID playerUuid) {
+        return cycleEquippedUnit(playerUuid, 1);
+    }
+
+    public String cycleEquippedUnit(UUID playerUuid, int direction) {
         if (units.isEmpty()) return "";
         List<String> keys = new ArrayList<>(units.keySet());
         String current = equipped.get(playerUuid);
-        int index = current == null ? -1 : keys.indexOf(current);
-        int nextIndex = (index + 1) % keys.size();
+        int index = current == null ? 0 : keys.indexOf(current);
+        if (index == -1) index = 0;
+        int nextIndex = (index + direction + keys.size()) % keys.size();
         String nextUnitId = keys.get(nextIndex);
         equipped.put(playerUuid, nextUnitId);
         markDirty();

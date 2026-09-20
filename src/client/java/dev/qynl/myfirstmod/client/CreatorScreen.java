@@ -9,16 +9,23 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private int tab = 0;
     private TextFieldWidget searchField;
 
-    private static final int COLOR_BG_BACKDROP = 0xcc090d16;
-    private static final int COLOR_PANEL_MAIN = 0xff131c2e;
-    private static final int COLOR_PANEL_INNER = 0xff0d1522;
-    private static final int COLOR_CARD_BG = 0xff1a263d;
-    private static final int COLOR_CARD_BORDER = 0xff2a3c5a;
+    // Tactical Military Command Palette Colors
+    private static final int COLOR_BG_BACKDROP = 0xd9060b14;
+    private static final int COLOR_PANEL_MAIN = 0xff0f172a;
+    private static final int COLOR_PANEL_INNER = 0xff090e1a;
+    private static final int COLOR_CARD_BG = 0xff1e293b;
+    private static final int COLOR_CARD_HOVER = 0xff334155;
+    private static final int COLOR_CARD_BORDER = 0xff475569;
+    private static final int COLOR_GOLD_ACCENT = 0xfff59e0b;
+    private static final int COLOR_CYAN_ACCENT = 0xff06b6d4;
+    private static final int COLOR_GREEN_ACCENT = 0xff10b981;
+    private static final int COLOR_RED_ACCENT = 0xffef4444;
 
     // Simulation toggle states for UI display
     private boolean buildingEnabled = true;
@@ -42,163 +49,179 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private void rebuildInterface() {
         clearChildren();
 
-        int topY = y + 8;
+        int topY = y + 7;
         int tabWidth = 78;
 
-        // Navigation Tab Bar
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 0 ? "⚔ EDITOR" : "Editor"), b -> { tab = 0; rebuildInterface(); })
-                .dimensions(x + 12 + (0 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        // Navigation Tab Bar with active highlighted styling
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 0 ? "⚔ [EDITOR]" : "⚔ Editor"), b -> { tab = 0; rebuildInterface(); })
+                .dimensions(x + 10 + (0 * (tabWidth + 4)), topY, tabWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 1 ? "📋 UNITS" : "Units"), b -> { tab = 1; rebuildInterface(); })
-                .dimensions(x + 12 + (1 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 1 ? "📋 [UNITS]" : "📋 Units"), b -> { tab = 1; rebuildInterface(); })
+                .dimensions(x + 10 + (1 * (tabWidth + 4)), topY, tabWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 2 ? "🛡 FACTIONS" : "Factions"), b -> { tab = 2; rebuildInterface(); })
-                .dimensions(x + 12 + (2 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 2 ? "🛡 [FACTIONS]" : "🛡 Factions"), b -> { tab = 2; rebuildInterface(); })
+                .dimensions(x + 10 + (2 * (tabWidth + 4)), topY, tabWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 3 ? "💥 BATTLE" : "Battle"), b -> { tab = 3; rebuildInterface(); })
-                .dimensions(x + 12 + (3 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 3 ? "💥 [BATTLE]" : "💥 Battle"), b -> { tab = 3; rebuildInterface(); })
+                .dimensions(x + 10 + (3 * (tabWidth + 4)), topY, tabWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 4 ? "⚙ SETTINGS" : "Settings"), b -> { tab = 4; rebuildInterface(); })
-                .dimensions(x + 12 + (4 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 4 ? "⚙ [CONFIG]" : "⚙ Config"), b -> { tab = 4; rebuildInterface(); })
+                .dimensions(x + 10 + (4 * (tabWidth + 4)), topY, tabWidth, 20).build());
 
-        int leftX = x + 16;
-        int rightX = x + 250;
+        int leftX = x + 14;
+        int rightX = x + 252;
 
         if (tab == 0) { // UNIT EDITOR
-            addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Next Unit"), b -> sendButton(3))
-                    .dimensions(leftX, y + 36, 110, 18).build());
+            // Unit Selector (Prev / Next)
+            addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Prev Unit"), b -> sendButton(6))
+                    .dimensions(leftX, y + 34, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate"), b -> sendButton(4))
-                    .dimensions(leftX + 115, y + 36, 110, 18).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("Next Unit ⮞"), b -> sendButton(3))
+                    .dimensions(leftX + 115, y + 34, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Entity: Next ⮞"), b -> sendButton(50))
-                    .dimensions(leftX, y + 56, 110, 18).build());
+            // Entity Type Cycle (Dual Direction: Left Click = Next, Shift Click = Prev)
+            addDrawableChild(ButtonWidget.builder(Text.literal("🦁 ⮜ Entity ⮞"), b -> sendButton(hasShiftDown() ? 49 : 50))
+                    .dimensions(leftX, y + 54, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Role: Cycle"), b -> sendButton(51))
-                    .dimensions(leftX + 115, y + 56, 110, 18).build());
+            // Combat Role Cycle
+            addDrawableChild(ButtonWidget.builder(Text.literal("🎯 ⮜ Role ⮞"), b -> sendButton(hasShiftDown() ? 48 : 51))
+                    .dimensions(leftX + 115, y + 54, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Faction: Cycle"), b -> sendButton(52))
-                    .dimensions(leftX, y + 76, 110, 18).build());
+            // Faction Allegiance Cycle
+            addDrawableChild(ButtonWidget.builder(Text.literal("🚩 ⮜ Faction ⮞"), b -> sendButton(hasShiftDown() ? 47 : 52))
+                    .dimensions(leftX, y + 74, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Rank: Cycle"), b -> sendButton(53))
-                    .dimensions(leftX + 115, y + 76, 110, 18).build());
+            // Military Rank Cycle
+            addDrawableChild(ButtonWidget.builder(Text.literal("🎖 ⮜ Rank ⮞"), b -> sendButton(hasShiftDown() ? 46 : 53))
+                    .dimensions(leftX + 115, y + 74, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Mount: Next ⮞"), b -> sendButton(55))
-                    .dimensions(leftX, y + 96, 110, 18).build());
+            // Mount & Cavalry Steed Cycle
+            addDrawableChild(ButtonWidget.builder(Text.literal("🐎 ⮜ Mount ⮞"), b -> sendButton(hasShiftDown() ? 59 : 55))
+                    .dimensions(leftX, y + 94, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Aura: Cycle"), b -> sendButton(56))
-                    .dimensions(leftX + 115, y + 96, 110, 18).build());
+            // Visual Particle Aura Cycle
+            addDrawableChild(ButtonWidget.builder(Text.literal("✨ ⮜ Aura ⮞"), b -> sendButton(hasShiftDown() ? 45 : 56))
+                    .dimensions(leftX + 115, y + 94, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Death: Cycle"), b -> sendButton(57))
-                    .dimensions(leftX, y + 116, 110, 18).build());
+            // Death Action Effect Cycle
+            addDrawableChild(ButtonWidget.builder(Text.literal("💥 ⮜ Death ⮞"), b -> sendButton(hasShiftDown() ? 44 : 57))
+                    .dimensions(leftX, y + 114, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Scale: Cycle"), b -> sendButton(58))
-                    .dimensions(leftX + 115, y + 116, 110, 18).build());
+            // Entity Visual Scale Cycle
+            addDrawableChild(ButtonWidget.builder(Text.literal("📏 ⮜ Scale ⮞"), b -> sendButton(hasShiftDown() ? 43 : 58))
+                    .dimensions(leftX + 115, y + 114, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Commander: Toggle"), b -> sendButton(54))
-                    .dimensions(leftX, y + 136, 225, 18).build());
+            // Commander Toggle Button
+            addDrawableChild(ButtonWidget.builder(Text.literal("★ Commander Status: Toggle"), b -> sendButton(54))
+                    .dimensions(leftX, y + 134, 225, 18).build());
 
-            // Actions on right
-            addDrawableChild(ButtonWidget.builder(Text.literal("💾 Save Slots"), b -> sendButton(0))
-                    .dimensions(rightX, y + 36, 160, 18).build());
+            // Actions on right panel
+            addDrawableChild(ButtonWidget.builder(Text.literal("💾 Save Unit Slots"), b -> sendButton(0))
+                    .dimensions(rightX, y + 34, 162, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn Unit (1)"), b -> sendButton(1))
-                    .dimensions(rightX, y + 56, 160, 18).build());
+                    .dimensions(rightX, y + 54, 162, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🛡 Spawn Squad (5)"), b -> sendButton(2))
-                    .dimensions(rightX, y + 76, 160, 18).build());
+                    .dimensions(rightX, y + 74, 162, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate Unit"), b -> sendButton(4))
+                    .dimensions(rightX, y + 94, 78, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Delete Unit"), b -> sendButton(5))
-                    .dimensions(rightX, y + 96, 160, 18).build());
+                    .dimensions(rightX + 84, y + 94, 78, 18).build());
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
-            searchField = new TextFieldWidget(textRenderer, leftX, y + 36, 220, 20, Text.literal("Search"));
-            searchField.setPlaceholder(Text.literal("Search (knight, wolf, bear, dragoon, titan)..."));
+            searchField = new TextFieldWidget(textRenderer, leftX, y + 34, 224, 20, Text.literal("Search"));
+            searchField.setPlaceholder(Text.literal("Search units (knight, wolf, bear, dragoon, titan)..."));
             addDrawableChild(searchField);
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn Equipped"), b -> sendButton(1))
-                    .dimensions(rightX, y + 36, 160, 20).build());
+                    .dimensions(rightX, y + 34, 162, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🛡 Spawn Squad (5)"), b -> sendButton(2))
-                    .dimensions(rightX, y + 60, 160, 20).build());
+                    .dimensions(rightX, y + 58, 162, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Cycle Unit"), b -> sendButton(3))
-                    .dimensions(rightX, y + 84, 160, 20).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Next Unit"), b -> sendButton(3))
+                    .dimensions(rightX, y + 82, 78, 20).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Prev Unit"), b -> sendButton(6))
+                    .dimensions(rightX + 84, y + 82, 78, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate"), b -> sendButton(4))
-                    .dimensions(rightX, y + 108, 160, 20).build());
+                    .dimensions(rightX, y + 106, 78, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Delete"), b -> sendButton(5))
-                    .dimensions(rightX, y + 132, 160, 20).build());
+                    .dimensions(rightX + 84, y + 106, 78, 20).build());
 
-        } else if (tab == 2) { // FACTIONS
+        } else if (tab == 2) { // FACTIONS & DIPLOMACY
             addDrawableChild(ButtonWidget.builder(Text.literal("Kingdom ↔ Raiders: Toggle"), b -> sendButton(70))
-                    .dimensions(rightX, y + 36, 160, 20).build());
+                    .dimensions(rightX, y + 34, 162, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Kingdom ↔ Villagers: Toggle"), b -> sendButton(71))
-                    .dimensions(rightX, y + 60, 160, 20).build());
+                    .dimensions(rightX, y + 58, 162, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Raiders ↔ Villagers: Toggle"), b -> sendButton(72))
-                    .dimensions(rightX, y + 84, 160, 20).build());
+                    .dimensions(rightX, y + 82, 162, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Refresh Presets"), b -> sendButton(30))
-                    .dimensions(rightX, y + 115, 160, 20).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Restore Defaults"), b -> sendButton(30))
+                    .dimensions(rightX, y + 110, 162, 20).build());
 
         } else if (tab == 3) { // BATTLE SANDBOX
             addDrawableChild(ButtonWidget.builder(Text.literal("Faction A: Cycle"), b -> sendButton(65))
-                    .dimensions(leftX, y + 36, 102, 20).build());
+                    .dimensions(leftX, y + 34, 108, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Faction B: Cycle"), b -> sendButton(66))
-                    .dimensions(leftX + 106, y + 36, 102, 20).build());
+                    .dimensions(leftX + 116, y + 34, 108, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ START BATTLE (8 vs 8) ⚔"), b -> sendButton(10))
-                    .dimensions(leftX, y + 58, 210, 22).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ QUICK CLASH (8 vs 8) ⚔"), b -> sendButton(10))
+                    .dimensions(leftX, y + 58, 224, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ LARGE BATTLE (16 vs 16) ⚔"), b -> sendButton(20))
-                    .dimensions(leftX, y + 82, 210, 20).build());
+                    .dimensions(leftX, y + 80, 224, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ MASSIVE BATTLE (24 vs 24) ⚔"), b -> sendButton(21))
-                    .dimensions(leftX, y + 104, 210, 20).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ EPIC WARFARE (24 vs 24) ⚔"), b -> sendButton(21))
+                    .dimensions(leftX, y + 102, 224, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🗑 CLEAR ALL BATTLE MOBS"), b -> sendButton(11))
-                    .dimensions(leftX, y + 126, 210, 20).build());
+                    .dimensions(leftX, y + 124, 224, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Battle Stats"), b -> sendButton(12))
-                    .dimensions(rightX, y + 126, 160, 20).build());
+                    .dimensions(rightX, y + 124, 162, 20).build());
 
-        } else if (tab == 4) { // SETTINGS
-            addDrawableChild(ButtonWidget.builder(Text.literal("Building AI: " + (buildingEnabled ? "ON" : "OFF")), b -> {
+        } else if (tab == 4) { // SETTINGS & SIMULATION
+            addDrawableChild(ButtonWidget.builder(Text.literal("Building AI: " + (buildingEnabled ? "ON [Active]" : "OFF [Disabled]")), b -> {
                 buildingEnabled = !buildingEnabled;
                 sendButton(31);
                 rebuildInterface();
-            }).dimensions(leftX, y + 36, 185, 20).build());
+            }).dimensions(leftX, y + 34, 195, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Potion Throwing: " + (potionsEnabled ? "ON" : "OFF")), b -> {
+            addDrawableChild(ButtonWidget.builder(Text.literal("Potion AI: " + (potionsEnabled ? "ON [Active]" : "OFF [Disabled]")), b -> {
                 potionsEnabled = !potionsEnabled;
                 sendButton(32);
                 rebuildInterface();
-            }).dimensions(leftX, y + 60, 185, 20).build());
+            }).dimensions(leftX, y + 58, 195, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Fireworks Artillery: " + (fireworksEnabled ? "ON" : "OFF")), b -> {
+            addDrawableChild(ButtonWidget.builder(Text.literal("Fireworks Artillery: " + (fireworksEnabled ? "ON [Active]" : "OFF [Disabled]")), b -> {
                 fireworksEnabled = !fireworksEnabled;
                 sendButton(33);
                 rebuildInterface();
-            }).dimensions(leftX, y + 84, 185, 20).build());
+            }).dimensions(leftX, y + 82, 195, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Shield Defense: " + (shieldEnabled ? "ON" : "OFF")), b -> {
+            addDrawableChild(ButtonWidget.builder(Text.literal("Shield Defense: " + (shieldEnabled ? "ON [Active]" : "OFF [Disabled]")), b -> {
                 shieldEnabled = !shieldEnabled;
                 sendButton(34);
                 rebuildInterface();
-            }).dimensions(leftX, y + 108, 185, 20).build());
+            }).dimensions(leftX, y + 106, 195, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Friendly Fire: " + (friendlyFireAllowed ? "ALLOWED" : "PREVENTED")), b -> {
                 friendlyFireAllowed = !friendlyFireAllowed;
                 sendButton(35);
                 rebuildInterface();
-            }).dimensions(leftX, y + 132, 185, 20).build());
+            }).dimensions(leftX, y + 130, 195, 20).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Restore Default Presets"), b -> sendButton(30))
-                    .dimensions(rightX, y + 36, 160, 22).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Everything to Defaults"), b -> sendButton(30))
+                    .dimensions(rightX, y + 34, 162, 22).build());
         }
     }
 
@@ -210,15 +233,19 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        // Fullscreen backdrop dimming
+        // High-tech military command backdrop
         context.fill(0, 0, width, height, COLOR_BG_BACKDROP);
 
-        // Main Dialog Panel
+        // Main Dialog Console Panel
         context.fill(x, y, x + backgroundWidth, y + backgroundHeight, COLOR_PANEL_MAIN);
-        context.fill(x + 10, y + 30, x + backgroundWidth - 10, y + backgroundHeight - 10, COLOR_PANEL_INNER);
+        context.fill(x + 8, y + 28, x + backgroundWidth - 8, y + backgroundHeight - 8, COLOR_PANEL_INNER);
 
         // Header separator line
-        context.fill(x + 10, y + 30, x + backgroundWidth - 10, y + 31, COLOR_CARD_BORDER);
+        context.fill(x + 8, y + 28, x + backgroundWidth - 8, y + 29, COLOR_CARD_BORDER);
+
+        // Tab selection highlight under active tab
+        int tabWidth = 78;
+        context.fill(x + 10 + (tab * (tabWidth + 4)), y + 26, x + 10 + (tab * (tabWidth + 4)) + tabWidth, y + 28, COLOR_GOLD_ACCENT);
     }
 
     @Override
@@ -245,32 +272,39 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
     private void drawSlotLabels(DrawContext context) {
         int eqX = x + 255;
-        int eqY = y + 128;
+        int eqY = y + 126;
         context.drawText(textRenderer, Text.literal("H   C   L   F   M   O").formatted(Formatting.DARK_GRAY), eqX + 3, eqY, 0xff8294ad, false);
-        context.drawText(textRenderer, Text.literal("Unit Equipment & Inventory").formatted(Formatting.AQUA), eqX, y + 115, 0xff9ecbff, false);
-        context.drawText(textRenderer, Text.literal("Player Inventory").formatted(Formatting.GRAY), x + 20, y + 148, 0xff8294ad, false);
+        context.drawText(textRenderer, Text.literal("Unit Equipment & Inventory").formatted(Formatting.AQUA), eqX, y + 113, 0xff9ecbff, false);
+        context.drawText(textRenderer, Text.literal("Player Inventory (Drag Items to Unit)").formatted(Formatting.GRAY), x + 18, y + 148, 0xff8294ad, false);
     }
 
     private void drawTabContent(DrawContext context, int mouseX, int mouseY) {
-        int leftX = x + 16;
+        int leftX = x + 14;
         int leftY = y + 160;
 
-        if (tab == 0) { // UNIT EDITOR CONTENT
-            context.drawText(textRenderer, Text.literal("Dynamic Modded Mobs & Beasts Supported!").formatted(Formatting.GOLD), leftX, leftY, 0xffffd700, false);
-            context.drawText(textRenderer, Text.literal("Non-humanoid mobs adapt weapon damage & armor seamlessly.").formatted(Formatting.GREEN), leftX, leftY + 12, 0xffcbd5e1, false);
+        if (tab == 0) { // UNIT EDITOR CONTENT & STAT HUD
+            // Stat Bars and Active Unit Badges
+            context.fill(leftX, leftY - 4, leftX + 225, y + backgroundHeight - 12, COLOR_CARD_BG);
+            context.fill(leftX, leftY - 4, leftX + 3, y + backgroundHeight - 12, COLOR_GOLD_ACCENT);
+
+            context.drawText(textRenderer, Text.literal("⚔ ACTIVE TEMPLATE OVERVIEW").formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, leftY, COLOR_GOLD_ACCENT, false);
+            context.drawText(textRenderer, Text.literal("• Scale, Mounts & Modded Mobs (Naturalist) Supported").formatted(Formatting.WHITE), leftX + 8, leftY + 14, 0xffe2e8f0, false);
+            context.drawText(textRenderer, Text.literal("• Shift-Click buttons to cycle backwards instantly").formatted(Formatting.YELLOW), leftX + 8, leftY + 26, 0xfffde047, false);
+            context.drawText(textRenderer, Text.literal("• Weapon damage & armor adapt cleanly to beasts & mounts").formatted(Formatting.GREEN), leftX + 8, leftY + 38, 0xff4ade80, false);
+            context.drawText(textRenderer, Text.literal("• Shield Block, Potions & Morale Active in Combat").formatted(Formatting.GRAY), leftX + 8, leftY + 50, 0xff94a3b8, false);
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
-            int cardY = y + 62;
+            int cardY = y + 58;
             String q = searchField == null ? "" : searchField.getText().toLowerCase();
             int cardsDrawn = 0;
 
             String[][] allUnits = {
                     {"Royal Knight", "VILLAGER • MELEE TANK • 40 HP • 7.5 DMG", "0xff3b82f6", "royal knight villager melee tank"},
-                    {"Royal Heavy Cavalry", "HORSE • MOUNTED KNIGHT • 45 HP • 9.0 DMG", "0xff3b82f6", "royal cavalry horse mount"},
+                    {"Royal Heavy Cavalry", "HORSE MOUNT • ARMORED LANCE • 45 HP", "0xff3b82f6", "royal cavalry horse mount"},
                     {"Savage War Wolf", "WOLF • BERSERKER BEAST • 36 HP • 8.0 DMG", "0xfff97316", "war wolf beast berserker animal canine naturalist"},
                     {"Armored Battle Bear", "POLAR BEAR • 1.25x TANK JUGGERNAUT • 85 HP", "0xff38bdf8", "battle bear polar grizzly bear naturalist tank"},
                     {"Desert Camel Dragoon", "CAMEL MOUNT • CROSSBOW RANGED • 48 HP", "0xffeab308", "desert camel dragoon mount ranged marksman"},
-                    {"Royal Archer", "SKELETON • RANGED • 24 HP • 5.0 DMG", "0xff38bdf8", "royal archer skeleton ranged"},
+                    {"Royal Archer", "SKELETON • RANGED SNIPER • 24 HP • 5.0 DMG", "0xff38bdf8", "royal archer skeleton ranged"},
                     {"Field Medic", "VILLAGER • HEALER • 28 HP • POTIONS", "0xff10b981", "field medic villager healer support potion"},
                     {"Holy Paladin Crusader", "PALADIN • SMITE & ABSORPTION • 55 HP", "0xfffacc15", "holy paladin crusader mace sunforge"},
                     {"Colossal Iron Titan", "IRON GOLEM • 1.35x SCALE • 150 HP • 16 DMG", "0xff10b981", "colossal iron titan golem tank warlord"},
@@ -298,39 +332,39 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                 }
             }
 
-        } else if (tab == 2) { // FACTIONS
-            drawFactionCard(context, leftX, y + 36, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Raiders, Undead", 0xff3b82f6);
-            drawFactionCard(context, leftX, y + 74, "Iron Raiders", "Red (#EF4444) • 3 Units • Hostile: Kingdom, Village", 0xffef4444);
-            drawFactionCard(context, leftX, y + 112, "Village Alliance", "Green (#10B981) • 3 Units • Allied: Kingdom", 0xff10b981);
+        } else if (tab == 2) { // FACTIONS & DIPLOMACY
+            drawFactionCard(context, leftX, y + 34, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Raiders, Undead", 0xff3b82f6);
+            drawFactionCard(context, leftX, y + 72, "Iron Raiders", "Red (#EF4444) • 3 Units • Hostile: Kingdom, Village", 0xffef4444);
+            drawFactionCard(context, leftX, y + 110, "Village Alliance", "Green (#10B981) • 3 Units • Allied: Kingdom", 0xff10b981);
 
-            int infoY = y + 155;
-            context.drawTextWithShadow(textRenderer, Text.literal("FACTION PERKS & FRIENDLY FIRE RULES").formatted(Formatting.BOLD, Formatting.GOLD), leftX, infoY, 0xffffd700);
+            int infoY = y + 152;
+            context.drawTextWithShadow(textRenderer, Text.literal("FACTION PERKS & FRIENDLY FIRE DIPLOMACY").formatted(Formatting.BOLD, Formatting.GOLD), leftX, infoY, 0xffffd700);
             context.drawText(textRenderer, Text.literal("• Military Discipline (+15% DMG)  • Heavy Armor (+20% Armor)").formatted(Formatting.WHITE), leftX, infoY + 14, 0xffe2e8f0, false);
             context.drawText(textRenderer, Text.literal("• Pyrotechnics (+50% Fireworks AoE) • Holy Might (+50% Heals)").formatted(Formatting.WHITE), leftX, infoY + 26, 0xffe2e8f0, false);
-            context.drawText(textRenderer, Text.literal("• Friendly Fire: Zero damage between members of same/allied factions.").formatted(Formatting.GREEN), leftX, infoY + 38, 0xff4ade80, false);
+            context.drawText(textRenderer, Text.literal("• Zero friendly fire damage between allied or same-faction forces.").formatted(Formatting.GREEN), leftX, infoY + 38, 0xff4ade80, false);
 
         } else if (tab == 3) { // BATTLE SANDBOX
-            int statsX = x + 235;
-            int statsY = y + 36;
+            int statsX = x + 242;
+            int statsY = y + 34;
 
-            context.drawTextWithShadow(textRenderer, Text.literal("LIVE BATTLE SANDBOX").formatted(Formatting.BOLD, Formatting.GOLD), statsX, statsY, 0xffffd700);
-            context.drawText(textRenderer, Text.literal("Side A / B: Select Any Two Factions").formatted(Formatting.AQUA), statsX, statsY + 16, 0xff38bdf8, false);
-            context.drawText(textRenderer, Text.literal("Formation: Frontline, Ranged, Medics, Pyro").formatted(Formatting.GRAY), statsX, statsY + 30, 0xff94a3b8, false);
-            context.drawText(textRenderer, Text.literal("Tactical AI: Shield Block, Potions & Artillery").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
+            context.drawTextWithShadow(textRenderer, Text.literal("LIVE WAR SANDBOX").formatted(Formatting.BOLD, Formatting.GOLD), statsX, statsY, 0xffffd700);
+            context.drawText(textRenderer, Text.literal("Side A / B: Select Factions").formatted(Formatting.AQUA), statsX, statsY + 16, 0xff38bdf8, false);
+            context.drawText(textRenderer, Text.literal("Deploy structured army lines").formatted(Formatting.GRAY), statsX, statsY + 30, 0xff94a3b8, false);
+            context.drawText(textRenderer, Text.literal("Frontline, Ranged, Medics, Mortars").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
 
-            context.fill(leftX, y + 150, x + backgroundWidth - 16, y + backgroundHeight - 16, COLOR_PANEL_MAIN);
-            context.drawTextWithShadow(textRenderer, Text.literal("REAL-TIME BATTLE SIMULATION ACTIVE").formatted(Formatting.GREEN), leftX + 8, y + 156, 0xff4ade80);
-            context.drawText(textRenderer, Text.literal("Cycle factions, choose army size, and deploy structured armies instantly!").formatted(Formatting.GRAY), leftX + 8, y + 170, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Healers cast divine rays, Pyrotechnics launch fireworks, and Bards play songs!").formatted(Formatting.YELLOW), leftX + 8, y + 184, 0xfffde047, false);
+            context.fill(leftX, y + 148, x + backgroundWidth - 14, y + backgroundHeight - 12, COLOR_PANEL_MAIN);
+            context.drawTextWithShadow(textRenderer, Text.literal("AUTOMATED CASUALTY TRACKING & VICTORY SYSTEM").formatted(Formatting.GREEN, Formatting.BOLD), leftX + 8, y + 154, 0xff4ade80);
+            context.drawText(textRenderer, Text.literal("• Armies automatically adapt to terrain heightmaps on deployment.").formatted(Formatting.WHITE), leftX + 8, y + 168, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("• When all units of one faction fall, victory fireworks and horn sound!").formatted(Formatting.YELLOW), leftX + 8, y + 180, 0xfffde047, false);
 
-        } else if (tab == 4) { // SETTINGS
-            int infoX = x + 215;
-            int infoY = y + 70;
-            context.drawTextWithShadow(textRenderer, Text.literal("WORLD SIMULATION CONFIG").formatted(Formatting.BOLD, Formatting.GOLD), infoX, infoY, 0xffffd700);
-            context.drawText(textRenderer, Text.literal("• Server-Authoritative Architecture").formatted(Formatting.WHITE), infoX, infoY + 16, 0xffe2e8f0, false);
+        } else if (tab == 4) { // SETTINGS & SIMULATION
+            int infoX = x + 218;
+            int infoY = y + 68;
+            context.drawTextWithShadow(textRenderer, Text.literal("WORLD CONFIG & AUTHORITY").formatted(Formatting.BOLD, Formatting.GOLD), infoX, infoY, 0xffffd700);
+            context.drawText(textRenderer, Text.literal("• 100% Server Authoritative Architecture").formatted(Formatting.WHITE), infoX, infoY + 16, 0xffe2e8f0, false);
             context.drawText(textRenderer, Text.literal("• AI runs throttled every 10 server ticks").formatted(Formatting.GRAY), infoX, infoY + 28, 0xffcbd5e1, false);
             context.drawText(textRenderer, Text.literal("• Spatial queries protect TPS performance").formatted(Formatting.GRAY), infoX, infoY + 40, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("• All units & factions persist across restarts").formatted(Formatting.GREEN), infoX, infoY + 52, 0xff4ade80, false);
+            context.drawText(textRenderer, Text.literal("• Full data persistence across restarts").formatted(Formatting.GREEN), infoX, infoY + 52, 0xff4ade80, false);
         }
     }
 
@@ -343,14 +377,14 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     }
 
     private void drawUnitCard(DrawContext context, int cx, int cy, String name, String meta, int accentColor) {
-        context.fill(cx, cy, cx + 220, cy + 30, COLOR_CARD_BG);
+        context.fill(cx, cy, cx + 224, cy + 30, COLOR_CARD_BG);
         context.fill(cx, cy, cx + 3, cy + 30, accentColor);
         context.drawText(textRenderer, Text.literal(name).formatted(Formatting.BOLD), cx + 8, cy + 4, 0xfff8fafc, false);
         context.drawText(textRenderer, Text.literal(meta), cx + 8, cy + 16, 0xff94a3b8, false);
     }
 
     private void drawFactionCard(DrawContext context, int cx, int cy, String name, String meta, int accentColor) {
-        context.fill(cx, cy, cx + 220, cy + 34, COLOR_CARD_BG);
+        context.fill(cx, cy, cx + 224, cy + 34, COLOR_CARD_BG);
         context.fill(cx, cy, cx + 4, cy + 34, accentColor);
         context.drawText(textRenderer, Text.literal(name).formatted(Formatting.BOLD), cx + 8, cy + 5, 0xfff8fafc, false);
         context.drawText(textRenderer, Text.literal(meta), cx + 8, cy + 18, 0xff94a3b8, false);

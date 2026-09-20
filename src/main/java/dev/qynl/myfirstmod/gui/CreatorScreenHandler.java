@@ -221,7 +221,14 @@ public class CreatorScreenHandler extends ScreenHandler {
                 }
             }
             case 3 -> { // Cycle to next unit
-                String nextId = data.cycleEquippedUnit(player.getUuid());
+                String nextId = data.cycleEquippedUnit(player.getUuid(), 1);
+                UnitDefinition unit = data.units.get(nextId);
+                if (unit != null) {
+                    loadUnitIntoSlots(unit);
+                }
+            }
+            case 6 -> { // Cycle to prev unit
+                String nextId = data.cycleEquippedUnit(player.getUuid(), -1);
                 UnitDefinition unit = data.units.get(nextId);
                 if (unit != null) {
                     loadUnitIntoSlots(unit);
@@ -317,7 +324,22 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
-            case 51 -> { // Cycle Role
+            case 48 -> { // Prev Role
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < ROLE_CYCLE.length; i++) {
+                        if (ROLE_CYCLE[i].equalsIgnoreCase(unit.role)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.role = ROLE_CYCLE[(currentIndex - 1 + ROLE_CYCLE.length) % ROLE_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 51 -> { // Cycle Role (Next)
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
@@ -332,7 +354,17 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
-            case 52 -> { // Cycle Faction
+            case 47 -> { // Prev Faction
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null && !data.factions.isEmpty()) {
+                    List<String> fKeys = new ArrayList<>(data.factions.keySet());
+                    int idx = fKeys.indexOf(unit.factionId);
+                    unit.factionId = fKeys.get((idx - 1 + fKeys.size()) % fKeys.size());
+                    data.markDirty();
+                }
+            }
+            case 52 -> { // Cycle Faction (Next)
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null && !data.factions.isEmpty()) {
@@ -342,7 +374,22 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
-            case 53 -> { // Cycle Rank
+            case 46 -> { // Prev Rank
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < RANK_CYCLE.length; i++) {
+                        if (RANK_CYCLE[i].equalsIgnoreCase(unit.rank)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.rank = RANK_CYCLE[(currentIndex - 1 + RANK_CYCLE.length) % RANK_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 53 -> { // Cycle Rank (Next)
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
@@ -381,7 +428,22 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
-            case 56 -> { // Cycle Aura
+            case 45 -> { // Prev Aura
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < AURA_CYCLE.length; i++) {
+                        if (AURA_CYCLE[i].equalsIgnoreCase(unit.particleAura)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.particleAura = AURA_CYCLE[(currentIndex - 1 + AURA_CYCLE.length) % AURA_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 56 -> { // Cycle Aura (Next)
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
@@ -396,7 +458,22 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
-            case 57 -> { // Cycle Death Action
+            case 44 -> { // Prev Death Action
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < DEATH_CYCLE.length; i++) {
+                        if (DEATH_CYCLE[i].equalsIgnoreCase(unit.deathAction)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.deathAction = DEATH_CYCLE[(currentIndex - 1 + DEATH_CYCLE.length) % DEATH_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 57 -> { // Cycle Death Action (Next)
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
@@ -411,7 +488,22 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
-            case 58 -> { // Cycle Scale
+            case 43 -> { // Prev Scale
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 2; // default 1.0f
+                    for (int i = 0; i < SCALE_CYCLE.length; i++) {
+                        if (Math.abs(SCALE_CYCLE[i] - unit.scale) < 0.05f) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.scale = SCALE_CYCLE[(currentIndex - 1 + SCALE_CYCLE.length) % SCALE_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 58 -> { // Cycle Scale (Next)
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
