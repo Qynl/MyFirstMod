@@ -27,14 +27,14 @@ jobs:
 
       - name: Build Mod with Gradle
         run: |
-          gradle --version
-          gradle build --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
-          while IFS= read -r line; do
-            [ -n "$line" ] && echo "::notice file=build.gradle::$line"
-          done < <(grep -E "(BUILD|Task|jar|Jar|compile|Compile|SUCCESS|FAILED|warning|error)" gradle-build.log | tail -n 25)
-          if [ "$BUILD_FAILED" = "1" ]; then
+          set -o pipefail
+          gradle build --stacktrace 2>&1 | tee gradle-build.log || {
+            echo "::error file=build.gradle::$(grep -A 10 -B 2 'FAILURE:' gradle-build.log | tr '\n' ' ')"
+            while IFS= read -r line; do
+              [ -n "$line" ] && echo "::error file=build.gradle::$line"
+            done < <(grep -E '(: error:|cannot find symbol|does not exist|FAILURE|What went wrong:|Caused by:)' gradle-build.log | head -n 30)
             exit 1
-          fi
+          }
 
       - name: Upload Mod JAR Artifact
         uses: actions/upload-artifact@v4
