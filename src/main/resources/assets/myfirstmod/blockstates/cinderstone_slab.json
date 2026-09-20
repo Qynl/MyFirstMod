@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "myfirstmod:block/cinderstone_slab"
+    },
+    "type=top": {
+      "model": "myfirstmod:block/cinderstone_slab_top"
+    },
+    "type=double": {
+      "model": "myfirstmod:block/cinderstone"
+    }
+  }
+}

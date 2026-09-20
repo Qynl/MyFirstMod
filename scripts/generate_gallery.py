@@ -233,6 +233,36 @@ for i,(title,kind,caption) in enumerate(CARDS):
     s.append('</g>')
     s.append(text(x+4,y+186,caption,12))
 s.append(text(22,636,'Every landmark is chunk-contained, sanctuary-aware, and carries a region-themed cache.',13));s.append('</svg>');(OUT/'kingdom-landmarks.svg').write_text('\n'.join(s)+'\n')
+
+# The Refined Realm: build set swatches, remembrance chain, named elites. Schematic.
+s=svg(1080,486,'THE REFINED REALM','2.0.0-alpha.6: a full builder set for every realm stone, remembrance advancements for all eight landmark families, and named elite guardians in the chapel and the fissure. Schematic, not gameplay screenshots.')
+STONESW=[('NULLSTONE','#23262c'),('POLISHED','#39424e'),('BRICKS','#5a6472'),('VEILSTONE','#7e9096'),('PRISMSTONE','#64d8c8'),('CINDERSTONE','#6b4a3a')]
+s.append(text(22,110,'BUILDER SET - stairs, slab and wall for every realm stone',16,'#dce9e1'))
+for i,(label,color) in enumerate(STONESW):
+    x=22+i*176
+    s.append(f'<rect x="{x}" y="126" width="160" height="96" rx="8" fill="#0d1721" stroke="#22384a"/>')
+    s.append(f'<rect x="{x+14}" y="176" width="52" height="12" fill="{color}"/>')
+    s.append(f'<rect x="{x+26}" y="164" width="40" height="12" fill="{color}"/>')
+    s.append(f'<rect x="{x+38}" y="152" width="28" height="12" fill="{color}"/>')
+    s.append(f'<rect x="{x+78}" y="176" width="30" height="10" fill="{color}"/>')
+    s.append(f'<rect x="{x+112}" y="152" width="10" height="34" fill="{color}"/>')
+    s.append(f'<rect x="{x+122}" y="164" width="22" height="10" fill="{color}"/>')
+    s.append(text(x+14,210,label,12))
+s.append(text(22,262,'REMEMBRANCE - open a cache of every family; the survey pays the bounty',16,'#dce9e1'))
+for i,label in enumerate(['WATCHTOWER','CHAPEL','GEODE','CAMP','WRECK','FISSURE','CIRCLE','SHRINE']):
+    x=22+i*132
+    s.append(f'<rect x="{x}" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>')
+    s.append(f'<circle cx="{x+16}" cy="304" r="7" fill="#7fd0c0"/>')
+    s.append(text(x+30,300,label,11))
+    s.append(text(x+30,316,'+50 xp',10,'#8fa39b'))
+    if i<7:s.append(f'<rect x="{x+122}" y="302" width="10" height="4" fill="#22384a"/>')
+s.append(f'<rect x="22" y="346" width="1042" height="56" rx="8" fill="#0d1721" stroke="#22384a"/>')
+s.append(text(38,372,'CARTOGRAPHER OF THE NULL',15,'#f0c040'))
+s.append(text(38,390,'goal advancement: 200 xp and the Wayfarer Bounty cache',12))
+s.append(text(560,372,'NAMED ELITES',15,'#dce9e1'))
+s.append(text(560,390,'The Brine Keeper (trident) - Warden of the Fissure (warded, swift)',12))
+s.append(text(22,436,'Every piece crafts shaped and (for stone) at the stonecutter; slabs double-drop from full blocks.',13))
+s.append(text(22,462,'Verification: 60+ Python contracts, JUnit discovery mapping, smoke fixtures for states, drops and elite names.',13));s.append('</svg>');(OUT/'refined-realm.svg').write_text('\n'.join(s)+'\n')
 # Dimension route diagram, to exact portal block proportions.
 s=svg(1100,420,'AWAKEN THE ANCIENT CITY','22 by 8 reinforced-deepslate frame with a 20 by 6 opening. Three-second awakening, Echo Shard to the Null Realm sanctuary and its matching return gateway, then Hollow Keep after a Warden clear.')
 s.append(text(30,76,'Find the central monument • Right-click any frame block with one Echo Shard • hold it still for three seconds'))

@@ -154,7 +154,7 @@ class ResourceTests(unittest.TestCase):
     def test_all_custom_recipe_items_exist(self):
         source=(ROOT/'src/main/java/dev/qynl/myfirstmod/item/ModItems.java').read_text()
         blocks=(ROOT/'src/main/java/dev/qynl/myfirstmod/block/ModBlocks.java').read_text()
-        known=set(re.findall(r'register\("([a-z_]+)"',source)) | set(re.findall(r'(?:stone|building)\("([a-z_]+)"',blocks))
+        known=set(re.findall(r'register\("([a-z_]+)"',source)) | set(re.findall(r'(?:stone|building|stairs|slab|wall)\("([a-z_]+)"',blocks))
         def check(value):
             if isinstance(value,dict):
                 for key,entry in value.items():
@@ -358,7 +358,7 @@ class ResourceTests(unittest.TestCase):
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))
         before={str(p.relative_to(RES)):p.read_bytes() for p in paths if p.is_file()}
-        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py','generate_pilgrimage.py','generate_remembrance.py','generate_keep.py','generate_kingdom.py']:
+        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py','generate_pilgrimage.py','generate_remembrance.py','generate_keep.py','generate_kingdom.py','generate_build_set.py']:
             subprocess.run([sys.executable,str(ROOT/'scripts'/script)],check=True)
         after={str(p.relative_to(RES)):p.read_bytes() for p in RES.rglob('*') if p.is_file()}
         self.assertEqual(before,after)

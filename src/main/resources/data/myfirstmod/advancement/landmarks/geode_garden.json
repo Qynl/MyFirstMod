@@ -1,0 +1,26 @@
+{
+  "parent": "myfirstmod:enter_realm",
+  "display": {
+    "icon": {
+      "id": "minecraft:amethyst_shard"
+    },
+    "title": {
+      "text": "Geode Garden"
+    },
+    "description": {
+      "text": "Break open a Geode Garden and take the half-buried cache."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "discover": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

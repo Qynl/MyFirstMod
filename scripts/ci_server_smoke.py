@@ -163,7 +163,7 @@ def main():
                 connection.command(prefix+'execute unless blocks 1042 81 1042 1053 81 1053 1042 100 1042 all run say SMOKE_SCENERY_OK')
             # Milestone E: the eight landmark families, each on a flat platform of its own
             # surface block inside the preloaded fixture chunks (1040..1055).
-            def landmark(surface,feature,checks,tables=(),spawners=()):
+            def landmark(surface,feature,checks,tables=(),spawners=(),elites=()):
                 connection.command(prefix+'fill 1041 60 1041 1055 200 1055 minecraft:air')
                 connection.command(prefix+f'fill 1041 80 1041 1055 80 1055 myfirstmod:{surface}')
                 connection.command(prefix+f'place feature myfirstmod:{feature} 1048 81 1048')
@@ -176,11 +176,23 @@ def main():
                 for x,y,z,actor in spawners:
                     response=connection.command(prefix+f'data get block {x} {y} {z} SpawnData.entity.id')
                     if actor not in response:raise RuntimeError(f'{feature} spawner lost its actor: '+response)
+                for x,y,z,name in elites:
+                    response=connection.command(prefix+f'data get block {x} {y} {z} SpawnData.entity.CustomName')
+                    if name not in response:raise RuntimeError(f'{feature} elite lost its name: '+response)
+            # Build set: real block states, wall connections and the doubled slab drop.
+            connection.command(prefix+'setblock 1042 81 1042 myfirstmod:nullstone_brick_stairs[facing=north,half=top,shape=straight]')
+            connection.command(prefix+'execute if block 1042 81 1042 myfirstmod:nullstone_brick_stairs[facing=north,half=top,shape=straight] run say SMOKE_BUILDSET_OK')
+            connection.command(prefix+'setblock 1043 81 1042 myfirstmod:nullstone_brick_wall[up=true,north=low]')
+            connection.command(prefix+'execute if block 1043 81 1042 myfirstmod:nullstone_brick_wall[up=true,north=low] run say SMOKE_BUILDSET_OK')
+            connection.command(prefix+'setblock 1044 81 1042 myfirstmod:nullstone_brick_slab[type=double]')
+            connection.command(prefix+'loot spawn 1044 83 1042 mine 1044 81 1042 minecraft:iron_pickaxe')
+            connection.command(prefix+'execute if entity @e[type=minecraft:item,nbt={Item:{id:"myfirstmod:nullstone_brick_slab",count:2}}] run say SMOKE_SLAB_DOUBLE_OK')
             landmark('veilstone','veil_watchtower',[(1048,81,1050,'minecraft:air'),(1049,83,1049,'minecraft:stone_brick_stairs'),
                      (1048,91,1048,'myfirstmod:prism_lamp')],tables=[(1048,91,1047,'watch_cache')])
             landmark('brinesilt','brine_chapel',[(1049,81,1049,'minecraft:water'),(1048,83,1046,'myfirstmod:prism_lamp'),
                      (1045,81,1045,'minecraft:spawner')],tables=[(1050,81,1050,'chapel_cache')],
-                     spawners=[(1045,81,1045,'minecraft:drowned')])
+                     spawners=[(1045,81,1045,'minecraft:drowned')],
+                     elites=[(1045,81,1045,'Brine Keeper')])
             landmark('prismstone','geode_garden',[(1051,81,1048,'myfirstmod:spire_crystal'),(1048,81,1048,'minecraft:amethyst_cluster'),
                      (1048,80,1048,'myfirstmod:resonite_ore')],tables=[(1052,81,1048,'geode_cache')])
             landmark('cinderstone','slag_camp',[(1048,81,1048,'minecraft:campfire'),(1048,84,1046,'minecraft:warped_slab'),
@@ -189,7 +201,8 @@ def main():
                      tables=[(1047,82,1048,'caravan_cache'),(1049,82,1049,'caravan_cache')])
             landmark('cinderstone','echo_fissure',[(1049,79,1048,'myfirstmod:resonite_ore'),(1049,81,1048,'minecraft:soul_fire'),
                      (1048,79,1050,'minecraft:spawner')],tables=[(1048,79,1048,'fissure_cache')],
-                     spawners=[(1048,79,1050,'myfirstmod:rift_sentinel')])
+                     spawners=[(1048,79,1050,'myfirstmod:rift_sentinel')],
+                     elites=[(1048,79,1050,'Warden of the Fissure')])
             landmark('hushed_moss','heartwood_circle',[(1051,81,1048,'myfirstmod:hushwood'),(1051,85,1048,'myfirstmod:hush_leaves'),
                      (1048,81,1048,'minecraft:chest')],tables=[(1048,81,1048,'circle_cache')])
             landmark('lumen_moss','fen_shrine',[(1050,82,1050,'myfirstmod:prism_lamp'),(1048,83,1048,'minecraft:spore_blossom')],
@@ -277,7 +290,7 @@ def main():
             bad=[line for line in text.splitlines() if re.search(
                 r'Failed to (?:parse|load)|Couldn.t (?:parse|load)|Error loading|Exception in server tick|Unbound values|Missing referenced',line,re.I)]
             if bad:raise RuntimeError('Resource/runtime errors:\n'+'\n'.join(bad))
-            print('PASS: server startup, realm chunks, ruins/vault/shrine/observatory/cathedral/monastery, eight landmark families, spawner IDs, nursery/ore drops, caches, mobs, custom structure type, save and shutdown.',flush=True)
+            print('PASS: server startup, realm chunks, ruins/vault/shrine/observatory/cathedral/monastery, eight landmark families, elite spawner names, the build set, spawner IDs, nursery/ore drops, caches, mobs, custom structure type, save and shutdown.',flush=True)
         finally:
             if connection:connection.socket.close()
             if proc.poll() is None:

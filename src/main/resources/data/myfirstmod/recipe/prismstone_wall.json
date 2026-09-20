@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "myfirstmod:prismstone"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:prismstone_wall",
+    "count": 6
+  }
+}

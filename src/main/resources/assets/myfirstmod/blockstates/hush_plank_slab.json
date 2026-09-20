@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "myfirstmod:block/hush_plank_slab"
+    },
+    "type=top": {
+      "model": "myfirstmod:block/hush_plank_slab_top"
+    },
+    "type=double": {
+      "model": "myfirstmod:block/hush_planks"
+    }
+  }
+}

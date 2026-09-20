@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "myfirstmod:hush_planks"
+    "myfirstmod:hush_planks",
+    "myfirstmod:hush_plank_stairs",
+    "myfirstmod:hush_plank_slab"
   ]
 }

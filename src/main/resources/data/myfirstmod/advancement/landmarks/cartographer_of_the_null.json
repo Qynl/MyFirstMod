@@ -1,0 +1,29 @@
+{
+  "parent": "myfirstmod:enter_realm",
+  "display": {
+    "icon": {
+      "id": "myfirstmod:pilgrim_atlas"
+    },
+    "title": {
+      "text": "Cartographer of the Null"
+    },
+    "description": {
+      "text": "Open a cache of every landmark family in the Null Realm."
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 200,
+    "loot": [
+      "myfirstmod:chests/wayfarer_bounty"
+    ]
+  }
+}

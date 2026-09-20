@@ -4,6 +4,8 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.inventory.LootableInventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtFloat;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -39,12 +41,14 @@ public final class KingdomLandmarks {
         put(w,pos,Blocks.CHEST);
         LootableInventory.setLootTable(w,c.getRandom(),pos,RegistryKey.of(RegistryKeys.LOOT_TABLE,Identifier.of("myfirstmod","chests/"+table)));
     }
-    static void spawner(StructureWorldAccess w,BlockPos pos,String actor){
+    static void spawner(StructureWorldAccess w,BlockPos pos,String actor){spawner(w,pos,actor,null);}
+    static void spawner(StructureWorldAccess w,BlockPos pos,String actor,NbtCompound elite){
         put(w,pos,Blocks.SPAWNER);
         NbtCompound nbt=new NbtCompound();
         nbt.putString("id","minecraft:mob_spawner");
         nbt.putInt("x",pos.getX());nbt.putInt("y",pos.getY());nbt.putInt("z",pos.getZ());
         var entity=new NbtCompound();entity.putString("id",actor);
+        if(elite!=null)for(var key:elite.getKeys())entity.put(key,elite.get(key));
         var data=new NbtCompound();data.put("entity",entity);nbt.put("SpawnData",data);
         nbt.putShort("Delay",(short)140);nbt.putShort("MinSpawnDelay",(short)320);nbt.putShort("MaxSpawnDelay",(short)720);
         nbt.putShort("SpawnCount",(short)1);nbt.putShort("SpawnRange",(short)3);nbt.putShort("MaxNearbyEntities",(short)2);nbt.putShort("RequiredPlayerRange",(short)10);
@@ -53,6 +57,33 @@ public final class KingdomLandmarks {
         } else {
             w.getChunk(pos).addPendingBlockEntityNbt(nbt);
         }
+    }
+    /** Named elites: a trident-throwing keeper and a hardened warden. Souls-like pressure, small arenas. */
+    static NbtCompound brineKeeper(){
+        var elite=new NbtCompound();
+        elite.putString("CustomName","{\"text\":\"The Brine Keeper\",\"color\":\"aqua\",\"italic\":false}");
+        elite.putByte("CustomNameVisible",(byte)1);
+        var hands=new NbtList();
+        var trident=new NbtCompound();trident.putString("id","minecraft:trident");trident.putInt("count",1);
+        hands.add(trident);hands.add(new NbtCompound());
+        elite.put("hand_items",hands);
+        var chances=new NbtList();chances.add(NbtFloat.of(0.085f));chances.add(NbtFloat.of(0f));
+        elite.put("hand_drop_chances",chances);
+        return elite;
+    }
+    static NbtCompound fissureWarden(){
+        var elite=new NbtCompound();
+        elite.putString("CustomName","{\"text\":\"Warden of the Fissure\",\"color\":\"red\",\"italic\":false}");
+        elite.putByte("CustomNameVisible",(byte)1);
+        var effects=new NbtList();
+        for(String[] e:new String[][]{{"minecraft:resistance","0"},{"minecraft:speed","0"}}){
+            var effect=new NbtCompound();effect.putString("id",e[0]);
+            effect.putByte("amplifier",(byte)Integer.parseInt(e[1]));
+            effect.putInt("duration",2400);effect.putBoolean("show_particles",false);
+            effects.add(effect);
+        }
+        elite.put("active_effects",effects);
+        return elite;
     }
     static BlockPos origin(FeatureContext<DefaultFeatureConfig> c){
         int cx=c.getOrigin().getX()&~15,cz=c.getOrigin().getZ()&~15;

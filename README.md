@@ -3,6 +3,8 @@
 
 **A dark-fantasy expedition through a ruined kingdom: awaken the great Ancient City gate, prepare at a sanctuary, ring the bells of a drowned-root monastery, recover forgotten memories, descend beneath cathedrals, and challenge the guardians of a broken realm.**
 
+> **2.0.0-alpha.6 — "The Refined Realm"** adds a full **builder set** (stairs, slabs and walls for every realm stone plus hush planks), **Remembrance** — nine advancements that record which landmark caches you have opened, paying a Wayfarer Bounty for the full survey — and **named elite guardians** in the Brine Chapel and Echo Fissure. See [docs/REFINEMENT.md](docs/REFINEMENT.md).
+>
 > **2.0.0-alpha.5 — "Landmarks of the Kingdom"** scatters **eight new landmark families** across all eight regions — watchtowers, brine chapels, geode gardens, slag camps, caravan wrecks, echo fissures, heartwood circles and fen shrines — each chunk-contained, sanctuary-aware and carrying a region-themed cache. See [docs/STRUCTURES.md](docs/STRUCTURES.md).
 >
 > **2.0.0-alpha.4 — "The Silent Capital"** completes the kingdom: a unique fixed-place citadel at **(0, -352)**, the **Crown Gate**, the three-session **Silent Court**, the **Crown Seal** and the **Crown of the Silent Court**. See [docs/CAPITAL.md](docs/CAPITAL.md).
@@ -26,6 +28,7 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 - [The Ashen Foundry — the chain of seals](#the-ashen-foundry--the-chain-of-seals)
 - [The Silent Capital — coronation](#the-silent-capital--coronation)
 - [Landmarks of the Kingdom](#landmarks-of-the-kingdom)
+- [The Refined Realm — build, remember, survive](#the-refined-realm--build-remember-survive)
 - [The Rootbound Monastery](#the-rootbound-monastery)
 - [New in 1.8 — The Ancient Threshold](#new-in-18--the-ancient-threshold)
 - [New in 1.7 — The Hollow Keep](#new-in-17--the-hollow-keep)
@@ -125,6 +128,23 @@ The realm now carries **seventeen structure families**. Eight new ones give ever
 | **Fen Shrine** | Fen | Prism-lamp corners, a moss altar with glass bowl and spore crown, and a cache at the steps |
 
 Every landmark is **chunk-contained** (no synchronous chunk generation at exploration time), never starts inside the sanctuary approach, verifies its own surface and flatness, and writes its cache with a real loot table. The journal gains a *Landmarks of the Kingdom* page.
+
+## The Refined Realm — build, remember, survive
+
+![The Refined Realm: builder set swatches, the remembrance chain and the named elites](docs/images/refined-realm.svg)
+
+**Build.** Twenty new pieces complete every realm material: stairs, slab and wall for Nullstone, Polished Nullstone, Nullstone Bricks, Veilstone, Prismstone and Cinderstone, plus stairs and slab for Hush Planks. Every piece crafts shaped, the stone pieces also cut at the stonecutter, slabs double-drop from full blocks, and all pieces join the correct tool and plank tags and the creative tab.
+
+**Remember.** Opening a landmark cache now records the discovery: eight task advancements (one per family, +50 xp each) hang under *Beyond the Seal*, and opening one cache of **every** family grants the goal advancement **Cartographer of the Null** (+200 xp and the shared-once-per-player **Wayfarer Bounty**: memory shards, echo shards, resonite ingots). Progress lives in player data, so it survives saves and stays per-player on shared worlds.
+
+**Survive.** Two landmarks now guard named elites: the chapel spawner raises **The Brine Keeper**, a trident-throwing drowned with a rare trident drop, and the fissure spawner raises the **Warden of the Fissure**, a resistance-and-speed-hardened Rift Sentinel. Small arenas, real pressure.
+
+| Addition | Count | Where |
+| --- | --- | --- |
+| Builder pieces (stairs/slab/wall) | 20 | Creative tab, crafting, stonecutting |
+| Remembrance advancements | 9 | Under *Beyond the Seal* |
+| Named elites | 2 | Brine Chapel, Echo Fissure |
+| New loot table | 1 | `chests/wayfarer_bounty` |
 
 ## The Rootbound Monastery
 
@@ -521,7 +541,7 @@ Vigor/Gale effect timers persist and cannot be bypassed by swapping relics. Attu
 
 ## Building and cultivation
 
-Collectible blocks include Nullstone and its polished/brick forms, three ores, Resonite storage, Prism Lamps, Prismstone, Cinderstone, both mosses, Hushwood/planks/leaves, the forge, Hush Nursery, and Pilgrim Ledger: **24 registered collectible blocks** (including Brinesilt, Veilstone, Vent Basalt, Spire Crystal and Oxidized Trim).
+Collectible blocks include Nullstone and its polished/brick forms, three ores, Resonite storage, Prism Lamps, Prismstone, Cinderstone, both mosses, Hushwood/planks/leaves, the forge, Hush Nursery, and Pilgrim Ledger: **24 registered collectible blocks** (including Brinesilt, Veilstone, Vent Basalt, Spire Crystal and Oxidized Trim). Since alpha.6 every stone family also ships **stairs, slab and wall** (plus hush plank stairs and slab): twenty builder pieces with shaped and stonecutting recipes.
 
 World-only cores, seals, stelae, waystones, reliquaries, and the monastery's Rootbound Heart, Cloister Bells and reliquary are not ordinary collectible building items.
 
@@ -617,6 +637,7 @@ python3 scripts/generate_remembrance.py
 python3 scripts/generate_keep.py
 python3 scripts/generate_kingdom.py
 python3 scripts/generate_capital.py
+python3 scripts/generate_build_set.py
 python3 scripts/generate_gallery.py
 python3 -m unittest discover -s tests -v
 ```
@@ -642,6 +663,7 @@ The original generated textures are deterministic. Translations and Java models 
 
 ### Further reading and history
 
+- [2.0 alpha.6 Refinement record](docs/REFINEMENT.md)
 - [2.0 alpha.5 Landmarks catalog](docs/STRUCTURES.md)
 - [2.0 alpha.4 Capital record](docs/CAPITAL.md)
 - [2.0 alpha.3 Foundry record](docs/FOUNDRY.md)

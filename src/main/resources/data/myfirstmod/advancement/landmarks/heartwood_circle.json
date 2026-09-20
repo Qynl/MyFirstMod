@@ -1,0 +1,26 @@
+{
+  "parent": "myfirstmod:enter_realm",
+  "display": {
+    "icon": {
+      "id": "myfirstmod:hush_leaves"
+    },
+    "title": {
+      "text": "Heartwood Circle"
+    },
+    "description": {
+      "text": "Stand in a Heartwood Circle and uncover the covered cache."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "discover": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

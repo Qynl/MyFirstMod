@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "myfirstmod:block/polished_nullstone"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "myfirstmod:block/nullstone_brick_slab"
+    },
+    "type=top": {
+      "model": "myfirstmod:block/nullstone_brick_slab_top"
+    },
+    "type=double": {
+      "model": "myfirstmod:block/nullstone_bricks"
+    }
+  }
+}

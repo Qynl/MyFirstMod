@@ -16,6 +16,24 @@
     "myfirstmod:slagglass",
     "myfirstmod:spire_crystal",
     "myfirstmod:veilstone",
-    "myfirstmod:vent_basalt"
+    "myfirstmod:vent_basalt",
+    "myfirstmod:nullstone_stairs",
+    "myfirstmod:nullstone_slab",
+    "myfirstmod:nullstone_wall",
+    "myfirstmod:polished_nullstone_stairs",
+    "myfirstmod:polished_nullstone_slab",
+    "myfirstmod:polished_nullstone_wall",
+    "myfirstmod:nullstone_brick_stairs",
+    "myfirstmod:nullstone_brick_slab",
+    "myfirstmod:nullstone_brick_wall",
+    "myfirstmod:veilstone_stairs",
+    "myfirstmod:veilstone_slab",
+    "myfirstmod:veilstone_wall",
+    "myfirstmod:prismstone_stairs",
+    "myfirstmod:prismstone_slab",
+    "myfirstmod:prismstone_wall",
+    "myfirstmod:cinderstone_stairs",
+    "myfirstmod:cinderstone_slab",
+    "myfirstmod:cinderstone_wall"
   ]
 }

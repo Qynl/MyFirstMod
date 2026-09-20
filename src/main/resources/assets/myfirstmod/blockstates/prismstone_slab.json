@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "myfirstmod:block/prismstone_slab"
+    },
+    "type=top": {
+      "model": "myfirstmod:block/prismstone_slab_top"
+    },
+    "type=double": {
+      "model": "myfirstmod:block/prismstone"
+    }
+  }
+}

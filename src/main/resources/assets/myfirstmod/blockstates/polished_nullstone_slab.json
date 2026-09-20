@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "myfirstmod:block/polished_nullstone_slab"
+    },
+    "type=top": {
+      "model": "myfirstmod:block/polished_nullstone_slab_top"
+    },
+    "type=double": {
+      "model": "myfirstmod:block/polished_nullstone"
+    }
+  }
+}

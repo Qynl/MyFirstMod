@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "myfirstmod:cinderstone"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:cinderstone_slab",
+    "count": 6
+  }
+}

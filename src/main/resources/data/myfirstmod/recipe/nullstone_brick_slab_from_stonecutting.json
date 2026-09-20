@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "myfirstmod:nullstone_bricks"
+  },
+  "result": {
+    "count": 1,
+    "id": "myfirstmod:nullstone_brick_slab"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "parent": "myfirstmod:enter_realm",
+  "display": {
+    "icon": {
+      "id": "myfirstmod:tide_lantern"
+    },
+    "title": {
+      "text": "Brine Chapel"
+    },
+    "description": {
+      "text": "Wade the flooded nave of a Brine Chapel and claim its cache."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "discover": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

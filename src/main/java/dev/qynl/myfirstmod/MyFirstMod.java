@@ -38,6 +38,7 @@ public class MyFirstMod implements ModInitializer {
         dev.qynl.myfirstmod.kingdom.ArchiveFeature.register();
         dev.qynl.myfirstmod.kingdom.FoundryFeature.register();
         dev.qynl.myfirstmod.kingdom.CapitalStructure.register();
+        dev.qynl.myfirstmod.realm.LandmarkDiscovery.register();
         VoidPortalManager.registerGateCommand();
         dev.qynl.myfirstmod.keep.HollowKeep.registerCommands();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(dev.qynl.myfirstmod.keep.HollowKeep::resetTickets);

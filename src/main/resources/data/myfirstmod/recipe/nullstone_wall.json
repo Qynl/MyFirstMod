@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "myfirstmod:nullstone"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:nullstone_wall",
+    "count": 6
+  }
+}

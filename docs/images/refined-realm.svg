@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="486" viewBox="0 0 1080 486" role="img" aria-labelledby="title desc"><title id="title">THE REFINED REALM</title><desc id="desc">2.0.0-alpha.6: a full builder set for every realm stone, remembrance advancements for all eight landmark families, and named elite guardians in the chapel and the fissure. Schematic, not gameplay screenshots.</desc><rect width="100%" height="100%" fill="#0b121d"/>
+<text x="32" y="44" fill="#e2eee7" font-family="sans-serif" font-size="27" font-weight="bold">THE REFINED REALM</text>
+<text x="22" y="110" fill="#dce9e1" font-family="sans-serif" font-size="16">BUILDER SET - stairs, slab and wall for every realm stone</text>
+<rect x="22" y="126" width="160" height="96" rx="8" fill="#0d1721" stroke="#22384a"/>
+<rect x="36" y="176" width="52" height="12" fill="#23262c"/>
+<rect x="48" y="164" width="40" height="12" fill="#23262c"/>
+<rect x="60" y="152" width="28" height="12" fill="#23262c"/>
+<rect x="100" y="176" width="30" height="10" fill="#23262c"/>
+<rect x="134" y="152" width="10" height="34" fill="#23262c"/>
+<rect x="144" y="164" width="22" height="10" fill="#23262c"/>
+<text x="36" y="210" fill="#9aaebc" font-family="sans-serif" font-size="12">NULLSTONE</text>
+<rect x="198" y="126" width="160" height="96" rx="8" fill="#0d1721" stroke="#22384a"/>
+<rect x="212" y="176" width="52" height="12" fill="#39424e"/>
+<rect x="224" y="164" width="40" height="12" fill="#39424e"/>
+<rect x="236" y="152" width="28" height="12" fill="#39424e"/>
+<rect x="276" y="176" width="30" height="10" fill="#39424e"/>
+<rect x="310" y="152" width="10" height="34" fill="#39424e"/>
+<rect x="320" y="164" width="22" height="10" fill="#39424e"/>
+<text x="212" y="210" fill="#9aaebc" font-family="sans-serif" font-size="12">POLISHED</text>
+<rect x="374" y="126" width="160" height="96" rx="8" fill="#0d1721" stroke="#22384a"/>
+<rect x="388" y="176" width="52" height="12" fill="#5a6472"/>
+<rect x="400" y="164" width="40" height="12" fill="#5a6472"/>
+<rect x="412" y="152" width="28" height="12" fill="#5a6472"/>
+<rect x="452" y="176" width="30" height="10" fill="#5a6472"/>
+<rect x="486" y="152" width="10" height="34" fill="#5a6472"/>
+<rect x="496" y="164" width="22" height="10" fill="#5a6472"/>
+<text x="388" y="210" fill="#9aaebc" font-family="sans-serif" font-size="12">BRICKS</text>
+<rect x="550" y="126" width="160" height="96" rx="8" fill="#0d1721" stroke="#22384a"/>
+<rect x="564" y="176" width="52" height="12" fill="#7e9096"/>
+<rect x="576" y="164" width="40" height="12" fill="#7e9096"/>
+<rect x="588" y="152" width="28" height="12" fill="#7e9096"/>
+<rect x="628" y="176" width="30" height="10" fill="#7e9096"/>
+<rect x="662" y="152" width="10" height="34" fill="#7e9096"/>
+<rect x="672" y="164" width="22" height="10" fill="#7e9096"/>
+<text x="564" y="210" fill="#9aaebc" font-family="sans-serif" font-size="12">VEILSTONE</text>
+<rect x="726" y="126" width="160" height="96" rx="8" fill="#0d1721" stroke="#22384a"/>
+<rect x="740" y="176" width="52" height="12" fill="#64d8c8"/>
+<rect x="752" y="164" width="40" height="12" fill="#64d8c8"/>
+<rect x="764" y="152" width="28" height="12" fill="#64d8c8"/>
+<rect x="804" y="176" width="30" height="10" fill="#64d8c8"/>
+<rect x="838" y="152" width="10" height="34" fill="#64d8c8"/>
+<rect x="848" y="164" width="22" height="10" fill="#64d8c8"/>
+<text x="740" y="210" fill="#9aaebc" font-family="sans-serif" font-size="12">PRISMSTONE</text>
+<rect x="902" y="126" width="160" height="96" rx="8" fill="#0d1721" stroke="#22384a"/>
+<rect x="916" y="176" width="52" height="12" fill="#6b4a3a"/>
+<rect x="928" y="164" width="40" height="12" fill="#6b4a3a"/>
+<rect x="940" y="152" width="28" height="12" fill="#6b4a3a"/>
+<rect x="980" y="176" width="30" height="10" fill="#6b4a3a"/>
+<rect x="1014" y="152" width="10" height="34" fill="#6b4a3a"/>
+<rect x="1024" y="164" width="22" height="10" fill="#6b4a3a"/>
+<text x="916" y="210" fill="#9aaebc" font-family="sans-serif" font-size="12">CINDERSTONE</text>
+<text x="22" y="262" fill="#dce9e1" font-family="sans-serif" font-size="16">REMEMBRANCE - open a cache of every family; the survey pays the bounty</text>
+<rect x="22" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>
+<circle cx="38" cy="304" r="7" fill="#7fd0c0"/>
+<text x="52" y="300" fill="#9aaebc" font-family="sans-serif" font-size="11">WATCHTOWER</text>
+<text x="52" y="316" fill="#8fa39b" font-family="sans-serif" font-size="10">+50 xp</text>
+<rect x="144" y="302" width="10" height="4" fill="#22384a"/>
+<rect x="154" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>
+<circle cx="170" cy="304" r="7" fill="#7fd0c0"/>
+<text x="184" y="300" fill="#9aaebc" font-family="sans-serif" font-size="11">CHAPEL</text>
+<text x="184" y="316" fill="#8fa39b" font-family="sans-serif" font-size="10">+50 xp</text>
+<rect x="276" y="302" width="10" height="4" fill="#22384a"/>
+<rect x="286" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>
+<circle cx="302" cy="304" r="7" fill="#7fd0c0"/>
+<text x="316" y="300" fill="#9aaebc" font-family="sans-serif" font-size="11">GEODE</text>
+<text x="316" y="316" fill="#8fa39b" font-family="sans-serif" font-size="10">+50 xp</text>
+<rect x="408" y="302" width="10" height="4" fill="#22384a"/>
+<rect x="418" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>
+<circle cx="434" cy="304" r="7" fill="#7fd0c0"/>
+<text x="448" y="300" fill="#9aaebc" font-family="sans-serif" font-size="11">CAMP</text>
+<text x="448" y="316" fill="#8fa39b" font-family="sans-serif" font-size="10">+50 xp</text>
+<rect x="540" y="302" width="10" height="4" fill="#22384a"/>
+<rect x="550" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>
+<circle cx="566" cy="304" r="7" fill="#7fd0c0"/>
+<text x="580" y="300" fill="#9aaebc" font-family="sans-serif" font-size="11">WRECK</text>
+<text x="580" y="316" fill="#8fa39b" font-family="sans-serif" font-size="10">+50 xp</text>
+<rect x="672" y="302" width="10" height="4" fill="#22384a"/>
+<rect x="682" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>
+<circle cx="698" cy="304" r="7" fill="#7fd0c0"/>
+<text x="712" y="300" fill="#9aaebc" font-family="sans-serif" font-size="11">FISSURE</text>
+<text x="712" y="316" fill="#8fa39b" font-family="sans-serif" font-size="10">+50 xp</text>
+<rect x="804" y="302" width="10" height="4" fill="#22384a"/>
+<rect x="814" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>
+<circle cx="830" cy="304" r="7" fill="#7fd0c0"/>
+<text x="844" y="300" fill="#9aaebc" font-family="sans-serif" font-size="11">CIRCLE</text>
+<text x="844" y="316" fill="#8fa39b" font-family="sans-serif" font-size="10">+50 xp</text>
+<rect x="936" y="302" width="10" height="4" fill="#22384a"/>
+<rect x="946" y="278" width="120" height="52" rx="8" fill="#0d1721" stroke="#22384a"/>
+<circle cx="962" cy="304" r="7" fill="#7fd0c0"/>
+<text x="976" y="300" fill="#9aaebc" font-family="sans-serif" font-size="11">SHRINE</text>
+<text x="976" y="316" fill="#8fa39b" font-family="sans-serif" font-size="10">+50 xp</text>
+<rect x="22" y="346" width="1042" height="56" rx="8" fill="#0d1721" stroke="#22384a"/>
+<text x="38" y="372" fill="#f0c040" font-family="sans-serif" font-size="15">CARTOGRAPHER OF THE NULL</text>
+<text x="38" y="390" fill="#9aaebc" font-family="sans-serif" font-size="12">goal advancement: 200 xp and the Wayfarer Bounty cache</text>
+<text x="560" y="372" fill="#dce9e1" font-family="sans-serif" font-size="15">NAMED ELITES</text>
+<text x="560" y="390" fill="#9aaebc" font-family="sans-serif" font-size="12">The Brine Keeper (trident) - Warden of the Fissure (warded, swift)</text>
+<text x="22" y="436" fill="#9aaebc" font-family="sans-serif" font-size="13">Every piece crafts shaped and (for stone) at the stonecutter; slabs double-drop from full blocks.</text>
+<text x="22" y="462" fill="#9aaebc" font-family="sans-serif" font-size="13">Verification: 60+ Python contracts, JUnit discovery mapping, smoke fixtures for states, drops and elite names.</text>
+</svg>

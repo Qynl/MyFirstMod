@@ -4,6 +4,9 @@ import dev.qynl.myfirstmod.MyFirstMod;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.block.StairsBlock;
+import net.minecraft.block.WallBlock;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -17,6 +20,9 @@ public final class ModBlocks {
         BUILDING_BLOCKS.add(block);
         return block;
     }
+    private static Block stairs(String name,Block base){return building(name,new StairsBlock(base.getDefaultState(),AbstractBlock.Settings.copy(base)));}
+    private static Block slab(String name,Block base){return building(name,new SlabBlock(AbstractBlock.Settings.copy(base)));}
+    private static Block wall(String name,Block base){return building(name,new WallBlock(AbstractBlock.Settings.copy(base)));}
     private static Block stone(String name,float strength,int light) {
         return building(name,new Block(AbstractBlock.Settings.copy(Blocks.DEEPSLATE).strength(strength).luminance(s->light)));
     }
@@ -72,6 +78,26 @@ public final class ModBlocks {
     public static final Block SPIRE_CRYSTAL=stone("spire_crystal",2.5f,7);
     public static final Block OXIDIZED_TRIM=building("oxidized_trim",new Block(AbstractBlock.Settings.copy(Blocks.OXIDIZED_COPPER)));
     public static final Block CROWN_GATE=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"crown_gate"),new CrownGateBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->4*s.get(CrownGateBlock.PHASE))));
+    public static final Block NULLSTONE_STAIRS=stairs("nullstone_stairs",NULLSTONE);
+    public static final Block NULLSTONE_SLAB=slab("nullstone_slab",NULLSTONE);
+    public static final Block NULLSTONE_WALL=wall("nullstone_wall",NULLSTONE);
+    public static final Block POLISHED_NULLSTONE_STAIRS=stairs("polished_nullstone_stairs",POLISHED_NULLSTONE);
+    public static final Block POLISHED_NULLSTONE_SLAB=slab("polished_nullstone_slab",POLISHED_NULLSTONE);
+    public static final Block POLISHED_NULLSTONE_WALL=wall("polished_nullstone_wall",POLISHED_NULLSTONE);
+    public static final Block NULLSTONE_BRICK_STAIRS=stairs("nullstone_brick_stairs",NULLSTONE_BRICKS);
+    public static final Block NULLSTONE_BRICK_SLAB=slab("nullstone_brick_slab",NULLSTONE_BRICKS);
+    public static final Block NULLSTONE_BRICK_WALL=wall("nullstone_brick_wall",NULLSTONE_BRICKS);
+    public static final Block VEILSTONE_STAIRS=stairs("veilstone_stairs",VEILSTONE);
+    public static final Block VEILSTONE_SLAB=slab("veilstone_slab",VEILSTONE);
+    public static final Block VEILSTONE_WALL=wall("veilstone_wall",VEILSTONE);
+    public static final Block PRISMSTONE_STAIRS=stairs("prismstone_stairs",PRISMSTONE);
+    public static final Block PRISMSTONE_SLAB=slab("prismstone_slab",PRISMSTONE);
+    public static final Block PRISMSTONE_WALL=wall("prismstone_wall",PRISMSTONE);
+    public static final Block CINDERSTONE_STAIRS=stairs("cinderstone_stairs",CINDERSTONE);
+    public static final Block CINDERSTONE_SLAB=slab("cinderstone_slab",CINDERSTONE);
+    public static final Block CINDERSTONE_WALL=wall("cinderstone_wall",CINDERSTONE);
+    public static final Block HUSH_PLANK_STAIRS=stairs("hush_plank_stairs",HUSH_PLANKS);
+    public static final Block HUSH_PLANK_SLAB=slab("hush_plank_slab",HUSH_PLANKS);
     public static final Block SLAGGLASS=building("slagglass",new Block(AbstractBlock.Settings.copy(Blocks.OBSIDIAN)));
     public static final Block EMBER_CRUCIBLE=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"ember_crucible"),new CrucibleBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->s.get(CrucibleBlock.QUENCHED)?4:15)));
     public static final Block SEAL_PLINTH=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"seal_plinth"),new SealPlinthBlock(AbstractBlock.Settings.copy(Blocks.POLISHED_BLACKSTONE).luminance(s->2*s.get(SealPlinthBlock.SEALS))));

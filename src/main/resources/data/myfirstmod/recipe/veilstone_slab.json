@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "myfirstmod:veilstone"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:veilstone_slab",
+    "count": 6
+  }
+}

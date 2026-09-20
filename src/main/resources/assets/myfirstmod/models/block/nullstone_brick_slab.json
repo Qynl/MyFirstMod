@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "myfirstmod:block/nullstone_bricks",
+    "side": "myfirstmod:block/nullstone_bricks",
+    "top": "myfirstmod:block/nullstone_bricks"
+  }
+}

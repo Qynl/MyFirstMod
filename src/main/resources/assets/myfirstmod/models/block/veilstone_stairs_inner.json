@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "myfirstmod:block/veilstone",
+    "side": "myfirstmod:block/veilstone",
+    "top": "myfirstmod:block/veilstone"
+  }
+}

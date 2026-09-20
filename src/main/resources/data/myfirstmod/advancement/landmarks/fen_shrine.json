@@ -1,0 +1,26 @@
+{
+  "parent": "myfirstmod:enter_realm",
+  "display": {
+    "icon": {
+      "id": "myfirstmod:lumen_moss"
+    },
+    "title": {
+      "text": "Fen Shrine"
+    },
+    "description": {
+      "text": "Kneel at a Fen Shrine and take the cache at its steps."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "discover": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

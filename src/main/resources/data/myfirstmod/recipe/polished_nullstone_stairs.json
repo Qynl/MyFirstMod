@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "myfirstmod:polished_nullstone"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:polished_nullstone_stairs",
+    "count": 4
+  }
+}

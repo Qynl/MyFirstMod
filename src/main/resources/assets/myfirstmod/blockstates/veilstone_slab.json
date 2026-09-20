@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "myfirstmod:block/veilstone_slab"
+    },
+    "type=top": {
+      "model": "myfirstmod:block/veilstone_slab_top"
+    },
+    "type=double": {
+      "model": "myfirstmod:block/veilstone"
+    }
+  }
+}

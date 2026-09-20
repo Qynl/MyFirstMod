@@ -1,0 +1,26 @@
+{
+  "parent": "myfirstmod:enter_realm",
+  "display": {
+    "icon": {
+      "id": "myfirstmod:prism_lamp"
+    },
+    "title": {
+      "text": "Veil Watchtower"
+    },
+    "description": {
+      "text": "Climb a Veil Watchtower and open the cache aloft."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "discover": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

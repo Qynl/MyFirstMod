@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "myfirstmod:hush_planks"
+    }
+  },
+  "result": {
+    "id": "myfirstmod:hush_plank_stairs",
+    "count": 4
+  }
+}
