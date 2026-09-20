@@ -1,5 +1,6 @@
 package dev.qynl.myfirstmod.equipment;
 
+import dev.qynl.myfirstmod.item.ModItems;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -90,7 +91,8 @@ public final class ItemCapabilities {
             return Capability.FOOD;
         }
 
-        if (item instanceof SwordItem || item instanceof AxeItem || item instanceof MaceItem) {
+        if (item instanceof SwordItem || item instanceof AxeItem || item instanceof MaceItem ||
+            stack.isOf(ModItems.PALADIN_MACE) || stack.isOf(ModItems.ASSASSIN_DAGGER)) {
             return Capability.MELEE_WEAPON;
         }
 

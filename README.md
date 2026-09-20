@@ -1,5 +1,5 @@
 # ⚔️ LEGIONS & FACTIONS: Autonomous War Sandbox ⚔️
-### *The Ultimate Autonomous Army, Faction, Cavalry & War Simulation Sandbox for Minecraft 1.21.1 (Fabric)*
+### *The Ultimate Autonomous Army, Faction, Cavalry & 3D Arsenal War Simulation Sandbox for Minecraft 1.21.1 (Fabric)*
 
 ```text
   ██████╗ ███████╗ ██████╗ ██╗ ██████╗ ███╗   ██╗███████╗
@@ -18,24 +18,31 @@
 Ever wanted to command a **50-strong battalion of heavily armored Royal Villager Knights charging on armored horses**, supported by **Bogged Snipers firing venom arrows**, **Tempest Breeze wind-mages**, **Pixie Combat Medics**, **Colossal 1.5x Iron Titans**, **Pyrotechnic Artillery launching firework volleys**, and **Necromancers summoning undead hordes**?
 
 **Legions & Factions: Autonomous War Sandbox** transforms Minecraft into an **autonomous, server-authoritative tactical war simulator**. 
-Create any living Minecraft entity into a custom battle template, equip it, customize its scale, mount, aura and death explosions, assign it to a faction with unique perks, place outposts, whistle army formations, transmute wild mobs, and watch legendary battles unfold!
+Create any living Minecraft entity into a custom battle template, equip it with custom **3D modeled weapons, staves, lutes, and relics**, customize its scale, mount, aura and death explosions, assign it to a faction with unique perks, place outposts, whistle army formations, transmute wild mobs, and watch legendary battles unfold!
 
 ![Dashboard Overview](docs/unit-sandbox-dashboard.png)
 
 ---
 
-## 🎮 The Commander's Arsenal (8 Interactive Tactical Tools)
+## 🎮 The Commander's 3D Arsenal (13 Custom 3D Modeled Weapons & Tools)
 
-| Item | Name | Primary Action | Shift Action | Tactical Role |
+Every non-vanilla item in **Legions & Factions** features a **custom 3D voxel-sculpted model with authentic first-person, third-person, ground, and GUI display transforms**!
+
+| Item | 3D Model Description | Primary Action | Shift Action | Tactical Role |
 | :--- | :--- | :--- | :--- | :--- |
-| 🪄 | **Legion Creator Tool** | **Right-Click**: Open Creator GUI<br>**Left-Click**: Spawn equipped unit<br>**Right-Click Unit**: View dossier | **Shift + Right-Click**: Quick-cycle units<br>**Shift + Left-Click**: Spawn 5-unit squad | Full unit creation, inspection & deployment |
-| 📯 | **Tactical Formation Whistle** | **Right-Click**: Instantly order nearby troops into formation | **Shift + Right-Click**: Cycle formation mode (*Shield Wall, Wedge, Circle, Spread*) | Tactical positioning & battlelines |
-| 🌟 | **Unit Transmutation Wand** | **Right-Click Living Mob**: Transmute/Recruit into active unit template | *Plays totem flash & syncs gear/faction* | Rapid recruitment of wild mobs |
-| 💖 | **Grand Healer's Divine Staff** | **Right-Click**: Cast massive 16-block restoration wave (8 HP + Regen II + Cleanse) | *Cooldown: 5s* | Direct army healing & support |
-| 🪄 | **Faction Commander's Scepter** | **Right-Click Block**: Set Move/Rally waypoint<br>**Right-Click Enemy**: Mark focus target | **Action bar**: View active troops in radius | Real-time battlefield tactical command |
-| 🎺 | **Commander's Tactical War Horn** | **Right-Click**: Sound rally horn (Area Strength & Speed) | **Shift + Right-Click**: Cycle orders (*Rally / Charge / Hold*) | Morale boosts & squad rally |
-| ⚡ | **Reinforcement Drop Beacon** | **Right-Click Block**: Call down a 4-unit elite drop wave | *Cooldown: 10s* | Emergency frontline reinforcements |
-| 🚩 | **Faction Outpost Standard** | **Right-Click Block**: Establish faction outpost territory | *Defensive Zone: 32 blocks* | "Home Turf" territorial defense |
+| 📖 **Legion Creator Tool** | 3D Leather Grimoire with glowing gem | **Right-Click**: Open Creator GUI<br>**Left-Click**: Spawn unit<br>**Right-Click Unit**: Dossier | **Shift + Right-Click**: Quick-cycle<br>**Shift + Left-Click**: Spawn squad | Full unit creation, inspection & deployment |
+| 📯 **Tactical Formation Whistle** | 3D Silver Trench Whistle with lanyard ring | **Right-Click**: Order troops into formation | **Shift + Right-Click**: Cycle mode (*Shield Wall, Wedge, Circle, Spread*) | Battlefield unit positioning & battlelines |
+| 🌟 **Unit Transmutation Wand** | 3D Runic Rod with floating amethyst core & 4 orbit prongs | **Right-Click Mob**: Transmute/Recruit into active unit template | *Plays totem flash & syncs gear/faction* | Rapid recruitment of wild mobs |
+| 💖 **Grand Healer's Divine Staff** | 3D Winged Caduceus Staff with emerald life sphere | **Right-Click**: Cast 16-block restoration wave (8 HP + Regen II + Cleanse) | *Cooldown: 5s* | Direct army healing & support |
+| 🌿 **Oakbound Druidic Staff** | 3D Gnarled Oak Branch with nature bloom | **Right-Click**: Cast Entangling Roots & Healing Surge | *Roots foes with Slowness V & heals allies* | Area-of-effect crowd control & druid magic |
+| 🎶 **Harmonic War Lute** | 3D Acoustic War Lute with golden tuning pegs | **Right-Click**: Strum Inspiring Battle Hymn | *Grants Speed II, Resistance & Regen (18 blocks)* | Army-wide morale & combat buffs |
+| 💣 **Handheld Siege Mortar** | 3D Cast-Iron Mortar Cannon with brass reinforcement | **Right-Click**: Launch ballistic airburst mortar shell | *Explodes with heavy AoE splash damage* | Long-range siege bombardment |
+| ⚡ **Sunforge Paladin Warhammer** | 3D Heavy Holy Warhammer with radiant gold crosses | **Right-Click / Strike**: Unleash Holy Radiant Smite | *Deals 2x damage to Undead + grants Absorption* | Holy melee smite & team shielding |
+| 🗡️ **Shadowfang Obsidian Dagger** | 3D Serrated Obsidian Blade with skull pommel | **Right-Click**: Shadow Step Blink (6 Blocks) | *Grants Invisibility & Speed III for backstabs* | Stealth flanking & high-value assassination |
+| 🪄 **Faction Commander's Scepter** | 3D Royal Gold & Sapphire Crowned Scepter | **Right-Click Block**: Set Move/Rally waypoint<br>**Right-Click Enemy**: Mark focus target | **Action bar**: View active troops in radius | Real-time battlefield tactical command |
+| 🎺 **Commander's Tactical War Horn** | 3D Curved Brass & Gold Battlehorn with pennant | **Right-Click**: Sound rally horn (Area Strength & Speed) | **Shift + Right-Click**: Cycle orders (*Rally / Charge / Hold*) | Morale boosts & squad rally |
+| ⚡ **Reinforcement Drop Beacon** | 3D Heavy Stabilized Beacon Core with emitter array | **Right-Click Block**: Call down a 4-unit elite drop wave | *Cooldown: 10s* | Emergency frontline reinforcements |
+| 🚩 **Faction Outpost Standard** | 3D Standard Flagpole with crossbeam and tassel | **Right-Click Block**: Establish faction outpost territory | *Defensive Zone: 32 blocks* | "Home Turf" territorial defense |
 
 ---
 
@@ -50,16 +57,18 @@ Create any living Minecraft entity into a custom battle template, equip it, cust
                ⚔ Melee Tanks & Knights
                🛡 Shield Wall Formations
                ⚡ Colossal Iron Titans
+               🔨 Sunforge Holy Paladins
                          │
                      [ MID LINE ]
                🏹 Ranged Marksmen & Bogged Snipers
-               💣 Siege Bombardiers & Mortars
+               💣 Siege Bombardiers (Mortar Tubes)
                🎆 Pyrotechnic Fireworks Artillery
                🌪 Tempest Breeze Wind Casters
                          │
                      [ BACK LINE ]
                💖 Field Medics & Allay Pixie Healers
-               🎶 Battlefield Bards (War Songs)
+               🌿 Oakbound Grove Druids
+               🎶 Battlefield Bards (War Lutes)
                ☠ Dark Necromancers & Summoners
                👑 Commanders & Tacticians
 ```
@@ -97,19 +106,19 @@ Create any living Minecraft entity into a custom battle template, equip it, cust
 - Roars fiercely when injured and enters Bloodrage (gaining Strength II, Speed II, and Haste II with fire auras).
 
 ### 10. 🎶 Battlefield Bards (`BardAI`)
-- Plays melodic horn songs that grant Speed, Regeneration, and Resistance to all nearby allies.
+- Plays melodic lute songs that grant Speed, Regeneration, and Resistance to all nearby allies.
 
 ### 11. 💣 Siege Bombardiers (`BombardierAI`)
-- Heavy sappers launching explosive TNT mortar charges at enemy lines.
+- Heavy sappers launching explosive mortar charges with 3D handheld siege mortars.
 
 ### 12. 🌿 Nature Druids (`DruidAI`)
-- Entangles enemies in thorny roots (Slowness IV) and summons Nature Spirit Wolves.
+- Wields the 3D Oakbound Druid Staff to entangle enemies in thorny roots (Slowness V) and summon Nature Spirit Wolves.
 
 ### 13. ✨ Holy Paladins (`PaladinAI`)
-- Golden crusaders dealing +60% radiant damage to undead and releasing healing waves on hit.
+- Wields the 3D Sunforge Paladin Warhammer, dealing +60% radiant damage to undead and releasing healing waves on hit.
 
 ### 14. 🗡 Flanking Assassins (`AssassinAI`)
-- Sprints behind enemy lines to backstab commanders and medics with +175% critical damage.
+- Wields the 3D Shadowfang Obsidian Dagger to blink behind enemy lines and backstab high-value commanders and medics.
 
 ---
 

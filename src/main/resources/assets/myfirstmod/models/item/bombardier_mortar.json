@@ -1,0 +1,100 @@
+{
+  "credit": "Legions & Factions 3D Custom Item Model",
+  "textures": {
+    "barrel": "minecraft:block/netherite_block",
+    "rim": "minecraft:block/iron_block",
+    "brass": "minecraft:block/raw_gold_block",
+    "grip": "minecraft:block/dark_oak_planks"
+  },
+  "elements": [
+    {
+      "name": "mortar_barrel",
+      "from": [5, 4, 5],
+      "to": [11, 15, 11],
+      "faces": {
+        "north": {"uv": [0, 0, 6, 11], "texture": "#barrel"},
+        "east": {"uv": [0, 0, 6, 11], "texture": "#barrel"},
+        "south": {"uv": [0, 0, 6, 11], "texture": "#barrel"},
+        "west": {"uv": [0, 0, 6, 11], "texture": "#barrel"},
+        "up": {"uv": [0, 0, 6, 6], "texture": "#rim"},
+        "down": {"uv": [0, 0, 6, 6], "texture": "#brass"}
+      }
+    },
+    {
+      "name": "muzzle_collar",
+      "from": [4.5, 13, 4.5],
+      "to": [11.5, 15.5, 11.5],
+      "faces": {
+        "north": {"uv": [0, 0, 7, 2], "texture": "#rim"},
+        "east": {"uv": [0, 0, 7, 2], "texture": "#rim"},
+        "south": {"uv": [0, 0, 7, 2], "texture": "#rim"},
+        "west": {"uv": [0, 0, 7, 2], "texture": "#rim"},
+        "up": {"uv": [0, 0, 7, 7], "texture": "#rim"},
+        "down": {"uv": [0, 0, 7, 7], "texture": "#rim"}
+      }
+    },
+    {
+      "name": "brass_band",
+      "from": [4.8, 8, 4.8],
+      "to": [11.2, 9.5, 11.2],
+      "faces": {
+        "north": {"uv": [0, 0, 6, 1], "texture": "#brass"},
+        "east": {"uv": [0, 0, 6, 1], "texture": "#brass"},
+        "south": {"uv": [0, 0, 6, 1], "texture": "#brass"},
+        "west": {"uv": [0, 0, 6, 1], "texture": "#brass"},
+        "up": {"uv": [0, 0, 6, 6], "texture": "#brass"},
+        "down": {"uv": [0, 0, 6, 6], "texture": "#brass"}
+      }
+    },
+    {
+      "name": "handle_grip",
+      "from": [7, 0, 7],
+      "to": [9, 4, 9],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 4], "texture": "#grip"},
+        "east": {"uv": [0, 0, 2, 4], "texture": "#grip"},
+        "south": {"uv": [0, 0, 2, 4], "texture": "#grip"},
+        "west": {"uv": [0, 0, 2, 4], "texture": "#grip"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#grip"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#brass"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [-45, 0, 0],
+      "translation": [0, 2, 1],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [-45, 0, 0],
+      "translation": [0, 2, 1],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "firstperson_righthand": {
+      "rotation": [-25, 15, 0],
+      "translation": [1.5, 2, -1],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    "firstperson_lefthand": {
+      "rotation": [-25, -15, 0],
+      "translation": [1.5, 2, -1],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    "ground": {
+      "rotation": [90, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.55, 0.55, 0.55]
+    },
+    "gui": {
+      "rotation": [30, -135, 0],
+      "translation": [0, -1, 0],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.7, 0.7, 0.7]
+    }
+  }
+}

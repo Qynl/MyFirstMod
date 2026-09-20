@@ -1,0 +1,114 @@
+{
+  "credit": "Legions & Factions 3D Custom Item Model",
+  "textures": {
+    "body": "minecraft:block/spruce_planks",
+    "soundboard": "minecraft:block/stripped_oak_log",
+    "neck": "minecraft:block/dark_oak_planks",
+    "pegs": "minecraft:block/gold_block",
+    "soundhole": "minecraft:block/blackstone"
+  },
+  "elements": [
+    {
+      "name": "lute_body",
+      "from": [4, 1, 6],
+      "to": [12, 10, 10],
+      "faces": {
+        "north": {"uv": [0, 0, 8, 9], "texture": "#body"},
+        "east": {"uv": [0, 0, 4, 9], "texture": "#body"},
+        "south": {"uv": [0, 0, 8, 9], "texture": "#body"},
+        "west": {"uv": [0, 0, 4, 9], "texture": "#body"},
+        "up": {"uv": [0, 0, 8, 4], "texture": "#body"},
+        "down": {"uv": [0, 0, 8, 4], "texture": "#body"}
+      }
+    },
+    {
+      "name": "soundboard_face",
+      "from": [4.5, 1.5, 5.5],
+      "to": [11.5, 9.5, 6],
+      "faces": {
+        "north": {"uv": [0, 0, 7, 8], "texture": "#soundboard"},
+        "east": {"uv": [0, 0, 1, 8], "texture": "#body"},
+        "south": {"uv": [0, 0, 7, 8], "texture": "#soundboard"},
+        "west": {"uv": [0, 0, 1, 8], "texture": "#body"},
+        "up": {"uv": [0, 0, 7, 1], "texture": "#body"},
+        "down": {"uv": [0, 0, 7, 1], "texture": "#body"}
+      }
+    },
+    {
+      "name": "soundhole",
+      "from": [7, 4.5, 5.2],
+      "to": [9, 6.5, 5.6],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 2], "texture": "#soundhole"},
+        "east": {"uv": [0, 0, 1, 2], "texture": "#soundhole"},
+        "south": {"uv": [0, 0, 2, 2], "texture": "#soundhole"},
+        "west": {"uv": [0, 0, 1, 2], "texture": "#soundhole"},
+        "up": {"uv": [0, 0, 2, 1], "texture": "#soundhole"},
+        "down": {"uv": [0, 0, 2, 1], "texture": "#soundhole"}
+      }
+    },
+    {
+      "name": "lute_neck",
+      "from": [7, 10, 6.5],
+      "to": [9, 17, 8.5],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 7], "texture": "#neck"},
+        "east": {"uv": [0, 0, 2, 7], "texture": "#neck"},
+        "south": {"uv": [0, 0, 2, 7], "texture": "#neck"},
+        "west": {"uv": [0, 0, 2, 7], "texture": "#neck"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#neck"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#neck"}
+      }
+    },
+    {
+      "name": "pegbox_head",
+      "from": [6.5, 17, 6],
+      "to": [9.5, 20, 9],
+      "faces": {
+        "north": {"uv": [0, 0, 3, 3], "texture": "#neck"},
+        "east": {"uv": [0, 0, 3, 3], "texture": "#pegs"},
+        "south": {"uv": [0, 0, 3, 3], "texture": "#neck"},
+        "west": {"uv": [0, 0, 3, 3], "texture": "#pegs"},
+        "up": {"uv": [0, 0, 3, 3], "texture": "#pegs"},
+        "down": {"uv": [0, 0, 3, 3], "texture": "#neck"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [-30, 90, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.7, 0.7, 0.7]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [-30, -90, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.7, 0.7, 0.7]
+    },
+    "firstperson_righthand": {
+      "rotation": [-20, -90, 25],
+      "translation": [1.13, 2.5, 0],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "firstperson_lefthand": {
+      "rotation": [-20, 90, -25],
+      "translation": [1.13, 2.5, 0],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "ground": {
+      "rotation": [90, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.55, 0.55, 0.55]
+    },
+    "gui": {
+      "rotation": [30, 45, 0],
+      "translation": [0, -1, 0],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.7, 0.7, 0.7]
+    }
+  }
+}

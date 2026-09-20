@@ -1,6 +1,153 @@
 {
-  "parent": "minecraft:item/handheld",
+  "credit": "Legions & Factions 3D Custom Item Model",
   "textures": {
-    "layer0": "minecraft:item/beacon"
+    "base": "minecraft:block/netherite_block",
+    "core": "minecraft:block/sea_lantern",
+    "emitter": "minecraft:block/copper_block",
+    "gold": "minecraft:block/gold_block",
+    "antenna": "minecraft:block/diamond_block"
+  },
+  "elements": [
+    {
+      "name": "base_plate",
+      "from": [4, 0, 4],
+      "to": [12, 3, 12],
+      "faces": {
+        "north": {"uv": [0, 0, 8, 3], "texture": "#base"},
+        "east": {"uv": [0, 0, 8, 3], "texture": "#base"},
+        "south": {"uv": [0, 0, 8, 3], "texture": "#base"},
+        "west": {"uv": [0, 0, 8, 3], "texture": "#base"},
+        "up": {"uv": [0, 0, 8, 8], "texture": "#gold"},
+        "down": {"uv": [0, 0, 8, 8], "texture": "#base"}
+      }
+    },
+    {
+      "name": "stabilizer_corner_nw",
+      "from": [3, 0, 3],
+      "to": [5, 4, 5],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "east": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "south": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "west": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#emitter"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#emitter"}
+      }
+    },
+    {
+      "name": "stabilizer_corner_ne",
+      "from": [11, 0, 3],
+      "to": [13, 4, 5],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "east": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "south": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "west": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#emitter"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#emitter"}
+      }
+    },
+    {
+      "name": "stabilizer_corner_sw",
+      "from": [3, 0, 11],
+      "to": [5, 4, 13],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "east": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "south": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "west": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#emitter"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#emitter"}
+      }
+    },
+    {
+      "name": "stabilizer_corner_se",
+      "from": [11, 0, 11],
+      "to": [13, 4, 13],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "east": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "south": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "west": {"uv": [0, 0, 2, 4], "texture": "#emitter"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#emitter"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#emitter"}
+      }
+    },
+    {
+      "name": "beacon_core",
+      "from": [5.5, 3, 5.5],
+      "to": [10.5, 9, 10.5],
+      "faces": {
+        "north": {"uv": [0, 0, 5, 6], "texture": "#core"},
+        "east": {"uv": [0, 0, 5, 6], "texture": "#core"},
+        "south": {"uv": [0, 0, 5, 6], "texture": "#core"},
+        "west": {"uv": [0, 0, 5, 6], "texture": "#core"},
+        "up": {"uv": [0, 0, 5, 5], "texture": "#core"},
+        "down": {"uv": [0, 0, 5, 5], "texture": "#core"}
+      }
+    },
+    {
+      "name": "emitter_dish",
+      "from": [4.5, 9, 4.5],
+      "to": [11.5, 11.5, 11.5],
+      "faces": {
+        "north": {"uv": [0, 0, 7, 2], "texture": "#emitter"},
+        "east": {"uv": [0, 0, 7, 2], "texture": "#emitter"},
+        "south": {"uv": [0, 0, 7, 2], "texture": "#emitter"},
+        "west": {"uv": [0, 0, 7, 2], "texture": "#emitter"},
+        "up": {"uv": [0, 0, 7, 7], "texture": "#gold"},
+        "down": {"uv": [0, 0, 7, 7], "texture": "#emitter"}
+      }
+    },
+    {
+      "name": "spire_antenna",
+      "from": [7.5, 11.5, 7.5],
+      "to": [8.5, 16, 8.5],
+      "faces": {
+        "north": {"uv": [0, 0, 1, 5], "texture": "#antenna"},
+        "east": {"uv": [0, 0, 1, 5], "texture": "#antenna"},
+        "south": {"uv": [0, 0, 1, 5], "texture": "#antenna"},
+        "west": {"uv": [0, 0, 1, 5], "texture": "#antenna"},
+        "up": {"uv": [0, 0, 1, 1], "texture": "#antenna"},
+        "down": {"uv": [0, 0, 1, 1], "texture": "#antenna"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [0, 90, 0],
+      "translation": [0, 2.5, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, -90, 0],
+      "translation": [0, 2.5, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, -90, 25],
+      "translation": [1.13, 3.2, 1.13],
+      "scale": [0.7, 0.7, 0.7]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 90, -25],
+      "translation": [1.13, 3.2, 1.13],
+      "scale": [0.7, 0.7, 0.7]
+    },
+    "ground": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "gui": {
+      "rotation": [30, -135, 0],
+      "translation": [0, -1, 0],
+      "scale": [0.7, 0.7, 0.7]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.7, 0.7, 0.7]
+    }
   }
 }

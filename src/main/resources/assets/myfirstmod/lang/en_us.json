@@ -7,6 +7,11 @@
   "item.myfirstmod.reinforcement_beacon": "Reinforcement Drop Beacon",
   "item.myfirstmod.transmutation_wand": "Unit Transmutation Wand",
   "item.myfirstmod.healing_staff": "Grand Healer's Divine Staff",
+  "item.myfirstmod.druid_staff": "Oakbound Druidic Staff",
+  "item.myfirstmod.bard_lute": "Harmonic War Lute",
+  "item.myfirstmod.bombardier_mortar": "Handheld Siege Mortar",
+  "item.myfirstmod.paladin_mace": "Sunforge Paladin Warhammer",
+  "item.myfirstmod.assassin_dagger": "Shadowfang Obsidian Dagger",
   "itemGroup.myfirstmod.units": "Legions & Factions Sandbox",
   "screen.myfirstmod.creator": "Legions & Factions: War Sandbox Dashboard",
 

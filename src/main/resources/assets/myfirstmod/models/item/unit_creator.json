@@ -1,6 +1,119 @@
 {
-  "parent": "minecraft:item/handheld",
+  "credit": "Legions & Factions 3D Custom Item Model",
   "textures": {
-    "layer0": "minecraft:item/blaze_rod"
+    "spine": "minecraft:block/netherite_block",
+    "cover": "minecraft:block/crying_obsidian",
+    "pages": "minecraft:block/chiseled_bookshelf_side",
+    "gold": "minecraft:block/gold_block",
+    "core": "minecraft:block/diamond_block"
+  },
+  "elements": [
+    {
+      "name": "book_spine",
+      "from": [3, 0, 6],
+      "to": [5, 14, 10],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 14], "texture": "#spine"},
+        "east": {"uv": [0, 0, 4, 14], "texture": "#spine"},
+        "south": {"uv": [0, 0, 2, 14], "texture": "#spine"},
+        "west": {"uv": [0, 0, 4, 14], "texture": "#gold"},
+        "up": {"uv": [0, 0, 2, 4], "texture": "#gold"},
+        "down": {"uv": [0, 0, 2, 4], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "front_cover",
+      "from": [5, 0, 5],
+      "to": [14, 14, 6],
+      "faces": {
+        "north": {"uv": [0, 0, 9, 14], "texture": "#cover"},
+        "east": {"uv": [0, 0, 1, 14], "texture": "#gold"},
+        "south": {"uv": [0, 0, 9, 14], "texture": "#gold"},
+        "west": {"uv": [0, 0, 1, 14], "texture": "#gold"},
+        "up": {"uv": [0, 0, 9, 1], "texture": "#gold"},
+        "down": {"uv": [0, 0, 9, 1], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "back_cover",
+      "from": [5, 0, 10],
+      "to": [14, 14, 11],
+      "faces": {
+        "north": {"uv": [0, 0, 9, 14], "texture": "#gold"},
+        "east": {"uv": [0, 0, 1, 14], "texture": "#gold"},
+        "south": {"uv": [0, 0, 9, 14], "texture": "#cover"},
+        "west": {"uv": [0, 0, 1, 14], "texture": "#gold"},
+        "up": {"uv": [0, 0, 9, 1], "texture": "#gold"},
+        "down": {"uv": [0, 0, 9, 1], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "pages",
+      "from": [5, 1, 6],
+      "to": [13, 13, 10],
+      "faces": {
+        "north": {"uv": [0, 0, 8, 12], "texture": "#pages"},
+        "east": {"uv": [0, 0, 4, 12], "texture": "#pages"},
+        "south": {"uv": [0, 0, 8, 12], "texture": "#pages"},
+        "west": {"uv": [0, 0, 4, 12], "texture": "#pages"},
+        "up": {"uv": [0, 0, 8, 4], "texture": "#pages"},
+        "down": {"uv": [0, 0, 8, 4], "texture": "#pages"}
+      }
+    },
+    {
+      "name": "glowing_core_gem",
+      "from": [8, 5, 4.5],
+      "to": [11, 8, 5.2],
+      "faces": {
+        "north": {"uv": [0, 0, 3, 3], "texture": "#core"},
+        "east": {"uv": [0, 0, 1, 3], "texture": "#core"},
+        "south": {"uv": [0, 0, 3, 3], "texture": "#core"},
+        "west": {"uv": [0, 0, 1, 3], "texture": "#core"},
+        "up": {"uv": [0, 0, 3, 1], "texture": "#core"},
+        "down": {"uv": [0, 0, 3, 1], "texture": "#core"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [0, 90, -35],
+      "translation": [0, 2.5, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, -90, 35],
+      "translation": [0, 2.5, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, -90, 25],
+      "translation": [1.13, 3.2, 1.13],
+      "scale": [0.68, 0.68, 0.68]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 90, -25],
+      "translation": [1.13, 3.2, 1.13],
+      "scale": [0.68, 0.68, 0.68]
+    },
+    "ground": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "gui": {
+      "rotation": [30, -135, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "head": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 13, 7],
+      "scale": [1, 1, 1]
+    },
+    "fixed": {
+      "rotation": [0, 180, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.75, 0.75, 0.75]
+    }
   }
 }

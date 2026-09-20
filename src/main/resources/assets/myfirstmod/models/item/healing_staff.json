@@ -1,6 +1,126 @@
 {
-  "parent": "minecraft:item/handheld",
+  "credit": "Legions & Factions 3D Custom Item Model",
   "textures": {
-    "layer0": "minecraft:item/breeze_rod"
+    "shaft": "minecraft:block/smooth_quartz",
+    "gold": "minecraft:block/gold_block",
+    "emerald": "minecraft:block/emerald_block",
+    "core": "minecraft:block/diamond_block"
+  },
+  "elements": [
+    {
+      "name": "staff_shaft",
+      "from": [7.5, 0, 7.5],
+      "to": [8.5, 17, 8.5],
+      "faces": {
+        "north": {"uv": [0, 0, 1, 16], "texture": "#shaft"},
+        "east": {"uv": [0, 0, 1, 16], "texture": "#shaft"},
+        "south": {"uv": [0, 0, 1, 16], "texture": "#shaft"},
+        "west": {"uv": [0, 0, 1, 16], "texture": "#shaft"},
+        "up": {"uv": [0, 0, 1, 1], "texture": "#gold"},
+        "down": {"uv": [0, 0, 1, 1], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "bottom_ferrule",
+      "from": [7, 0, 7],
+      "to": [9, 2, 9],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 2], "texture": "#gold"},
+        "east": {"uv": [0, 0, 2, 2], "texture": "#gold"},
+        "south": {"uv": [0, 0, 2, 2], "texture": "#gold"},
+        "west": {"uv": [0, 0, 2, 2], "texture": "#gold"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#gold"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "winged_crest_left",
+      "from": [4, 13, 7.5],
+      "to": [7.5, 17, 8.5],
+      "faces": {
+        "north": {"uv": [0, 0, 3, 4], "texture": "#gold"},
+        "east": {"uv": [0, 0, 1, 4], "texture": "#gold"},
+        "south": {"uv": [0, 0, 3, 4], "texture": "#gold"},
+        "west": {"uv": [0, 0, 1, 4], "texture": "#gold"},
+        "up": {"uv": [0, 0, 3, 1], "texture": "#gold"},
+        "down": {"uv": [0, 0, 3, 1], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "winged_crest_right",
+      "from": [8.5, 13, 7.5],
+      "to": [12, 17, 8.5],
+      "faces": {
+        "north": {"uv": [0, 0, 3, 4], "texture": "#gold"},
+        "east": {"uv": [0, 0, 1, 4], "texture": "#gold"},
+        "south": {"uv": [0, 0, 3, 4], "texture": "#gold"},
+        "west": {"uv": [0, 0, 1, 4], "texture": "#gold"},
+        "up": {"uv": [0, 0, 3, 1], "texture": "#gold"},
+        "down": {"uv": [0, 0, 3, 1], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "halo_ring",
+      "from": [4.5, 17.5, 7.5],
+      "to": [11.5, 18.5, 8.5],
+      "faces": {
+        "north": {"uv": [0, 0, 7, 1], "texture": "#gold"},
+        "east": {"uv": [0, 0, 1, 1], "texture": "#gold"},
+        "south": {"uv": [0, 0, 7, 1], "texture": "#gold"},
+        "west": {"uv": [0, 0, 1, 1], "texture": "#gold"},
+        "up": {"uv": [0, 0, 7, 1], "texture": "#gold"},
+        "down": {"uv": [0, 0, 7, 1], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "emerald_life_orb",
+      "from": [6.5, 16.5, 6.5],
+      "to": [9.5, 19.5, 9.5],
+      "faces": {
+        "north": {"uv": [0, 0, 3, 3], "texture": "#emerald"},
+        "east": {"uv": [0, 0, 3, 3], "texture": "#emerald"},
+        "south": {"uv": [0, 0, 3, 3], "texture": "#emerald"},
+        "west": {"uv": [0, 0, 3, 3], "texture": "#emerald"},
+        "up": {"uv": [0, 0, 3, 3], "texture": "#core"},
+        "down": {"uv": [0, 0, 3, 3], "texture": "#core"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [0, 90, 0],
+      "translation": [0, 3, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, -90, 0],
+      "translation": [0, 3, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, -90, 25],
+      "translation": [1.13, 3.2, 1.13],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 90, -25],
+      "translation": [1.13, 3.2, 1.13],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "ground": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "gui": {
+      "rotation": [30, -135, 0],
+      "translation": [0, -1, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.65, 0.65, 0.65]
+    }
   }
 }

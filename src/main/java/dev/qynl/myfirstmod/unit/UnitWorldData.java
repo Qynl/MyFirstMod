@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.qynl.myfirstmod.faction.Faction;
 import dev.qynl.myfirstmod.faction.FactionRelation;
+import dev.qynl.myfirstmod.item.ModItems;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -358,7 +359,7 @@ public final class UnitWorldData extends PersistentState {
             bard.maxHealth = 30.0f;
             bard.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
             bard.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
-            bard.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.GOAT_HORN));
+            bard.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(ModItems.BARD_LUTE));
             units.put(bard.id, bard);
 
             // 12. Royal Heavy Cavalry
@@ -405,7 +406,7 @@ public final class UnitWorldData extends PersistentState {
             paladin.armor = 16.0f;
             paladin.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
             paladin.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.DIAMOND_CHESTPLATE));
-            paladin.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.MACE));
+            paladin.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(ModItems.PALADIN_MACE));
             paladin.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
             units.put(paladin.id, paladin);
 
@@ -419,7 +420,7 @@ public final class UnitWorldData extends PersistentState {
             druid.maxHealth = 32.0f;
             druid.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.TURTLE_HELMET));
             druid.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
-            druid.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.STICK));
+            druid.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(ModItems.DRUID_STAFF));
             units.put(druid.id, druid);
 
             // 16. Siege Bombardier
@@ -433,8 +434,20 @@ public final class UnitWorldData extends PersistentState {
             bomb.maxHealth = 35.0f;
             bomb.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
             bomb.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
-            bomb.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.TNT));
+            bomb.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(ModItems.BOMBARDIER_MORTAR));
             units.put(bomb.id, bomb);
+
+            // 17. Shadow Assassin
+            UnitDefinition assassin = new UnitDefinition("shadow_assassin", "Shadowfang Assassin", Identifier.of("minecraft", "stray"));
+            assassin.description = "Stealth assassin wielding an obsidian dagger for devastating backstabs.";
+            assassin.factionId = "undead";
+            assassin.role = "assassin";
+            assassin.rank = "specialist";
+            assassin.movementSpeed = 0.32f;
+            assassin.maxHealth = 28.0f;
+            assassin.attackDamage = 8.0f;
+            assassin.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(ModItems.ASSASSIN_DAGGER));
+            units.put(assassin.id, assassin);
 
             // 17. Tempest Breeze
             UnitDefinition breeze = new UnitDefinition("tempest_breeze", "Tempest Breeze", Identifier.of("minecraft", "breeze"));

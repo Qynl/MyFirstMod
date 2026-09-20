@@ -55,6 +55,36 @@ public final class ModItems {
             new HealingStaffItem(new Item.Settings().maxCount(1))
     );
 
+    public static final Item DRUID_STAFF = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "druid_staff"),
+            new DruidStaffItem(new Item.Settings().maxCount(1))
+    );
+
+    public static final Item BARD_LUTE = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "bard_lute"),
+            new BardLuteItem(new Item.Settings().maxCount(1))
+    );
+
+    public static final Item BOMBARDIER_MORTAR = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "bombardier_mortar"),
+            new BombardierMortarItem(new Item.Settings().maxCount(1))
+    );
+
+    public static final Item PALADIN_MACE = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "paladin_mace"),
+            new PaladinMaceItem(new Item.Settings().maxCount(1))
+    );
+
+    public static final Item ASSASSIN_DAGGER = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "assassin_dagger"),
+            new AssassinDaggerItem(new Item.Settings().maxCount(1))
+    );
+
     private ModItems() {}
 
     public static void register() {}

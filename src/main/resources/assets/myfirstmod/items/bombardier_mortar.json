@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "myfirstmod:item/unit_creator"
+    "model": "myfirstmod:item/bombardier_mortar"
   }
 }

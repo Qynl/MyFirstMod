@@ -1,6 +1,126 @@
 {
-  "parent": "minecraft:item/handheld",
+  "credit": "Legions & Factions 3D Custom Item Model",
   "textures": {
-    "layer0": "minecraft:item/goat_horn"
+    "horn": "minecraft:block/gold_block",
+    "rim": "minecraft:block/raw_gold_block",
+    "mouthpiece": "minecraft:block/iron_block",
+    "ribbon": "minecraft:block/red_wool"
+  },
+  "elements": [
+    {
+      "name": "mouthpiece",
+      "from": [7, 1, 7],
+      "to": [9, 4, 9],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 3], "texture": "#mouthpiece"},
+        "east": {"uv": [0, 0, 2, 3], "texture": "#mouthpiece"},
+        "south": {"uv": [0, 0, 2, 3], "texture": "#mouthpiece"},
+        "west": {"uv": [0, 0, 2, 3], "texture": "#mouthpiece"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#mouthpiece"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#mouthpiece"}
+      }
+    },
+    {
+      "name": "horn_neck_1",
+      "from": [6.5, 4, 6.5],
+      "to": [9.5, 8, 9.5],
+      "faces": {
+        "north": {"uv": [0, 0, 3, 4], "texture": "#horn"},
+        "east": {"uv": [0, 0, 3, 4], "texture": "#horn"},
+        "south": {"uv": [0, 0, 3, 4], "texture": "#horn"},
+        "west": {"uv": [0, 0, 3, 4], "texture": "#horn"},
+        "up": {"uv": [0, 0, 3, 3], "texture": "#horn"},
+        "down": {"uv": [0, 0, 3, 3], "texture": "#horn"}
+      }
+    },
+    {
+      "name": "horn_body_curve",
+      "from": [5.5, 8, 5.5],
+      "to": [10.5, 12, 10.5],
+      "faces": {
+        "north": {"uv": [0, 0, 5, 4], "texture": "#horn"},
+        "east": {"uv": [0, 0, 5, 4], "texture": "#horn"},
+        "south": {"uv": [0, 0, 5, 4], "texture": "#horn"},
+        "west": {"uv": [0, 0, 5, 4], "texture": "#horn"},
+        "up": {"uv": [0, 0, 5, 5], "texture": "#horn"},
+        "down": {"uv": [0, 0, 5, 5], "texture": "#horn"}
+      }
+    },
+    {
+      "name": "horn_bell_flare",
+      "from": [4.5, 12, 4.5],
+      "to": [11.5, 15, 11.5],
+      "faces": {
+        "north": {"uv": [0, 0, 7, 3], "texture": "#horn"},
+        "east": {"uv": [0, 0, 7, 3], "texture": "#horn"},
+        "south": {"uv": [0, 0, 7, 3], "texture": "#horn"},
+        "west": {"uv": [0, 0, 7, 3], "texture": "#horn"},
+        "up": {"uv": [0, 0, 7, 7], "texture": "#rim"},
+        "down": {"uv": [0, 0, 7, 7], "texture": "#rim"}
+      }
+    },
+    {
+      "name": "horn_rim",
+      "from": [4, 15, 4],
+      "to": [12, 16, 12],
+      "faces": {
+        "north": {"uv": [0, 0, 8, 1], "texture": "#rim"},
+        "east": {"uv": [0, 0, 8, 1], "texture": "#rim"},
+        "south": {"uv": [0, 0, 8, 1], "texture": "#rim"},
+        "west": {"uv": [0, 0, 8, 1], "texture": "#rim"},
+        "up": {"uv": [0, 0, 8, 8], "texture": "#rim"},
+        "down": {"uv": [0, 0, 8, 8], "texture": "#rim"}
+      }
+    },
+    {
+      "name": "battle_ribbon",
+      "from": [7.5, 5, 4.5],
+      "to": [8.5, 11, 5.5],
+      "faces": {
+        "north": {"uv": [0, 0, 1, 6], "texture": "#ribbon"},
+        "east": {"uv": [0, 0, 1, 6], "texture": "#ribbon"},
+        "south": {"uv": [0, 0, 1, 6], "texture": "#ribbon"},
+        "west": {"uv": [0, 0, 1, 6], "texture": "#ribbon"},
+        "up": {"uv": [0, 0, 1, 1], "texture": "#ribbon"},
+        "down": {"uv": [0, 0, 1, 1], "texture": "#ribbon"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [-45, 0, 0],
+      "translation": [0, 3, 1],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [-45, 0, 0],
+      "translation": [0, 3, 1],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "firstperson_righthand": {
+      "rotation": [-15, 30, -10],
+      "translation": [1.5, 2.5, -2],
+      "scale": [0.85, 0.85, 0.85]
+    },
+    "firstperson_lefthand": {
+      "rotation": [-15, -30, 10],
+      "translation": [1.5, 2.5, -2],
+      "scale": [0.85, 0.85, 0.85]
+    },
+    "ground": {
+      "rotation": [90, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.6, 0.6, 0.6]
+    },
+    "gui": {
+      "rotation": [30, 45, 0],
+      "translation": [0, -1, 0],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.8, 0.8, 0.8]
+    }
   }
 }

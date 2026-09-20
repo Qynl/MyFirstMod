@@ -1,0 +1,114 @@
+{
+  "credit": "Legions & Factions 3D Custom Item Model",
+  "textures": {
+    "wood": "minecraft:block/oak_log",
+    "leaf": "minecraft:block/oak_leaves",
+    "gem": "minecraft:block/emerald_block",
+    "core": "minecraft:block/diamond_block",
+    "bark": "minecraft:block/dark_oak_log"
+  },
+  "elements": [
+    {
+      "name": "staff_shaft",
+      "from": [7, 0, 7],
+      "to": [9, 15, 9],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 15], "texture": "#wood"},
+        "east": {"uv": [0, 0, 2, 15], "texture": "#wood"},
+        "south": {"uv": [0, 0, 2, 15], "texture": "#wood"},
+        "west": {"uv": [0, 0, 2, 15], "texture": "#wood"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#bark"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#bark"}
+      }
+    },
+    {
+      "name": "gnarled_branch_left",
+      "from": [5, 13, 6.5],
+      "to": [7, 19, 9.5],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 6], "texture": "#bark"},
+        "east": {"uv": [0, 0, 3, 6], "texture": "#bark"},
+        "south": {"uv": [0, 0, 2, 6], "texture": "#bark"},
+        "west": {"uv": [0, 0, 3, 6], "texture": "#bark"},
+        "up": {"uv": [0, 0, 2, 3], "texture": "#leaf"},
+        "down": {"uv": [0, 0, 2, 3], "texture": "#bark"}
+      }
+    },
+    {
+      "name": "gnarled_branch_right",
+      "from": [9, 13, 6.5],
+      "to": [11, 19, 9.5],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 6], "texture": "#bark"},
+        "east": {"uv": [0, 0, 3, 6], "texture": "#bark"},
+        "south": {"uv": [0, 0, 2, 6], "texture": "#bark"},
+        "west": {"uv": [0, 0, 3, 6], "texture": "#bark"},
+        "up": {"uv": [0, 0, 2, 3], "texture": "#leaf"},
+        "down": {"uv": [0, 0, 2, 3], "texture": "#bark"}
+      }
+    },
+    {
+      "name": "nature_crystal_core",
+      "from": [6.5, 14.5, 6.5],
+      "to": [9.5, 17.5, 9.5],
+      "faces": {
+        "north": {"uv": [0, 0, 3, 3], "texture": "#gem"},
+        "east": {"uv": [0, 0, 3, 3], "texture": "#gem"},
+        "south": {"uv": [0, 0, 3, 3], "texture": "#gem"},
+        "west": {"uv": [0, 0, 3, 3], "texture": "#gem"},
+        "up": {"uv": [0, 0, 3, 3], "texture": "#core"},
+        "down": {"uv": [0, 0, 3, 3], "texture": "#core"}
+      }
+    },
+    {
+      "name": "leaf_bloom",
+      "from": [6, 17.5, 6],
+      "to": [10, 20.5, 10],
+      "faces": {
+        "north": {"uv": [0, 0, 4, 3], "texture": "#leaf"},
+        "east": {"uv": [0, 0, 4, 3], "texture": "#leaf"},
+        "south": {"uv": [0, 0, 4, 3], "texture": "#leaf"},
+        "west": {"uv": [0, 0, 4, 3], "texture": "#leaf"},
+        "up": {"uv": [0, 0, 4, 4], "texture": "#leaf"},
+        "down": {"uv": [0, 0, 4, 4], "texture": "#leaf"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [0, 90, 0],
+      "translation": [0, 3, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, -90, 0],
+      "translation": [0, 3, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, -90, 25],
+      "translation": [1.13, 3.2, 1.13],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 90, -25],
+      "translation": [1.13, 3.2, 1.13],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "ground": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "gui": {
+      "rotation": [30, -135, 0],
+      "translation": [0, -1, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.65, 0.65, 0.65]
+    }
+  }
+}

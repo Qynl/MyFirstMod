@@ -1,6 +1,113 @@
 {
-  "parent": "minecraft:item/handheld",
+  "credit": "Legions & Factions 3D Custom Item Model",
   "textures": {
-    "layer0": "minecraft:item/white_banner"
+    "pole": "minecraft:block/spruce_planks",
+    "gold": "minecraft:block/gold_block",
+    "cloth": "minecraft:block/blue_wool",
+    "trim": "minecraft:block/yellow_wool"
+  },
+  "elements": [
+    {
+      "name": "banner_pole",
+      "from": [7.5, 0, 7.5],
+      "to": [8.5, 20, 8.5],
+      "faces": {
+        "north": {"uv": [0, 0, 1, 16], "texture": "#pole"},
+        "east": {"uv": [0, 0, 1, 16], "texture": "#pole"},
+        "south": {"uv": [0, 0, 1, 16], "texture": "#pole"},
+        "west": {"uv": [0, 0, 1, 16], "texture": "#pole"},
+        "up": {"uv": [0, 0, 1, 1], "texture": "#gold"},
+        "down": {"uv": [0, 0, 1, 1], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "spear_finial",
+      "from": [7, 20, 7],
+      "to": [9, 23, 9],
+      "faces": {
+        "north": {"uv": [0, 0, 2, 3], "texture": "#gold"},
+        "east": {"uv": [0, 0, 2, 3], "texture": "#gold"},
+        "south": {"uv": [0, 0, 2, 3], "texture": "#gold"},
+        "west": {"uv": [0, 0, 2, 3], "texture": "#gold"},
+        "up": {"uv": [0, 0, 2, 2], "texture": "#gold"},
+        "down": {"uv": [0, 0, 2, 2], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "crossbeam",
+      "from": [3, 18, 7.2],
+      "to": [13, 19, 8.8],
+      "faces": {
+        "north": {"uv": [0, 0, 10, 1], "texture": "#gold"},
+        "east": {"uv": [0, 0, 1, 1], "texture": "#gold"},
+        "south": {"uv": [0, 0, 10, 1], "texture": "#gold"},
+        "west": {"uv": [0, 0, 1, 1], "texture": "#gold"},
+        "up": {"uv": [0, 0, 10, 1], "texture": "#gold"},
+        "down": {"uv": [0, 0, 10, 1], "texture": "#gold"}
+      }
+    },
+    {
+      "name": "banner_cloth",
+      "from": [3.5, 4, 7.6],
+      "to": [12.5, 18, 8.4],
+      "faces": {
+        "north": {"uv": [0, 0, 9, 14], "texture": "#cloth"},
+        "east": {"uv": [0, 0, 1, 14], "texture": "#trim"},
+        "south": {"uv": [0, 0, 9, 14], "texture": "#cloth"},
+        "west": {"uv": [0, 0, 1, 14], "texture": "#trim"},
+        "up": {"uv": [0, 0, 9, 1], "texture": "#trim"},
+        "down": {"uv": [0, 0, 9, 1], "texture": "#trim"}
+      }
+    },
+    {
+      "name": "banner_fringe",
+      "from": [3.5, 2, 7.6],
+      "to": [12.5, 4, 8.4],
+      "faces": {
+        "north": {"uv": [0, 0, 9, 2], "texture": "#trim"},
+        "east": {"uv": [0, 0, 1, 2], "texture": "#trim"},
+        "south": {"uv": [0, 0, 9, 2], "texture": "#trim"},
+        "west": {"uv": [0, 0, 1, 2], "texture": "#trim"},
+        "up": {"uv": [0, 0, 9, 1], "texture": "#trim"},
+        "down": {"uv": [0, 0, 9, 1], "texture": "#trim"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [0, 90, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, -90, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.65, 0.65, 0.65]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, -90, 15],
+      "translation": [1.5, 1, -1],
+      "scale": [0.6, 0.6, 0.6]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 90, -15],
+      "translation": [1.5, 1, -1],
+      "scale": [0.6, 0.6, 0.6]
+    },
+    "ground": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 2, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "gui": {
+      "rotation": [30, -135, 0],
+      "translation": [0, -2, 0],
+      "scale": [0.55, 0.55, 0.55]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.6, 0.6, 0.6]
+    }
   }
 }
