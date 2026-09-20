@@ -14,6 +14,10 @@ import java.util.List;
 public final class MoraleSystem {
     private MoraleSystem() {}
 
+    public static void updateMorale(ServerWorld world, MobEntity mob, UnitDefinition unit) {
+        checkMorale(world, mob, unit);
+    }
+
     public static void checkMorale(ServerWorld world, MobEntity mob, UnitDefinition unit) {
         if (mob == null || !mob.isAlive() || mob.age % 80 != 0) return;
 

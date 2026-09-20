@@ -2,7 +2,8 @@ name: Build Mod
 
 on:
   push:
-    branches: ["main"]
+    branches: ["**"]
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -10,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Java 21
@@ -19,16 +20,17 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Set up Gradle
+      - name: Set up Gradle 8.10.2
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "9.5.1"
+          gradle-version: "8.10.2"
 
-      - name: Build
-        run: gradle build
+      - name: Build Mod with Gradle
+        run: gradle build --stacktrace
 
-      - name: Upload JAR
+      - name: Upload Mod JAR Artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: MyFirstMod
+          name: LegionsAndFactions-1.21.1
           path: build/libs/*.jar

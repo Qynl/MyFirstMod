@@ -25,11 +25,11 @@ public final class MountedCavalrySpawner {
         if (world == null || riderDef == null || mountTypeId == null) return null;
 
         EntityType<?> mountType = Registries.ENTITY_TYPE.getOrEmpty(mountTypeId).orElse(null);
-        if (mountType == null) return UnitSpawner.spawn(world, riderDef, pos, yaw);
+        if (mountType == null) return UnitSpawner.spawnDirect(world, riderDef, pos, yaw);
 
         Entity mountEntity = mountType.create(world);
         if (!(mountEntity instanceof MobEntity mount)) {
-            return UnitSpawner.spawn(world, riderDef, pos, yaw);
+            return UnitSpawner.spawnDirect(world, riderDef, pos, yaw);
         }
 
         mount.refreshPositionAndAngles(pos.x, pos.y, pos.z, yaw, 0.0f);
@@ -48,7 +48,7 @@ public final class MountedCavalrySpawner {
         mount.getCommandTags().add("battle_mob");
         world.spawnEntity(mount);
 
-        LivingEntity rider = UnitSpawner.spawn(world, riderDef, pos, yaw);
+        LivingEntity rider = UnitSpawner.spawnDirect(world, riderDef, pos, yaw);
         if (rider != null) {
             rider.startRiding(mount, true);
         }

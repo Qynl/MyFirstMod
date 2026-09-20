@@ -36,6 +36,13 @@ public final class MyFirstMod implements ModInitializer {
             entries.add(ModItems.FACTION_SCEPTER);
             entries.add(ModItems.TACTICAL_WHISTLE);
             entries.add(ModItems.REINFORCEMENT_BEACON);
+            entries.add(ModItems.TRANSMUTATION_WAND);
+            entries.add(ModItems.HEALING_STAFF);
+            entries.add(ModItems.DRUID_STAFF);
+            entries.add(ModItems.BARD_LUTE);
+            entries.add(ModItems.BOMBARDIER_MORTAR);
+            entries.add(ModItems.PALADIN_MACE);
+            entries.add(ModItems.ASSASSIN_DAGGER);
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.add(ModItems.UNIT_CREATOR);
@@ -44,6 +51,13 @@ public final class MyFirstMod implements ModInitializer {
             entries.add(ModItems.FACTION_SCEPTER);
             entries.add(ModItems.TACTICAL_WHISTLE);
             entries.add(ModItems.REINFORCEMENT_BEACON);
+            entries.add(ModItems.TRANSMUTATION_WAND);
+            entries.add(ModItems.HEALING_STAFF);
+            entries.add(ModItems.DRUID_STAFF);
+            entries.add(ModItems.BARD_LUTE);
+            entries.add(ModItems.BOMBARDIER_MORTAR);
+            entries.add(ModItems.PALADIN_MACE);
+            entries.add(ModItems.ASSASSIN_DAGGER);
         });
 
         // Left-click on block with Creator Tool -> spawn unit / squad

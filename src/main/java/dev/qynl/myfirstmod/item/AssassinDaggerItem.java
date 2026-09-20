@@ -19,7 +19,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Set;
 
 public class AssassinDaggerItem extends Item {
     public AssassinDaggerItem(Settings settings) {
@@ -37,7 +36,7 @@ public class AssassinDaggerItem extends Item {
 
             // Shadow step blink
             serverWorld.spawnParticles(ParticleTypes.PORTAL, player.getX(), player.getY() + 1.0, player.getZ(), 25, 0.3, 0.5, 0.3, 0.1);
-            player.teleport(serverWorld, targetPos.x, targetPos.y, targetPos.z, Set.of(), player.getYaw(), player.getPitch());
+            player.requestTeleport(targetPos.x, targetPos.y, targetPos.z);
             serverWorld.spawnParticles(ParticleTypes.SMOKE, targetPos.x, targetPos.y + 0.5, targetPos.z, 20, 0.3, 0.5, 0.3, 0.05);
 
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 80, 0));
