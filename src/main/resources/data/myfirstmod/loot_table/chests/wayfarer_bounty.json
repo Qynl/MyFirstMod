@@ -22,7 +22,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "myfirstmod:echo_shard",
+          "name": "minecraft:echo_shard",
           "functions": [
             {
               "function": "minecraft:set_count",

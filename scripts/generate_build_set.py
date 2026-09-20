@@ -30,7 +30,7 @@ LANDMARK_META = [
     ('geode_garden', 'Geode Garden', 'minecraft:amethyst_shard', 'Break open a Geode Garden and take the half-buried cache.'),
     ('slag_camp', 'Slag Camp', 'myfirstmod:hushberry', 'Rest a moment at a Slag Camp and loot its supply barrels.'),
     ('caravan_wreck', 'Caravan Wreck', 'myfirstmod:dusk_fiber', 'Pick through a Caravan Wreck and its spilled caches.'),
-    ('echo_fissure', 'Echo Fissure', 'myfirstmod:echo_shard', 'Descend an Echo Fissure past the Warden and seize the echo cache.'),
+    ('echo_fissure', 'Echo Fissure', 'minecraft:echo_shard', 'Descend an Echo Fissure past the Warden and seize the echo cache.'),
     ('heartwood_circle', 'Heartwood Circle', 'myfirstmod:hush_leaves', 'Stand in a Heartwood Circle and uncover the covered cache.'),
     ('fen_shrine', 'Fen Shrine', 'myfirstmod:lumen_moss', 'Kneel at a Fen Shrine and take the cache at its steps.'),
 ]
@@ -170,7 +170,7 @@ def main():
     dump(DATA / 'loot_table/chests/wayfarer_bounty.json', {'type': 'minecraft:chest', 'pools': [
         {'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': 'myfirstmod:memory_shard',
                                   'functions': [{'function': 'minecraft:set_count', 'count': 3, 'add': False}]}]},
-        {'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': 'myfirstmod:echo_shard',
+        {'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': 'minecraft:echo_shard',
                                   'functions': [{'function': 'minecraft:set_count', 'count': 2, 'add': False}]}]},
         {'rolls': 1, 'entries': [{'type': 'minecraft:item', 'name': 'myfirstmod:resonite_ingot',
                                   'functions': [{'function': 'minecraft:set_count', 'count': 2, 'add': False}]}]}]})

@@ -2,7 +2,7 @@
   "parent": "myfirstmod:enter_realm",
   "display": {
     "icon": {
-      "id": "myfirstmod:echo_shard"
+      "id": "minecraft:echo_shard"
     },
     "title": {
       "text": "Echo Fissure"
