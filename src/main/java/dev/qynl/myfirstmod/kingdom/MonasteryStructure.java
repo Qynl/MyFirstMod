@@ -16,10 +16,9 @@ public final class MonasteryStructure extends Structure {
     private final Config settings;private volatile JigsawStructure delegate;
     public MonasteryStructure(Config config){super(config);settings=config;}
     public static void register(){Registry.register(Registries.STRUCTURE_TYPE,Identifier.of("myfirstmod","rootbound_monastery"),TYPE);}
-    public static boolean reserved(BlockPos pos){return Math.abs((long)pos.getX())<160&&pos.getZ()>-160&&pos.getZ()<256;}
     @Override protected Optional<StructurePosition> getStructurePosition(Context context){
         var start=new BlockPos(context.chunkPos().getStartX(),0,context.chunkPos().getStartZ());
-        if(reserved(start))return Optional.empty();
+        if(MonasteryRules.reserved(start.getX(),start.getZ()))return Optional.empty();
         var jigsaw=delegate;
         if(jigsaw==null){
             var pools=context.dynamicRegistryManager().get(RegistryKeys.TEMPLATE_POOL);

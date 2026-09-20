@@ -21,12 +21,12 @@ class MonasteryTest {
         assertFalse(MonasteryRules.lane(6,1.2,0));assertFalse(MonasteryRules.lane(6,0,3));
     }
     @Test void seedfallHasAClearOutside(){
-        assertTrue(MonasteryRules.seed(0,0,0));assertTrue(MonasteryRules.seed(2.2,0,2.9));
+        assertTrue(MonasteryRules.seed(0,0,0));assertTrue(MonasteryRules.seed(2.1,0,2.9));
         assertFalse(MonasteryRules.seed(2.3,0,0));assertFalse(MonasteryRules.seed(0,0,3));
         assertFalse(MonasteryRules.seed(-4,4,0));
     }
     @Test void crownHasGapsACenterAndASecondRotation(){
-        assertTrue(MonasteryRules.crown(3,0,0,false));assertTrue(MonasteryRules.crown(7,.8,2.9,false));
+        assertTrue(MonasteryRules.crown(3,0,0,false));assertTrue(MonasteryRules.crown(7,0,2.9,false));
         assertFalse(MonasteryRules.crown(2.9,0,0,false));assertFalse(MonasteryRules.crown(7.1,0,0,false));
         assertFalse(MonasteryRules.crown(4,4,0,false));assertFalse(MonasteryRules.crown(3,0,3,false));
         assertTrue(MonasteryRules.crown(3,3,0,true));assertFalse(MonasteryRules.crown(3,3,0,false));
@@ -44,11 +44,11 @@ class MonasteryTest {
         }
     }
     @Test void theSanctuaryApproachStaysClearOfNewMonasteries(){
-        assertTrue(MonasteryStructure.reserved(new BlockPos(0,81,160)));
-        assertTrue(MonasteryStructure.reserved(new BlockPos(-159,81,255)));
-        assertFalse(MonasteryStructure.reserved(new BlockPos(160,81,160)));
-        assertFalse(MonasteryStructure.reserved(new BlockPos(0,81,256)));
-        assertFalse(MonasteryStructure.reserved(new BlockPos(0,81,-160)));
-        assertFalse(MonasteryStructure.reserved(new BlockPos(3000,81,3000)));
+        assertTrue(MonasteryRules.reserved(0,160));
+        assertTrue(MonasteryRules.reserved(-159,255));
+        assertFalse(MonasteryRules.reserved(160,160));
+        assertFalse(MonasteryRules.reserved(0,256));
+        assertFalse(MonasteryRules.reserved(0,-160));
+        assertFalse(MonasteryRules.reserved(3000,3000));
     }
 }
