@@ -51,7 +51,7 @@ public final class MountedCavalrySpawner {
             camel.setTame(true);
             camel.equipStack(EquipmentSlot.FEET, new ItemStack(Items.SADDLE));
         } else if (mount instanceof TameableEntity tameable) {
-            tameable.setTamed(true);
+            tameable.setTamed(true, true);
         } else if (mount instanceof StriderEntity strider) {
             strider.equipStack(EquipmentSlot.FEET, new ItemStack(Items.SADDLE));
         } else if (mount instanceof PigEntity pig) {
