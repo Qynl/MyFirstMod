@@ -21,7 +21,23 @@ The guard demonstrates the important villager path: it is still a vanilla villag
 - `gui/` uses a normal server ScreenHandler. Buttons are validated and executed server-side; the client only renders controls.
 - `UnitCreatorItem` references a saved unit through server state rather than embedding a unit definition in the item.
 
-The existing Null Warden content remains registered as legacy content while this new simulation layer becomes the main mod identity. Future work can add richer editor fields, inventories, item capabilities, squads, perks, building validation, imports/exports, and battle setup without replacing the unit/faction core.
+The same library is also fully addressable from the server command layer, which is useful for operators, testing, and future datapack integration:
+
+```text
+/unit create royal_guard minecraft:villager Royal Guard
+/unit set royal_guard health 40
+/unit set royal_guard damage 8
+/unit set royal_guard role melee
+/unit equip royal_guard mainhand minecraft:iron_sword
+/unit equip royal_guard offhand minecraft:shield
+/unit faction create kingdom Kingdom of Eldoria
+/unit set royal_guard faction kingdom
+/unit faction create raiders Iron Raiders
+/unit faction relation kingdom raiders HOSTILE
+/unit spawn royal_guard
+```
+
+The existing Null Warden content remains registered as legacy content while this new simulation layer becomes the main mod identity. The core is deliberately ready for the next systems: inventories, item capabilities, squads, perks, building validation, imports/exports, and battle setup can all use the same saved definitions and server authority.
 
 ## Build
 
