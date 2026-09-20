@@ -36,7 +36,8 @@ class MonasteryTest {
     @Test void bothBellsResolveToTheSameHeartInEveryRotation(){
         for(var facing:Direction.Type.HORIZONTAL) {
             var heart=new BlockPos(400,81,-240);
-            var west=Monastery.relative(heart,facing,-16,0,-16),east=Monastery.relative(heart,facing,16,6,-16);
+            BlockPos west=Monastery.relative(heart,facing,-16,0,-16);
+            BlockPos east=Monastery.relative(heart,facing,16,6,-16);
             assertEquals(heart,Monastery.relative(west,facing,16,0,16),facing.getName());
             assertEquals(heart,Monastery.relative(east,facing,-16,-6,16),facing.getName());
             assertNotEquals(west,east);
