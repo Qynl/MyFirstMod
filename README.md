@@ -70,3 +70,16 @@ Units can prioritize commanders, medics, ranged units, weakest targets, or neare
 ```
 
 Ranged templates receive an ammunition budget from their saved arrow inventory. The simulation tracks that budget on each spawned unit and stops custom ranged units when ammunition is exhausted instead of silently granting unlimited supplies.
+
+## Faction perks
+
+Faction perks are data-driven and persistent:
+
+```text
+/unit faction perk kingdom military_discipline
+/unit faction perk kingdom heavy_armor
+/unit faction perk kingdom swift_army
+/unit faction perk kingdom regeneration
+```
+
+These affect real attributes or server-side healing rather than merely changing UI text.
