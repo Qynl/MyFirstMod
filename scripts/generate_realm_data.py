@@ -53,7 +53,7 @@ REGIONS = [
  ('hushed_grove',[-1,-.55],0x102F38,0x132535,'sculk_soul','soul_sand_valley.loop',[]),
  ('veil_highlands',[-.55,-.25],0x274049,0x2C4A52,'cloud','warped_forest.loop',[('creature','myfirstmod:veil_wisp',12,1,2)]),
  ('luminous_fen',[-.25,.05],0x183F42,0x193E47,'spore_blossom_air','warped_forest.loop',[]),
- ('drowned_stacks',[.05,.35],0x14424A,0x173B44,'dripping_dripstone','underwater.loop',[('monster','minecraft:drowned',20,1,2)]),
+ ('drowned_stacks',[.05,.35],0x14424A,0x173B44,'dripping_dripstone_water','underwater.loop',[('monster','minecraft:drowned',20,1,2)]),
  ('prism_wastes',[.35,.6],0x302646,0x271839,'end_rod','soul_sand_valley.loop',[]),
  ('shard_spires',[.6,.8],0x2A2A4E,0x232045,'glow','soul_sand_valley.loop',[('creature','myfirstmod:veil_wisp',12,1,2)]),
  ('cinder_steps',[.8,.92],0x352B38,0x281A30,'ash','basalt_deltas.loop',[]),

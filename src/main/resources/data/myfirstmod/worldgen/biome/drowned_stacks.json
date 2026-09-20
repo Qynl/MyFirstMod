@@ -9,7 +9,7 @@
     "water_fog_color": 1188659,
     "particle": {
       "options": {
-        "type": "minecraft:dripping_dripstone"
+        "type": "minecraft:dripping_dripstone_water"
       },
       "probability": 0.004
     },
