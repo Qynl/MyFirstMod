@@ -40,7 +40,7 @@ public final class CombatAI {
             mob.swingHand(Hand.MAIN_HAND);
 
             float damage = unit.attackDamage;
-            var dmgAttr = mob.getAttributeInstance(EntityAttributes.ATTACK_DAMAGE);
+            var dmgAttr = mob.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
             if (dmgAttr != null) {
                 damage = (float) dmgAttr.getValue();
             }

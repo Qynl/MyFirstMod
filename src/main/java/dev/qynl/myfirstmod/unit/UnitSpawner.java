@@ -149,24 +149,24 @@ public final class UnitSpawner {
         if (faction == null) return;
 
         if (faction.hasPerk(FactionPerk.MILITARY_DISCIPLINE)) {
-            EntityAttributeInstance dmg = living.getAttributeInstance(EntityAttributes.ATTACK_DAMAGE);
+            EntityAttributeInstance dmg = living.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
             if (dmg != null) dmg.setBaseValue(dmg.getBaseValue() * 1.15);
         }
 
         if (faction.hasPerk(FactionPerk.HEAVY_ARMOR)) {
-            EntityAttributeInstance armor = living.getAttributeInstance(EntityAttributes.ARMOR);
+            EntityAttributeInstance armor = living.getAttributeInstance(EntityAttributes.GENERIC_ARMOR);
             if (armor != null) armor.setBaseValue(armor.getBaseValue() * 1.20);
-            EntityAttributeInstance kb = living.getAttributeInstance(EntityAttributes.KNOCKBACK_RESISTANCE);
+            EntityAttributeInstance kb = living.getAttributeInstance(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE);
             if (kb != null) kb.setBaseValue(kb.getBaseValue() + 0.2);
         }
 
         if (faction.hasPerk(FactionPerk.SWIFT_ARMY)) {
-            EntityAttributeInstance speed = living.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
+            EntityAttributeInstance speed = living.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
             if (speed != null) speed.setBaseValue(speed.getBaseValue() * 1.15);
         }
 
         if (faction.hasPerk(FactionPerk.FORTIFICATION)) {
-            EntityAttributeInstance health = living.getAttributeInstance(EntityAttributes.MAX_HEALTH);
+            EntityAttributeInstance health = living.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
             if (health != null) health.setBaseValue(health.getBaseValue() * 1.15);
             living.setHealth(living.getMaxHealth());
         }

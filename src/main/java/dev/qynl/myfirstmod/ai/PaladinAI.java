@@ -4,7 +4,6 @@ import dev.qynl.myfirstmod.faction.FactionManager;
 import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.MinecraftServer;

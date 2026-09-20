@@ -45,7 +45,7 @@ public final class FoodAI {
 
     private static void consumeFood(ServerWorld world, MobEntity mob, ItemStack stack, EquipmentSlot slot, int invIndex) {
         mob.heal(5.0f);
-        world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_GENERIC_EAT.value(), SoundCategory.NEUTRAL, 0.8f, 1.0f);
+        world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_PLAYER_BURP.value(), SoundCategory.NEUTRAL, 0.8f, 1.0f);
         world.spawnParticles(ParticleTypes.ITEM_SNOWBALL, mob.getX(), mob.getEyeY(), mob.getZ(), 6, 0.2, 0.2, 0.2, 0.05);
 
         stack.decrement(1);

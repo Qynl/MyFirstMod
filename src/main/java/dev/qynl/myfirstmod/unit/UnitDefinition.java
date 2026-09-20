@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -132,7 +133,7 @@ public final class UnitDefinition {
         this.variant = nbt.getString("variant");
         this.isBaby = nbt.getBoolean("is_baby");
 
-        RegistryWrapper.WrapperLookup lookup = Registries.ITEM.getReadOnlyWrapper();
+        RegistryWrapper.WrapperLookup lookup = DynamicRegistryManager.of(Registries.REGISTRIES);
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (nbt.contains("item_" + slot.getName())) {
                 equipment.put(slot, ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("item_" + slot.getName())));
@@ -199,7 +200,7 @@ public final class UnitDefinition {
         nbt.putString("variant", variant == null ? "" : variant);
         nbt.putBoolean("is_baby", isBaby);
 
-        RegistryWrapper.WrapperLookup lookup = Registries.ITEM.getReadOnlyWrapper();
+        RegistryWrapper.WrapperLookup lookup = DynamicRegistryManager.of(Registries.REGISTRIES);
         for (Map.Entry<EquipmentSlot, ItemStack> entry : equipment.entrySet()) {
             if (entry.getValue() != null && !entry.getValue().isEmpty()) {
                 nbt.put("item_" + entry.getKey().getName(), entry.getValue().encode(lookup));
@@ -314,15 +315,15 @@ public final class UnitDefinition {
     }
 
     public void applyAttributes(LivingEntity entity) {
-        setAttribute(EntityAttributes.MAX_HEALTH, maxHealth, entity);
-        setAttribute(EntityAttributes.MOVEMENT_SPEED, movementSpeed, entity);
-        setAttribute(EntityAttributes.ATTACK_DAMAGE, attackDamage, entity);
-        setAttribute(EntityAttributes.FOLLOW_RANGE, followRange, entity);
-        setAttribute(EntityAttributes.ARMOR, armor, entity);
-        setAttribute(EntityAttributes.ARMOR_TOUGHNESS, armorToughness, entity);
-        setAttribute(EntityAttributes.KNOCKBACK_RESISTANCE, knockbackResistance, entity);
-        setAttribute(EntityAttributes.ATTACK_SPEED, attackSpeed, entity);
-        setAttribute(EntityAttributes.SCALE, scale, entity);
+        setAttribute(EntityAttributes.GENERIC_MAX_HEALTH, maxHealth, entity);
+        setAttribute(EntityAttributes.GENERIC_MOVEMENT_SPEED, movementSpeed, entity);
+        setAttribute(EntityAttributes.GENERIC_ATTACK_DAMAGE, attackDamage, entity);
+        setAttribute(EntityAttributes.GENERIC_FOLLOW_RANGE, followRange, entity);
+        setAttribute(EntityAttributes.GENERIC_ARMOR, armor, entity);
+        setAttribute(EntityAttributes.GENERIC_ARMOR_TOUGHNESS, armorToughness, entity);
+        setAttribute(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE, knockbackResistance, entity);
+        setAttribute(EntityAttributes.GENERIC_ATTACK_SPEED, attackSpeed, entity);
+        setAttribute(EntityAttributes.GENERIC_SCALE, scale, entity);
 
         entity.setHealth(Math.min(maxHealth, entity.getMaxHealth()));
     }

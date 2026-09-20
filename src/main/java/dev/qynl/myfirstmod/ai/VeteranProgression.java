@@ -37,13 +37,13 @@ public final class VeteranProgression {
     }
 
     private static void promote(ServerWorld world, LivingEntity unit, String title, Formatting format, double hpBonus, double dmgBonus) {
-        EntityAttributeInstance maxHp = unit.getAttributeInstance(EntityAttributes.MAX_HEALTH);
+        EntityAttributeInstance maxHp = unit.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         if (maxHp != null) {
             maxHp.setBaseValue(maxHp.getBaseValue() + hpBonus);
             unit.heal((float) hpBonus);
         }
 
-        EntityAttributeInstance dmg = unit.getAttributeInstance(EntityAttributes.ATTACK_DAMAGE);
+        EntityAttributeInstance dmg = unit.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE);
         if (dmg != null) {
             dmg.setBaseValue(dmg.getBaseValue() + dmgBonus);
         }
