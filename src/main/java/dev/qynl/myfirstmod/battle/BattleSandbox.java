@@ -8,9 +8,6 @@ import dev.qynl.myfirstmod.unit.UnitSpawner;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.FireworkRocketEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -28,6 +25,11 @@ import java.util.List;
 
 public final class BattleSandbox {
     private BattleSandbox() {}
+
+    public static String activeFactionA = null;
+    public static String activeFactionB = null;
+    public static boolean battleActive = false;
+    private static int battleTickTimer = 0;
 
     public static void startBattle(ServerPlayerEntity player, String factionAId, String factionBId, int armySize) {
         if (player == null) return;
@@ -54,7 +56,7 @@ public final class BattleSandbox {
         ServerWorld world = player.getServerWorld();
         Vec3d center = player.getPos();
 
-        double battleDistance = 30.0;
+        double battleDistance = 32.0;
         Vec3d sideAPos = center.add(-battleDistance / 2.0, 0, 0);
         Vec3d sideBPos = center.add(battleDistance / 2.0, 0, 0);
 
@@ -63,6 +65,11 @@ public final class BattleSandbox {
 
         // Spawn Side B (facing West -> Yaw -90)
         spawnArmyFormation(world, unitsB, sideBPos, -90.0f, armySize);
+
+        activeFactionA = factionAId;
+        activeFactionB = factionBId;
+        battleActive = true;
+        battleTickTimer = 0;
 
         // Sound battle horn
         world.playSound(null, center.x, center.y, center.z, SoundEvents.EVENT_RAID_HORN, SoundCategory.NEUTRAL, 2.0f, 1.0f);
@@ -84,7 +91,6 @@ public final class BattleSandbox {
             int row = i / cols;
             int col = i % cols;
 
-            // Offset frontline melee ahead, ranged in middle, support/commanders behind
             double rowOffset = row * 2.5;
             if (template.role.equalsIgnoreCase("melee") || template.role.equalsIgnoreCase("tank") || template.role.equalsIgnoreCase("berserker")) {
                 rowOffset -= 1.5;
@@ -101,6 +107,42 @@ public final class BattleSandbox {
                 entity.getCommandTags().add("battle_mob");
             }
         }
+    }
+
+    public static void tickBattleCheck(ServerWorld world) {
+        if (!battleActive || world == null || activeFactionA == null || activeFactionB == null) return;
+
+        battleTickTimer++;
+        if (battleTickTimer < 20) return; // Wait initial warm-up period
+        if (battleTickTimer % 20 != 0) return; // Check once per second
+
+        int countA = countAliveBattleFaction(world, activeFactionA);
+        int countB = countAliveBattleFaction(world, activeFactionB);
+
+        if (countA == 0 && countB > 0) {
+            announceVictory(world, activeFactionB);
+            battleActive = false;
+        } else if (countB == 0 && countA > 0) {
+            announceVictory(world, activeFactionA);
+            battleActive = false;
+        } else if (countA == 0 && countB == 0) {
+            MinecraftServer server = world.getServer();
+            if (server != null) {
+                server.getPlayerManager().broadcast(Text.literal("⚔ BATTLE ENDED IN MUTUAL DESTRUCTION! No survivors remain! ⚔").formatted(Formatting.RED, Formatting.BOLD), false);
+            }
+            battleActive = false;
+        }
+    }
+
+    public static int countAliveBattleFaction(ServerWorld world, String factionId) {
+        if (world == null || factionId == null) return 0;
+        int count = 0;
+        for (Entity e : world.iterateEntities()) {
+            if (e.isAlive() && e.getCommandTags().contains("battle_mob") && factionId.equalsIgnoreCase(UnitSystem.getTagValue(e, "faction:"))) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public static int clearAllBattleMobs(ServerWorld world) {
@@ -120,6 +162,7 @@ public final class BattleSandbox {
             count++;
         }
 
+        battleActive = false;
         return count;
     }
 

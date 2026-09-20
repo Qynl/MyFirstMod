@@ -87,10 +87,11 @@ public final class UnitInspector {
     }
 
     private static String buildHealthBar(float current, float max) {
-        int totalBars = 10;
+        int totalBars = 12;
         int filled = Math.max(0, Math.min(totalBars, Math.round((current / max) * totalBars)));
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < filled; i++) sb.append("❤");
-        return sb.toString();
+        for (int i = 0; i < filled; i++) sb.append("■");
+        for (int i = filled; i < totalBars; i++) sb.append("□");
+        return "[" + sb.toString() + "]";
     }
 }

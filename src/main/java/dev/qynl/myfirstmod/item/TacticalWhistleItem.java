@@ -4,6 +4,8 @@ import dev.qynl.myfirstmod.ai.UnitSystem;
 import dev.qynl.myfirstmod.faction.Faction;
 import dev.qynl.myfirstmod.faction.FactionManager;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -24,6 +26,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TacticalWhistleItem extends Item {
     public enum FormationType {
@@ -50,7 +55,7 @@ public class TacticalWhistleItem extends Item {
         }
     }
 
-    private static FormationType activeFormation = FormationType.SHIELD_WALL;
+    private static final Map<UUID, FormationType> PLAYER_FORMATIONS = new ConcurrentHashMap<>();
 
     public TacticalWhistleItem(Settings settings) {
         super(settings.maxCount(1));
@@ -63,12 +68,16 @@ public class TacticalWhistleItem extends Item {
         if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer) {
             ServerWorld serverWorld = serverPlayer.getServerWorld();
             UnitWorldData data = UnitWorldData.get(serverPlayer.getServer());
+            UUID uuid = player.getUuid();
+
+            FormationType currentFormation = PLAYER_FORMATIONS.getOrDefault(uuid, FormationType.SHIELD_WALL);
 
             if (player.isSneaking()) {
-                activeFormation = activeFormation.next();
+                currentFormation = currentFormation.next();
+                PLAYER_FORMATIONS.put(uuid, currentFormation);
                 serverPlayer.sendMessage(
                         Text.literal("🎺 Formation Mode: ").formatted(Formatting.GRAY)
-                                .append(Text.literal(activeFormation.name).formatted(activeFormation.color, Formatting.BOLD)),
+                                .append(Text.literal(currentFormation.name).formatted(currentFormation.color, Formatting.BOLD)),
                         true // Action bar
                 );
                 serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -84,7 +93,7 @@ public class TacticalWhistleItem extends Item {
             var unit = data.units.get(equippedId);
             String factionId = unit != null ? unit.factionId : "kingdom";
 
-            List<MobEntity> troops = serverWorld.getEntitiesByClass(MobEntity.class, player.getBoundingBox().expand(32.0),
+            List<MobEntity> troops = serverWorld.getEntitiesByClass(MobEntity.class, player.getBoundingBox().expand(36.0),
                     e -> e.isAlive() && FactionManager.isAllied(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
             Vec3d playerPos = player.getPos();
@@ -96,19 +105,22 @@ public class TacticalWhistleItem extends Item {
                 MobEntity troop = troops.get(i);
                 Vec3d targetSlot = playerPos;
 
-                switch (activeFormation) {
+                switch (currentFormation) {
                     case SHIELD_WALL -> {
                         double offset = (i - (count / 2.0)) * 1.6;
                         targetSlot = playerPos.add(forward.multiply(3.0)).add(right.multiply(offset));
+                        troop.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 1));
                     }
                     case WEDGE -> {
                         int row = (i + 1) / 2;
                         int side = (i % 2 == 0) ? 1 : -1;
                         targetSlot = playerPos.add(forward.multiply(4.0 - row * 1.5)).add(right.multiply(side * row * 1.5));
+                        troop.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 200, 1));
                     }
                     case PERIMETER -> {
                         double angle = (2 * Math.PI * i) / Math.max(1, count);
                         targetSlot = playerPos.add(Math.cos(angle) * 3.5, 0, Math.sin(angle) * 3.5);
+                        troop.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 0));
                     }
                     case SCATTER -> {
                         double angle = (2 * Math.PI * i) / Math.max(1, count);
@@ -116,13 +128,13 @@ public class TacticalWhistleItem extends Item {
                     }
                 }
 
-                troop.getNavigation().startMovingTo(targetSlot.x, targetSlot.y, targetSlot.z, 1.25);
+                troop.getNavigation().startMovingTo(targetSlot.x, targetSlot.y, targetSlot.z, 1.35);
                 serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, targetSlot.x, targetSlot.y + 0.2, targetSlot.z, 6, 0.2, 0.2, 0.2, 0.05);
             }
 
             serverPlayer.sendMessage(
                     Text.literal("⚔ Formation Executed: ").formatted(Formatting.GOLD, Formatting.BOLD)
-                            .append(Text.literal(activeFormation.name).formatted(activeFormation.color, Formatting.BOLD))
+                            .append(Text.literal(currentFormation.name).formatted(currentFormation.color, Formatting.BOLD))
                             .append(Text.literal(" (" + count + " units deployed)").formatted(Formatting.GRAY)),
                     true // Action bar
             );

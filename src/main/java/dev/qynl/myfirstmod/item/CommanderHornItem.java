@@ -26,6 +26,9 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CommanderHornItem extends Item {
     public enum OrderMode {
@@ -50,6 +53,8 @@ public class CommanderHornItem extends Item {
         }
     }
 
+    private static final Map<UUID, OrderMode> PLAYER_ORDERS = new ConcurrentHashMap<>();
+
     public CommanderHornItem(Settings settings) {
         super(settings.maxCount(1));
     }
@@ -61,20 +66,27 @@ public class CommanderHornItem extends Item {
         if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer) {
             ServerWorld serverWorld = serverPlayer.getServerWorld();
             UnitWorldData data = UnitWorldData.get(serverPlayer.getServer());
+            UUID uuid = player.getUuid();
+
+            OrderMode mode = PLAYER_ORDERS.getOrDefault(uuid, OrderMode.RALLY);
+
+            if (player.isSneaking()) {
+                mode = mode.next();
+                PLAYER_ORDERS.put(uuid, mode);
+                serverPlayer.sendMessage(
+                        Text.literal("🎺 Order Mode: ").formatted(Formatting.GRAY)
+                                .append(Text.literal(mode.name).formatted(mode.format, Formatting.BOLD)),
+                        true // Action bar
+                );
+                serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 1.2f, 1.8f);
+                return TypedActionResult.success(stack, false);
+            }
 
             String equippedUnitId = data.getEquippedUnit(player.getUuid());
             var unitDef = data.units.get(equippedUnitId);
             String factionId = unitDef != null ? unitDef.factionId : "kingdom";
             Faction faction = data.factions.get(factionId);
-
-            // Determine order mode from NBT / tag
-            OrderMode mode = OrderMode.RALLY;
-            if (player.isSneaking()) {
-                String currentMode = stack.getOrDefault(net.minecraft.component.DataComponentTypes.CUSTOM_NAME, Text.literal("")).getString();
-                if (currentMode.contains("CHARGE")) mode = OrderMode.HOLD;
-                else if (currentMode.contains("HOLD")) mode = OrderMode.RALLY;
-                else mode = OrderMode.CHARGE;
-            }
 
             // Sound war horn
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -96,7 +108,6 @@ public class CommanderHornItem extends Item {
                 if (mode == OrderMode.RALLY) {
                     troop.getNavigation().startMovingTo(player, 1.25);
                 } else if (mode == OrderMode.CHARGE) {
-                    // Find nearest hostile
                     LivingEntity target = serverWorld.getEntitiesByClass(LivingEntity.class, troop.getBoundingBox().expand(32.0),
                             e -> e != troop && e.isAlive() && FactionManager.isHostile(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:"))).stream().findFirst().orElse(null);
                     if (target != null) {

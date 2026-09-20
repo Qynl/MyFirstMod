@@ -46,30 +46,33 @@ Every non-vanilla item in **Legions & Factions** features a **custom 3D voxel-sc
 
 ---
 
-## 🛡️ Tactical Roles & Combat Behaviors
+## 🛡️ Tactical Roles & Specialized Combat Behaviors
 
 ```text
                      [ CAVALRY & VANGUARD ]
                🐎 Armored Knights on Warhorses
+               💀 Dread Wither Cavalry on Skeleton Steeds
                🕷 Spider Riders & Wolf Cavalry
                          │
                      [ FRONT LINE ]
                ⚔ Melee Tanks & Knights
                🛡 Shield Wall Formations
-               ⚡ Colossal Iron Titans
+               ⚡ Colossal Iron Titans (1.35x Scale)
                🔨 Sunforge Holy Paladins
+               🦏 Ravager Earthshakers
                          │
                      [ MID LINE ]
-               🏹 Ranged Marksmen & Bogged Snipers
-               💣 Siege Bombardiers (Mortar Tubes)
+               🏹 Ranged Marksmen & Bogged Poison Snipers
+               💣 Siege Bombardiers (Hand Mortars)
                🎆 Pyrotechnic Fireworks Artillery
                🌪 Tempest Breeze Wind Casters
+               🧙‍♂️ Evoker Fang Spellweavers
                          │
                      [ BACK LINE ]
                💖 Field Medics & Allay Pixie Healers
                🌿 Oakbound Grove Druids
-               🎶 Battlefield Bards (War Lutes)
-               ☠ Dark Necromancers & Summoners
+               🎶 Battlefield Bards (Harmonic War Lutes)
+               ☠ Dark Necromancers & Undead Summoners
                👑 Commanders & Tacticians
 ```
 
@@ -78,47 +81,30 @@ Every non-vanilla item in **Legions & Factions** features a **custom 3D voxel-sc
 - Mounted units gain increased movement speed, charge impact knockback, and synchronized rider AI!
 
 ### 2. 📏 Entity Scaling (0.25x Miniature to 5.0x Colossus)
-- Scale any warrior up or down via the attributes engine (`EntityAttributes.SCALE`).
+- Scale any warrior up or down via the attributes engine (`EntityAttributes.GENERIC_SCALE`).
 - Create colossal **Iron Titan Juggernauts** or miniature **Goblin Swarms** with matching hitboxes and step heights!
 
 ### 3. 🧠 Dynamic Morale & Panic System (`MoraleSystem`)
-- **Commander Casualties**: When a squad leader dies, recruit-tier units suffer **Morale Break** (retreating in panic with smoke particles).
+- **Commander Casualties**: When a squad leader dies, recruit-tier units suffer **Morale Break** (retreating in panic with crying particles).
 - **Vengeance Rage**: Veteran and Captain units enter **Vengeance Fury** (+40% speed and damage) to avenge fallen officers!
 
-### 4. ✨ Particle Auras & 💥 Death Actions
+### 4. 🌪️ 1.21 Special Mob AI Routines (`SpecialEntityAI`)
+- **Breeze**: Fires howling wind bursts (`GUST_EMITTER_LARGE`) knocking enemies 15+ blocks back and into the air.
+- **Bogged**: Fires lingering poison sniper arrows from long range with slime trail VFX.
+- **Evoker**: Casts piercing ground fangs in straight offensive lines towards hostile troop formations.
+- **Witch**: Intelligently switches between casting healing mist on injured allies and throwing weakness/poison curses at enemy ranks.
+- **Ravager**: Roars and executes an earth-shattering ground stomp launching enemy clusters high into the air.
+- **Wolf Pack**: Howls in unison to grant all nearby allied wolves pack speed and strength buffs.
+- **Wither Skeleton**: Performs dark shadow dashes that inflict Wither II.
+- **Warden**: Emits devastating sonic boom shockwaves across large combat distances.
+
+### 5. ✨ Particle Auras & 💥 Death Actions
 - **Custom Visual Auras**: `Flame`, `Soul Flame`, `Enchanted Hit`, `Portal`, `Heart`, `Totem of Undying`, `Electric Spark`.
 - **Lethal Death Actions**: `Explosion`, `Healing Mist`, `Victory Fireworks`, `Lightning Strike`, `Poison Cloud`.
 
-### 5. 🎆 Pyrotechnic Artillery (`FireworksArtilleryAI`)
-- Pyros fire fireworks rockets and explosive crossbow shells into enemy ranks with colorful particle explosions.
-
-### 6. 💖 Field Medics & Flying Pixies (`HealerMedicAI` / `SpecialEntityAI`)
-- Casts divine restoration beams, cleanses negative debuffs (Poison/Wither), and throws splash healing flasks.
-- Allay Combat Medics fly between wounded troops delivering healing fairy dust!
-
-### 7. 🧪 Potion Alchemists (`ThrowablePotionAI`)
-- Ballistic splash flasks of Harming, Poison, Slowness, and Weakness over enemy frontline units.
-
-### 8. ☠ Dark Necromancers (`NecromancerAI`)
-- Channels dark summoning circles in combat to summon armed skeleton and zombie thralls.
-
-### 9. 🩸 Bloodrage Berserkers (`BerserkerAI`)
-- Roars fiercely when injured and enters Bloodrage (gaining Strength II, Speed II, and Haste II with fire auras).
-
-### 10. 🎶 Battlefield Bards (`BardAI`)
-- Plays melodic lute songs that grant Speed, Regeneration, and Resistance to all nearby allies.
-
-### 11. 💣 Siege Bombardiers (`BombardierAI`)
-- Heavy sappers launching explosive mortar charges with 3D handheld siege mortars.
-
-### 12. 🌿 Nature Druids (`DruidAI`)
-- Wields the 3D Oakbound Druid Staff to entangle enemies in thorny roots (Slowness V) and summon Nature Spirit Wolves.
-
-### 13. ✨ Holy Paladins (`PaladinAI`)
-- Wields the 3D Sunforge Paladin Warhammer, dealing +60% radiant damage to undead and releasing healing waves on hit.
-
-### 14. 🗡 Flanking Assassins (`AssassinAI`)
-- Wields the 3D Shadowfang Obsidian Dagger to blink behind enemy lines and backstab high-value commanders and medics.
+### 6. 🏆 Automatic Battle Victory Detection (`BattleSandbox`)
+- Start any size clash (8v8, 16v16, 24v24) between two factions.
+- Real-time ticker monitors active troop casualties and automatically broadcasts the winning faction with victory fireworks, fanfare sound effects, and persistent scoreboard kill counters!
 
 ---
 

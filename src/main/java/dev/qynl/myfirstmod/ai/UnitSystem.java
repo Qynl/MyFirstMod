@@ -41,6 +41,8 @@ public final class UnitSystem {
         if (server.getTicks() % interval != 0) return;
 
         for (ServerWorld world : server.getWorlds()) {
+            dev.qynl.myfirstmod.battle.BattleSandbox.tickBattleCheck(world);
+
             for (Entity entity : world.iterateEntities()) {
                 if (entity instanceof MobEntity mob && entity.isAlive()) {
                     simulateMob(server, world, mob, data);
