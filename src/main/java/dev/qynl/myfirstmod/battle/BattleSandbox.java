@@ -71,7 +71,8 @@ public final class BattleSandbox {
                 .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true))
                 .append(Text.literal(factionA.name).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(factionA.getParsedColor())).withBold(true)))
                 .append(Text.literal(" VS ").setStyle(Style.EMPTY.withColor(Formatting.YELLOW)))
-                .append(Text.literal(factionB.name).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(factionB.getParsedColor())).withBold(true)));
+                .append(Text.literal(factionB.name).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(factionB.getParsedColor())).withBold(true)))
+                .append(Text.literal(" (" + armySize + " vs " + armySize + ")").formatted(Formatting.GRAY));
 
         server.getPlayerManager().broadcast(startMsg, false);
     }
@@ -85,9 +86,9 @@ public final class BattleSandbox {
 
             // Offset frontline melee ahead, ranged in middle, support/commanders behind
             double rowOffset = row * 2.5;
-            if (template.role.equalsIgnoreCase("melee") || template.role.equalsIgnoreCase("tank")) {
+            if (template.role.equalsIgnoreCase("melee") || template.role.equalsIgnoreCase("tank") || template.role.equalsIgnoreCase("berserker")) {
                 rowOffset -= 1.5;
-            } else if (template.role.equalsIgnoreCase("medic") || template.role.equalsIgnoreCase("pyrotechnic") || template.commander) {
+            } else if (template.role.equalsIgnoreCase("medic") || template.role.equalsIgnoreCase("pyrotechnic") || template.role.equalsIgnoreCase("bard") || template.commander) {
                 rowOffset += 2.0;
             }
 
@@ -143,11 +144,19 @@ public final class BattleSandbox {
 
         BattleStats.get(server).recordWin(winningFactionId);
 
-        Text victoryText = Text.literal("🏆 VICTORY: ")
-                .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true))
-                .append(Text.literal(winner.name).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(winner.getParsedColor())).withBold(true)))
-                .append(Text.literal(" has conquered the battlefield!").setStyle(Style.EMPTY.withColor(Formatting.YELLOW)));
+        server.getPlayerManager().broadcast(Text.literal("🏆 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 🏆").formatted(Formatting.GOLD), false);
+        server.getPlayerManager().broadcast(
+                Text.literal("             BATTLE VICTOR: ").formatted(Formatting.YELLOW, Formatting.BOLD)
+                        .append(Text.literal(winner.name.toUpperCase()).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(winner.getParsedColor())).withBold(true))),
+                false
+        );
+        server.getPlayerManager().broadcast(Text.literal("      Total Kills Recorded: " + BattleStats.get(server).getKills(winningFactionId)).formatted(Formatting.AQUA), false);
+        server.getPlayerManager().broadcast(Text.literal("🏆 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 🏆").formatted(Formatting.GOLD), false);
 
-        server.getPlayerManager().broadcast(victoryText, false);
+        // Celebration fireworks in the sky
+        for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
+            world.spawnParticles(ParticleTypes.FIREWORK, p.getX(), p.getY() + 8.0, p.getZ(), 50, 2.0, 2.0, 2.0, 0.2);
+            world.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.2f, 1.0f);
+        }
     }
 }

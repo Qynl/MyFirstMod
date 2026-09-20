@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "myfirstmod",
   "version": "${version}",
-  "name": "Unit & Faction Sandbox",
-  "description": "A server-authoritative sandbox for creating, equipping, spawning, and simulating faction units.",
+  "name": "Legions & Factions: Autonomous Army Sandbox",
+  "description": "An advanced server-authoritative sandbox for creating custom units, managing factions, commanding army formations, and simulating epic autonomous battles in Minecraft 1.21.1.",
   "authors": ["Qynl"],
   "contact": {
     "sources": "https://github.com/Qynl/MyFirstMod"

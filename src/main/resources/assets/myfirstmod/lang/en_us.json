@@ -1,12 +1,12 @@
 {
-  "item.myfirstmod.unit_creator": "Unit Creator",
-  "item.myfirstmod.commander_horn": "Commander's War Horn",
+  "item.myfirstmod.unit_creator": "Legion Creator Tool",
+  "item.myfirstmod.commander_horn": "Commander's Tactical War Horn",
   "item.myfirstmod.faction_banner": "Faction Outpost Standard",
   "item.myfirstmod.faction_scepter": "Faction Commander's Scepter",
   "item.myfirstmod.tactical_whistle": "Tactical Formation Whistle",
   "item.myfirstmod.reinforcement_beacon": "Reinforcement Drop Beacon",
-  "itemGroup.myfirstmod.units": "Unit & Faction Sandbox",
-  "screen.myfirstmod.creator": "Unit & Faction Sandbox",
+  "itemGroup.myfirstmod.units": "Legions & Factions Sandbox",
+  "screen.myfirstmod.creator": "Legions & Factions: War Sandbox Dashboard",
 
   "perk.myfirstmod.military_discipline": "Military Discipline",
   "perk.myfirstmod.heavy_armor": "Heavy Armor",
