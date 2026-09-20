@@ -247,13 +247,23 @@
                       },
                       "argument2": {
                         "type": "minecraft:mul",
-                        "argument1": 1.2,
+                        "argument1": 1.6,
                         "argument2": {
                           "type": "minecraft:add",
-                          "argument1": {
-                            "type": "minecraft:ridge"
-                          },
-                          "argument2": -0.5
+                          "argument1": 0.5,
+                          "argument2": {
+                            "type": "minecraft:mul",
+                            "argument1": -1.2,
+                            "argument2": {
+                              "type": "minecraft:abs",
+                              "argument": {
+                                "type": "minecraft:noise",
+                                "noise": "myfirstmod:shards",
+                                "xz_scale": 1.2,
+                                "y_scale": 0.4
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -551,13 +561,23 @@
                               },
                               "argument2": {
                                 "type": "minecraft:mul",
-                                "argument1": 1.2,
+                                "argument1": 1.6,
                                 "argument2": {
                                   "type": "minecraft:add",
-                                  "argument1": {
-                                    "type": "minecraft:ridge"
-                                  },
-                                  "argument2": -0.5
+                                  "argument1": 0.5,
+                                  "argument2": {
+                                    "type": "minecraft:mul",
+                                    "argument1": -1.2,
+                                    "argument2": {
+                                      "type": "minecraft:abs",
+                                      "argument": {
+                                        "type": "minecraft:noise",
+                                        "noise": "myfirstmod:shards",
+                                        "xz_scale": 1.2,
+                                        "y_scale": 0.4
+                                      }
+                                    }
+                                  }
                                 }
                               }
                             }
@@ -856,13 +876,23 @@
                             },
                             "argument2": {
                               "type": "minecraft:mul",
-                              "argument1": 1.2,
+                              "argument1": 1.6,
                               "argument2": {
                                 "type": "minecraft:add",
-                                "argument1": {
-                                  "type": "minecraft:ridge"
-                                },
-                                "argument2": -0.5
+                                "argument1": 0.5,
+                                "argument2": {
+                                  "type": "minecraft:mul",
+                                  "argument1": -1.2,
+                                  "argument2": {
+                                    "type": "minecraft:abs",
+                                    "argument": {
+                                      "type": "minecraft:noise",
+                                      "noise": "myfirstmod:shards",
+                                      "xz_scale": 1.2,
+                                      "y_scale": 0.4
+                                    }
+                                  }
+                                }
                               }
                             }
                           }

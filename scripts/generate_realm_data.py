@@ -16,7 +16,7 @@ def mul(a,b): return {'type':'minecraft:mul','argument1':a,'argument2':b}
 def block(name): return {'type':'minecraft:block','result_state':{'Name':name if ':' in name else 'minecraft:'+name}}
 def mask(lo, hi):
     return {'type':'minecraft:range_choice','input':noise('climate',1,0),'min_inclusive':lo,'max_exclusive':hi,'when_in_range':1,'when_out_of_range':0}
-for name, octave, amps in [('strata',-6,[1,1,.5]),('fractures',-4,[1,.5,.25]),('climate',-8,[1,1]),('basins',-8,[1,.5]),('ravines',-6,[1,.4])]:
+for name, octave, amps in [('strata',-6,[1,1,.5]),('fractures',-4,[1,.5,.25]),('climate',-8,[1,1]),('basins',-8,[1,.5]),('ravines',-6,[1,.4]),('shards',-5,[1,.6,.3])]:
     put('worldgen/noise/'+name+'.json', {'firstOctave':octave,'amplitudes':amps})
 # Region masks key every landform term to one climate band, so each biome owns a silhouette.
 M_HIGH, M_STACKS, M_SPIRES, M_VENTS = mask(-.55,-.25), mask(.05,.35), mask(.6,.8), mask(.92,1.01)
@@ -26,7 +26,9 @@ terrace = {'type':'minecraft:range_choice','input':noise('basins',1,0),'min_incl
            'when_out_of_range':{'type':'minecraft:range_choice','input':noise('basins',1,0),'min_inclusive':.1,'max_exclusive':.5,'when_in_range':1,'when_out_of_range':1.5}}}
 stacks = mul(M_STACKS, mul(.8, add(terrace, -.75)))
 # Shard Spires: vanilla's steep ridge function, gated to the spire band.
-spires = mul(M_SPIRES, mul(1.2, add({'type':'minecraft:ridge'},-.5)))
+# Shard Spires: folded zero-crossings of a dedicated noise make thin jagged walls.
+fold = add(.5, mul(-1.2, {'type':'minecraft:abs','argument':noise('shards',1.2,.4)}))
+spires = mul(M_SPIRES, mul(1.6, fold))
 # Veil Highlands: a lifted plateau with its own broad swell.
 high = mul(M_HIGH, add(.5, mul(.35, noise('basins',.6,0))))
 basins_coef = add(.8, add(mul(-.5, M_STACKS), mul(-.55, M_VENTS)))
