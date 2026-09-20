@@ -48,3 +48,15 @@ Minecraft 1.21.1, Fabric Loader 0.16.10+, Fabric API, and Java 21 are required. 
 ## Support and potion behavior
 
 Medic and support roles are active gameplay roles. They search a bounded area for injured members of their own faction, heal the most injured ally, apply regeneration, and consume potion items on a cooldown. Use the GUI's **New Medic** action or configure a saved template with `/unit set <id> role medic`. Potion, food, weapon, shield, ranged weapon, ammunition, tool, and block capability classification is centralized so future behaviors can add real world interactions without adding item-name special cases.
+
+## Squads, commanders, food, and battle stats
+
+```text
+/unit set royal_guard rank captain
+/unit set royal_guard squad first_guard
+/unit set royal_guard commander true
+/unit inventory royal_guard minecraft:bread 16
+/unit stats
+```
+
+Commanders rally nearby faction members with Strength. Squad members follow their commander. Injured units consume food from their hand or compatible inventory. Kills and deaths are persisted per faction in server world data and can be viewed with `/unit stats`.
