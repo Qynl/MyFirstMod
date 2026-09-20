@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "seal": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:rootbound_seal"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "myfirstmod:briarbrand"
+    ]
+  }
+}

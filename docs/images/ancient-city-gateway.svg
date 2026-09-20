@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1100" height="390" viewBox="0 0 1100 390" role="img" aria-labelledby="title desc"><title id="title">AWAKEN THE ANCIENT CITY</title><desc id="desc">22 by 8 reinforced-deepslate frame with a 20 by 6 opening. Echo Shard to Null Realm sanctuary, then Hollow Keep after a Warden clear.</desc><rect width="100%" height="100%" fill="#0b121d"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1100" height="420" viewBox="0 0 1100 420" role="img" aria-labelledby="title desc"><title id="title">AWAKEN THE ANCIENT CITY</title><desc id="desc">22 by 8 reinforced-deepslate frame with a 20 by 6 opening. Three-second awakening, Echo Shard to the Null Realm sanctuary and its matching return gateway, then Hollow Keep after a Warden clear.</desc><rect width="100%" height="100%" fill="#0b121d"/>
 <text x="32" y="44" fill="#e2eee7" font-family="sans-serif" font-size="27" font-weight="bold">AWAKEN THE ANCIENT CITY</text>
-<text x="30" y="76" fill="#9aaebc" font-family="sans-serif" font-size="14">Find the central monument • Right-click any frame block with one Echo Shard</text>
+<text x="30" y="76" fill="#9aaebc" font-family="sans-serif" font-size="14">Find the central monument • Right-click any frame block with one Echo Shard • hold it still for three seconds</text>
 <rect x="30" y="106" width="19" height="19" fill="#566669"/>
 <rect x="50" y="106" width="19" height="19" fill="#566669"/>
 <rect x="70" y="106" width="19" height="19" fill="#566669"/>
@@ -180,11 +180,14 @@
 <text x="30" y="295" fill="#cfe7dc" font-family="sans-serif" font-size="18">22 × 8 outside / 20 × 6 opening</text>
 <text x="30" y="320" fill="#9aaebc" font-family="sans-serif" font-size="13">Survival: generated Ancient City, Overworld</text>
 <text x="30" y="345" fill="#9aaebc" font-family="sans-serif" font-size="13">Creative: matching replicas also work</text>
+<text x="30" y="370" fill="#9aaebc" font-family="sans-serif" font-size="13">Step away or release the shard and the awakening fades</text>
+<text x="30" y="395" fill="#9aaebc" font-family="sans-serif" font-size="13">No shard is consumed by a cancelled awakening</text>
 <text x="508" y="180" fill="#8cd7c9" font-family="sans-serif" font-size="40">→</text>
-<text x="570" y="155" fill="#b0e4d0" font-family="sans-serif" font-size="24">NULL REALM</text>
-<text x="570" y="183" fill="#9aaebc" font-family="sans-serif" font-size="14">Sanctuary → wilds → Null Warden</text>
-<text x="570" y="212" fill="#9aaebc" font-family="sans-serif" font-size="13">Return gateway → recorded Overworld entry</text>
-<text x="570" y="261" fill="#d3bd88" font-family="sans-serif" font-size="18">↓ First Warden victory</text>
-<text x="570" y="306" fill="#d4b18c" font-family="sans-serif" font-size="24">HOLLOW KEEP</text>
-<text x="570" y="334" fill="#9aaebc" font-family="sans-serif" font-size="14">Three wards → Grave Regent → Requiem Glaive</text>
+<text x="570" y="150" fill="#b0e4d0" font-family="sans-serif" font-size="24">NULL REALM</text>
+<text x="570" y="176" fill="#9aaebc" font-family="sans-serif" font-size="13">Matching 22 × 8 return gateway at the sanctuary</text>
+<text x="570" y="201" fill="#9aaebc" font-family="sans-serif" font-size="14">Sanctuary → wilds → Null Warden</text>
+<text x="570" y="232" fill="#a9d8b0" font-family="sans-serif" font-size="13">Two bells → Rootbound Prior → Briarbrand</text>
+<text x="570" y="266" fill="#d3bd88" font-family="sans-serif" font-size="18">↓ First Warden victory</text>
+<text x="570" y="311" fill="#d4b18c" font-family="sans-serif" font-size="24">HOLLOW KEEP</text>
+<text x="570" y="339" fill="#9aaebc" font-family="sans-serif" font-size="14">Three wards → Grave Regent → Requiem Glaive</text>
 </svg>

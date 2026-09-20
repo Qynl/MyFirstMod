@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "bells=0,facing=north": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=0,facing=east": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=0,facing=south": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=0,facing=west": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=1,facing=north": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=1,facing=east": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=1,facing=south": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=1,facing=west": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=2,facing=north": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=2,facing=east": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=2,facing=south": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=2,facing=west": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=3,facing=north": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=3,facing=east": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=3,facing=south": {
+      "model": "myfirstmod:block/cloister_bell"
+    },
+    "bells=3,facing=west": {
+      "model": "myfirstmod:block/cloister_bell"
+    }
+  }
+}

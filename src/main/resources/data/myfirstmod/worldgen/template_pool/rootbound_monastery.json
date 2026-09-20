@@ -1,0 +1,15 @@
+{
+  "name": "myfirstmod:rootbound_monastery",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "myfirstmod:rootbound_monastery",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      }
+    }
+  ]
+}

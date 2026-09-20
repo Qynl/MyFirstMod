@@ -17,6 +17,7 @@ public final class RealmScenery extends Feature<DefaultFeatureConfig> {
         // Existing landmark roofs/cores occupy the chunk center. Never decorate through them.
         var center=new BlockPos(cx+8,RealmFeatures.surfaceHeight(w,cx+8,cz+8)-1,cz+8);
         if(!natural(w.getBlockState(center)))return false;
+        if(w.getBlockState(center).isOf(ModBlocks.HUSHED_MOSS)&&random.nextInt(4)==0)rootArch(w,center.up());
         for(int n=0;n<9;n++){
             int x=cx+2+random.nextInt(12),z=cz+2+random.nextInt(12);var p=new BlockPos(x,RealmFeatures.surfaceHeight(w,x,z),z);
             if(p.getY()<20||p.getY()>190||!w.getBlockState(p).isAir())continue;
@@ -31,6 +32,22 @@ public final class RealmScenery extends Feature<DefaultFeatureConfig> {
 
         }
         return true;
+    }
+    private static void rootArch(net.minecraft.world.StructureWorldAccess w,BlockPos center){
+        // Only gentle, natural ground; no neighboring-chunk reads or writes.
+        for(int dx=-6;dx<=6;dx++)for(int dz=-2;dz<=2;dz++){
+            int y=RealmFeatures.surfaceHeight(w,center.getX()+dx,center.getZ()+dz);
+            if(Math.abs(y-center.getY())>2||!w.getBlockState(new BlockPos(center.getX()+dx,y-1,center.getZ()+dz)).isOf(ModBlocks.HUSHED_MOSS))return;
+        }
+        for(int dx=-5;dx<=5;dx++){
+            int height=4+(5-Math.abs(dx));
+            for(int y=Math.abs(dx)==5?-2:height;y<=height+1;y++){
+                var p=center.add(dx,y,0);if(w.getBlockState(p).isAir())w.setBlockState(p,ModBlocks.HUSHWOOD.getDefaultState(),Block.NOTIFY_LISTENERS);
+            }
+            for(int dz=-2;dz<=2;dz++)for(int y=height+2;y<=height+3;y++){
+                var p=center.add(dx,y,dz);if(w.getBlockState(p).isAir())w.setBlockState(p,ModBlocks.HUSH_LEAVES.getDefaultState(),Block.NOTIFY_LISTENERS);
+            }
+        }
     }
     private static boolean pond(net.minecraft.world.StructureWorldAccess w,BlockPos p){
         // Only flat natural ground, with an intact rim and no buried structures.

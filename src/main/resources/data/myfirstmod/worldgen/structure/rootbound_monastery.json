@@ -1,0 +1,7 @@
+{
+  "type": "myfirstmod:rootbound_monastery",
+  "biomes": "#myfirstmod:has_rootbound_monastery",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

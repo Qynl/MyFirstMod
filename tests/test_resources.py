@@ -1,4 +1,5 @@
 """Fast resource-contract tests, not a substitute for Loom or an in-game test."""
+import gzip
 import json
 import re
 import struct
@@ -236,7 +237,7 @@ class ResourceTests(unittest.TestCase):
             self.assertEqual(tree.attrib['role'],'img')
             self.assertIsNotNone(tree.find('{http://www.w3.org/2000/svg}desc'))
         models=before['creature-gallery.svg'].decode()
-        for name in ['NullWarden','GraveRegent','RiftHerald','RiftSentinel','Shardstalker']:
+        for name in ['NullWarden','GraveRegent','RootboundPrior','RiftHerald','RiftSentinel','Shardstalker']:
             self.assertIn('data-model="'+name+'"',models)
         self.assertIn('not gameplay screenshots',models)
 
@@ -252,10 +253,109 @@ class ResourceTests(unittest.TestCase):
         lang=load(ASSETS/'lang/en_us.json')
         for attack in range(1,4):self.assertIn('regent.myfirstmod.attack.'+str(attack),lang)
 
+    def test_kingdom_structure_and_dungeon_contracts(self):
+        structure=load(DATA/'worldgen/structure/rootbound_monastery.json')
+        self.assertEqual(structure['type'],'myfirstmod:rootbound_monastery')
+        self.assertEqual(set(structure),{'type','biomes','step','spawn_overrides','terrain_adaptation'})
+        self.assertEqual(structure['biomes'],'#myfirstmod:has_rootbound_monastery')
+        self.assertEqual(load(DATA/'tags/worldgen/biome/has_rootbound_monastery.json')['values'],['myfirstmod:hushed_grove'])
+        pool=load(DATA/'worldgen/template_pool/rootbound_monastery.json')
+        self.assertEqual(pool['elements'][0]['element']['location'],'myfirstmod:rootbound_monastery')
+        placement=load(DATA/'worldgen/structure_set/rootbound_monastery.json')['placement']
+        self.assertGreater(placement['spacing'],placement['separation'])
+        self.assertEqual(load(DATA/'loot_table/entities/rootbound_prior.json')['pools'],[])
+        language=load(ASSETS/'lang/en_us.json')
+        for key in ['entity.myfirstmod.rootbound_prior','block.myfirstmod.root_heart','block.myfirstmod.cloister_bell',
+                    'block.myfirstmod.root_reliquary','item.myfirstmod.rootbound_seal','item.myfirstmod.briarbrand',
+                    'item.myfirstmod.briarbrand.tooltip','journal.myfirstmod.monastery','monastery.myfirstmod.riddle',
+                    'monastery.myfirstmod.bell','monastery.myfirstmod.spent','monastery.myfirstmod.active',
+                    'monastery.myfirstmod.blocked','monastery.myfirstmod.peaceful','monastery.myfirstmod.begin',
+                    'monastery.myfirstmod.reward','message.myfirstmod.gate_charging','message.myfirstmod.gate_cancelled',
+                    'prior.myfirstmod.recovery']:
+            self.assertIn(key,language)
+        for attack in range(1,4):self.assertIn('prior.myfirstmod.attack.'+str(attack),language)
+        for name in ['root_heart','cloister_bell','root_reliquary']:
+            variants=set(load(ASSETS/f'blockstates/{name}.json')['variants'])
+            self.assertEqual(variants,{f'bells={b},facing={f}' for b in range(4) for f in ['north','east','south','west']})
+            self.assertTrue((ASSETS/f'textures/block/{name}.png').exists())
+        for item in ['rootbound_seal','briarbrand']:
+            self.assertTrue((ASSETS/f'models/item/{item}.json').exists())
+            self.assertTrue((ASSETS/f'textures/item/{item}.png').exists())
+        self.assertEqual(struct.unpack('>II',(ASSETS/'textures/entity/rootbound_prior.png').read_bytes()[16:24]),(128,128))
+        recipe=load(DATA/'recipe/briarbrand.json')
+        self.assertIn('myfirstmod:rootbound_seal',json.dumps(recipe))
+        self.assertEqual(load(DATA/'advancement/recipes/briarbrand.json')['rewards']['recipes'],['myfirstmod:briarbrand'])
+        self.assertIn('journal.myfirstmod.monastery',(ROOT/'src/main/java/dev/qynl/myfirstmod/realm/ExpeditionJournal.java').read_text())
+        self.assertEqual(self.monastery_blocks()[((23,1,10))],'myfirstmod:root_heart')
+
+    def monastery_blocks(self):
+        """Decode the real structure NBT so geometry regressions fail here, not in-game."""
+        raw=gzip.decompress((DATA/'structure/rootbound_monastery.nbt').read_bytes())
+        self.assertEqual(raw[0],10);self.assertEqual(raw[1:3],b'\0\0','Unnamed root compound')
+        pos=[3]
+        def read(kind):
+            if kind==1:pos[0]+=1;return raw[pos[0]-1]
+            if kind==3:pos[0]+=4;return struct.unpack('>i',raw[pos[0]-4:pos[0]])[0]
+            if kind==8:
+                length=struct.unpack('>H',raw[pos[0]:pos[0]+2])[0];pos[0]+=2
+                value=raw[pos[0]:pos[0]+length].decode();pos[0]+=length;return value
+            if kind==9:
+                inner=raw[pos[0]];pos[0]+=1;count=read(3)
+                return [read(inner) for _ in range(count)]
+            if kind==10:
+                out={}
+                while raw[pos[0]]:
+                    kind=raw[pos[0]];pos[0]+=1;name=read(8);out[name]=read(kind)
+                pos[0]+=1;return out
+            raise AssertionError('Unsupported NBT tag '+str(kind))
+        root=read(10)
+        self.assertEqual(root['size'],[47,18,47])
+        self.assertEqual(root['DataVersion'],3955)
+        palette=[entry['Name'] for entry in root['palette']]
+        blocks={}
+        for entry in root['blocks']:
+            key=tuple(entry['pos'])
+            self.assertNotIn(key,blocks,'Duplicate structure block position')
+            self.assertLess(entry['state'],len(palette))
+            blocks[key]=palette[entry['state']]
+            if 'nbt' in entry:blocks[(key,'nbt')]=entry['nbt']
+        self.assertEqual(len([k for k in blocks if isinstance(k[0],int)]),47*47*18)
+        return blocks
+
+    def test_monastery_template_is_playable(self):
+        blocks=self.monastery_blocks()
+        for position,expected in [((7,1,26),'myfirstmod:cloister_bell'),((39,7,26),'myfirstmod:cloister_bell'),
+                                  ((23,1,43),'myfirstmod:waystone'),((23,1,27),'minecraft:iron_bars'),
+                                  ((23,1,35),'minecraft:air'),((39,1,39),'minecraft:dark_oak_stairs'),
+                                  ((39,2,39),'minecraft:air'),((39,3,39),'minecraft:air'),
+                                  ((39,6,29),'myfirstmod:hush_planks'),((5,1,35),'minecraft:spawner'),
+                                  ((42,7,24),'minecraft:spawner'),((9,1,24),'minecraft:chest'),
+                                  ((36,7,30),'minecraft:chest'),((23,2,46),'minecraft:air'),((0,3,23),'minecraft:mossy_stone_bricks')]:
+            self.assertEqual(blocks[position],expected,position)
+        self.assertEqual(blocks[((5,1,35),'nbt')]['SpawnData']['entity']['id'],'myfirstmod:rift_sentinel')
+        self.assertEqual(blocks[((42,7,24),'nbt')]['SpawnData']['entity']['id'],'myfirstmod:shardstalker')
+        for chest in [(9,1,24),(36,7,30)]:
+            self.assertEqual(blocks[(chest,'nbt')]['LootTable'],'myfirstmod:chests/monastery_cache')
+        # Every telegraphed attack path stays inside the open chapterhouse: lane, crown arms and headroom.
+        for forward in range(1,10):
+            for side in [-1,0,1]:
+                self.assertEqual(blocks[(23+side,1,10+forward)],'minecraft:air',(side,forward))
+        for radius in range(3,8):
+            for dx,dz in [(radius,0),(-radius,0),(0,radius),(0,-radius)]:
+                self.assertEqual(blocks[(23+dx,1,10+dz)],'minecraft:air',(dx,dz))
+        for y in [2,3,4]:
+            self.assertEqual(blocks[(23,y,10)],'minecraft:air',y)
+        # Four root pillars flank (never cross) the telegraphed paths and act as partial cover.
+        pillars={(16,4),(30,4),(16,18),(30,18)}
+        for x in range(15,32):
+            for z in range(3,20):
+                expected='myfirstmod:hushwood' if (x,z) in pillars else 'myfirstmod:root_heart' if (x,z)==(23,10) else 'minecraft:air'
+                self.assertEqual(blocks[(x,1,z)],expected,(x,z))
+
     def test_generators_are_reproducible(self):
         paths=list(RES.rglob('*'))
         before={str(p.relative_to(RES)):p.read_bytes() for p in paths if p.is_file()}
-        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py','generate_pilgrimage.py','generate_remembrance.py','generate_keep.py']:
+        for script in ['generate_art.py','generate_realm_data.py','generate_loot.py','generate_wilds.py','generate_convergence.py','generate_pilgrimage.py','generate_remembrance.py','generate_keep.py','generate_kingdom.py']:
             subprocess.run([sys.executable,str(ROOT/'scripts'/script)],check=True)
         after={str(p.relative_to(RES)):p.read_bytes() for p in RES.rglob('*') if p.is_file()}
         self.assertEqual(before,after)

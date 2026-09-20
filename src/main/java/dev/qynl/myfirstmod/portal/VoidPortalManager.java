@@ -30,9 +30,15 @@ public final class VoidPortalManager {
     private static final int TELEPORT_COOLDOWN = 80;
     private static final Map<UUID, Integer> COOLDOWNS = new HashMap<>();
 
+    private record Opening(RegistryKey<World> world,AncientCityGate.Frame frame,UUID player,net.minecraft.util.Hand hand,int age) {}
+    private static final Map<net.minecraft.util.math.GlobalPos,Opening> OPENINGS=new HashMap<>();
     private VoidPortalManager() {}
 
     public static boolean tryIgnite(ServerPlayerEntity player, BlockPos clicked, net.minecraft.util.Hand hand) {
+        return ignite(player,clicked,hand,false);
+    }
+    private static boolean ignite(ServerPlayerEntity player,BlockPos clicked,net.minecraft.util.Hand hand,boolean complete) {
+        if(!player.getStackInHand(hand).isOf(net.minecraft.item.Items.ECHO_SHARD)||!player.isAlive())return false;
         ServerWorld world=player.getServerWorld();
         if(player.isSpectator() || !world.canPlayerModifyAt(player,clicked))return false;
         if(!player.isCreative()) {
@@ -53,6 +59,12 @@ public final class VoidPortalManager {
             fresh|=!world.getBlockState(p).isOf(ModBlocks.VOID_PORTAL);
         }
         if(!fresh){player.sendMessage(Text.translatable("message.myfirstmod.city_gate_open"),true);return false;}
+        if(!complete){
+            var key=net.minecraft.util.math.GlobalPos.create(world.getRegistryKey(),blockPos(frame.origin()));
+            if(OPENINGS.containsKey(key)||OPENINGS.size()>=16)return false;
+            OPENINGS.put(key,new Opening(world.getRegistryKey(),frame,player.getUuid(),hand,0));
+            player.sendMessage(Text.translatable("message.myfirstmod.gate_charging"),false);return true;
+        }
         openGate(world,frame);
         if(!player.isCreative())player.getStackInHand(hand).decrement(1);
         player.sendMessage(Text.translatable("message.myfirstmod.city_gate_awakened"),false);return true;
@@ -122,13 +134,34 @@ public final class VoidPortalManager {
         );
 
         dev.qynl.myfirstmod.realm.RealmExpedition.prepare(target);
-        player.teleport(target, 0.5, 81.0, 160.5, 180, 0);
+        player.teleport(target, 0.5, 81.0, dev.qynl.myfirstmod.realm.RealmState.get(target).thresholdBuilt?172.5:160.5, 180, 0);
         dev.qynl.myfirstmod.realm.RealmExpedition.welcome(player);
     }
 
-    public static void clear() { COOLDOWNS.clear(); }
+    public static void clear() { COOLDOWNS.clear(); OPENINGS.clear(); }
 
     public static void tick(MinecraftServer server) {
+        for(var entry:new java.util.ArrayList<>(OPENINGS.entrySet())){
+            var o=entry.getValue();var w=server.getWorld(o.world());var player=server.getPlayerManager().getPlayer(o.player());
+            var center=blockPos(o.frame().at(11,3));
+            if(w==null||player==null||player.getServerWorld()!=w||!player.isAlive()||player.squaredDistanceTo(net.minecraft.util.math.Vec3d.ofCenter(center))>32*32
+                ||!player.getStackInHand(o.hand()).isOf(net.minecraft.item.Items.ECHO_SHARD)){
+                OPENINGS.remove(entry.getKey());if(player!=null)player.sendMessage(Text.translatable("message.myfirstmod.gate_cancelled"),true);continue;
+            }
+            if(o.age()>=60){
+                OPENINGS.remove(entry.getKey());
+                if(!ignite(player,blockPos(o.frame().origin()),o.hand(),true))player.sendMessage(Text.translatable("message.myfirstmod.gate_cancelled"),false);
+                continue;
+            }
+            if(o.age()%4==0){
+                int upto=1+o.age()*22/60;
+                for(int x=0;x<upto;x++)for(int y:new int[]{0,7}){
+                    var p=blockPos(o.frame().at(x,y));if(w.isChunkLoaded(p))w.spawnParticles(ParticleTypes.REVERSE_PORTAL,p.getX()+.5,p.getY()+.5,p.getZ()+.5,2,.15,.15,.15,.02);
+                }
+                if(o.age()%20==0)w.playSound(null,center,SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE,SoundCategory.BLOCKS,.7f,.5f+o.age()/80f);
+            }
+            OPENINGS.put(entry.getKey(),new Opening(o.world(),o.frame(),o.player(),o.hand(),o.age()+1));
+        }
         COOLDOWNS.replaceAll((uuid, value) -> Math.max(0, value - 1));
         COOLDOWNS.entrySet().removeIf(entry -> entry.getValue() == 0);
 

@@ -10,7 +10,8 @@ import java.util.Map;
 
 public final class RealmState extends PersistentState {
     public final java.util.Set<Long> keepForcedChunks=new java.util.HashSet<>();
-    public boolean sanctuaryBuilt;
+    public final Map<Long,java.util.UUID> monasteryGuardians=new HashMap<>();
+    public boolean sanctuaryBuilt,thresholdBuilt;
     public int bossClears, contentVersion;
     public long rematchReadyAt;
     public final Map<java.util.UUID, ExpeditionRecord> expeditions = new HashMap<>();
@@ -27,6 +28,7 @@ public final class RealmState extends PersistentState {
         RealmState state=new RealmState();
         for(long pos:nbt.getLongArray("KeepForcedChunks"))state.keepForcedChunks.add(pos);
         state.sanctuaryBuilt=nbt.getBoolean("SanctuaryBuilt");
+        state.thresholdBuilt=nbt.getBoolean("ThresholdBuilt");
         state.contentVersion=nbt.getInt("ContentVersion");
         state.bossClears=Math.max(0,nbt.getInt("BossClears"));
         state.rematchReadyAt=nbt.getLong("RematchReadyAt");
@@ -44,11 +46,14 @@ public final class RealmState extends PersistentState {
         for(int i=0;i<rifts.size();i++) {
             var entry=rifts.getCompound(i);state.riftCooldowns.put(entry.getLong("Pos"),entry.getLong("Ready"));
         }
+        var guardians=nbt.getList("MonasteryGuardians",10);
+        for(int i=0;i<guardians.size();i++){var e=guardians.getCompound(i);if(e.containsUuid("Actor"))state.monasteryGuardians.put(e.getLong("Heart"),e.getUuid("Actor"));}
         return state;
     }
     @Override public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         nbt.putLongArray("KeepForcedChunks",keepForcedChunks.stream().mapToLong(Long::longValue).toArray());
         nbt.putBoolean("SanctuaryBuilt",sanctuaryBuilt);
+        nbt.putBoolean("ThresholdBuilt",thresholdBuilt);
         nbt.putInt("BossClears",bossClears);
         nbt.putInt("ContentVersion",contentVersion);
         nbt.putLong("RematchReadyAt",rematchReadyAt);
@@ -63,6 +68,7 @@ public final class RealmState extends PersistentState {
         NbtList rifts=new NbtList();
         riftCooldowns.forEach((pos,ready)->{var entry=new NbtCompound();entry.putLong("Pos",pos);entry.putLong("Ready",ready);rifts.add(entry);});
         nbt.put("Rifts",rifts);
+        var guardians=new NbtList();monasteryGuardians.forEach((pos,id)->{var e=new NbtCompound();e.putLong("Heart",pos);e.putUuid("Actor",id);guardians.add(e);});nbt.put("MonasteryGuardians",guardians);
         return nbt;
     }
 }

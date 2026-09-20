@@ -1,3 +1,15 @@
+# 2.0 alpha validation additions
+
+The Kingdom milestone adds seven JUnit methods: bell combination is idempotent and never regresses, party health is clamped 1..4, and all three Prior damage rules are asserted at their exact boundaries (lane length/width/height, seed radius, crown inner/outer radius, arm gaps and the rotated second pulse). Two further methods prove that both bells resolve to the same heart in **all four** template rotations, and that the custom structure type refuses every start chunk inside the sanctuary approach.
+
+Resource tests decode the generated `rootbound_monastery.nbt` with a from-scratch NBT reader and assert its size, DataVersion, palette bounds, 39,762 unique block positions, both bells, heart, waystone, cloister screen and its open shortcut, stair treads with headroom, library gallery, both spawner actors, both chest loot tables, the south doorway, four cover pillars, an unobstructed boss lane, every crown arm and full chapterhouse floor clearance. Contracts also cover the structure/pool/set/biome-tag wiring, the 16-variant blockstates, new item/block/entity translations, both awakening messages, the Briarbrand recipe and its advancement, and the new journal page.
+
+The dedicated-server smoke forceloads a 5×5 chunk area, places the **actual template**, asserts 17 blocks plus both spawner and chest NBT payloads, spawns both new loot tables, summons the Prior and both new items, then runs `/place structure myfirstmod:rootbound_monastery` through the custom structure type (asserted only where `/locate biome` finds a real grove chunk; a declined placement is logged, not failed).
+
+Manual checks still outstanding: no connected client has rung a bell, fought the Prior, claimed the seal, crafted or attuned the Briarbrand, or seen the three-second awakening. Also unverified: natural structure spacing and travel distance between monasteries, difficulty balance at 1/2/4 players, multiplayer bell races and shared-reward behavior, restarts mid-fight and mid-awakening, old-save arrival migration, roof/pillar line-of-sight fairness, and grove root-arch appearance across seeds.
+
+---
+
 # 1.8 validation additions
 
 The Ancient City gate adds five JUnit methods covering both axes, every outline click, every missing frame block, all 120 possible interior obstructions, already-open/partial gates, and old-small-frame rejection. Resource tests cover the axis-specific membrane, animated texture, retired recipe, biome scenery/ambience, and reproducible illustrated documentation.
@@ -36,10 +48,10 @@ Manual release checklist: navigate both stair flights in Survival; try the rite 
 
 ## Automated validation
 
-- Local Python resource suite: **21 tests**.
+- Local Python resource suite: **23 tests**.
 - `git diff --check`: clean.
 - Java builds run in **GitHub Actions** because this workspace has no Java installation.
-- CI compiles main/client sources, runs **35 JUnit tests**, creates the remapped JAR, and executes `scripts/ci_server_smoke.py`.
+- CI compiles main/client sources, runs **42 JUnit tests**, creates the remapped JAR, and executes `scripts/ci_server_smoke.py`.
 - The smoke test launches a real Fabric dedicated server, loads the custom dimension codecs, generates chunks, places a ruin, forced archive vault, and shrine, checks shrine placement and three ore drop tables, spawns both realm mobs, saves, and shuts down. Logs and JUnit reports are uploaded as `Validation-<commit>`; the mod is in `Null-Warden-<commit>`.
 
 Check the final Actions run for the exact revision under test. Compilation is not a playtest, and the smoke test does not simulate a connected player or a complete boss/trial encounter.

@@ -1,3 +1,40 @@
+# 2.0.0-alpha.1 — The Kingdom Beyond the Gate
+
+## Gateway
+
+- Ancient City activation now takes three seconds: particles climb both posts, the charge sound rises, and the shard is consumed only when the aperture actually opens.
+- Moving 32+ blocks away, changing dimension, dying, or swapping the shard out of that hand cancels the awakening and consumes nothing. At most 16 awakenings run at once; all are cleared on shutdown.
+- New worlds build a matching 22×8 realm-side gateway at the sanctuary, with a larger lamp-inlaid plaza and arrival at (0, 81, 172). Existing saves keep their current sanctuary and arrival point.
+
+## Rootbound Monastery
+
+- Added an original 47×18×47 generated structure for the Hushed Grove: chapterhouse, west chapel, two-storey east library with a real stair, cloister colonnade, root garden, two spawners, two caches and an entrance waystone.
+- Added the `myfirstmod:rootbound_monastery` structure type, which delegates to vanilla jigsaw placement and refuses start chunks inside the fixed sanctuary approach.
+- Added a two-bell rite whose progress is stored in block states, survives restarts, and is rotation-correct for all four template orientations.
+- Added the Rootbound Prior: altar-bound, 240-540 scaled health, three telegraphed attacks with a recovery pause, a rotated second crown pulse below half health, and self-cleanup when its heart or actor disappears.
+- Defeating the Prior turns the heart into a reliquary and opens the cloister screen as a shortcut.
+
+## Rewards and gear
+
+- Added the Rootbound Seal (one shared per monastery) and the Briarbrand: a narrow four-block thorn sweep for 9 damage, Slowness III, one heart healed on hit, ten-second cooldown, forge-attunable.
+- Added a shaped Briarbrand recipe and its recipe-book advancement.
+
+## World and assets
+
+- Hushed Grove chunks can now raise great root arches between landmarks, chunk-contained and only on flat natural moss.
+- Added original block textures and 16-variant blockstates for the heart, bells and reliquary, item sprites for the seal and Briarbrand, a 128×128 Prior texture, and a new client model/renderer.
+- Documentation plates now show 26 items and six creature previews, and the gateway plate documents the hold-to-awaken behavior.
+- Added a journal page, all rite/boss/awakening translations, and docs/KINGDOM.md.
+
+## Validation
+
+- 23 Python resource tests, including a from-scratch NBT decoder asserting the monastery's geometry, puzzle blocks, stair headroom, spawner actors and loot tables.
+- 42 JUnit methods; 7 new for bell logic, party scaling, every attack boundary, bell-to-heart rotation invariance and the sanctuary exclusion.
+- Dedicated-server smoke places the real template, checks 17 blocks and both NBT payloads, spawns the new loot tables and entities, and runs the custom structure type.
+- No connected-player test: the monastery has not been walked, the Prior has not been fought, and the awakening has not been seen by a human.
+
+---
+
 # 1.3.0 — Wilds & Relics
 
 ## Dimension

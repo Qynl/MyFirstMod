@@ -21,6 +21,7 @@ public class MyFirstMod implements ModInitializer {
         ModBlocks.register();
         ModItems.register();
         ModEntities.register();
+        dev.qynl.myfirstmod.kingdom.MonasteryStructure.register();
         dev.qynl.myfirstmod.realm.RealmScenery.register();
         VoidPortalManager.registerGateCommand();
         dev.qynl.myfirstmod.keep.HollowKeep.registerCommands();
@@ -38,6 +39,7 @@ public class MyFirstMod implements ModInitializer {
             dev.qynl.myfirstmod.rift.RealmRifts.clear();
             dev.qynl.myfirstmod.boss.NullWardenManager.clear();
             VoidPortalManager.clear();
+            dev.qynl.myfirstmod.kingdom.Monastery.clear();
         });
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             dev.qynl.myfirstmod.boss.NullWardenManager.entityLoaded(entity, world);
@@ -48,8 +50,15 @@ public class MyFirstMod implements ModInitializer {
         });
 
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
-            if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;
+            if (world.isClient) return ActionResult.PASS;
             if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
+            if(hand!=net.minecraft.util.Hand.MAIN_HAND){
+                if(serverPlayer.getStackInHand(hand).isOf(Items.ECHO_SHARD)&&world.getBlockState(hit.getBlockPos()).isOf(Blocks.REINFORCED_DEEPSLATE)
+                    &&VoidPortalManager.tryIgnite(serverPlayer,hit.getBlockPos(),hand))return ActionResult.SUCCESS;
+                return ActionResult.PASS;
+            }
+            ActionResult monastery=dev.qynl.myfirstmod.kingdom.Monastery.interact(serverPlayer,hit.getBlockPos());
+            if(monastery!=ActionResult.PASS)return monastery;
             ActionResult keep=dev.qynl.myfirstmod.keep.HollowKeep.interact(serverPlayer,hit.getBlockPos());
             if(keep!=ActionResult.PASS)return keep;
             dev.qynl.myfirstmod.remembrance.LandmarkAtlas.remember(serverPlayer,hit.getBlockPos());
@@ -75,6 +84,7 @@ public class MyFirstMod implements ModInitializer {
             return ActionResult.PASS;
         });
 
+        ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.kingdom.Monastery::tick);
         ServerTickEvents.END_SERVER_TICK.register(VoidPortalManager::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.keep.HollowKeep::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.remembrance.PilgrimVows::tick);

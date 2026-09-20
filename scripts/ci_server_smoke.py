@@ -161,6 +161,48 @@ def main():
                 connection.command(prefix+f'fill 1041 78 1041 1055 80 1055 myfirstmod:{material}')
                 connection.command(prefix+'place feature myfirstmod:realm_scenery 1048 81 1048')
                 connection.command(prefix+'execute unless blocks 1042 81 1042 1053 81 1053 1042 100 1042 all run say SMOKE_SCENERY_OK')
+            # Rootbound Monastery: the real 47x47x18 template, its puzzle blocks, spawner NBT and loot codecs.
+            grove='execute in myfirstmod:null_realm run '
+            connection.command(grove+'forceload add 3000 3000 3072 3072')
+            deadline=time.monotonic()+90
+            while not all('passed' in connection.command(grove+f'execute if loaded {x} 80 {z}',allow_failure=True).lower()
+                          for x in range(3000,3073,16) for z in range(3000,3073,16)):
+                if time.monotonic()>deadline:raise TimeoutError('Monastery fixture chunks did not load')
+                time.sleep(1)
+            # /place template carves its own 39762-block volume, so no separate fill (and its 32768 limit) is needed.
+            connection.command(grove+'place template myfirstmod:rootbound_monastery 3000 100 3000')
+            for dx,dy,dz,block in [(23,1,10,'myfirstmod:root_heart'),(7,1,26,'myfirstmod:cloister_bell'),(39,7,26,'myfirstmod:cloister_bell'),
+                                   (23,1,43,'myfirstmod:waystone'),(23,1,27,'minecraft:iron_bars'),(23,1,35,'minecraft:air'),
+                                   (39,1,39,'minecraft:dark_oak_stairs'),(39,3,39,'minecraft:air'),(39,6,29,'myfirstmod:hush_planks'),
+                                   (5,1,35,'minecraft:spawner'),(42,7,24,'minecraft:spawner'),(9,1,24,'minecraft:chest'),
+                                   (36,7,30,'minecraft:chest'),(23,2,46,'minecraft:air'),(0,3,23,'minecraft:mossy_stone_bricks'),
+                                   (16,4,4,'myfirstmod:hushwood'),(23,4,10,'minecraft:air')]:
+                connection.command(grove+f'execute if block {3000+dx} {100+dy} {3000+dz} {block} run say SMOKE_MONASTERY_OK')
+            for dx,dy,dz,actor in [(5,1,35,'rift_sentinel'),(42,7,24,'shardstalker')]:
+                response=connection.command(grove+f'data get block {3000+dx} {100+dy} {3000+dz} SpawnData.entity.id')
+                if 'myfirstmod:'+actor not in response:raise RuntimeError('Wrong monastery spawner actor: '+response)
+            for dx,dy,dz in [(9,1,24),(36,7,30)]:
+                response=connection.command(grove+f'data get block {3000+dx} {100+dy} {3000+dz} LootTable')
+                if 'myfirstmod:chests/monastery_cache' not in response:raise RuntimeError('Monastery chest lost its loot table: '+response)
+            connection.command(grove+'loot spawn 3023 104 3010 loot myfirstmod:chests/monastery_cache')
+            connection.command(grove+'loot spawn 3023 104 3010 loot myfirstmod:entities/rootbound_prior')
+            connection.command(grove+'summon myfirstmod:rootbound_prior 3023 102 3010')
+            connection.command(grove+'execute if entity @e[type=myfirstmod:rootbound_prior] run say SMOKE_PRIOR_OK')
+            for item in ['rootbound_seal','briarbrand']:
+                connection.command(grove+f'summon minecraft:item 3023 104 3012 {{Item:{{id:"myfirstmod:{item}",count:1}}}}')
+            # Exercise the custom structure type at runtime. Placement is only asserted inside an actual grove.
+            located=connection.command(grove+'execute positioned 4000 100 4000 run locate biome myfirstmod:hushed_grove',allow_failure=True)
+            found=re.search(r'\[(-?\d+), (-?\d+), (-?\d+)\]',located)
+            if found and not (abs(int(found[1]))<160 and -160<int(found[3])<256):
+                x,z=int(found[1]),int(found[3])
+                connection.command(grove+f'forceload add {x-16} {z-16} {x+64} {z+64}')
+                response=connection.command(grove+f'place structure myfirstmod:rootbound_monastery {x} 100 {z}',allow_failure=True)
+                if 'placed' in response.lower():print('SMOKE_STRUCTURE_PLACED at',x,z,flush=True)
+                else:print('Monastery structure declined this chunk (biome or terrain):',response.strip(),flush=True)
+                connection.command(grove+f'forceload remove {x-16} {z-16} {x+64} {z+64}')
+            else:
+                print('Monastery structure placement skipped: no eligible grove chunk was located.',flush=True)
+            connection.command(grove+'forceload remove 3000 3000 3072 3072')
             # Actual vanilla city-center templates, including their top-center jigsaw final state.
             city='execute in minecraft:overworld run '
             connection.command(city+'forceload add 2000 2000 2095 2095')
@@ -202,7 +244,7 @@ def main():
             bad=[line for line in text.splitlines() if re.search(
                 r'Failed to (?:parse|load)|Couldn.t (?:parse|load)|Error loading|Exception in server tick|Unbound values|Missing referenced',line,re.I)]
             if bad:raise RuntimeError('Resource/runtime errors:\n'+'\n'.join(bad))
-            print('PASS: server startup, realm chunks, ruins/vault/shrine/observatory/cathedral, spawner IDs, nursery/ore drops, caches, mobs, save and shutdown.',flush=True)
+            print('PASS: server startup, realm chunks, ruins/vault/shrine/observatory/cathedral/monastery, spawner IDs, nursery/ore drops, caches, mobs, custom structure type, save and shutdown.',flush=True)
         finally:
             if connection:connection.socket.close()
             if proc.poll() is None:

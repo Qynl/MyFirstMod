@@ -1,7 +1,9 @@
 # The Null Warden
-## 1.8 — The Ancient Threshold
+## 2.0 alpha — The Kingdom Beyond the Gate
 
-**A dark-fantasy expedition through a ruined dimension: prepare at a sanctuary, recover forgotten memories, descend beneath cathedrals, and challenge the guardian of a broken kingdom.**
+**A dark-fantasy expedition through a ruined kingdom: awaken the great Ancient City gate, prepare at a sanctuary, ring the bells of a drowned-root monastery, recover forgotten memories, descend beneath cathedrals, and challenge the guardians of a broken realm.**
+
+> **2.0.0-alpha.1** is the first milestone of the 2.0 plan: one fully built dungeon, one new keeper, and a gateway that now has an arrival moment. It is an alpha — see [the Kingdom record](docs/KINGDOM.md) for exactly what is and is not verified.
 
 Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an exploration dimension and a separate fortress dimension, four realm biomes, original creature models, exploration landmarks, equipment progression, opt-in encounters, and persistent player records.
 
@@ -13,6 +15,8 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 
 ## Contents
 
+- [New in 2.0 alpha — The Kingdom Beyond the Gate](#new-in-20-alpha--the-kingdom-beyond-the-gate)
+- [The Rootbound Monastery](#the-rootbound-monastery)
 - [New in 1.8 — The Ancient Threshold](#new-in-18--the-ancient-threshold)
 - [New in 1.7 — The Hollow Keep](#new-in-17--the-hollow-keep)
 - [What is new in 1.6?](#what-is-new-in-16)
@@ -33,6 +37,34 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 - [Troubleshooting and limitations](#troubleshooting-and-limitations)
 - [Build, tests, and repository guide](#build-tests-and-repository-guide)
 
+## New in 2.0 alpha — The Kingdom Beyond the Gate
+
+![The Rootbound Prior, its monastery, and the six creature previews including the new keeper](docs/images/creature-gallery.svg)
+
+- **A generated dungeon:** the **Rootbound Monastery**, an original 47×47 cloister placed by vanilla jigsaw rules in **new Hushed Grove chunks** — north chapterhouse, west chapel, two-storey east library with a real stair, colonnade, root garden, two spawners and two caches. It never starts inside the sanctuary approach.
+- **A two-bell rite:** ring the west chapel bell and the upper library bell, then wake the keeper at the Rootbound Heart. Bell progress is stored in the block state, so it survives unloads, restarts, and rotated placement.
+- **A new boss:** the **Rootbound Prior**, altar-bound and unhurried — three telegraphed attacks with a one-second recovery pause, and a second rotated Thorn Crown pulse below half health. Four root pillars give partial cover.
+- **A real reward:** one shared **Rootbound Seal** per monastery, reforged into the **Briarbrand**, a fast narrow thorn sweep that slows and heals. The seal has no other use, so monasteries stay worth finding.
+- **An arrival moment:** the Ancient City gate now **awakens over three seconds** — light climbs both posts, the anchor charge rises in pitch — and stepping away or swapping the shard cancels it without consuming anything.
+- **A counterpart gateway:** new worlds arrive at **(0, 81, 172)** facing a matching 22×8 reinforced frame on the far side of a larger, lamp-inlaid plaza. Existing saves keep their current sanctuary untouched.
+- **Grove identity:** a quarter of suitable grove chunks now raise great **root arches** between landmarks.
+
+**Honest status:** compilation, 23 Python resource tests, 42 JUnit methods and a dedicated-server smoke test that places the real template and runs the custom structure type all pass. No connected client has walked the monastery, fought the Prior, or seen the awakening particles; balance and natural structure spacing are unverified. Details and limits: [docs/KINGDOM.md](docs/KINGDOM.md).
+
+## The Rootbound Monastery
+
+| Step | What to do |
+| --- | --- |
+| Find it | Explore **new** Hushed Grove chunks; at most one monastery per 32×32-chunk region, at least 16 chunks apart. Bind the entrance **Waystone** at the south doorway |
+| Ring both bells | West chapel bell on the ground floor; east library bell on the upper gallery, reached by the two-wide stair |
+| Wake the keeper | Right-click the **Rootbound Heart** in the north chapterhouse once both bells have rung. Blocked space or Peaceful difficulty refuses safely |
+| Fight | Leave the marked lane, take the centre pocket or stand outside radius 7 for the crown, and step out of your own Seedfall circle. Strike during the recovery pause |
+| Claim | The heart becomes a reliquary: one **Rootbound Seal**, 3 Resonite Ingots, 1 Dusk Fiber, 250 XP. The cloister screen opens as a shortcut |
+
+The Prior scales from 240 health solo to 540 with four eligible players, never moves, and never
+despawns mid-fight. If it is removed by a command or its chunk is abandoned, the heart frees
+itself after six seconds with a player nearby, so the monastery is never permanently locked.
+
 ## New in 1.8 — The Ancient Threshold
 
 **The great Ancient City monument is now your entrance.** Awaken the existing reinforced-deepslate frame with an Echo Shard and step through its full twenty-block-wide veil. No tiny handmade frame, catalyst search, or ignition corner.
@@ -48,13 +80,13 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 
 ### Items and equipment
 
-![Twenty-four original item textures, including weapons, armor, flasks, navigation tools, vows and boss rewards](docs/images/item-gallery.svg)
+![Twenty-six original item textures, including the Briarbrand and Rootbound Seal, weapons, armor, flasks, navigation tools, vows and boss rewards](docs/images/item-gallery.svg)
 
 These are the mod's actual PNG item assets, enlarged without smoothing. See [equipment and crafting](#equipment-and-crafting) for their mechanics.
 
 ### Bosses and creatures
 
-![Source-derived geometric previews of the Null Warden, Grave Regent, Rift Herald, Rift Sentinel and Shardstalker](docs/images/creature-gallery.svg)
+![Source-derived geometric previews of the Null Warden, Grave Regent, Rootbound Prior, Rift Herald, Rift Sentinel and Shardstalker](docs/images/creature-gallery.svg)
 
 **Model-preview disclosure:** geometry and bone pivots are read from the real Java model sources. Material colors are simplified; Minecraft UV textures, glow, live animation, and renderer scale are not reproduced. These previews show silhouettes, not a claim of in-game visual verification.
 
@@ -89,7 +121,7 @@ Everything from earlier updates remains: Ashen Flasks, cathedral embers, Converg
 | Mod loader | **Fabric Loader 0.16.10** development target; metadata accepts 0.16.10+ |
 | Fabric API | Built against **0.116.17+1.21.1**; install a compatible 1.21.1 build |
 | Java | **21** |
-| Mod version | **1.8.0** |
+| Mod version | **2.0.0-alpha.1** |
 
 1. Install Fabric for Minecraft 1.21.1.
 2. Open a **successful** [build workflow run](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml).
@@ -106,10 +138,10 @@ Existing expedition progress is retained. Sanctuary upgrades only fill designate
 1. Find an **Ancient City in the Overworld** and reach the large central reinforced-deepslate monument. Vanilla does not activate this structure; this mod supplies that behavior.
 2. Bring **one Echo Shard**, obtainable from Ancient City loot. You do not need to mine or craft reinforced deepslate.
 3. Preserve the complete **22-block-wide × 8-block-tall outline**, including corners. The **20×6 opening** must contain only air or already-active portal blocks. Clear obstructions yourself; activation does not destroy them.
-4. **Right-click any reinforced-deepslate frame block with the Echo Shard**, in either hand. The shard is consumed only on successful activation; Creative consumes nothing.
+4. **Right-click any reinforced-deepslate frame block with the Echo Shard**, in either hand, and **keep holding it still for three seconds** while the frame awakens. Walking 32+ blocks away, changing dimension, dying, or swapping the shard out of that hand cancels the awakening. The shard is consumed only on a successful opening; Creative consumes nothing.
 5. Step through the teal veil. City rotations are supported in both the X/Y and Z/Y planes.
 
-The gateway brings you to the **Hushed Threshold at approximately (0, 81, 160)**. A return gate is available immediately—defeating the boss is not required to leave. Return-point information survives restarts; returning searches for supported, collision-free, dry space near the original entry rather than placing you inside the membrane. If the return landing is blocked, the saved point is retained and the return fails safely.
+The gateway brings you to the **Hushed Threshold**: **(0, 81, 172)** in worlds first entered on 2.0+, facing the realm-side counterpart of the city frame, or **(0, 81, 160)** in saves that already had a sanctuary. A return gate is available immediately—defeating the boss is not required to leave. Return-point information survives restarts; returning searches for supported, collision-free, dry space near the original entry rather than placing you inside the membrane. If the return landing is blocked, the saved point is retained and the return fails safely.
 
 **Creative/testing:** matching 22×8 replicas can be activated outside cities. Operators can run `/nullgate x y z` against a frame block to validate and open a fixture without a player; this deliberately bypasses the Survival location/item checks. See [the gateway implementation and test notes](docs/ANCIENT_CITY.md).
 
@@ -274,6 +306,7 @@ Replacement: **leather + Dusk Fiber + Resonite Ingot**. This is an item ability,
 | **Shardstalker** | Original six-limbed crystal hunter; 30-tick fixed-position tell, physical lunge | Leave the marked position, watch the creature's actual landing, punish recovery |
 | **Grave Regent** | Crowned funeral monarch in the Keep; cleave, ring, and cross-lane attacks | Clear three wards first; dodge its committed tells and use recovery windows |
 | **Rift Herald** | Original floating construct with crown and orbiting shards; bursts and ring attacks | Leave the burst circle; for the ring, stay within three blocks or beyond six |
+| **Rootbound Prior** | Monastery keeper: 3-second tells for a root lane, a thorn crown (with a rotated second pulse below half health) and seedfall circles; 1-second recovery pause | Leave the lane, hold the centre pocket or stand outside radius 7, step out of your circle, then punish the pause; root pillars break line of sight |
 | **Null Warden** | Four-phase scripted guardian with pylons, committed attacks, and cinematic transitions | Read the ground/text tells, cleanse pylons, and punish recovery openings |
 
 Sentinel and Stalker ordinary melee is disabled during their special windup/recovery sequences. The Stalker's marked point is its intended destination, not a guaranteed blast boundary: it moves with collision and damages around its final position.
@@ -365,6 +398,7 @@ Realm ores replace Nullstone below roughly Y=65 and require iron-tier tools or b
 
 | Gear | Use |
 | --- | --- |
+| **Briarbrand** | Monastery weapon: hold one second, release a narrow 4-block thorn sweep for 9 damage, Slowness III for three seconds and one heart healed on a hit; 10-second cooldown, 3 durability, base melee 7 damage at 1.6 speed |
 | **Requiem Glaive** | First Keep-clear weapon: charge for one second, release a 14-damage forward reaping arc; successful hits slow enemies and grant temporary absorption |
 | **Nullblade** | Hold/release Soul Rend; sneak-use safe Riftstep. Base sword: 10 attack damage / 1.8 speed. Abilities consume durability and share cooldowns across blade tiers |
 | **Awakened Nullblade** | Stronger blade, longer Rend/Riftstep, shorter recovery; upgraded by smithing |
@@ -397,7 +431,7 @@ Recipe JSON and the vanilla recipe book are authoritative for shaped layouts. [W
 
 Hold a supported relic main-hand and a rune offhand, then use an **Attunement Forge**. Sneak to replace an existing attunement; the previous rune is not refunded. Each relic has one socket.
 
-Supported: both Nullblades, Prism Staff, Cinder Maul, Rift Aegis, and Requiem Glaive.
+Supported: both Nullblades, Prism Staff, Cinder Maul, Rift Aegis, Requiem Glaive, and Briarbrand.
 
 | Rune | Craft with an Astral Core + Resonant Shard + … | Effect |
 | --- | --- | --- |
@@ -411,7 +445,7 @@ Vigor/Gale effect timers persist and cannot be bypassed by swapping relics. Attu
 
 Collectible blocks include Nullstone and its polished/brick forms, three ores, Resonite storage, Prism Lamps, Prismstone, Cinderstone, both mosses, Hushwood/planks/leaves, the forge, Hush Nursery, and Pilgrim Ledger: **18 registered collectible blocks**.
 
-World-only cores, seals, stelae, waystones, and reliquaries are not ordinary collectible building items.
+World-only cores, seals, stelae, waystones, reliquaries, and the monastery's Rootbound Heart, Cloister Bells and reliquary are not ordinary collectible building items.
 
 Craft **two Hush Nurseries** from two Hushberries, Dusk Fiber, and Lumen Moss. Plant on dirt, grass, farmland, or supported moss. They have four growth stages, support bonemeal, and grow in realm darkness; outside the realm they need light level 8+. Use a mature nursery for **two berries and one fiber** without uprooting it. Breaking any stage returns the nursery.
 
@@ -429,6 +463,8 @@ The realm can support a base, crafting, food production, and repeated expedition
 | Keep run | One shared party at a time; canceled on restart; fortress geometry persists |
 | Boss/rift/Keep reward mail | Queued per player; claimed when alive in the realm, including after reconnect |
 | Interrupted courts/rifts | Canceled on restart; tagged orphan actors cleaned up |
+| Monastery bells and heart | Shared world puzzle progress, stored in block states |
+| Monastery guardian | One shared Prior per heart; a removed or unloaded actor clears the heart after six seconds with a player nearby |
 | Sanctuary upgrade stations | Added only at empty designated positions |
 
 Inventory overflow uses offer-or-drop behavior rather than silently deleting rewards. Normal death/inventory rules still apply: there is no added soul-loss tax, forced inventory wipe, or automatic equipment recovery.
@@ -438,6 +474,12 @@ Contract claims and transactions run server-side; extra ledgers and alternate it
 ## Troubleshooting and limitations
 
 **“The great frame is incomplete or obstructed.”** Check the 22×8 reinforced outline and 20×6 opening; all frame chunks must be loaded. Use an Echo Shard, not flint and steel. Survival activation also requires the Overworld Ancient City structure. Rotated gates work.
+
+**“The gate started to open and then stopped.”** The awakening needs three seconds with the Echo Shard still in that hand and the player within 32 blocks. Nothing is consumed by a cancelled awakening; simply use the shard on the frame again.
+
+**“The Prior will not wake.”** Both bells must have rung — the west chapel bell and the upper east library bell — and the heart's own message tells you which step is missing. Peaceful difficulty refuses, and the space above the heart must be clear.
+
+**“I cannot find a monastery.”** They generate only in **new** Hushed Grove chunks, at most one per 32×32-chunk region. Already-explored terrain never receives one.
 
 **“I cannot find new content.”** Explore previously ungenerated chunks or use a fresh test world. The atlas surveys loaded chunk-center columns only; it is not a guarantee that an unseen landmark exists nearby. `/locate structure` does not find these features.
 
@@ -451,7 +493,7 @@ Contract claims and transactions run server-side; extra ledgers and alternate it
 
 **“My teammate got the cathedral reward.”** That reliquary is shared. Memorial rewards and contracts are per player; cathedral treasure is not.
 
-**Known scope:** no custom recorded soundtrack/voice acting, no global minimap, no free-camera cutscenes, no guaranteed compatibility with shader/rendering/AI overhaul mods, and no completed connected-player combat or multiplayer test in this development sandbox. The cathedral is a compact vertical dungeon rather than a large castle network.
+**Known scope:** no custom recorded soundtrack/voice acting, no global minimap, no free-camera cutscenes, no guaranteed compatibility with shader/rendering/AI overhaul mods, and no completed connected-player combat or multiplayer test in this development sandbox. The cathedral is a compact vertical dungeon rather than a large castle network, and the monastery is the first of several planned 2.0 dungeons rather than a finished kingdom.
 
 ## Build, tests, and repository guide
 
@@ -476,7 +518,7 @@ Windows: use `gradlew.bat`. Installable output is in `build/libs/`; omit source 
 3. A real Fabric dedicated-server smoke test.
 4. Separate installable-JAR and validation-report artifacts.
 
-The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, inspects cathedral spawner IDs, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
+The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials and the full monastery template, inspects cathedral and monastery spawner IDs and chest loot tables, runs the custom monastery structure type, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
 
 **This is not a combat bot.** It does not prove that a human completed a rite, channelled a flask, bought from a ledger, used the atlas, or enjoyed the fight. Manual checks are listed in [TESTING.md](docs/TESTING.md).
 
@@ -495,6 +537,7 @@ python3 scripts/generate_convergence.py
 python3 scripts/generate_pilgrimage.py
 python3 scripts/generate_remembrance.py
 python3 scripts/generate_keep.py
+python3 scripts/generate_kingdom.py
 python3 scripts/generate_gallery.py
 python3 -m unittest discover -s tests -v
 ```
@@ -510,6 +553,7 @@ The original generated textures are deterministic. Translations and Java models 
 | `…/rift/` | Convergence observatory and encounter |
 | `…/pilgrimage/` | Cathedral geometry/rite and Pilgrimage rules |
 | `…/keep/` | Dedicated fortress dimension, incremental builder, party expedition, Regent AI |
+| `…/kingdom/` | Monastery structure type, temple geometry rite, Prior AI and combat rules |
 | `…/remembrance/` | Memorials, atlas survey, vows, contracts, supply exchange |
 | `…/item/`, `…/block/`, `…/mob/` | Registered gameplay objects and behavior |
 | `src/client/java/` | Original models, renderers, textures, HUD |
@@ -519,6 +563,7 @@ The original generated textures are deterministic. Translations and Java models 
 
 ### Further reading and history
 
+- [2.0 alpha Kingdom record](docs/KINGDOM.md)
 - [1.7 Hollow Keep expedition guide](docs/HOLLOW_KEEP.md)
 - [1.6 Remembrance notes](docs/REMEMBRANCE.md)
 - [1.5 Ashen Pilgrimage guide](docs/PILGRIMAGE.md)

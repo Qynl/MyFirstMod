@@ -13,8 +13,8 @@ def text(x,y,value,size=14,color='#9aaebc'):
  return f'<text x="{x}" y="{y}" fill="{color}" font-family="sans-serif" font-size="{size}">{html.escape(value)}</text>'
 def image(path,x,y,w,h):
  return f'<image x="{x}" y="{y}" width="{w}" height="{h}" style="image-rendering:pixelated" xlink:href="data:image/png;base64,{base64.b64encode(path.read_bytes()).decode()}"/>'
-items=['requiem_glaive','prism_staff','cinder_maul','rift_aegis','ashen_flask','pilgrim_step','pilgrim_atlas','survey_lens','echo_sigil','null_relic','regent_crest','warden_crest','memory_shard','mourning_ember','astral_core','resonite_ingot','resonite_pickaxe','resonite_chestplate','iron_vow','ember_vow','mist_vow','vigor_rune','gale_rune','focus_rune']
-s=svg(1080,790,'THE PILGRIM’S ARMORY','Twenty-four actual item textures from the mod, enlarged without smoothing.');s.append(text(32,70,'Original in-game pixel assets • Weapons, exploration, progression and rewards'))
+items=['briarbrand','rootbound_seal','requiem_glaive','prism_staff','cinder_maul','rift_aegis','ashen_flask','pilgrim_step','pilgrim_atlas','survey_lens','echo_sigil','null_relic','regent_crest','warden_crest','memory_shard','mourning_ember','astral_core','resonite_ingot','resonite_pickaxe','resonite_chestplate','iron_vow','ember_vow','mist_vow','vigor_rune','gale_rune','focus_rune']
+s=svg(1080,920,'THE PILGRIM’S ARMORY','Twenty-six actual item textures from the mod, enlarged without smoothing.');s.append(text(32,70,'Original in-game pixel assets • Weapons, exploration, progression and rewards'))
 for i,name in enumerate(items):
  x=20+i%6*176;y=94+i//6*163
  s += [f'<rect x="{x}" y="{y}" width="164" height="151" rx="8" fill="#121f2c" stroke="#243648"/>',image(ASSETS/'item'/f'{name}.png',x+34,y+8,96,96),text(x+10,y+130,name.replace('_',' ').title(),13,'#d3e4df')]
@@ -81,8 +81,8 @@ def model(name,x,y,w,h):
  nodes=extract(name);polys=[]
  for key,n in nodes.items():
   glow=any(word in key for word in ['core','eye','crown','horn','shard'])
-  base=(119,94,141) if name=='NullWarden' else (142,104,75) if name=='GraveRegent' else (63,133,142) if name=='RiftSentinel' else (121,90,157)
-  if glow:base=(145,216,202) if name!='GraveRegent' else (220,180,100)
+  base=(119,94,141) if name=='NullWarden' else (142,104,75) if name=='GraveRegent' else (63,133,142) if name=='RiftSentinel' else (86,110,72) if name=='RootboundPrior' else (121,90,157)
+  if glow:base=(145,216,202) if name not in ('GraveRegent','RootboundPrior') else (220,180,100) if name=='GraveRegent' else (213,255,155)
   for bx,by,bz,dx,dy,dz in n['boxes']:
    v=[project(world(nodes,key,(bx+(i&1)*dx,by+((i>>1)&1)*dy,bz+((i>>2)&1)*dz))) for i in range(8)]
    for indices,shade in [([0,2,3,1],.9),([4,5,7,6],.52),([0,4,6,2],.6),([1,3,7,5],.78),([0,1,5,4],1.1),([2,6,7,3],.4)]:
@@ -95,13 +95,17 @@ def model(name,x,y,w,h):
   coords=' '.join(f'{ox+(p[0]-minx)*scale:.2f},{oy+(p[1]-miny)*scale:.2f}' for p in pts)
   out.append(f'<polygon points="{coords}" fill="{color}" stroke="#142330" stroke-width="0.55" stroke-linejoin="round"/>')
  out.append('</g>');return out
-s=svg(1200,760,'THOSE WHO WAIT IN THE DARK','Source-derived geometric previews of the Null Warden, Grave Regent, Rift Herald, Rift Sentinel and Shardstalker. Simplified colors; not gameplay screenshots.')
+s=svg(1200,1120,'THOSE WHO WAIT IN THE DARK','Source-derived geometric previews of the Null Warden, Grave Regent, Rootbound Prior, Rift Herald, Rift Sentinel and Shardstalker. Simplified colors; not gameplay screenshots.')
 s.append(text(32,73,'Actual Java-model cuboids and bone pivots • Simplified materials • Not gameplay screenshots'))
-for name,title,role,x,y,w,h in [('NullWarden','NULL WARDEN','Realm boss / fractured colossus',25,105,370,545),('GraveRegent','GRAVE REGENT','Hollow Keep boss / crowned monarch',414,105,330,545),('RiftHerald','RIFT HERALD','Unstable rift guardian',784,104,185,225),('RiftSentinel','RIFT SENTINEL','Committed greatblade attacks',995,104,180,225),('Shardstalker','SHARDSTALKER','Six-legged ambush predator',786,416,380,220)]:
+for name,title,role,x,y,w,h in [('NullWarden','NULL WARDEN','Realm boss / fractured colossus',25,105,370,545),('GraveRegent','GRAVE REGENT','Hollow Keep boss / crowned monarch',414,105,330,545),('RiftHerald','RIFT HERALD','Unstable rift guardian',784,104,185,225),('RiftSentinel','RIFT SENTINEL','Committed greatblade attacks',995,104,180,225),('Shardstalker','SHARDSTALKER','Six-legged ambush predator',786,416,380,220),('RootboundPrior','ROOTBOUND PRIOR','Monastery keeper / bark-robed abbot',25,720,560,300)]:
  s.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h+53}" rx="10" fill="#101e2a" stroke="#243c49"/>')
  s+=model(name,x+18,y+14,w-36,h-25)
  s += [text(x+16,y+h+18,title,17,'#deebe5'),text(x+16,y+h+38,role,11)]
-s.append(text(32,739,'Generated from src/client/.../model/*.java. Live animation, UV textures, glow and renderer scaling are not reproduced.',12))
+s += [text(620,760,'ROOTBOUND MONASTERY',24,'#cfe7dc'),text(620,792,'New in 2.0: a 47 by 47 cloister generated by vanilla jigsaw rules',13),text(620,817,'in fresh Hushed Grove chunks, never over the sanctuary approach.',13),
+ text(620,848,'Ring the west chapel bell and the upper east library bell,',13),text(620,873,'then wake the Prior at the Rootbound Heart in the north hall.',13),
+ text(620,904,'Three telegraphed attacks: Root Lash lane, Thorn Crown ring,',13),text(620,929,'Seedfall circles. Strike only during the visible recovery pause.',13),
+ text(620,960,'Reward: one shared Rootbound Seal per monastery, reforged',13),text(620,985,'into the Briarbrand: a short thorn sweep that slows and heals.',13)]
+s.append(text(32,1090,'Generated from src/client/.../model/*.java. Live animation, UV textures, glow and renderer scaling are not reproduced.',12))
 s.append('</svg>');(OUT/'creature-gallery.svg').write_text('\n'.join(s)+'\n')
 # Biome materials: actual pixel texture plates, not fabricated terrain screenshots.
 s=svg(1080,350,'FOUR REGIONS. ONE LONG NIGHT.','Actual surface and scenery textures for four Null Realm biomes. Material palette, not a landscape screenshot.')
@@ -109,13 +113,13 @@ for i,(title,a,b,caption) in enumerate([('HUSHED GROVE','hushed_moss','hushwood'
  x=25+i*266;s += [text(x,100,title,19,'#dce9e1'),image(ASSETS/'block'/f'{a}.png',x,120,112,112),image(ASSETS/'block'/f'{b}.png',x+116,120,112,112),text(x,263,caption,12)]
 s.append(text(25,320,'Original block textures • Material palette, not a gameplay screenshot',13));s.append('</svg>');(OUT/'biome-palettes.svg').write_text('\n'.join(s)+'\n')
 # Dimension route diagram, to exact portal block proportions.
-s=svg(1100,390,'AWAKEN THE ANCIENT CITY','22 by 8 reinforced-deepslate frame with a 20 by 6 opening. Echo Shard to Null Realm sanctuary, then Hollow Keep after a Warden clear.')
-s.append(text(30,76,'Find the central monument • Right-click any frame block with one Echo Shard'))
+s=svg(1100,420,'AWAKEN THE ANCIENT CITY','22 by 8 reinforced-deepslate frame with a 20 by 6 opening. Three-second awakening, Echo Shard to the Null Realm sanctuary and its matching return gateway, then Hollow Keep after a Warden clear.')
+s.append(text(30,76,'Find the central monument • Right-click any frame block with one Echo Shard • hold it still for three seconds'))
 for y in range(8):
  for x in range(22):
   border=x in [0,21] or y in [0,7]
   s.append(f'<rect x="{30+x*20}" y="{106+y*20}" width="19" height="19" fill="{"#566669" if border else "#266376"}"/>')
-s += [text(30,295,'22 × 8 outside / 20 × 6 opening',18,'#cfe7dc'),text(30,320,'Survival: generated Ancient City, Overworld',13),text(30,345,'Creative: matching replicas also work',13)]
-s += [text(508,180,'→',40,'#8cd7c9'),text(570,155,'NULL REALM',24,'#b0e4d0'),text(570,183,'Sanctuary → wilds → Null Warden',14),text(570,212,'Return gateway → recorded Overworld entry',13),text(570,261,'↓ First Warden victory',18,'#d3bd88'),text(570,306,'HOLLOW KEEP',24,'#d4b18c'),text(570,334,'Three wards → Grave Regent → Requiem Glaive',14)]
+s += [text(30,295,'22 × 8 outside / 20 × 6 opening',18,'#cfe7dc'),text(30,320,'Survival: generated Ancient City, Overworld',13),text(30,345,'Creative: matching replicas also work',13),text(30,370,'Step away or release the shard and the awakening fades',13),text(30,395,'No shard is consumed by a cancelled awakening',13)]
+s += [text(508,180,'→',40,'#8cd7c9'),text(570,150,'NULL REALM',24,'#b0e4d0'),text(570,176,'Matching 22 × 8 return gateway at the sanctuary',13),text(570,201,'Sanctuary → wilds → Null Warden',14),text(570,232,'Two bells → Rootbound Prior → Briarbrand',13,'#a9d8b0'),text(570,266,'↓ First Warden victory',18,'#d3bd88'),text(570,311,'HOLLOW KEEP',24,'#d4b18c'),text(570,339,'Three wards → Grave Regent → Requiem Glaive',14)]
 s.append('</svg>');(OUT/'ancient-city-gateway.svg').write_text('\n'.join(s)+'\n')
 print('Generated four documentation plates from local assets/model sources.')

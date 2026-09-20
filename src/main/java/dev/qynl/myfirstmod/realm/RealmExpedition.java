@@ -16,6 +16,8 @@ import net.minecraft.util.math.BlockPos;
 
 public final class RealmExpedition {
     public static final BlockPos ARRIVAL=new BlockPos(0,81,160);
+    /** Fresh worlds arrive in front of the realm-side counterpart of the Ancient City gateway. */
+    public static final BlockPos THRESHOLD=new BlockPos(0,81,172);
     public static void prepare(ServerWorld world) {
         RealmState state=RealmState.get(world);
         if(state.sanctuaryBuilt) {prepareAltar(world,state);prepareForge(world,state);return;}
@@ -27,18 +29,28 @@ public final class RealmExpedition {
             if(Math.abs(x)==3 && z%12!=0) put(world,new BlockPos(x,81,z),Blocks.DEEPSLATE_BRICK_WALL);
             if(Math.abs(x)==3 && z%12==0) put(world,new BlockPos(x,81,z),Blocks.SEA_LANTERN);
         }
-        for(int x=-10;x<=10;x++) for(int z=150;z<=170;z++) {
+        for(int x=-14;x<=14;x++) for(int z=150;z<=178;z++) {
             put(world,new BlockPos(x,79,z),Blocks.DEEPSLATE_BRICKS);
-            put(world,new BlockPos(x,80,z),Math.abs(x)==10||z==170?Blocks.CRYING_OBSIDIAN:Blocks.POLISHED_BLACKSTONE);
-            for(int y=81;y<90;y++) put(world,new BlockPos(x,y,z),Blocks.AIR);
+            put(world,new BlockPos(x,80,z),Math.abs(x)==14||z==178?Blocks.CRYING_OBSIDIAN:Blocks.POLISHED_BLACKSTONE);
+            for(int y=81;y<93;y++) put(world,new BlockPos(x,y,z),Blocks.AIR);
         }
         for(int x:new int[]{-8,8}) for(int z:new int[]{152,168}) {
             for(int y=81;y<87;y++) put(world,new BlockPos(x,y,z),Blocks.CHISELED_DEEPSLATE);
             put(world,new BlockPos(x,87,z),Blocks.SEA_LANTERN);
         }
-        // A return gate is available BEFORE the boss, including in Peaceful mode.
-        for(int x=-1;x<=1;x++) for(int y=81;y<=84;y++)
-            put(world,new BlockPos(x,y,167),Math.abs(x)==1||y==84?Blocks.CRYING_OBSIDIAN:ModBlocks.VOID_PORTAL);
+        // Fresh worlds receive the counterpart of the Ancient City gateway. Never retrofit over old builds.
+        for(int x=-10;x<=11;x++)for(int y=80;y<=87;y++){
+            var cell=new BlockPos(x,y,175);
+            if(x==-10||x==11||y==80||y==87)put(world,cell,Blocks.REINFORCED_DEEPSLATE);
+            else world.setBlockState(cell,ModBlocks.VOID_PORTAL.getDefaultState()
+                .with(dev.qynl.myfirstmod.block.VoidPortalBlock.AXIS,net.minecraft.util.math.Direction.Axis.X),net.minecraft.block.Block.NOTIFY_LISTENERS);
+        }
+        for(int z=151;z<=175;z+=4)for(int x:new int[]{-3,3})put(world,new BlockPos(x,80,z),ModBlocks.PRISM_LAMP);
+        for(int x:new int[]{-12,12})for(int z:new int[]{154,162,170}){
+            put(world,new BlockPos(x,81,z),ModBlocks.HUSHED_MOSS);
+            put(world,new BlockPos(x,82,z),ModBlocks.HUSH_LEAVES);
+        }
+        state.thresholdBuilt=true;
         // Nearby introductory trial court, separate from the safe arrival tile.
         for(int x=14;x<=28;x++) for(int z=145;z<=159;z++) {
             put(world,new BlockPos(x,80,z),Blocks.DEEPSLATE_TILES);
@@ -116,9 +128,11 @@ public final class RealmExpedition {
             }
             if(p.squaredDistanceTo(.5,81,.5)<20*20) NullWardenManager.approachArena(world,p);
             // A quiet arrival refuge: suppress naturally spawned hostiles, never trial mobs.
-            if(p.squaredDistanceTo(ARRIVAL.toCenterPos())<14*14) {
+            var refuge=p.squaredDistanceTo(ARRIVAL.toCenterPos());
+            if(RealmState.get(world).thresholdBuilt)refuge=Math.min(refuge,p.squaredDistanceTo(THRESHOLD.toCenterPos()));
+            if(refuge<14*14) {
                 world.getEntitiesByClass(net.minecraft.entity.mob.HostileEntity.class,
-                        new net.minecraft.util.math.Box(ARRIVAL).expand(10),
+                        new net.minecraft.util.math.Box(ARRIVAL).union(new net.minecraft.util.math.Box(THRESHOLD)).expand(10),
                         e->!e.getCommandTags().contains("null_trial")).forEach(net.minecraft.entity.Entity::discard);
             }
             var progress=RealmState.get(world).expedition(p.getUuid());
