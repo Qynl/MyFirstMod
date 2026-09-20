@@ -23,7 +23,7 @@ class ResourceTests(unittest.TestCase):
         dimension=load(DATA/'dimension/null_realm.json')
         self.assertEqual(dimension['generator']['settings'],'myfirstmod:null_realm')
         biomes=dimension['generator']['biome_source']['biomes']
-        self.assertEqual(len(biomes),4)
+        self.assertEqual(len(biomes),8)
         for biome in biomes:
             self.assertTrue((DATA/('worldgen/biome/'+biome['biome'].split(':')[1]+'.json')).exists())
         noise=load(DATA/'worldgen/noise_settings/null_realm.json')
@@ -47,9 +47,12 @@ class ResourceTests(unittest.TestCase):
                 for feature in stage:
                     placed=load(DATA/('worldgen/placed_feature/'+feature.split(':')[1]+'.json'))
                     configured=load(DATA/('worldgen/configured_feature/'+placed['feature'].split(':')[1]+'.json'))
-                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial','myfirstmod:realm_scenery'])
-            self.assertEqual({s['type'] for s in biome['spawners']['monster']},
-                             {'myfirstmod:rift_sentinel','myfirstmod:shardstalker'})
+                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial','myfirstmod:realm_scenery','myfirstmod:region_signatures','myfirstmod:drowned_archive'])
+            monsters={s['type'] for s in biome['spawners']['monster']}
+            self.assertTrue({'myfirstmod:rift_sentinel','myfirstmod:shardstalker'}<=monsters,path.name)
+            self.assertEqual('minecraft:drowned' in monsters,path.stem=='drowned_stacks')
+            creatures={s['type'] for s in biome['spawners'].get('creature',[])}
+            self.assertEqual('myfirstmod:veil_wisp' in creatures,path.stem in ('veil_highlands','shard_spires'))
 
     def test_item_models_and_translations(self):
         source=(ROOT/'src/main/java/dev/qynl/myfirstmod/item/ModItems.java').read_text()
@@ -126,7 +129,7 @@ class ResourceTests(unittest.TestCase):
     def test_wilds_blocks_are_complete(self):
         source=(ROOT/'src/main/java/dev/qynl/myfirstmod/block/ModBlocks.java').read_text()
         names=set(re.findall(r'(?:stone|building)\("([a-z_]+)"',source))
-        self.assertEqual(len(names),18)
+        self.assertEqual(len(names),23)
         language=load(ASSETS/'lang/en_us.json')
         for name in names:
             self.assertTrue((ASSETS/f'blockstates/{name}.json').exists(),name)

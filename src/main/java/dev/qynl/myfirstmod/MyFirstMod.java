@@ -23,6 +23,8 @@ public class MyFirstMod implements ModInitializer {
         ModEntities.register();
         dev.qynl.myfirstmod.kingdom.MonasteryStructure.register();
         dev.qynl.myfirstmod.realm.RealmScenery.register();
+        dev.qynl.myfirstmod.realm.RegionSignatures.register();
+        dev.qynl.myfirstmod.kingdom.ArchiveFeature.register();
         VoidPortalManager.registerGateCommand();
         dev.qynl.myfirstmod.keep.HollowKeep.registerCommands();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(dev.qynl.myfirstmod.keep.HollowKeep::resetTickets);
@@ -57,6 +59,8 @@ public class MyFirstMod implements ModInitializer {
                     &&VoidPortalManager.tryIgnite(serverPlayer,hit.getBlockPos(),hand))return ActionResult.SUCCESS;
                 return ActionResult.PASS;
             }
+            ActionResult tide=dev.qynl.myfirstmod.kingdom.ArchiveTides.interact(serverPlayer,hit.getBlockPos());
+            if(tide!=ActionResult.PASS)return tide;
             ActionResult monastery=dev.qynl.myfirstmod.kingdom.Monastery.interact(serverPlayer,hit.getBlockPos());
             if(monastery!=ActionResult.PASS)return monastery;
             ActionResult keep=dev.qynl.myfirstmod.keep.HollowKeep.interact(serverPlayer,hit.getBlockPos());

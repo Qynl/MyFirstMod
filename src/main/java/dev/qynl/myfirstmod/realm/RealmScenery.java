@@ -10,7 +10,7 @@ import net.minecraft.world.gen.feature.util.FeatureContext;
 public final class RealmScenery extends Feature<DefaultFeatureConfig> {
     public RealmScenery(){super(DefaultFeatureConfig.CODEC);}
     public static void register(){Registry.register(Registries.FEATURE,Identifier.of("myfirstmod","realm_scenery"),new RealmScenery());}
-    private static boolean natural(BlockState state){return state.isOf(ModBlocks.HUSHED_MOSS)||state.isOf(ModBlocks.LUMEN_MOSS)||state.isOf(ModBlocks.PRISMSTONE)||state.isOf(ModBlocks.CINDERSTONE);}
+    private static boolean natural(BlockState state){return state.isOf(ModBlocks.HUSHED_MOSS)||state.isOf(ModBlocks.LUMEN_MOSS)||state.isOf(ModBlocks.PRISMSTONE)||state.isOf(ModBlocks.CINDERSTONE)||state.isOf(ModBlocks.BRINESILT)||state.isOf(ModBlocks.VEILSTONE)||state.isOf(ModBlocks.VENT_BASALT);}
     @Override public boolean generate(FeatureContext<DefaultFeatureConfig> c){
         var w=c.getWorld();var random=c.getRandom();int cx=c.getOrigin().getX()&~15,cz=c.getOrigin().getZ()&~15;
         if(Math.abs(cx+8)<96&&cz+8>-96&&cz+8<192)return false;
@@ -25,7 +25,10 @@ public final class RealmScenery extends Feature<DefaultFeatureConfig> {
             Block decoration;
             if(floor.isOf(ModBlocks.HUSHED_MOSS))decoration=n%4==0?ModBlocks.HUSHWOOD:n%3==0?Blocks.BROWN_MUSHROOM:Blocks.MOSS_CARPET;
             else if(floor.isOf(ModBlocks.LUMEN_MOSS))decoration=n%3==0?Blocks.MOSS_BLOCK:Blocks.MOSS_CARPET;
-            else if(floor.isOf(ModBlocks.PRISMSTONE))decoration=n%3==0?Blocks.AMETHYST_CLUSTER:Blocks.SMALL_AMETHYST_BUD;
+            else if(floor.isOf(ModBlocks.PRISMSTONE))decoration=n%3==0?ModBlocks.SPIRE_CRYSTAL:Blocks.SMALL_AMETHYST_BUD;
+            else if(floor.isOf(ModBlocks.BRINESILT))decoration=n%3==0?Blocks.SEA_PICKLE:Blocks.MOSS_CARPET;
+            else if(floor.isOf(ModBlocks.VEILSTONE))decoration=n%4==0?ModBlocks.HUSH_LEAVES:Blocks.MOSS_CARPET;
+            else if(floor.isOf(ModBlocks.VENT_BASALT))decoration=n%4==0?Blocks.MAGMA_BLOCK:Blocks.BLACKSTONE_SLAB;
             else decoration=n%3==0?Blocks.POLISHED_BASALT:Blocks.BLACKSTONE_SLAB;
             if(floor.isOf(ModBlocks.LUMEN_MOSS)&&n==0&&pond(w,p))continue;
             w.setBlockState(p,decoration.getDefaultState(),Block.NOTIFY_LISTENERS);

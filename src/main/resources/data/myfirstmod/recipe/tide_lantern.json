@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "myfirstmod:prism_lamp"
+    },
+    {
+      "item": "myfirstmod:drowned_seal"
+    },
+    {
+      "item": "myfirstmod:resonite_ingot"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:tide_lantern",
+    "count": 1
+  }
+}

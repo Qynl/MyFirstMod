@@ -3,9 +3,9 @@
 
 **A dark-fantasy expedition through a ruined kingdom: awaken the great Ancient City gate, prepare at a sanctuary, ring the bells of a drowned-root monastery, recover forgotten memories, descend beneath cathedrals, and challenge the guardians of a broken realm.**
 
-> **2.0.0-alpha.1** is the first milestone of the 2.0 plan: one fully built dungeon, one new keeper, and a gateway that now has an arrival moment. It is an alpha — see [the Kingdom record](docs/KINGDOM.md) for exactly what is and is not verified.
+> **2.0.0-alpha.2 — "The Wider Kingdom"** grows the realm from four to **eight authored regions** with per-region terrain shaping and landmarks, adds the **Drowned Archive** dungeon with its one-shot **Tide Bell** drain, the **Drowned Seal → Tide Lantern** progression reward, and a passive **Veil Wisp**. It is an alpha — see [the Regions record](docs/REGIONS.md) and [the Kingdom record](docs/KINGDOM.md) for exactly what is and is not verified.
 
-Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an exploration dimension and a separate fortress dimension, four realm biomes, original creature models, exploration landmarks, equipment progression, opt-in encounters, and persistent player records.
+Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an exploration dimension and a separate fortress dimension, eight realm regions, original creature models, exploration landmarks, equipment progression, opt-in encounters, and persistent player records.
 
 [Download builds](https://github.com/Qynl/MyFirstMod/actions/workflows/build.yml) · [Report an issue](https://github.com/Qynl/MyFirstMod/issues) · [Validation details](docs/TESTING.md)
 
@@ -16,6 +16,7 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 ## Contents
 
 - [New in 2.0 alpha — The Kingdom Beyond the Gate](#new-in-20-alpha--the-kingdom-beyond-the-gate)
+- [The Wider Kingdom — eight regions](#the-wider-kingdom--eight-regions)
 - [The Rootbound Monastery](#the-rootbound-monastery)
 - [New in 1.8 — The Ancient Threshold](#new-in-18--the-ancient-threshold)
 - [New in 1.7 — The Hollow Keep](#new-in-17--the-hollow-keep)
@@ -49,7 +50,31 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 - **A counterpart gateway:** new worlds arrive at **(0, 81, 172)** facing a matching 22×8 reinforced frame on the far side of a larger, lamp-inlaid plaza. Existing saves keep their current sanctuary untouched.
 - **Grove identity:** a quarter of suitable grove chunks now raise great **root arches** between landmarks.
 
-**Honest status:** compilation, 23 Python resource tests, 42 JUnit methods and a dedicated-server smoke test that places the real template and runs the custom structure type all pass. No connected client has walked the monastery, fought the Prior, or seen the awakening particles; balance and natural structure spacing are unverified. Details and limits: [docs/KINGDOM.md](docs/KINGDOM.md).
+**Honest status:** compilation, 33 Python resource tests, 45 JUnit methods and a dedicated-server smoke test that places the real template, runs the custom structure type, places all four region signatures and a full Drowned Archive from blocks and asserts bell, water, walkway, spawner and vault NBT all pass. No connected client has walked the monastery or the archive, fought the Prior, rung the Tide Bell in survival, or seen the awakening particles; balance and natural spacing are unverified. Details and limits: [docs/KINGDOM.md](docs/KINGDOM.md) and [docs/REGIONS.md](docs/REGIONS.md).
+
+## The Wider Kingdom — eight regions
+
+![Material plates for all eight Null Realm regions: Hushed Grove, Veil Highlands, Luminous Fen, Drowned Stacks, Prism Wastes, Shard Spires, Cinder Steps and Ember Vents](docs/images/biome-palettes.svg)
+
+Every region now owns its own terrain shape, surface material, fog, ambient loop and authored landmark — not just a palette:
+
+| Region | Terrain | Signature landmark |
+| --- | --- | --- |
+| **Hushed Grove** | Rolling moss basins | Root arches and the Rootbound Monastery |
+| **Veil Highlands** *(new)* | A lifted plateau (+~24 blocks) | **Floating veil islands** with hanging roots, patrolled by Veil Wisps |
+| **Luminous Fen** | Low glowing flats | Glowstone pools and spore drifts |
+| **Drowned Stacks** *(new)* | **Four quantized flooded terraces** | Ruined colonnades, slab walkways and brine pools — and the **Drowned Archive** |
+| **Prism Wastes** | Crystal flats | Scattered ruins and amethyst buds |
+| **Shard Spires** *(new)* | **Jagged ridge spires** (steep-noise gated) | Tapering crystal columns with amethyst crowns |
+| **Cinder Steps** | Terraced ash shelves | Cinder terraces and basalt rubble |
+| **Ember Vents** *(new)* | Damped, smoking flats | Polished-basalt chimneys around **lava pockets with magma rims and soul fire** |
+
+- **The Drowned Archive:** a 17×17 flooded reading hall in the Stacks — walkway ring above the water, drowned desks and the vault below it, drowned and Rift Sentinel spawners, blue-glass windows and an oxidized-copper roof. Ring the **Tide Bell** on the central dais and the hall **drains exactly once**, permanently (state saved in the block): shortcuts and the submerged vault become reachable. The bell never refills — one decision per archive.
+- **Progression reward:** the vault's **Drowned Seal** has one purpose — craft it with a Prism Lamp and a Resonite Ingot into the **Tide Lantern**: forty seconds of Water Breathing plus twenty seconds of Night Vision on a ninety-second cooldown. Rewards keep changing how you play, not just what you carry.
+- **Veil Wisp:** a harmless drifting light in the Highlands and Spires — ambient, no gravity, sine wander, spawns only on veilstone or prismstone.
+- **Eight-region journal pages:** the expedition journal gains *Eight Regions* and *Royal Seals* pages; the seals thread now names two seals and promises two more.
+
+Regions are routed by climate bands, so they arrive in broad connected arcs rather than confetti. **Existing saves keep everything already generated; the new regions appear only in new chunks.**
 
 ## The Rootbound Monastery
 
@@ -86,7 +111,7 @@ These are the mod's actual PNG item assets, enlarged without smoothing. See [equ
 
 ### Bosses and creatures
 
-![Source-derived geometric previews of the Null Warden, Grave Regent, Rootbound Prior, Rift Herald, Rift Sentinel and Shardstalker](docs/images/creature-gallery.svg)
+![Source-derived geometric previews of the Null Warden, Grave Regent, Rootbound Prior, Veil Wisp, Rift Herald, Rift Sentinel and Shardstalker](docs/images/creature-gallery.svg)
 
 **Model-preview disclosure:** geometry and bone pivots are read from the real Java model sources. Material colors are simplified; Minecraft UV textures, glow, live animation, and renderer scale are not reproduced. These previews show silhouettes, not a claim of in-game visual verification.
 
@@ -398,6 +423,7 @@ Realm ores replace Nullstone below roughly Y=65 and require iron-tier tools or b
 
 | Gear | Use |
 | --- | --- |
+| **Tide Lantern** | Archive reward: Prism Lamp + Drowned Seal + Resonite Ingot (shapeless). Use for 40s Water Breathing + 20s Night Vision; 90s cooldown |
 | **Briarbrand** | Monastery weapon: hold one second, release a narrow 4-block thorn sweep for 9 damage, Slowness III for three seconds and one heart healed on a hit; 10-second cooldown, 3 durability, base melee 7 damage at 1.6 speed |
 | **Requiem Glaive** | First Keep-clear weapon: charge for one second, release a 14-damage forward reaping arc; successful hits slow enemies and grant temporary absorption |
 | **Nullblade** | Hold/release Soul Rend; sneak-use safe Riftstep. Base sword: 10 attack damage / 1.8 speed. Abilities consume durability and share cooldowns across blade tiers |
@@ -443,7 +469,7 @@ Vigor/Gale effect timers persist and cannot be bypassed by swapping relics. Attu
 
 ## Building and cultivation
 
-Collectible blocks include Nullstone and its polished/brick forms, three ores, Resonite storage, Prism Lamps, Prismstone, Cinderstone, both mosses, Hushwood/planks/leaves, the forge, Hush Nursery, and Pilgrim Ledger: **18 registered collectible blocks**.
+Collectible blocks include Nullstone and its polished/brick forms, three ores, Resonite storage, Prism Lamps, Prismstone, Cinderstone, both mosses, Hushwood/planks/leaves, the forge, Hush Nursery, and Pilgrim Ledger: **23 registered collectible blocks** (including Brinesilt, Veilstone, Vent Basalt, Spire Crystal and Oxidized Trim).
 
 World-only cores, seals, stelae, waystones, reliquaries, and the monastery's Rootbound Heart, Cloister Bells and reliquary are not ordinary collectible building items.
 
@@ -518,7 +544,7 @@ Windows: use `gradlew.bat`. Installable output is in `build/libs/`; omit source 
 3. A real Fabric dedicated-server smoke test.
 4. Separate installable-JAR and validation-report artifacts.
 
-The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials and the full monastery template, inspects cathedral and monastery spawner IDs and chest loot tables, runs the custom monastery structure type, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
+The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, all four region signatures, a complete Drowned Archive and the full monastery template, inspects cathedral and monastery spawner IDs and chest loot tables, runs the custom monastery structure type, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
 
 **This is not a combat bot.** It does not prove that a human completed a rite, channelled a flask, bought from a ledger, used the atlas, or enjoyed the fight. Manual checks are listed in [TESTING.md](docs/TESTING.md).
 
@@ -563,6 +589,7 @@ The original generated textures are deterministic. Translations and Java models 
 
 ### Further reading and history
 
+- [2.0 alpha.2 Regions record](docs/REGIONS.md)
 - [2.0 alpha Kingdom record](docs/KINGDOM.md)
 - [1.7 Hollow Keep expedition guide](docs/HOLLOW_KEEP.md)
 - [1.6 Remembrance notes](docs/REMEMBRANCE.md)

@@ -137,4 +137,55 @@ lang=json.loads((A/'lang/en_us.json').read_text());lang.update({
  'message.myfirstmod.gate_charging':'The frame remembers. Hold the Echo Shard nearby while the threshold awakens.',
  'message.myfirstmod.gate_cancelled':'The awakening fades. No Echo Shard was consumed.'
 });put(A,'lang/en_us.json',lang)
+
+# --- 2.0 alpha.2: region assets, archive rewards and the veil wisp -----------------
+for name in ['brinesilt','veilstone','vent_basalt','spire_crystal','oxidized_trim']:
+    put(A,'models/block/'+name+'.json',{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/'+name}})
+    put(A,'blockstates/'+name+'.json',{'variants':{'':{'model':'myfirstmod:block/'+name}}})
+    put(A,'models/item/'+name+'.json',{'parent':'myfirstmod:block/'+name})
+    put(D,'loot_table/blocks/'+name+'.json',{'type':'minecraft:block','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':'myfirstmod:'+name}],'conditions':[{'condition':'minecraft:survives_explosion'}]}]})
+tag=(D.parents[0]/'minecraft/tags/block/mineable/pickaxe.json')
+values=sorted(set(json.loads(tag.read_text())['values'])|{'myfirstmod:brinesilt','myfirstmod:veilstone','myfirstmod:vent_basalt','myfirstmod:spire_crystal','myfirstmod:oxidized_trim'})
+tag.write_text(json.dumps({'replace':False,'values':values},indent=2)+'\n')
+for drained,tint in [(False,(214,196,120)),(True,(120,110,74))]:
+    pixels=[]
+    for y in range(16):
+        for x in range(16):
+            c=(58+(x+y)%7,74+(x*y)%9,80)
+            if x in [2,13] or y in [1,14]:c=(38,52,58)
+            if abs(x-7.5)+abs(y-7.5)<5:c=tint
+            pixels.append(c+(255,))
+    suffix='' if not drained else '_drained'
+    png('block/tide_bell'+suffix+'.png',16,16,pixels)
+    put(A,'models/block/tide_bell'+suffix+'.json',{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/tide_bell'+suffix}})
+put(A,'blockstates/tide_bell.json',{'variants':{'drained=false':{'model':'myfirstmod:block/tide_bell'},'drained=true':{'model':'myfirstmod:block/tide_bell_drained'}}})
+sprite('drowned_seal',[([(16,1),(29,10),(27,24),(16,31),(5,24),(3,10)],(30,64,72)), ([(16,5),(25,12),(23,23),(16,27),(9,23),(7,12)],(96,190,196)), ([(10,14),(22,14),(20,18),(12,18)],(28,52,60)), ([(10,19),(22,19),(20,23),(12,23)],(28,52,60))])
+sprite('tide_lantern',[([(12,2),(20,2),(21,5),(11,5)],(70,84,90)), ([(10,5),(22,5),(23,24),(9,24)],(44,58,64)), ([(13,8),(19,8),(20,21),(12,21)],(140,235,225)), ([(15,11),(17,11),(18,17),(14,17)],(235,255,250)), ([(11,24),(21,24),(21,28),(11,28)],(70,84,90)), ([(15,0),(17,0),(17,2),(15,2)],(120,140,150))])
+for name in ['drowned_seal','tide_lantern']:
+    put(A,'models/item/'+name+'.json',{'parent':'minecraft:item/generated','textures':{'layer0':'myfirstmod:item/'+name}})
+put(D,'loot_table/chests/archive_cache.json',{'type':'minecraft:chest','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':'myfirstmod:drowned_seal'}]},{'rolls':{'type':'minecraft:uniform','min':3,'max':5},'entries':[{'type':'minecraft:item','name':'myfirstmod:resonite_ingot','weight':3,'functions':[{'function':'minecraft:set_count','count':1}]},{'type':'minecraft:item','name':'myfirstmod:prism_dust','weight':3,'functions':[{'function':'minecraft:set_count','count':{'type':'minecraft:uniform','min':2,'max':4}}]},{'type':'minecraft:item','name':'minecraft:book','weight':2},{'type':'minecraft:item','name':'myfirstmod:memory_shard','weight':1}]}]})
+put(D,'loot_table/entities/veil_wisp.json',{'type':'minecraft:entity','pools':[]})
+put(D,'recipe/tide_lantern.json',{'type':'minecraft:crafting_shapeless','category':'equipment','ingredients':[{'item':'myfirstmod:prism_lamp'},{'item':'myfirstmod:drowned_seal'},{'item':'myfirstmod:resonite_ingot'}],'result':{'id':'myfirstmod:tide_lantern','count':1}})
+put(D,'advancement/recipes/tide_lantern.json',{'criteria':{'seal':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':['myfirstmod:drowned_seal']}]}}},'rewards':{'recipes':['myfirstmod:tide_lantern']}})
+rng=random.Random('veil-wisp');pixels=[]
+for y in range(32):
+    for x in range(32):
+        g=rng.randint(-8,8);c=(0,0,0,0)
+        dx=abs(x-15.5);dy=abs(y-15.5)
+        if dx+dy<5:c=(225+g//2,255,246)
+        elif dx+dy<8:c=(140+g,226+g//2,214)
+        elif (dx<14 and dy<5) or (dy<14 and dx<5):c=(110+g,190+g,200)
+        pixels.append(c if len(c)==4 else c+(255,))
+png('entity/veil_wisp.png',32,32,pixels)
+lang=json.loads((A/'lang/en_us.json').read_text());lang.update({
+ 'block.myfirstmod.brinesilt':'Brinesilt','block.myfirstmod.veilstone':'Veilstone','block.myfirstmod.vent_basalt':'Vent Basalt',
+ 'block.myfirstmod.spire_crystal':'Spire Crystal','block.myfirstmod.oxidized_trim':'Oxidized Trim','block.myfirstmod.tide_bell':'Tide Bell',
+ 'item.myfirstmod.drowned_seal':'Drowned Seal','item.myfirstmod.drowned_seal.tooltip':'Recovered from the drained archive vault. Craft the Tide Lantern with a Prism Lamp and a Resonite Ingot.',
+ 'item.myfirstmod.tide_lantern':'Tide Lantern','item.myfirstmod.tide_lantern.tooltip':'Use: forty seconds of water breathing and twenty seconds of night vision. Ninety-second cooldown. The drowned archive\'s answer to deep water.',
+ 'entity.myfirstmod.veil_wisp':'Veil Wisp',
+ 'archive.myfirstmod.drained':'The tide obeys. %s blocks of water drain from the hall.',
+ 'archive.myfirstmod.dry':'The bell rings over an already dry hall.',
+ 'archive.myfirstmod.once':'The tide obeys only once.',
+ 'archive.myfirstmod.unloaded':'The hall\'s waters lie beyond loaded chunks.'
+});put(A,'lang/en_us.json',lang)
 print('Generated Rootbound Monastery:',len(blocks),'blocks across a 47x47 footprint.')

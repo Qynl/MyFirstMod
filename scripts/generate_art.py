@@ -88,3 +88,17 @@ png('block/void_portal.png',16,256,pixels)
 put(Path('textures/block/void_portal.png.mcmeta'),{'animation':{'frametime':3,'interpolate':True}})
 put(Path('blockstates/void_portal.json'),{'variants':{'axis=x':{'model':'myfirstmod:block/void_portal'},'axis=z':{'model':'myfirstmod:block/void_portal','y':90}}})
 put(Path('models/block/void_portal.json'),{'textures':{'portal':'myfirstmod:block/void_portal','particle':'myfirstmod:block/void_portal'},'elements':[{'from':[0,0,6],'to':[16,16,10],'shade':False,'faces':{f:{'texture':'#portal','uv':[0,0,16,16]} for f in ['north','south','east','west','up','down']}}]})
+
+# --- 2.0 alpha.2: region materials for the four new biomes -------------------------
+def blocktex(name, fn):
+    rng=random.Random('region-'+name);pixels=[]
+    for y in range(16):
+        for x in range(16):
+            pixels.append(fn(x,y,rng)+(255,))
+    png('block/'+name+'.png',16,16,pixels)
+def _n(r,d):return r.randint(-d,d)
+blocktex('brinesilt',lambda x,y,r:(40+_n(r,5),78+_n(r,7),84+_n(r,7)) if (x*3+y*5)%11 else (66,120,124) if (x+y)%7 else (28,54,60))
+blocktex('veilstone',lambda x,y,r:(126+_n(r,7),144+_n(r,7),150+_n(r,7)) if (x*5+y*3)%13 else (96,132,128) if (x+y)%9 else (156,172,178))
+blocktex('vent_basalt',lambda x,y,r:(38+_n(r,3),36+_n(r,3),38+_n(r,3)) if x%4<2 else (26+_n(r,2),24+_n(r,2),26+_n(r,2)) if (x*7+y*13)%29 else (196,96,44))
+blocktex('spire_crystal',lambda x,y,r:(140+_n(r,10),120+_n(r,10),220+_n(r,8)) if (x+y)%5==0 else (190,240,255) if abs(x-y)%8<1 else (86+_n(r,6),74+_n(r,6),140+_n(r,8)))
+blocktex('oxidized_trim',lambda x,y,r:(64+_n(r,6),128+_n(r,8),116+_n(r,8)) if (x+y)%9 else (44+_n(r,4),96+_n(r,6),88+_n(r,6)))

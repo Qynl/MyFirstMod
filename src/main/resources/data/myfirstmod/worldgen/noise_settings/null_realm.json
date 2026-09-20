@@ -50,7 +50,47 @@
           "type": "minecraft:add",
           "argument1": {
             "type": "minecraft:mul",
-            "argument1": 0.8,
+            "argument1": {
+              "type": "minecraft:add",
+              "argument1": 0.8,
+              "argument2": {
+                "type": "minecraft:add",
+                "argument1": {
+                  "type": "minecraft:mul",
+                  "argument1": -0.5,
+                  "argument2": {
+                    "type": "minecraft:range_choice",
+                    "input": {
+                      "type": "minecraft:noise",
+                      "noise": "myfirstmod:climate",
+                      "xz_scale": 1,
+                      "y_scale": 0
+                    },
+                    "min_inclusive": 0.05,
+                    "max_exclusive": 0.35,
+                    "when_in_range": 1,
+                    "when_out_of_range": 0
+                  }
+                },
+                "argument2": {
+                  "type": "minecraft:mul",
+                  "argument1": -0.55,
+                  "argument2": {
+                    "type": "minecraft:range_choice",
+                    "input": {
+                      "type": "minecraft:noise",
+                      "noise": "myfirstmod:climate",
+                      "xz_scale": 1,
+                      "y_scale": 0
+                    },
+                    "min_inclusive": 0.92,
+                    "max_exclusive": 1.01,
+                    "when_in_range": 1,
+                    "when_out_of_range": 0
+                  }
+                }
+              }
+            },
             "argument2": {
               "type": "minecraft:noise",
               "noise": "myfirstmod:basins",
@@ -65,7 +105,31 @@
               "argument1": 0.55,
               "argument2": {
                 "type": "minecraft:mul",
-                "argument1": -1.1,
+                "argument1": {
+                  "type": "minecraft:mul",
+                  "argument1": -1.1,
+                  "argument2": {
+                    "type": "minecraft:add",
+                    "argument1": 1,
+                    "argument2": {
+                      "type": "minecraft:mul",
+                      "argument1": -0.6,
+                      "argument2": {
+                        "type": "minecraft:range_choice",
+                        "input": {
+                          "type": "minecraft:noise",
+                          "noise": "myfirstmod:climate",
+                          "xz_scale": 1,
+                          "y_scale": 0
+                        },
+                        "min_inclusive": 0.92,
+                        "max_exclusive": 1.01,
+                        "when_in_range": 1,
+                        "when_out_of_range": 0
+                      }
+                    }
+                  }
+                },
                 "argument2": {
                   "type": "minecraft:abs",
                   "argument": {
@@ -90,13 +154,136 @@
                 }
               },
               "argument2": {
-                "type": "minecraft:mul",
-                "argument1": 0.23,
+                "type": "minecraft:add",
+                "argument1": {
+                  "type": "minecraft:mul",
+                  "argument1": 0.23,
+                  "argument2": {
+                    "type": "minecraft:noise",
+                    "noise": "myfirstmod:fractures",
+                    "xz_scale": 1,
+                    "y_scale": 0.5
+                  }
+                },
                 "argument2": {
-                  "type": "minecraft:noise",
-                  "noise": "myfirstmod:fractures",
-                  "xz_scale": 1,
-                  "y_scale": 0.5
+                  "type": "minecraft:add",
+                  "argument1": {
+                    "type": "minecraft:add",
+                    "argument1": {
+                      "type": "minecraft:mul",
+                      "argument1": {
+                        "type": "minecraft:range_choice",
+                        "input": {
+                          "type": "minecraft:noise",
+                          "noise": "myfirstmod:climate",
+                          "xz_scale": 1,
+                          "y_scale": 0
+                        },
+                        "min_inclusive": 0.05,
+                        "max_exclusive": 0.35,
+                        "when_in_range": 1,
+                        "when_out_of_range": 0
+                      },
+                      "argument2": {
+                        "type": "minecraft:mul",
+                        "argument1": 0.8,
+                        "argument2": {
+                          "type": "minecraft:add",
+                          "argument1": {
+                            "type": "minecraft:range_choice",
+                            "input": {
+                              "type": "minecraft:noise",
+                              "noise": "myfirstmod:basins",
+                              "xz_scale": 1,
+                              "y_scale": 0
+                            },
+                            "min_inclusive": -1000,
+                            "max_exclusive": -0.4,
+                            "when_in_range": 0,
+                            "when_out_of_range": {
+                              "type": "minecraft:range_choice",
+                              "input": {
+                                "type": "minecraft:noise",
+                                "noise": "myfirstmod:basins",
+                                "xz_scale": 1,
+                                "y_scale": 0
+                              },
+                              "min_inclusive": -0.4,
+                              "max_exclusive": 0.1,
+                              "when_in_range": 0.5,
+                              "when_out_of_range": {
+                                "type": "minecraft:range_choice",
+                                "input": {
+                                  "type": "minecraft:noise",
+                                  "noise": "myfirstmod:basins",
+                                  "xz_scale": 1,
+                                  "y_scale": 0
+                                },
+                                "min_inclusive": 0.1,
+                                "max_exclusive": 0.5,
+                                "when_in_range": 1,
+                                "when_out_of_range": 1.5
+                              }
+                            }
+                          },
+                          "argument2": -0.75
+                        }
+                      }
+                    },
+                    "argument2": {
+                      "type": "minecraft:mul",
+                      "argument1": {
+                        "type": "minecraft:range_choice",
+                        "input": {
+                          "type": "minecraft:noise",
+                          "noise": "myfirstmod:climate",
+                          "xz_scale": 1,
+                          "y_scale": 0
+                        },
+                        "min_inclusive": 0.6,
+                        "max_exclusive": 0.8,
+                        "when_in_range": 1,
+                        "when_out_of_range": 0
+                      },
+                      "argument2": {
+                        "type": "minecraft:mul",
+                        "argument1": 1.2,
+                        "argument2": {
+                          "type": "minecraft:steep"
+                        }
+                      }
+                    }
+                  },
+                  "argument2": {
+                    "type": "minecraft:mul",
+                    "argument1": {
+                      "type": "minecraft:range_choice",
+                      "input": {
+                        "type": "minecraft:noise",
+                        "noise": "myfirstmod:climate",
+                        "xz_scale": 1,
+                        "y_scale": 0
+                      },
+                      "min_inclusive": -0.55,
+                      "max_exclusive": -0.25,
+                      "when_in_range": 1,
+                      "when_out_of_range": 0
+                    },
+                    "argument2": {
+                      "type": "minecraft:add",
+                      "argument1": 0.5,
+                      "argument2": {
+                        "type": "minecraft:mul",
+                        "argument1": 0.35,
+                        "argument2": {
+                          "type": "minecraft:noise",
+                          "noise": "myfirstmod:basins",
+                          "xz_scale": 0.6,
+                          "y_scale": 0
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -163,7 +350,47 @@
                   "type": "minecraft:add",
                   "argument1": {
                     "type": "minecraft:mul",
-                    "argument1": 0.8,
+                    "argument1": {
+                      "type": "minecraft:add",
+                      "argument1": 0.8,
+                      "argument2": {
+                        "type": "minecraft:add",
+                        "argument1": {
+                          "type": "minecraft:mul",
+                          "argument1": -0.5,
+                          "argument2": {
+                            "type": "minecraft:range_choice",
+                            "input": {
+                              "type": "minecraft:noise",
+                              "noise": "myfirstmod:climate",
+                              "xz_scale": 1,
+                              "y_scale": 0
+                            },
+                            "min_inclusive": 0.05,
+                            "max_exclusive": 0.35,
+                            "when_in_range": 1,
+                            "when_out_of_range": 0
+                          }
+                        },
+                        "argument2": {
+                          "type": "minecraft:mul",
+                          "argument1": -0.55,
+                          "argument2": {
+                            "type": "minecraft:range_choice",
+                            "input": {
+                              "type": "minecraft:noise",
+                              "noise": "myfirstmod:climate",
+                              "xz_scale": 1,
+                              "y_scale": 0
+                            },
+                            "min_inclusive": 0.92,
+                            "max_exclusive": 1.01,
+                            "when_in_range": 1,
+                            "when_out_of_range": 0
+                          }
+                        }
+                      }
+                    },
                     "argument2": {
                       "type": "minecraft:noise",
                       "noise": "myfirstmod:basins",
@@ -178,7 +405,31 @@
                       "argument1": 0.55,
                       "argument2": {
                         "type": "minecraft:mul",
-                        "argument1": -1.1,
+                        "argument1": {
+                          "type": "minecraft:mul",
+                          "argument1": -1.1,
+                          "argument2": {
+                            "type": "minecraft:add",
+                            "argument1": 1,
+                            "argument2": {
+                              "type": "minecraft:mul",
+                              "argument1": -0.6,
+                              "argument2": {
+                                "type": "minecraft:range_choice",
+                                "input": {
+                                  "type": "minecraft:noise",
+                                  "noise": "myfirstmod:climate",
+                                  "xz_scale": 1,
+                                  "y_scale": 0
+                                },
+                                "min_inclusive": 0.92,
+                                "max_exclusive": 1.01,
+                                "when_in_range": 1,
+                                "when_out_of_range": 0
+                              }
+                            }
+                          }
+                        },
                         "argument2": {
                           "type": "minecraft:abs",
                           "argument": {
@@ -203,13 +454,136 @@
                         }
                       },
                       "argument2": {
-                        "type": "minecraft:mul",
-                        "argument1": 0.23,
+                        "type": "minecraft:add",
+                        "argument1": {
+                          "type": "minecraft:mul",
+                          "argument1": 0.23,
+                          "argument2": {
+                            "type": "minecraft:noise",
+                            "noise": "myfirstmod:fractures",
+                            "xz_scale": 1,
+                            "y_scale": 0.5
+                          }
+                        },
                         "argument2": {
-                          "type": "minecraft:noise",
-                          "noise": "myfirstmod:fractures",
-                          "xz_scale": 1,
-                          "y_scale": 0.5
+                          "type": "minecraft:add",
+                          "argument1": {
+                            "type": "minecraft:add",
+                            "argument1": {
+                              "type": "minecraft:mul",
+                              "argument1": {
+                                "type": "minecraft:range_choice",
+                                "input": {
+                                  "type": "minecraft:noise",
+                                  "noise": "myfirstmod:climate",
+                                  "xz_scale": 1,
+                                  "y_scale": 0
+                                },
+                                "min_inclusive": 0.05,
+                                "max_exclusive": 0.35,
+                                "when_in_range": 1,
+                                "when_out_of_range": 0
+                              },
+                              "argument2": {
+                                "type": "minecraft:mul",
+                                "argument1": 0.8,
+                                "argument2": {
+                                  "type": "minecraft:add",
+                                  "argument1": {
+                                    "type": "minecraft:range_choice",
+                                    "input": {
+                                      "type": "minecraft:noise",
+                                      "noise": "myfirstmod:basins",
+                                      "xz_scale": 1,
+                                      "y_scale": 0
+                                    },
+                                    "min_inclusive": -1000,
+                                    "max_exclusive": -0.4,
+                                    "when_in_range": 0,
+                                    "when_out_of_range": {
+                                      "type": "minecraft:range_choice",
+                                      "input": {
+                                        "type": "minecraft:noise",
+                                        "noise": "myfirstmod:basins",
+                                        "xz_scale": 1,
+                                        "y_scale": 0
+                                      },
+                                      "min_inclusive": -0.4,
+                                      "max_exclusive": 0.1,
+                                      "when_in_range": 0.5,
+                                      "when_out_of_range": {
+                                        "type": "minecraft:range_choice",
+                                        "input": {
+                                          "type": "minecraft:noise",
+                                          "noise": "myfirstmod:basins",
+                                          "xz_scale": 1,
+                                          "y_scale": 0
+                                        },
+                                        "min_inclusive": 0.1,
+                                        "max_exclusive": 0.5,
+                                        "when_in_range": 1,
+                                        "when_out_of_range": 1.5
+                                      }
+                                    }
+                                  },
+                                  "argument2": -0.75
+                                }
+                              }
+                            },
+                            "argument2": {
+                              "type": "minecraft:mul",
+                              "argument1": {
+                                "type": "minecraft:range_choice",
+                                "input": {
+                                  "type": "minecraft:noise",
+                                  "noise": "myfirstmod:climate",
+                                  "xz_scale": 1,
+                                  "y_scale": 0
+                                },
+                                "min_inclusive": 0.6,
+                                "max_exclusive": 0.8,
+                                "when_in_range": 1,
+                                "when_out_of_range": 0
+                              },
+                              "argument2": {
+                                "type": "minecraft:mul",
+                                "argument1": 1.2,
+                                "argument2": {
+                                  "type": "minecraft:steep"
+                                }
+                              }
+                            }
+                          },
+                          "argument2": {
+                            "type": "minecraft:mul",
+                            "argument1": {
+                              "type": "minecraft:range_choice",
+                              "input": {
+                                "type": "minecraft:noise",
+                                "noise": "myfirstmod:climate",
+                                "xz_scale": 1,
+                                "y_scale": 0
+                              },
+                              "min_inclusive": -0.55,
+                              "max_exclusive": -0.25,
+                              "when_in_range": 1,
+                              "when_out_of_range": 0
+                            },
+                            "argument2": {
+                              "type": "minecraft:add",
+                              "argument1": 0.5,
+                              "argument2": {
+                                "type": "minecraft:mul",
+                                "argument1": 0.35,
+                                "argument2": {
+                                  "type": "minecraft:noise",
+                                  "noise": "myfirstmod:basins",
+                                  "xz_scale": 0.6,
+                                  "y_scale": 0
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -277,7 +651,47 @@
                 "type": "minecraft:add",
                 "argument1": {
                   "type": "minecraft:mul",
-                  "argument1": 0.8,
+                  "argument1": {
+                    "type": "minecraft:add",
+                    "argument1": 0.8,
+                    "argument2": {
+                      "type": "minecraft:add",
+                      "argument1": {
+                        "type": "minecraft:mul",
+                        "argument1": -0.5,
+                        "argument2": {
+                          "type": "minecraft:range_choice",
+                          "input": {
+                            "type": "minecraft:noise",
+                            "noise": "myfirstmod:climate",
+                            "xz_scale": 1,
+                            "y_scale": 0
+                          },
+                          "min_inclusive": 0.05,
+                          "max_exclusive": 0.35,
+                          "when_in_range": 1,
+                          "when_out_of_range": 0
+                        }
+                      },
+                      "argument2": {
+                        "type": "minecraft:mul",
+                        "argument1": -0.55,
+                        "argument2": {
+                          "type": "minecraft:range_choice",
+                          "input": {
+                            "type": "minecraft:noise",
+                            "noise": "myfirstmod:climate",
+                            "xz_scale": 1,
+                            "y_scale": 0
+                          },
+                          "min_inclusive": 0.92,
+                          "max_exclusive": 1.01,
+                          "when_in_range": 1,
+                          "when_out_of_range": 0
+                        }
+                      }
+                    }
+                  },
                   "argument2": {
                     "type": "minecraft:noise",
                     "noise": "myfirstmod:basins",
@@ -292,7 +706,31 @@
                     "argument1": 0.55,
                     "argument2": {
                       "type": "minecraft:mul",
-                      "argument1": -1.1,
+                      "argument1": {
+                        "type": "minecraft:mul",
+                        "argument1": -1.1,
+                        "argument2": {
+                          "type": "minecraft:add",
+                          "argument1": 1,
+                          "argument2": {
+                            "type": "minecraft:mul",
+                            "argument1": -0.6,
+                            "argument2": {
+                              "type": "minecraft:range_choice",
+                              "input": {
+                                "type": "minecraft:noise",
+                                "noise": "myfirstmod:climate",
+                                "xz_scale": 1,
+                                "y_scale": 0
+                              },
+                              "min_inclusive": 0.92,
+                              "max_exclusive": 1.01,
+                              "when_in_range": 1,
+                              "when_out_of_range": 0
+                            }
+                          }
+                        }
+                      },
                       "argument2": {
                         "type": "minecraft:abs",
                         "argument": {
@@ -317,13 +755,136 @@
                       }
                     },
                     "argument2": {
-                      "type": "minecraft:mul",
-                      "argument1": 0.23,
+                      "type": "minecraft:add",
+                      "argument1": {
+                        "type": "minecraft:mul",
+                        "argument1": 0.23,
+                        "argument2": {
+                          "type": "minecraft:noise",
+                          "noise": "myfirstmod:fractures",
+                          "xz_scale": 1,
+                          "y_scale": 0.5
+                        }
+                      },
                       "argument2": {
-                        "type": "minecraft:noise",
-                        "noise": "myfirstmod:fractures",
-                        "xz_scale": 1,
-                        "y_scale": 0.5
+                        "type": "minecraft:add",
+                        "argument1": {
+                          "type": "minecraft:add",
+                          "argument1": {
+                            "type": "minecraft:mul",
+                            "argument1": {
+                              "type": "minecraft:range_choice",
+                              "input": {
+                                "type": "minecraft:noise",
+                                "noise": "myfirstmod:climate",
+                                "xz_scale": 1,
+                                "y_scale": 0
+                              },
+                              "min_inclusive": 0.05,
+                              "max_exclusive": 0.35,
+                              "when_in_range": 1,
+                              "when_out_of_range": 0
+                            },
+                            "argument2": {
+                              "type": "minecraft:mul",
+                              "argument1": 0.8,
+                              "argument2": {
+                                "type": "minecraft:add",
+                                "argument1": {
+                                  "type": "minecraft:range_choice",
+                                  "input": {
+                                    "type": "minecraft:noise",
+                                    "noise": "myfirstmod:basins",
+                                    "xz_scale": 1,
+                                    "y_scale": 0
+                                  },
+                                  "min_inclusive": -1000,
+                                  "max_exclusive": -0.4,
+                                  "when_in_range": 0,
+                                  "when_out_of_range": {
+                                    "type": "minecraft:range_choice",
+                                    "input": {
+                                      "type": "minecraft:noise",
+                                      "noise": "myfirstmod:basins",
+                                      "xz_scale": 1,
+                                      "y_scale": 0
+                                    },
+                                    "min_inclusive": -0.4,
+                                    "max_exclusive": 0.1,
+                                    "when_in_range": 0.5,
+                                    "when_out_of_range": {
+                                      "type": "minecraft:range_choice",
+                                      "input": {
+                                        "type": "minecraft:noise",
+                                        "noise": "myfirstmod:basins",
+                                        "xz_scale": 1,
+                                        "y_scale": 0
+                                      },
+                                      "min_inclusive": 0.1,
+                                      "max_exclusive": 0.5,
+                                      "when_in_range": 1,
+                                      "when_out_of_range": 1.5
+                                    }
+                                  }
+                                },
+                                "argument2": -0.75
+                              }
+                            }
+                          },
+                          "argument2": {
+                            "type": "minecraft:mul",
+                            "argument1": {
+                              "type": "minecraft:range_choice",
+                              "input": {
+                                "type": "minecraft:noise",
+                                "noise": "myfirstmod:climate",
+                                "xz_scale": 1,
+                                "y_scale": 0
+                              },
+                              "min_inclusive": 0.6,
+                              "max_exclusive": 0.8,
+                              "when_in_range": 1,
+                              "when_out_of_range": 0
+                            },
+                            "argument2": {
+                              "type": "minecraft:mul",
+                              "argument1": 1.2,
+                              "argument2": {
+                                "type": "minecraft:steep"
+                              }
+                            }
+                          }
+                        },
+                        "argument2": {
+                          "type": "minecraft:mul",
+                          "argument1": {
+                            "type": "minecraft:range_choice",
+                            "input": {
+                              "type": "minecraft:noise",
+                              "noise": "myfirstmod:climate",
+                              "xz_scale": 1,
+                              "y_scale": 0
+                            },
+                            "min_inclusive": -0.55,
+                            "max_exclusive": -0.25,
+                            "when_in_range": 1,
+                            "when_out_of_range": 0
+                          },
+                          "argument2": {
+                            "type": "minecraft:add",
+                            "argument1": 0.5,
+                            "argument2": {
+                              "type": "minecraft:mul",
+                              "argument1": 0.35,
+                              "argument2": {
+                                "type": "minecraft:noise",
+                                "noise": "myfirstmod:basins",
+                                "xz_scale": 0.6,
+                                "y_scale": 0
+                              }
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -480,6 +1041,106 @@
             "type": "minecraft:block",
             "result_state": {
               "Name": "myfirstmod:lumen_moss"
+            }
+          }
+        }
+      },
+      {
+        "type": "minecraft:condition",
+        "if_true": {
+          "type": "minecraft:biome",
+          "biome_is": [
+            "myfirstmod:drowned_stacks"
+          ]
+        },
+        "then_run": {
+          "type": "minecraft:condition",
+          "if_true": {
+            "type": "minecraft:stone_depth",
+            "offset": 0,
+            "add_surface_depth": false,
+            "secondary_depth_range": 0,
+            "surface_type": "floor"
+          },
+          "then_run": {
+            "type": "minecraft:block",
+            "result_state": {
+              "Name": "myfirstmod:brinesilt"
+            }
+          }
+        }
+      },
+      {
+        "type": "minecraft:condition",
+        "if_true": {
+          "type": "minecraft:biome",
+          "biome_is": [
+            "myfirstmod:veil_highlands"
+          ]
+        },
+        "then_run": {
+          "type": "minecraft:condition",
+          "if_true": {
+            "type": "minecraft:stone_depth",
+            "offset": 0,
+            "add_surface_depth": false,
+            "secondary_depth_range": 0,
+            "surface_type": "floor"
+          },
+          "then_run": {
+            "type": "minecraft:block",
+            "result_state": {
+              "Name": "myfirstmod:veilstone"
+            }
+          }
+        }
+      },
+      {
+        "type": "minecraft:condition",
+        "if_true": {
+          "type": "minecraft:biome",
+          "biome_is": [
+            "myfirstmod:shard_spires"
+          ]
+        },
+        "then_run": {
+          "type": "minecraft:condition",
+          "if_true": {
+            "type": "minecraft:stone_depth",
+            "offset": 0,
+            "add_surface_depth": false,
+            "secondary_depth_range": 0,
+            "surface_type": "floor"
+          },
+          "then_run": {
+            "type": "minecraft:block",
+            "result_state": {
+              "Name": "myfirstmod:prismstone"
+            }
+          }
+        }
+      },
+      {
+        "type": "minecraft:condition",
+        "if_true": {
+          "type": "minecraft:biome",
+          "biome_is": [
+            "myfirstmod:ember_vents"
+          ]
+        },
+        "then_run": {
+          "type": "minecraft:condition",
+          "if_true": {
+            "type": "minecraft:stone_depth",
+            "offset": 0,
+            "add_surface_depth": false,
+            "secondary_depth_range": 0,
+            "surface_type": "floor"
+          },
+          "then_run": {
+            "type": "minecraft:block",
+            "result_state": {
+              "Name": "myfirstmod:vent_basalt"
             }
           }
         }

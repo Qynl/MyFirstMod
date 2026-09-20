@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "seal": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:drowned_seal"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "myfirstmod:tide_lantern"
+    ]
+  }
+}

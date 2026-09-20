@@ -29,6 +29,8 @@ public class MyFirstModClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.GraveRegentRenderer.LAYER,dev.qynl.myfirstmod.client.model.GraveRegentModel::data);
         EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.RootboundPriorRenderer.LAYER,dev.qynl.myfirstmod.client.model.RootboundPriorModel::data);
         EntityRendererRegistry.register(ModEntities.ROOTBOUND_PRIOR,dev.qynl.myfirstmod.client.render.RootboundPriorRenderer::new);
+        EntityModelLayerRegistry.registerModelLayer(dev.qynl.myfirstmod.client.render.VeilWispRenderer.LAYER,dev.qynl.myfirstmod.client.model.VeilWispModel::data);
+        EntityRendererRegistry.register(ModEntities.VEIL_WISP,dev.qynl.myfirstmod.client.render.VeilWispRenderer::new);
         EntityRendererRegistry.register(ModEntities.GRAVE_REGENT,dev.qynl.myfirstmod.client.render.GraveRegentRenderer::new);
         EntityRendererRegistry.register(ModEntities.NULL_WARDEN, NullWardenRenderer::new);
         EntityRendererRegistry.register(ModEntities.RIFT_SENTINEL, dev.qynl.myfirstmod.client.render.RiftSentinelRenderer::new);

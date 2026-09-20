@@ -1,0 +1,19 @@
+{
+  "feature": "myfirstmod:drowned_archive",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 34
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:heightmap",
+      "heightmap": "WORLD_SURFACE_WG"
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

@@ -53,6 +53,8 @@ public final class ExpeditionJournal {
         page(pages,"journal.myfirstmod.ledger");
         page(pages,"journal.myfirstmod.gate");
         page(pages,"journal.myfirstmod.monastery");
+        page(pages,"journal.myfirstmod.regions");
+        page(pages,"journal.myfirstmod.seals");
         page(pages,"journal.myfirstmod.keep",record.keepClears);
         page(pages,"journal.myfirstmod.regent");
         page(pages,"journal.myfirstmod.pilgrimage");

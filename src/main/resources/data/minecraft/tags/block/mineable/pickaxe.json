@@ -1,15 +1,20 @@
 {
   "replace": false,
   "values": [
-    "myfirstmod:nullstone",
-    "myfirstmod:polished_nullstone",
-    "myfirstmod:nullstone_bricks",
-    "myfirstmod:resonite_ore",
-    "myfirstmod:prism_ore",
+    "myfirstmod:brinesilt",
     "myfirstmod:cinder_ore",
-    "myfirstmod:resonite_block",
+    "myfirstmod:cinderstone",
+    "myfirstmod:nullstone",
+    "myfirstmod:nullstone_bricks",
+    "myfirstmod:oxidized_trim",
+    "myfirstmod:polished_nullstone",
     "myfirstmod:prism_lamp",
+    "myfirstmod:prism_ore",
     "myfirstmod:prismstone",
-    "myfirstmod:cinderstone"
+    "myfirstmod:resonite_block",
+    "myfirstmod:resonite_ore",
+    "myfirstmod:spire_crystal",
+    "myfirstmod:veilstone",
+    "myfirstmod:vent_basalt"
   ]
 }

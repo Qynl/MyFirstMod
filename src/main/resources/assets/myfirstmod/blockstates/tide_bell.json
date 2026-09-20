@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "drained=false": {
+      "model": "myfirstmod:block/tide_bell"
+    },
+    "drained=true": {
+      "model": "myfirstmod:block/tide_bell_drained"
+    }
+  }
+}
