@@ -27,26 +27,18 @@ jobs:
 
       - name: Build Mod with Gradle
         run: |
-          gradle build remapJar --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
-          echo "### Gradle Build Output" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat gradle-build.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "### Built Files" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          find build -type f >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          gradle remapJar --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
+          echo "=== BUILD LOG ==="
+          cat gradle-build.log
+          echo "=== DIRECTORY STRUCTURE ==="
+          ls -laR build || true
           if [ "$BUILD_FAILED" = "1" ]; then
-            while IFS= read -r line; do
-              echo "::error title=Build Failure::$line"
-            done < <(grep -E "(error:|FAILURE:|FAILURE: Build failed|\> Compilation failed|\> Could not resolve|cannot find symbol|package .* does not exist)" gradle-build.log | head -n 40)
             exit 1
           fi
 
       - name: Upload Mod JAR Artifact
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: LegionsAndFactions-1.21.1
-          path: build/libs/
-          if-no-files-found: warn
+          path: build/libs/*.jar
+          if-no-files-found: ignore
