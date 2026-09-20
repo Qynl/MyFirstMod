@@ -30,6 +30,8 @@ The same library is also fully addressable from the server command layer, which 
 /unit set royal_guard role melee
 /unit equip royal_guard mainhand minecraft:iron_sword
 /unit equip royal_guard offhand minecraft:shield
+/unit inventory royal_guard minecraft:bread 16
+/unit set royal_guard retreat 0.20
 /unit faction create kingdom Kingdom of Eldoria
 /unit set royal_guard faction kingdom
 /unit faction create raiders Iron Raiders

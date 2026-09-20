@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,13 +23,13 @@ public final class UnitSystem {
         if (!mob.isAlive()) return; LivingEntity target = mob.getTarget(); if (!valid(server, unit, mob, target)) {
             target = world.getEntitiesByClass(LivingEntity.class, mob.getBoundingBox().expand(unit.followRange), e -> e != mob && valid(server, unit, mob, e)).stream().min((a,b)->Double.compare(mob.squaredDistanceTo(a),mob.squaredDistanceTo(b))).orElse(null); mob.setTarget(target);
         }
-        if(target!=null){ double distance=mob.squaredDistanceTo(target); if(unit.role.equalsIgnoreCase("ranged")){ if(distance<64) mob.getNavigation().startMovingTo(target.getX(),target.getY(),target.getZ(),0.8); else if(distance>256) mob.getNavigation().startMovingTo(target,1.0); } else if(distance>4.0) mob.getNavigation().startMovingTo(target,1.0); else if(mob.age%10==0) mob.tryAttack(target); }
+        if(target!=null){ if(unit.retreatHealth > 0 && mob.getHealth() <= mob.getMaxHealth() * unit.retreatHealth){ double dx=mob.getX()-target.getX(), dz=mob.getZ()-target.getZ(); mob.getNavigation().startMovingTo(mob.getX()+dx*4, mob.getY(), mob.getZ()+dz*4, 1.15); return; } double distance=mob.squaredDistanceTo(target); if(unit.role.equalsIgnoreCase("ranged")){ if(distance<64) mob.getNavigation().startMovingTo(target.getX(),target.getY(),target.getZ(),0.8); else if(distance>256) mob.getNavigation().startMovingTo(target,1.0); } else if(distance>4.0) mob.getNavigation().startMovingTo(target,1.0); else if(mob.age%10==0) mob.tryAttack(target); }
     }
     private static boolean valid(MinecraftServer server, UnitDefinition unit, MobEntity self, LivingEntity target) {
         if(target==null||!target.isAlive()||target.isSpectator())return false; if(target instanceof PlayerEntity && !unit.attackPlayers)return false;
         String mine=tagValue(self,"faction:"); String theirs=tagValue(target,"faction:"); if(mine!=null&&mine.equals(theirs))return false;
-        if(theirs!=null){ Faction f=UnitWorldData.get(server).factions.get(mine); if(f!=null&&f.relations.getOrDefault(theirs,Faction.Relation.NEUTRAL)!=Faction.Relation.HOSTILE)return false; }
-        return unit.attackHostile || theirs!=null;
+        if(theirs!=null){ Faction f=UnitWorldData.get(server).factions.get(mine); if(f!=null&&f.relations.getOrDefault(theirs,Faction.Relation.NEUTRAL)!=Faction.Relation.HOSTILE)return false; return true; }
+        return unit.attackHostile && target instanceof HostileEntity;
     }
     private static String tagValue(net.minecraft.entity.Entity e,String prefix){ return e.getCommandTags().stream().filter(s->s.startsWith(prefix)).map(s->s.substring(prefix.length())).findFirst().orElse(null); }
     public static boolean spawn(ServerPlayerEntity player, UnitDefinition unit) {

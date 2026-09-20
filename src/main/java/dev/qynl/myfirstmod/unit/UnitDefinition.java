@@ -12,6 +12,9 @@ import net.minecraft.util.Identifier;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.entity.InventoryOwner;
 
 /** A data-only unit template. It intentionally contains no entity instances. */
 public final class UnitDefinition {
@@ -33,6 +36,7 @@ public final class UnitDefinition {
     public boolean attackPlayers = false;
     public float retreatHealth = 0.0f;
     public final Map<EquipmentSlot, ItemStack> equipment = new LinkedHashMap<>();
+    public final ArrayList<ItemStack> inventory = new ArrayList<>();
 
     public UnitDefinition(String id, String name, Identifier entityId) { this.id = id; this.name = name; this.entityId = entityId; }
     public UnitDefinition(NbtCompound nbt) {
@@ -41,16 +45,18 @@ public final class UnitDefinition {
         maxHealth = nbt.getFloat("health"); movementSpeed = nbt.getFloat("speed"); attackDamage = nbt.getFloat("damage"); followRange = nbt.getFloat("range"); armor = nbt.getFloat("armor"); armorToughness = nbt.getFloat("toughness"); knockbackResistance = nbt.getFloat("knockback"); role = nbt.getString("role");
         attackHostile = nbt.getBoolean("attack_hostile"); protectAllies = nbt.getBoolean("protect_allies"); attackPlayers = nbt.getBoolean("attack_players"); retreatHealth = nbt.getFloat("retreat");
         for (EquipmentSlot slot : EquipmentSlot.values()) if (nbt.contains("item_" + slot.getName())) equipment.put(slot, ItemStack.fromNbtOrEmpty(Registries.ITEM.getReadOnlyWrapper(), nbt.getCompound("item_" + slot.getName())));
+        var list=nbt.getList("inventory",10); for(int i=0;i<list.size();i++) inventory.add(ItemStack.fromNbtOrEmpty(Registries.ITEM.getReadOnlyWrapper(),list.getCompound(i)));
     }
     public NbtCompound toNbt() {
         NbtCompound n = new NbtCompound(); n.putString("id", id); n.putString("name", name); n.putString("description", description == null ? "" : description); n.putString("entity", entityId.toString()); n.putString("faction", factionId);
         n.putFloat("health", maxHealth); n.putFloat("speed", movementSpeed); n.putFloat("damage", attackDamage); n.putFloat("range", followRange); n.putFloat("armor", armor); n.putFloat("toughness", armorToughness); n.putFloat("knockback", knockbackResistance); n.putString("role", role); n.putBoolean("attack_hostile", attackHostile); n.putBoolean("protect_allies", protectAllies); n.putBoolean("attack_players", attackPlayers); n.putFloat("retreat", retreatHealth);
-        for (var e : equipment.entrySet()) n.put("item_" + e.getKey().getName(), e.getValue().encode(Registries.ITEM.getReadOnlyWrapper())); return n;
+        for (var e : equipment.entrySet()) n.put("item_" + e.getKey().getName(), e.getValue().encode(Registries.ITEM.getReadOnlyWrapper())); var list=new net.minecraft.nbt.NbtList(); for(var stack:inventory) list.add(stack.encode(Registries.ITEM.getReadOnlyWrapper())); n.put("inventory",list); return n;
     }
     public void apply(LivingEntity entity) {
         set(EntityAttributes.MAX_HEALTH, maxHealth, entity); set(EntityAttributes.MOVEMENT_SPEED, movementSpeed, entity); set(EntityAttributes.ATTACK_DAMAGE, attackDamage, entity); set(EntityAttributes.FOLLOW_RANGE, followRange, entity); set(EntityAttributes.ARMOR, armor, entity); set(EntityAttributes.ARMOR_TOUGHNESS, armorToughness, entity); set(EntityAttributes.KNOCKBACK_RESISTANCE, knockbackResistance, entity);
         entity.setHealth(Math.min(maxHealth, entity.getMaxHealth()));
         for (var e : equipment.entrySet()) entity.equipStack(e.getKey(), e.getValue().copy());
+        if(entity instanceof InventoryOwner owner){ Inventory inv=owner.getInventory(); for(int i=0;i<inventory.size() && i<inv.size();i++) inv.setStack(i,inventory.get(i).copy()); }
     }
     private static void set(net.minecraft.registry.entry.RegistryEntry<EntityAttribute> attribute, double value, LivingEntity entity) { var instance = entity.getAttributeInstance(attribute); if (instance != null) instance.setBaseValue(Math.max(0.01, value)); }
 }
