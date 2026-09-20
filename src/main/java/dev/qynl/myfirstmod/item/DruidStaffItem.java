@@ -60,7 +60,7 @@ public class DruidStaffItem extends Item {
             }
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_GRASS_PLACE, SoundCategory.PLAYERS, 1.5f, 0.8f);
+                    SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 1.5f, 0.8f);
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.3f);
 
