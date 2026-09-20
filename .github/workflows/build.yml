@@ -27,11 +27,11 @@ jobs:
 
       - name: Build Mod with Gradle
         run: |
-          gradle remapJar --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
+          gradle remapJar build --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
           echo "=== BUILD LOG ==="
           cat gradle-build.log
-          echo "=== DIRECTORY STRUCTURE ==="
-          ls -laR build || true
+          echo "=== ALL JAR FILES ==="
+          find . -name "*.jar"
           if [ "$BUILD_FAILED" = "1" ]; then
             exit 1
           fi
@@ -41,4 +41,3 @@ jobs:
         with:
           name: LegionsAndFactions-1.21.1
           path: build/libs/*.jar
-          if-no-files-found: ignore
