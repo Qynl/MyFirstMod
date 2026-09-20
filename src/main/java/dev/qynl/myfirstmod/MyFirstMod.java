@@ -33,11 +33,17 @@ public final class MyFirstMod implements ModInitializer {
             entries.add(ModItems.UNIT_CREATOR);
             entries.add(ModItems.COMMANDER_HORN);
             entries.add(ModItems.FACTION_BANNER);
+            entries.add(ModItems.FACTION_SCEPTER);
+            entries.add(ModItems.TACTICAL_WHISTLE);
+            entries.add(ModItems.REINFORCEMENT_BEACON);
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.add(ModItems.UNIT_CREATOR);
             entries.add(ModItems.COMMANDER_HORN);
             entries.add(ModItems.FACTION_BANNER);
+            entries.add(ModItems.FACTION_SCEPTER);
+            entries.add(ModItems.TACTICAL_WHISTLE);
+            entries.add(ModItems.REINFORCEMENT_BEACON);
         });
 
         // Left-click on block with Creator Tool -> spawn unit / squad

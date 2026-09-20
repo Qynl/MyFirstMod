@@ -3,6 +3,8 @@
   "item.myfirstmod.commander_horn": "Commander's War Horn",
   "item.myfirstmod.faction_banner": "Faction Outpost Standard",
   "item.myfirstmod.faction_scepter": "Faction Commander's Scepter",
+  "item.myfirstmod.tactical_whistle": "Tactical Formation Whistle",
+  "item.myfirstmod.reinforcement_beacon": "Reinforcement Drop Beacon",
   "itemGroup.myfirstmod.units": "Unit & Faction Sandbox",
   "screen.myfirstmod.creator": "Unit & Faction Sandbox",
 
@@ -32,5 +34,8 @@
   "role.myfirstmod.necromancer": "Dark Necromancer",
   "role.myfirstmod.berserker": "Raging Berserker",
   "role.myfirstmod.bard": "Battlefield Bard",
+  "role.myfirstmod.bombardier": "Siege Bombardier",
+  "role.myfirstmod.druid": "Nature Druid",
+  "role.myfirstmod.paladin": "Holy Paladin",
   "role.myfirstmod.support": "Combat Support"
 }

@@ -1,6 +1,7 @@
 package dev.qynl.myfirstmod.item;
 
 import dev.qynl.myfirstmod.faction.Faction;
+import dev.qynl.myfirstmod.territory.TerritoryManager;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -45,6 +46,7 @@ public class FactionBannerItem extends Item {
 
             if (world.isAir(pos) || world.getBlockState(pos).isReplaceable()) {
                 world.setBlockState(pos, Blocks.BLUE_BANNER.getDefaultState(), Block.NOTIFY_ALL);
+                TerritoryManager.registerOutpost(factionId, pos);
 
                 world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 20, 0.5, 0.8, 0.5, 0.05);
                 world.spawnParticles(ParticleTypes.PORTAL, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 15, 0.4, 0.4, 0.4, 0.1);

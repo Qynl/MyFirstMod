@@ -31,6 +31,18 @@ public final class ModItems {
             new FactionScepterItem(new Item.Settings().maxCount(1))
     );
 
+    public static final Item TACTICAL_WHISTLE = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "tactical_whistle"),
+            new TacticalWhistleItem(new Item.Settings().maxCount(1))
+    );
+
+    public static final Item REINFORCEMENT_BEACON = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "reinforcement_beacon"),
+            new ReinforcementBeaconItem(new Item.Settings().maxCount(1))
+    );
+
     private ModItems() {}
 
     public static void register() {}

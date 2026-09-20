@@ -4,6 +4,7 @@ import dev.qynl.myfirstmod.faction.Faction;
 import dev.qynl.myfirstmod.faction.FactionManager;
 import dev.qynl.myfirstmod.faction.FactionPerk;
 import dev.qynl.myfirstmod.faction.FactionRelation;
+import dev.qynl.myfirstmod.territory.TerritoryManager;
 import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import dev.qynl.myfirstmod.unit.UnitSpawner;
@@ -66,6 +67,9 @@ public final class UnitSystem {
             mob.extinguish();
         }
 
+        // Territory check for home turf buffs
+        TerritoryManager.checkTerritory(world, mob);
+
         // Apply passive faction perks
         if (FactionManager.hasPerk(server, factionId, FactionPerk.REGENERATION) && mob.age % 40 == 0) {
             mob.heal(1.0f);
@@ -96,6 +100,10 @@ public final class UnitSystem {
 
         if (role.equals("tank")) {
             TankAI.executeTank(world, mob, unit);
+        }
+
+        if (role.equals("druid") || role.equals("nature")) {
+            DruidAI.executeDruid(world, mob, unit);
         }
 
         if (role.equals("necromancer") || FactionManager.hasPerk(server, factionId, FactionPerk.NECROMANCY)) {
@@ -149,8 +157,19 @@ public final class UnitSystem {
             }
 
             // Fireworks artillery
-            if (data.fireworksEnabled && (role.equals("pyrotechnic") || role.equals("artillery") || unit.canShootFireworks)) {
+            if (data.fireworksEnabled && (role.equals("pyrotechnic") || unit.canShootFireworks)) {
                 FireworksArtilleryAI.executeArtillery(world, mob, target, unit);
+            }
+
+            // Siege bombardier
+            if (role.equals("bombardier") || role.equals("artillery")) {
+                BombardierAI.executeBombardier(world, mob, target, unit);
+            }
+
+            // Paladin holy smite
+            if (role.equals("paladin") || role.equals("crusader")) {
+                PaladinAI.executePaladin(world, mob, target, unit);
+                return;
             }
 
             // Ranged or Melee attack

@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "myfirstmod:item/tactical_whistle"
+  }
+}
