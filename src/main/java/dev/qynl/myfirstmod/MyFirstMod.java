@@ -6,11 +6,13 @@ import dev.qynl.myfirstmod.faction.FactionManager;
 import dev.qynl.myfirstmod.gui.ModScreenHandlers;
 import dev.qynl.myfirstmod.item.ModItems;
 import dev.qynl.myfirstmod.item.UnitCreatorItem;
+import dev.qynl.myfirstmod.unit.UnitInspector;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
@@ -26,9 +28,17 @@ public final class MyFirstMod implements ModInitializer {
         UnitCommands.register();
         UnitSystem.register();
 
-        // Add creator tool to Tools & Combat item groups
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(ModItems.UNIT_CREATOR));
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> entries.add(ModItems.UNIT_CREATOR));
+        // Add creator tool and tactical gear to Creative tabs
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> {
+            entries.add(ModItems.UNIT_CREATOR);
+            entries.add(ModItems.COMMANDER_HORN);
+            entries.add(ModItems.FACTION_BANNER);
+        });
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
+            entries.add(ModItems.UNIT_CREATOR);
+            entries.add(ModItems.COMMANDER_HORN);
+            entries.add(ModItems.FACTION_BANNER);
+        });
 
         // Left-click on block with Creator Tool -> spawn unit / squad
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {

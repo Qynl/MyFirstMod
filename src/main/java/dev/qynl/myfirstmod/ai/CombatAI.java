@@ -34,7 +34,7 @@ public final class CombatAI {
         // Within melee reach: look at target and attack
         mob.getLookControl().lookAt(target, 30.0f, 30.0f);
 
-        // Attack cooldown check (every 10-15 ticks depending on attack speed)
+        // Attack cooldown check
         int attackRate = Math.max(8, (int)(20.0f / Math.max(1.0f, unit.attackSpeed)));
         if (mob.age % attackRate == 0) {
             mob.swingHand(Hand.MAIN_HAND);
@@ -73,6 +73,7 @@ public final class CombatAI {
                 if (targetWasAlive && !target.isAlive()) {
                     if (attackerFaction != null) stats.recordKill(attackerFaction);
                     if (victimFaction != null) stats.recordDeath(victimFaction);
+                    VeteranProgression.recordKillForUnit(world, mob);
                 }
             }
         }

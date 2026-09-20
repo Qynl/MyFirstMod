@@ -1,5 +1,7 @@
 {
   "item.myfirstmod.unit_creator": "Unit Creator",
+  "item.myfirstmod.commander_horn": "Commander's War Horn",
+  "item.myfirstmod.faction_banner": "Faction Outpost Standard",
   "itemGroup.myfirstmod.units": "Unit & Faction Sandbox",
   "screen.myfirstmod.creator": "Unit & Faction Sandbox",
 
@@ -21,5 +23,6 @@
   "role.myfirstmod.engineer": "Combat Engineer",
   "role.myfirstmod.tank": "Heavy Tank",
   "role.myfirstmod.assassin": "Flanking Assassin",
+  "role.myfirstmod.scout": "Recon Scout",
   "role.myfirstmod.support": "Combat Support"
 }

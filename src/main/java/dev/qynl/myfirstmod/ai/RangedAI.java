@@ -1,5 +1,6 @@
 package dev.qynl.myfirstmod.ai;
 
+import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;

@@ -16,6 +16,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.Undead;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
@@ -56,6 +57,11 @@ public final class UnitSystem {
 
         String factionId = unit.factionId;
 
+        // Prevent custom undead units from catching fire in sunlight
+        if (mob.isOnFire() && world.isDay() && mob.isUndead()) {
+            mob.extinguish();
+        }
+
         // Apply passive faction perks
         if (FactionManager.hasPerk(server, factionId, FactionPerk.REGENERATION) && mob.age % 40 == 0) {
             mob.heal(1.0f);
@@ -69,8 +75,23 @@ public final class UnitSystem {
         }
 
         // Role-specific routines
-        if (unit.healAllies && (unit.role.equalsIgnoreCase("medic") || unit.role.equalsIgnoreCase("support") || unit.role.equalsIgnoreCase("healer"))) {
+        String role = unit.role.toLowerCase();
+
+        if (unit.healAllies && (role.equals("medic") || role.equals("support") || role.equals("healer"))) {
             HealerMedicAI.executeHealer(world, mob, unit);
+        }
+
+        if (role.equals("assassin")) {
+            AssassinAI.executeAssassin(world, mob, unit);
+            return;
+        }
+
+        if (role.equals("scout")) {
+            ScoutAI.executeScout(world, mob, unit);
+        }
+
+        if (role.equals("tank")) {
+            TankAI.executeTank(world, mob, unit);
         }
 
         if (unit.commander) {
@@ -102,22 +123,22 @@ public final class UnitSystem {
             }
 
             // Engineer building
-            if (data.buildingEnabled && (unit.role.equalsIgnoreCase("engineer") || unit.canBuild)) {
+            if (data.buildingEnabled && (role.equals("engineer") || unit.canBuild)) {
                 EngineerBuildingAI.executeBuilding(world, mob, target, unit);
             }
 
             // Throwable potions
-            if (data.potionsEnabled && (unit.role.equalsIgnoreCase("support") || unit.role.equalsIgnoreCase("alchemist") || unit.canThrowPotions)) {
+            if (data.potionsEnabled && (role.equals("support") || role.equals("alchemist") || unit.canThrowPotions)) {
                 ThrowablePotionAI.executePotionThrowing(world, mob, target, unit);
             }
 
             // Fireworks artillery
-            if (data.fireworksEnabled && (unit.role.equalsIgnoreCase("pyrotechnic") || unit.role.equalsIgnoreCase("artillery") || unit.canShootFireworks)) {
+            if (data.fireworksEnabled && (role.equals("pyrotechnic") || role.equals("artillery") || unit.canShootFireworks)) {
                 FireworksArtilleryAI.executeArtillery(world, mob, target, unit);
             }
 
             // Ranged or Melee attack
-            if (unit.role.equalsIgnoreCase("ranged") || mob.getMainHandStack().isOf(Items.BOW) || mob.getMainHandStack().isOf(Items.CROSSBOW)) {
+            if (role.equals("ranged") || mob.getMainHandStack().isOf(Items.BOW) || mob.getMainHandStack().isOf(Items.CROSSBOW)) {
                 RangedAI.executeRanged(world, mob, target, unit);
             } else {
                 CombatAI.executeMelee(world, mob, target, unit);

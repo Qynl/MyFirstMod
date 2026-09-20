@@ -105,6 +105,7 @@ public final class FireworksArtilleryAI {
                     if (shooterFaction != null) stats.recordKill(shooterFaction);
                     String vFaction = UnitSystem.getTagValue(enemy, "faction:");
                     if (vFaction != null) stats.recordDeath(vFaction);
+                    VeteranProgression.recordKillForUnit(world, shooter);
                 }
             }
         }

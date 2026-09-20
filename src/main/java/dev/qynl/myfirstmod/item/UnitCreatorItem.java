@@ -1,11 +1,14 @@
 package dev.qynl.myfirstmod.item;
 
+import dev.qynl.myfirstmod.ai.UnitSystem;
 import dev.qynl.myfirstmod.faction.Faction;
 import dev.qynl.myfirstmod.gui.CreatorScreenHandler;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
+import dev.qynl.myfirstmod.unit.UnitInspector;
 import dev.qynl.myfirstmod.unit.UnitSpawner;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -66,6 +69,17 @@ public class UnitCreatorItem extends Item {
         return TypedActionResult.success(stack, world.isClient());
     }
 
+    @Override
+    public ActionResult useOnEntity(ItemStack stack, PlayerEntity player, LivingEntity entity, Hand hand) {
+        if (!player.getWorld().isClient && player instanceof ServerPlayerEntity serverPlayer) {
+            if (UnitSystem.getTagValue(entity, "unit:") != null) {
+                UnitInspector.inspectUnit(serverPlayer, entity);
+                return ActionResult.SUCCESS;
+            }
+        }
+        return ActionResult.PASS;
+    }
+
     public static boolean spawnEquipped(ServerPlayerEntity player) {
         if (player.getServer() == null) return false;
         UnitWorldData data = UnitWorldData.get(player.getServer());
@@ -96,6 +110,7 @@ public class UnitCreatorItem extends Item {
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         tooltip.add(Text.literal("Unit & Faction Sandbox Tool").formatted(Formatting.GOLD, Formatting.BOLD));
         tooltip.add(Text.literal("Right-Click: ").formatted(Formatting.YELLOW).append(Text.literal("Open Creator Dashboard").formatted(Formatting.GRAY)));
+        tooltip.add(Text.literal("Right-Click Unit: ").formatted(Formatting.YELLOW).append(Text.literal("Inspect Unit Dossier").formatted(Formatting.GRAY)));
         tooltip.add(Text.literal("Left-Click: ").formatted(Formatting.YELLOW).append(Text.literal("Spawn Equipped Unit").formatted(Formatting.GRAY)));
         tooltip.add(Text.literal("Shift + Right-Click: ").formatted(Formatting.YELLOW).append(Text.literal("Quick-Cycle Unit").formatted(Formatting.GRAY)));
         tooltip.add(Text.literal("Shift + Left-Click: ").formatted(Formatting.YELLOW).append(Text.literal("Spawn Squad (5 Units)").formatted(Formatting.GRAY)));
