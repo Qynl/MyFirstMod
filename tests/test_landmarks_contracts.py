@@ -38,8 +38,10 @@ class LandmarkTests(unittest.TestCase):
         for table in LOOT.values():
             self.assertIn('"'+table+'"',source)
         self.assertIn('"chests/"+table',source)
-        self.assertIn('spawner(w,s.add(-3,0,-3),"minecraft:drowned")',source)
-        self.assertIn('spawner(w,s.add(0,-2,2),"myfirstmod:rift_sentinel")',source)
+        self.assertIn('spawner(w,s.add(-3,0,-3),"minecraft:drowned",brineKeeper())',source)
+        self.assertIn('spawner(w,s.add(0,-2,2),"myfirstmod:rift_sentinel",fissureWarden())',source)
+        self.assertIn('static NbtCompound brineKeeper()',source)
+        self.assertIn('static NbtCompound fissureWarden()',source)
         self.assertIn('static boolean reserved(int cx,int cz)',source)
         self.assertIn('KingdomLandmarks.register();',(SRC/'realm/RealmFeatures.java').read_text())
     def test_journal_landmarks_page(self):
