@@ -23,6 +23,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -126,6 +127,11 @@ public class TacticalWhistleItem extends Item {
                         double angle = (2 * Math.PI * i) / Math.max(1, count);
                         targetSlot = playerPos.add(Math.cos(angle) * (6.0 + (i % 3) * 2.0), 0, Math.sin(angle) * (6.0 + (i % 3) * 2.0));
                     }
+                }
+
+                int topY = serverWorld.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(targetSlot.x), (int) Math.floor(targetSlot.z));
+                if (Math.abs(topY - targetSlot.y) < 10.0) {
+                    targetSlot = new Vec3d(targetSlot.x, topY, targetSlot.z);
                 }
 
                 troop.getNavigation().startMovingTo(targetSlot.x, targetSlot.y, targetSlot.z, 1.35);

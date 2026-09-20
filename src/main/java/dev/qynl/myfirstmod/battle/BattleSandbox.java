@@ -19,6 +19,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Heightmap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +103,11 @@ public final class BattleSandbox {
             double offsetZ = (col - (cols / 2.0)) * 2.2;
 
             Vec3d spawnPos = basePos.add(offsetX, 0, offsetZ);
+            int topY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, (int) Math.floor(spawnPos.x), (int) Math.floor(spawnPos.z));
+            if (Math.abs(topY - spawnPos.y) < 15.0) {
+                spawnPos = new Vec3d(spawnPos.x, topY, spawnPos.z);
+            }
+
             LivingEntity entity = UnitSpawner.spawn(world, template, spawnPos, yaw);
             if (entity != null) {
                 entity.getCommandTags().add("battle_mob");

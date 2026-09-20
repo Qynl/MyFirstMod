@@ -112,7 +112,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             searchField = new TextFieldWidget(textRenderer, leftX, y + 36, 220, 20, Text.literal("Search"));
-            searchField.setPlaceholder(Text.literal("Search saved units (name/role/entity)..."));
+            searchField.setPlaceholder(Text.literal("Search units (knight, archer, titan, paladin)..."));
             addDrawableChild(searchField);
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn Equipped"), b -> sendButton(1))
@@ -261,30 +261,37 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             int cardY = y + 62;
             String q = searchField == null ? "" : searchField.getText().toLowerCase();
+            int cardsDrawn = 0;
 
-            if (matches(q, "royal knight villager melee tank")) {
-                drawUnitCard(context, leftX, cardY, "Royal Knight", "VILLAGER • MELEE TANK • 40 HP • 7.5 DMG", 0xff3b82f6);
-                cardY += 34;
-            }
-            if (matches(q, "royal archer skeleton ranged")) {
-                drawUnitCard(context, leftX, cardY, "Royal Archer", "SKELETON • RANGED • 24 HP • 5.0 DMG", 0xffeab308);
-                cardY += 34;
-            }
-            if (matches(q, "field medic villager healer support potion")) {
-                drawUnitCard(context, leftX, cardY, "Field Medic", "VILLAGER • HEALER/MEDIC • 28 HP • SPLASH POTIONS", 0xff10b981);
-                cardY += 34;
-            }
-            if (matches(q, "royal pyro pillager fireworks artillery explosive")) {
-                drawUnitCard(context, leftX, cardY, "Royal Pyrotechnic", "PILLAGER • FIREWORKS ARTILLERY • 30 HP", 0xffef4444);
-                cardY += 34;
-            }
-            if (matches(q, "undead necromancer evoker summoner")) {
-                drawUnitCard(context, leftX, cardY, "Undead Necromancer", "EVOKER • DARK NECROMANCER • 45 HP", 0xff8b5cf6);
-                cardY += 34;
-            }
-            if (matches(q, "combat engineer villager barricade builder")) {
-                drawUnitCard(context, leftX, cardY, "Combat Engineer", "VILLAGER • BARRICADE BUILDER • 32 HP", 0xff06b6d4);
-                cardY += 34;
+            String[][] allUnits = {
+                    {"Royal Knight", "VILLAGER • MELEE TANK • 40 HP • 7.5 DMG", "0xff3b82f6", "royal knight villager melee tank"},
+                    {"Royal Heavy Cavalry", "HORSE • MOUNTED KNIGHT • 45 HP • 9.0 DMG", "0xff3b82f6", "royal cavalry horse mount"},
+                    {"Royal Archer", "SKELETON • RANGED • 24 HP • 5.0 DMG", "0xff38bdf8", "royal archer skeleton ranged"},
+                    {"Field Medic", "VILLAGER • HEALER • 28 HP • POTIONS", "0xff10b981", "field medic villager healer support potion"},
+                    {"Holy Paladin Crusader", "PALADIN • SMITE & ABSORPTION • 55 HP", "0xfffacc15", "holy paladin crusader mace sunforge"},
+                    {"Colossal Iron Titan", "IRON GOLEM • 1.35x SCALE • 150 HP • 16 DMG", "0xff10b981", "colossal iron titan golem tank warlord"},
+                    {"Grove Druid", "VILLAGER • ROOT SNARE & NATURE • 32 HP", "0xff22c55e", "grove druid nature roots wolf"},
+                    {"Royal Pyrotechnic", "PILLAGER • FIREWORKS ARTILLERY • 30 HP", "0xffef4444", "royal pyro pillager fireworks artillery explosive"},
+                    {"Siege Bombardier", "PIGLIN • TNT MORTAR SAPPER • 35 HP", "0xfff97316", "siege bombardier piglin mortar tnt"},
+                    {"Raider Berserker", "PIGLIN BRUTE • BLOODRAGE • 40 HP", "0xffef4444", "raider berserker piglin brute fury"},
+                    {"Undead Necromancer", "EVOKER • DARK SUMMONER • 45 HP", "0xff8b5cf6", "undead necromancer evoker summoner"},
+                    {"Shadowfang Assassin", "STRAY • BLINK BACKSTAB • 28 HP", "0xffa855f7", "shadow assassin stray dagger blink"},
+                    {"Dread Skeleton Cavalry", "SKELETON HORSE • WITHER • 48 HP", "0xff6b21a8", "dread cavalry wither skeleton horse"},
+                    {"Mossy Bogged Sniper", "BOGGED • POISON SNIPER • 26 HP", "0xff84cc16", "bogged poison sniper archer"},
+                    {"Tempest Breeze", "BREEZE • WIND GUST AOE • 40 HP", "0xff06b6d4", "tempest breeze wind knockback"},
+                    {"Celestial Pixie Medic", "ALLAY • FLYING HEALER • 25 HP", "0xff38bdf8", "celestial pixie medic allay flying fairy"},
+                    {"Arcane Bard", "VILLAGER • WAR LUTE BUFFS • 30 HP", "0xff06b6d4", "arcane bard lute music buff"},
+                    {"Combat Engineer", "VILLAGER • BARRICADE BUILDER • 32 HP", "0xff0ea5e9", "combat engineer villager builder barricade"}
+            };
+
+            for (String[] u : allUnits) {
+                if (cardsDrawn >= 5) break;
+                if (matches(q, u[3])) {
+                    int color = (int) Long.parseLong(u[2].replace("0x", ""), 16);
+                    drawUnitCard(context, leftX, cardY, u[0], u[1], color);
+                    cardY += 34;
+                    cardsDrawn++;
+                }
             }
 
         } else if (tab == 2) { // FACTIONS
