@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "quenched=false": {
+      "model": "myfirstmod:block/ember_crucible"
+    },
+    "quenched=true": {
+      "model": "myfirstmod:block/ember_crucible_quenched"
+    }
+  }
+}

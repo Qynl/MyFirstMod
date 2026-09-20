@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "seal": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:cinder_seal"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "myfirstmod:cinderwalk_charm"
+    ]
+  }
+}

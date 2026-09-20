@@ -12,6 +12,8 @@ public final class RealmState extends PersistentState {
     public final java.util.Set<Long> keepForcedChunks=new java.util.HashSet<>();
     public final Map<Long,java.util.UUID> monasteryGuardians=new HashMap<>();
     public boolean sanctuaryBuilt,thresholdBuilt;
+    public long plinthPos;
+    public int worldSeals;
     public int bossClears, contentVersion;
     public long rematchReadyAt;
     public final Map<java.util.UUID, ExpeditionRecord> expeditions = new HashMap<>();
@@ -29,6 +31,8 @@ public final class RealmState extends PersistentState {
         for(long pos:nbt.getLongArray("KeepForcedChunks"))state.keepForcedChunks.add(pos);
         state.sanctuaryBuilt=nbt.getBoolean("SanctuaryBuilt");
         state.thresholdBuilt=nbt.getBoolean("ThresholdBuilt");
+        state.plinthPos=nbt.getLong("PlinthPos");
+        state.worldSeals=nbt.getInt("WorldSeals")&7;
         state.contentVersion=nbt.getInt("ContentVersion");
         state.bossClears=Math.max(0,nbt.getInt("BossClears"));
         state.rematchReadyAt=nbt.getLong("RematchReadyAt");
@@ -54,6 +58,8 @@ public final class RealmState extends PersistentState {
         nbt.putLongArray("KeepForcedChunks",keepForcedChunks.stream().mapToLong(Long::longValue).toArray());
         nbt.putBoolean("SanctuaryBuilt",sanctuaryBuilt);
         nbt.putBoolean("ThresholdBuilt",thresholdBuilt);
+        nbt.putLong("PlinthPos",plinthPos);
+        nbt.putInt("WorldSeals",worldSeals);
         nbt.putInt("BossClears",bossClears);
         nbt.putInt("ContentVersion",contentVersion);
         nbt.putLong("RematchReadyAt",rematchReadyAt);

@@ -3,6 +3,8 @@
 
 **A dark-fantasy expedition through a ruined kingdom: awaken the great Ancient City gate, prepare at a sanctuary, ring the bells of a drowned-root monastery, recover forgotten memories, descend beneath cathedrals, and challenge the guardians of a broken realm.**
 
+> **2.0.0-alpha.3 — "The Ashen Foundry"** adds the third dungeon: a forge hall behind a shell of standing fire, the one-way **Quench**, the **seal chain** with its sanctuary plinth, and the **Cinderwalk Charm**. See [docs/FOUNDRY.md](docs/FOUNDRY.md).
+>
 > **2.0.0-alpha.2 — "The Wider Kingdom"** grows the realm from four to **eight authored regions** with per-region terrain shaping and landmarks, adds the **Drowned Archive** dungeon with its one-shot **Tide Bell** drain, the **Drowned Seal → Tide Lantern** progression reward, and a passive **Veil Wisp**. It is an alpha — see [the Regions record](docs/REGIONS.md) and [the Kingdom record](docs/KINGDOM.md) for exactly what is and is not verified.
 
 Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an exploration dimension and a separate fortress dimension, eight realm regions, original creature models, exploration landmarks, equipment progression, opt-in encounters, and persistent player records.
@@ -17,6 +19,7 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 
 - [New in 2.0 alpha — The Kingdom Beyond the Gate](#new-in-20-alpha--the-kingdom-beyond-the-gate)
 - [The Wider Kingdom — eight regions](#the-wider-kingdom--eight-regions)
+- [The Ashen Foundry — the chain of seals](#the-ashen-foundry--the-chain-of-seals)
 - [The Rootbound Monastery](#the-rootbound-monastery)
 - [New in 1.8 — The Ancient Threshold](#new-in-18--the-ancient-threshold)
 - [New in 1.7 — The Hollow Keep](#new-in-17--the-hollow-keep)
@@ -75,6 +78,18 @@ Every region now owns its own terrain shape, surface material, fog, ambient loop
 - **Eight-region journal pages:** the expedition journal gains *Eight Regions* and *Royal Seals* pages; the seals thread now names two seals and promises two more.
 
 Regions are routed by climate bands, so they arrive in broad connected arcs rather than confetti. **Existing saves keep everything already generated; the new regions appear only in new chunks.**
+
+## The Ashen Foundry — the chain of seals
+
+![Top-down schematic of the Ashen Foundry forge hall: fire shell, lava channels, vault and spawners](docs/images/ashen-foundry.svg)
+
+- **The third dungeon:** the **Ashen Foundry**, a 19×19 forge hall generated in **new Cinder Steps chunks** — blackstone brick walls with a magma band, blast furnaces and anvils, two lava channels beside the walk, magma-cube and Rift Sentinel spawners, a Waystone at the entrance, and the **Ember Crucible** on its dais **inside a shell of standing fire**.
+- **The Quench (one-way):** use the crucible and the fire shell falls, the lava channels cool to walkable **Slagglass**, and the vault opens. The `quenched` state lives in the block and survives restarts — a cooled forge stays cooled. Ringing it again only says *"The quench holds."*
+- **The seal chain:** the crucible answers **only to a bearer of the Rootbound and Drowned seals**. Attune a seal permanently by holding it and using it in hand; the ledger remembers forever. Quenching attunes the **Cinder Seal**, the third of four.
+- **Sanctuary plinth:** on the first attunement the sanctuary plaza grows a **Seal Plinth** at an empty designated spot (never over builds), counting the world's chain 0–3 with rising light.
+- **A reward that changes play:** the vault's Cinder Seal crafts (with Slagglass + Resonite Ingot) the **Cinderwalk Charm** — carried, magma floors no longer burn you and flames die on your skin. The vents and the foundry become terrain, not a threat.
+- **Cinder Steps signature:** those terraces now raise **basalt chimneys with smoking campfires** and slag piles, so every young region has an authored silhouette.
+- **Journal:** new *Ashen Foundry* and *Chain of Seals* pages. One seal still sleeps beneath the kingdom.
 
 ## The Rootbound Monastery
 
@@ -423,6 +438,7 @@ Realm ores replace Nullstone below roughly Y=65 and require iron-tier tools or b
 
 | Gear | Use |
 | --- | --- |
+| **Cinderwalk Charm** | Foundry reward: Cinder Seal + Slagglass + Resonite Ingot (shapeless). Carried: magma floors and flames no longer burn you |
 | **Tide Lantern** | Archive reward: Prism Lamp + Drowned Seal + Resonite Ingot (shapeless). Use for 40s Water Breathing + 20s Night Vision; 90s cooldown |
 | **Briarbrand** | Monastery weapon: hold one second, release a narrow 4-block thorn sweep for 9 damage, Slowness III for three seconds and one heart healed on a hit; 10-second cooldown, 3 durability, base melee 7 damage at 1.6 speed |
 | **Requiem Glaive** | First Keep-clear weapon: charge for one second, release a 14-damage forward reaping arc; successful hits slow enemies and grant temporary absorption |
@@ -469,7 +485,7 @@ Vigor/Gale effect timers persist and cannot be bypassed by swapping relics. Attu
 
 ## Building and cultivation
 
-Collectible blocks include Nullstone and its polished/brick forms, three ores, Resonite storage, Prism Lamps, Prismstone, Cinderstone, both mosses, Hushwood/planks/leaves, the forge, Hush Nursery, and Pilgrim Ledger: **23 registered collectible blocks** (including Brinesilt, Veilstone, Vent Basalt, Spire Crystal and Oxidized Trim).
+Collectible blocks include Nullstone and its polished/brick forms, three ores, Resonite storage, Prism Lamps, Prismstone, Cinderstone, both mosses, Hushwood/planks/leaves, the forge, Hush Nursery, and Pilgrim Ledger: **24 registered collectible blocks** (including Brinesilt, Veilstone, Vent Basalt, Spire Crystal and Oxidized Trim).
 
 World-only cores, seals, stelae, waystones, reliquaries, and the monastery's Rootbound Heart, Cloister Bells and reliquary are not ordinary collectible building items.
 
@@ -544,7 +560,7 @@ Windows: use `gradlew.bat`. Installable output is in `build/libs/`; omit source 
 3. A real Fabric dedicated-server smoke test.
 4. Separate installable-JAR and validation-report artifacts.
 
-The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, all four region signatures, a complete Drowned Archive and the full monastery template, inspects cathedral and monastery spawner IDs and chest loot tables, runs the custom monastery structure type, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
+The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, all five region signatures, a complete Drowned Archive, a complete Ashen Foundry and the full monastery template, inspects cathedral and monastery spawner IDs and chest loot tables, runs the custom monastery structure type, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
 
 **This is not a combat bot.** It does not prove that a human completed a rite, channelled a flask, bought from a ledger, used the atlas, or enjoyed the fight. Manual checks are listed in [TESTING.md](docs/TESTING.md).
 
@@ -589,6 +605,7 @@ The original generated textures are deterministic. Translations and Java models 
 
 ### Further reading and history
 
+- [2.0 alpha.3 Foundry record](docs/FOUNDRY.md)
 - [2.0 alpha.2 Regions record](docs/REGIONS.md)
 - [2.0 alpha Kingdom record](docs/KINGDOM.md)
 - [1.7 Hollow Keep expedition guide](docs/HOLLOW_KEEP.md)

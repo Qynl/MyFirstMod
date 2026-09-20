@@ -13,7 +13,7 @@ import net.minecraft.world.gen.feature.util.FeatureContext;
 public final class RegionSignatures extends Feature<DefaultFeatureConfig> {
     public RegionSignatures(){super(DefaultFeatureConfig.CODEC);}
     public static void register(){Registry.register(Registries.FEATURE,Identifier.of("myfirstmod","region_signatures"),new RegionSignatures());}
-    private static boolean natural(BlockState s){return s.isOf(ModBlocks.BRINESILT)||s.isOf(ModBlocks.VEILSTONE)||s.isOf(ModBlocks.VENT_BASALT)||s.isOf(ModBlocks.PRISMSTONE);}
+    private static boolean natural(BlockState s){return s.isOf(ModBlocks.BRINESILT)||s.isOf(ModBlocks.VEILSTONE)||s.isOf(ModBlocks.VENT_BASALT)||s.isOf(ModBlocks.PRISMSTONE)||s.isOf(ModBlocks.CINDERSTONE);}
     @Override public boolean generate(FeatureContext<DefaultFeatureConfig> c){
         var w=c.getWorld();var random=c.getRandom();int cx=c.getOrigin().getX()&~15,cz=c.getOrigin().getZ()&~15;
         if(Math.abs(cx+8)<96&&cz+8>-96&&cz+8<192)return false;
@@ -23,6 +23,7 @@ public final class RegionSignatures extends Feature<DefaultFeatureConfig> {
         if(state.isOf(ModBlocks.BRINESILT))colonnade(w,surface,random);
         else if(state.isOf(ModBlocks.VEILSTONE))island(w,surface,random);
         else if(state.isOf(ModBlocks.VENT_BASALT))vents(w,surface,random);
+        else if(state.isOf(ModBlocks.CINDERSTONE))chimney(w,surface,random);
         else spire(w,surface,random);
         return true;
     }
@@ -74,6 +75,11 @@ public final class RegionSignatures extends Feature<DefaultFeatureConfig> {
         for(int y=0;y<height;y++)put(w,s.up(y),y>height-3?ModBlocks.PRISMSTONE:ModBlocks.SPIRE_CRYSTAL);
         put(w,s.up(height),Blocks.AMETHYST_CLUSTER);
         for(int n=0;n<3;n++)put(w,s.up(3+random.nextInt(Math.max(1,height-4))).north(n%2==0?1:-1),Blocks.SMALL_AMETHYST_BUD);
+    }
+    private static void chimney(StructureWorldAccess w,BlockPos s,Random random){
+        for(int y=0;y<6;y++)put(w,s.up(y),Blocks.POLISHED_BASALT);
+        put(w,s.up(6),Blocks.CAMPFIRE);
+        for(var d:new BlockPos[]{new BlockPos(2,0,0),new BlockPos(-2,0,0),new BlockPos(0,0,2),new BlockPos(0,0,-2)})put(w,s.add(d),Blocks.BLACKSTONE);
     }
     private static void vents(StructureWorldAccess w,BlockPos s,Random random){
         for(int n=0;n<3;n++){

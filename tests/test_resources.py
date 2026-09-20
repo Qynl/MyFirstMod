@@ -47,7 +47,7 @@ class ResourceTests(unittest.TestCase):
                 for feature in stage:
                     placed=load(DATA/('worldgen/placed_feature/'+feature.split(':')[1]+'.json'))
                     configured=load(DATA/('worldgen/configured_feature/'+placed['feature'].split(':')[1]+'.json'))
-                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial','myfirstmod:realm_scenery','myfirstmod:region_signatures','myfirstmod:drowned_archive'])
+                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial','myfirstmod:realm_scenery','myfirstmod:region_signatures','myfirstmod:drowned_archive','myfirstmod:ashen_foundry'])
             monsters={s['type'] for s in biome['spawners']['monster']}
             self.assertTrue({'myfirstmod:rift_sentinel','myfirstmod:shardstalker'}<=monsters,path.name)
             self.assertEqual('minecraft:drowned' in monsters,path.stem=='drowned_stacks')
@@ -129,7 +129,7 @@ class ResourceTests(unittest.TestCase):
     def test_wilds_blocks_are_complete(self):
         source=(ROOT/'src/main/java/dev/qynl/myfirstmod/block/ModBlocks.java').read_text()
         names=set(re.findall(r'(?:stone|building)\("([a-z_]+)"',source))
-        self.assertEqual(len(names),23)
+        self.assertEqual(len(names),24)
         language=load(ASSETS/'lang/en_us.json')
         for name in names:
             self.assertTrue((ASSETS/f'blockstates/{name}.json').exists(),name)

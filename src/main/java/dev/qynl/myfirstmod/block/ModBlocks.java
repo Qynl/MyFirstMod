@@ -71,6 +71,9 @@ public final class ModBlocks {
     public static final Block VENT_BASALT=stone("vent_basalt",3.5f,0);
     public static final Block SPIRE_CRYSTAL=stone("spire_crystal",2.5f,7);
     public static final Block OXIDIZED_TRIM=building("oxidized_trim",new Block(AbstractBlock.Settings.copy(Blocks.OXIDIZED_COPPER)));
+    public static final Block SLAGGLASS=building("slagglass",new Block(AbstractBlock.Settings.copy(Blocks.OBSIDIAN)));
+    public static final Block EMBER_CRUCIBLE=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"ember_crucible"),new CrucibleBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->s.get(CrucibleBlock.QUENCHED)?4:15)));
+    public static final Block SEAL_PLINTH=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"seal_plinth"),new SealPlinthBlock(AbstractBlock.Settings.copy(Blocks.POLISHED_BLACKSTONE).luminance(s->2*s.get(SealPlinthBlock.SEALS))));
     public static final Block TIDE_BELL=Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,"tide_bell"),new TideBellBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->s.get(TideBellBlock.DRAINED)?6:12)));
     private static Block monastery(String id){return Registry.register(Registries.BLOCK,Identifier.of(MyFirstMod.MOD_ID,id),new dev.qynl.myfirstmod.kingdom.MonasteryBlock(AbstractBlock.Settings.copy(Blocks.REINFORCED_DEEPSLATE).strength(-1,3600000).luminance(s->s.get(dev.qynl.myfirstmod.kingdom.MonasteryBlock.BELLS)==3?12:5)));}
     public static final Block ROOT_HEART=monastery("root_heart"), CLOISTER_BELL=monastery("cloister_bell"),ROOT_RELIQUARY=monastery("root_reliquary");

@@ -65,10 +65,12 @@ for name,temp,fog,sky,particle,loop,extra in REGIONS:
         spawners.setdefault(category,[]).append({'type':actor,'weight':weight,'minCount':lo,'maxCount':hi})
     structures=['myfirstmod:realm_ruins','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial']
     vegetation=['myfirstmod:realm_flora','myfirstmod:realm_scenery']
-    if name in ('veil_highlands','drowned_stacks','shard_spires','ember_vents'):
+    if name in ('veil_highlands','drowned_stacks','shard_spires','ember_vents','cinder_steps'):
         vegetation.append('myfirstmod:region_signatures')
     if name=='drowned_stacks':
         structures.append('myfirstmod:drowned_archive')
+    if name=='cinder_steps':
+        structures.append('myfirstmod:ashen_foundry')
     put('worldgen/biome/'+name+'.json',{'has_precipitation':False,'temperature':.4,'downfall':0,'effects':{'fog_color':fog,'sky_color':sky,'water_color':0x31667F,'water_fog_color':0x122333,'particle':{'options':{'type':'minecraft:'+particle},'probability':.004},'ambient_sound':'minecraft:ambient.'+loop,'mood_sound':{'sound':'minecraft:ambient.cave','tick_delay':8000,'block_search_extent':8,'offset':2}},'spawners':spawners,'spawn_costs':{},'carvers':{},'features':[[],[],[],[],structures,[],['myfirstmod:realm_resources'],[],[],vegetation,[]]})
 put('dimension/null_realm.json',{'type':'myfirstmod:null_realm','generator':{'type':'minecraft:noise','settings':'myfirstmod:null_realm','biome_source':{'type':'minecraft:multi_noise','biomes':biomes}}})
 p=ROOT/'dimension_type/null_realm.json'
@@ -82,6 +84,8 @@ put('worldgen/configured_feature/realm_vault.json',{'type':'myfirstmod:realm_vau
 put('worldgen/configured_feature/region_signatures.json',{'type':'myfirstmod:region_signatures','config':{}})
 put('worldgen/placed_feature/region_signatures.json',{'feature':'myfirstmod:region_signatures','placement':[{'type':'minecraft:rarity_filter','chance':2},{'type':'minecraft:in_square'},{'type':'minecraft:heightmap','heightmap':'WORLD_SURFACE_WG'},{'type':'minecraft:biome'}]})
 put('worldgen/configured_feature/drowned_archive.json',{'type':'myfirstmod:drowned_archive','config':{}})
+put('worldgen/configured_feature/ashen_foundry.json',{'type':'myfirstmod:ashen_foundry','config':{}})
+put('worldgen/placed_feature/ashen_foundry.json',{'feature':'myfirstmod:ashen_foundry','placement':[{'type':'minecraft:rarity_filter','chance':30},{'type':'minecraft:in_square'},{'type':'minecraft:heightmap','heightmap':'WORLD_SURFACE_WG'},{'type':'minecraft:biome'}]})
 put('worldgen/placed_feature/drowned_archive.json',{'feature':'myfirstmod:drowned_archive','placement':[{'type':'minecraft:rarity_filter','chance':34},{'type':'minecraft:in_square'},{'type':'minecraft:heightmap','heightmap':'WORLD_SURFACE_WG'},{'type':'minecraft:biome'}]})
 
 p=ROOT.parents[1]/'assets/myfirstmod/lang/en_us.json';lang=json.loads(p.read_text());lang.update({
@@ -95,5 +99,7 @@ p=ROOT.parents[1]/'assets/myfirstmod/lang/en_us.json';lang=json.loads(p.read_tex
  'region.myfirstmod.shard_spires':'Shard Spires','biome.myfirstmod.shard_spires':'Shard Spires',
  'region.myfirstmod.ember_vents':'Ember Vents','biome.myfirstmod.ember_vents':'Ember Vents',
  'journal.myfirstmod.regions':'EIGHT REGIONS\n\nGrove, Highlands, Fen, Stacks, Wastes, Spires, Steps, Vents.\n\nHighlands float; Stacks drown; Spires cut; Vents smoulder. Each keeps its own stone, fog and silence.\n\nNew regions generate only in new chunks.',
+ 'journal.myfirstmod.foundry':'ASHEN FOUNDRY\n\nA sealed forge hall in the Cinder Steps.\n\nThe Ember Crucible sleeps behind a shell of standing fire. Only a pilgrim attuned to two seals may quench it.\n\nThe quench holds: fire falls, channels cool to slagglass, the vault opens.',
+ 'journal.myfirstmod.chain':'THE CHAIN OF SEALS\n\nRootbound, Drowned, Cinder.\n\nAttune a seal by holding it and using it in hand. The ledger remembers forever, and the sanctuary plinth counts the chain for all to see.\n\nOne seal still sleeps beneath the kingdom.',
  'journal.myfirstmod.seals':'ROYAL SEALS\n\nRootbound Seal: the monastery keeper.\nDrowned Seal: the flooded archive.\n\nTwo more seals wait in the kingdom. The ledger remembers each region you have walked.'
 });p.write_text(json.dumps(lang,indent=2)+'\n')

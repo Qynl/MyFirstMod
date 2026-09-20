@@ -102,3 +102,15 @@ blocktex('veilstone',lambda x,y,r:(126+_n(r,7),144+_n(r,7),150+_n(r,7)) if (x*5+
 blocktex('vent_basalt',lambda x,y,r:(38+_n(r,3),36+_n(r,3),38+_n(r,3)) if x%4<2 else (26+_n(r,2),24+_n(r,2),26+_n(r,2)) if (x*7+y*13)%29 else (196,96,44))
 blocktex('spire_crystal',lambda x,y,r:(140+_n(r,10),120+_n(r,10),220+_n(r,8)) if (x+y)%5==0 else (190,240,255) if abs(x-y)%8<1 else (86+_n(r,6),74+_n(r,6),140+_n(r,8)))
 blocktex('oxidized_trim',lambda x,y,r:(64+_n(r,6),128+_n(r,8),116+_n(r,8)) if (x+y)%9 else (44+_n(r,4),96+_n(r,6),88+_n(r,6)))
+blocktex('slagglass',lambda x,y,r:(24+_n(r,3),26+_n(r,3),30+_n(r,3)) if (x+y)%6 else (58+_n(r,6),64+_n(r,6),74+_n(r,6)) if (x*3-y)%11 else (96,110,124))
+for quenched,tint in [(False,(250,150,60)),(True,(70,76,86))]:
+    rng=random.Random('crucible-%s'%quenched);pixels=[]
+    for y in range(16):
+        for x in range(16):
+            c=(40+_n(rng,5),36+_n(rng,4),38+_n(rng,4))
+            if x in [1,14] or y in [1,14]:c=(28,26,28)
+            if 4<=x<=11 and 4<=y<=11:c=tint
+            if 5<=x<=10 and 5<=y<=10 and not quenched:c=(255,214,120)
+            if 5<=x<=10 and 5<=y<=10 and quenched:c=(40,44,50)
+            pixels.append(c+(255,))
+    png('block/ember_crucible'+('_quenched' if quenched else '')+'.png',16,16,pixels)

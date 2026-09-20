@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "myfirstmod:cinder_seal"
+    },
+    {
+      "item": "myfirstmod:slagglass"
+    },
+    {
+      "item": "myfirstmod:resonite_ingot"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:cinderwalk_charm",
+    "count": 1
+  }
+}

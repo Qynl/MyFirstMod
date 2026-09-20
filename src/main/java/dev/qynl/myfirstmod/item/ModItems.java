@@ -64,6 +64,8 @@ public final class ModItems {
     public static final Item ROOTBOUND_SEAL=register("rootbound_seal",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
     public static final Item BRIARBRAND=register("briarbrand",new BriarbrandItem(new Item.Settings().maxDamage(1800).fireproof().rarity(Rarity.EPIC)));
     public static final Item DROWNED_SEAL=register("drowned_seal",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
+    public static final Item CINDER_SEAL=register("cinder_seal",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
+    public static final Item CINDERWALK_CHARM=register("cinderwalk_charm",new Item(new Item.Settings().maxCount(1).fireproof().rarity(Rarity.RARE)));
     public static final Item TIDE_LANTERN=register("tide_lantern",new TideLanternItem(new Item.Settings().maxCount(1).fireproof().rarity(Rarity.RARE)));
     public static final Item REGENT_CREST=register("regent_crest",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
     public static final Item REQUIEM_GLAIVE=register("requiem_glaive",new RequiemGlaiveItem(new Item.Settings().maxDamage(2400).fireproof().rarity(Rarity.EPIC)));

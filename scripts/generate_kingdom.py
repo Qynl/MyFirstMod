@@ -145,7 +145,7 @@ for name in ['brinesilt','veilstone','vent_basalt','spire_crystal','oxidized_tri
     put(A,'models/item/'+name+'.json',{'parent':'myfirstmod:block/'+name})
     put(D,'loot_table/blocks/'+name+'.json',{'type':'minecraft:block','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':'myfirstmod:'+name}],'conditions':[{'condition':'minecraft:survives_explosion'}]}]})
 tag=(D.parents[0]/'minecraft/tags/block/mineable/pickaxe.json')
-values=sorted(set(json.loads(tag.read_text())['values'])|{'myfirstmod:brinesilt','myfirstmod:veilstone','myfirstmod:vent_basalt','myfirstmod:spire_crystal','myfirstmod:oxidized_trim'})
+values=sorted(set(json.loads(tag.read_text())['values'])|{'myfirstmod:brinesilt','myfirstmod:veilstone','myfirstmod:vent_basalt','myfirstmod:spire_crystal','myfirstmod:oxidized_trim','myfirstmod:slagglass'})
 tag.write_text(json.dumps({'replace':False,'values':values},indent=2)+'\n')
 for drained,tint in [(False,(214,196,120)),(True,(120,110,74))]:
     pixels=[]
@@ -187,5 +187,46 @@ lang=json.loads((A/'lang/en_us.json').read_text());lang.update({
  'archive.myfirstmod.dry':'The bell rings over an already dry hall.',
  'archive.myfirstmod.once':'The tide obeys only once.',
  'archive.myfirstmod.unloaded':'The hall\'s waters lie beyond loaded chunks.'
+});put(A,'lang/en_us.json',lang)
+
+# --- 2.0 alpha.3: foundry assets, seal chain and the cinderwalk charm --------------
+put(A,'models/block/slagglass.json',{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/slagglass'}})
+put(A,'blockstates/slagglass.json',{'variants':{'':{'model':'myfirstmod:block/slagglass'}}})
+put(A,'models/item/slagglass.json',{'parent':'myfirstmod:block/slagglass'})
+put(D,'loot_table/blocks/slagglass.json',{'type':'minecraft:block','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':'myfirstmod:slagglass'}],'conditions':[{'condition':'minecraft:survives_explosion'}]}]})
+for quenched in [False,True]:
+    suffix='' if not quenched else '_quenched'
+    put(A,'models/block/ember_crucible'+suffix+'.json',{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/ember_crucible'+suffix}})
+put(A,'blockstates/ember_crucible.json',{'variants':{'quenched=false':{'model':'myfirstmod:block/ember_crucible'},'quenched=true':{'model':'myfirstmod:block/ember_crucible_quenched'}}})
+for seals in range(4):
+    pixels=[]
+    for y in range(16):
+        for x in range(16):
+            c=(52,48,54) if y>11 else (0,0,0,0)
+            if y>11 and (x+y)%5==0:c=(70,64,72)
+            if 6<=x<=9 and 4<=y<=11:c=(96,88,104)
+            if 6<=x<=9 and 4<=y<=11 and seals>0 and y<=3+seals*2:c=(240,190,110) if seals>0 else c
+            pixels.append(c if len(c)==4 else c+(255,))
+    png('block/seal_plinth_%d.png'%seals,16,16,pixels)
+    put(A,'models/block/seal_plinth_%d.json'%seals,{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/seal_plinth_%d'%seals}})
+put(A,'blockstates/seal_plinth.json',{'variants':{'seals=0':{'model':'myfirstmod:block/seal_plinth_0'},'seals=1':{'model':'myfirstmod:block/seal_plinth_1'},'seals=2':{'model':'myfirstmod:block/seal_plinth_2'},'seals=3':{'model':'myfirstmod:block/seal_plinth_3'}}})
+sprite('cinder_seal',[([(16,1),(29,10),(27,24),(16,31),(5,24),(3,10)],(70,36,26)), ([(16,5),(25,12),(23,23),(16,27),(9,23),(7,12)],(240,150,70)), ([(13,10),(19,10),(21,16),(16,22),(11,16)],(255,220,140)), ([(15,13),(17,13),(17,18),(15,18)],(120,50,20))])
+sprite('cinderwalk_charm',[([(14,2),(18,2),(18,5),(14,5)],(120,120,130)), ([(10,5),(22,5),(24,14),(16,26),(8,14)],(60,56,64)), ([(12,8),(20,8),(21,14),(16,21),(11,14)],(240,150,70)), ([(15,11),(17,11),(18,14),(16,17),(14,14)],(255,230,160)), ([(15,26),(17,26),(17,30),(15,30)],(90,86,96))])
+for name in ['cinder_seal','cinderwalk_charm']:
+    put(A,'models/item/'+name+'.json',{'parent':'minecraft:item/generated','textures':{'layer0':'myfirstmod:item/'+name}})
+put(D,'loot_table/chests/foundry_cache.json',{'type':'minecraft:chest','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':'myfirstmod:cinder_seal'}]},{'rolls':{'type':'minecraft:uniform','min':3,'max':5},'entries':[{'type':'minecraft:item','name':'myfirstmod:resonite_ingot','weight':3,'functions':[{'function':'minecraft:set_count','count':1}]},{'type':'minecraft:item','name':'myfirstmod:cinder_pearl','weight':3,'functions':[{'function':'minecraft:set_count','count':{'type':'minecraft:uniform','min':1,'max':3}}]},{'type':'minecraft:item','name':'myfirstmod:slagglass','weight':2,'functions':[{'function':'minecraft:set_count','count':{'type':'minecraft:uniform','min':2,'max':6}}]},{'type':'minecraft:item','name':'myfirstmod:memory_shard','weight':1}]}]})
+put(D,'recipe/cinderwalk_charm.json',{'type':'minecraft:crafting_shapeless','category':'equipment','ingredients':[{'item':'myfirstmod:cinder_seal'},{'item':'myfirstmod:slagglass'},{'item':'myfirstmod:resonite_ingot'}],'result':{'id':'myfirstmod:cinderwalk_charm','count':1}})
+put(D,'advancement/recipes/cinderwalk_charm.json',{'criteria':{'seal':{'trigger':'minecraft:inventory_changed','conditions':{'items':[{'items':['myfirstmod:cinder_seal']}]}}},'rewards':{'recipes':['myfirstmod:cinderwalk_charm']}})
+lang=json.loads((A/'lang/en_us.json').read_text());lang.update({
+ 'block.myfirstmod.slagglass':'Slagglass','block.myfirstmod.ember_crucible':'Ember Crucible','block.myfirstmod.seal_plinth':'Seal Plinth',
+ 'item.myfirstmod.cinder_seal':'Cinder Seal','item.myfirstmod.cinder_seal.tooltip':'Recovered from the quenched foundry vault. Craft the Cinderwalk Charm with Slagglass and a Resonite Ingot.',
+ 'item.myfirstmod.cinderwalk_charm':'Cinderwalk Charm','item.myfirstmod.cinderwalk_charm.tooltip':'Carried: magma floors no longer burn you and flames die on your skin. The foundry\'s answer to the vents.',
+ 'foundry.myfirstmod.quenched':'The crucible sighs. The fire shell falls and the channels cool to slagglass.',
+ 'foundry.myfirstmod.once':'The quench holds. This forge is already cold.',
+ 'foundry.myfirstmod.unworthy':'The crucible answers only to a bearer of the Rootbound and Drowned seals.',
+ 'foundry.myfirstmod.unloaded':'The forge\'s fire lies beyond loaded chunks.',
+ 'seal.myfirstmod.attuned':'The %s binds to your ledger. The chain remembers.',
+ 'seal.myfirstmod.known':'This seal is already bound to your ledger.',
+ 'seal.myfirstmod.plinth':'The sanctuary plinth now bears %s seals.'
 });put(A,'lang/en_us.json',lang)
 print('Generated Rootbound Monastery:',len(blocks),'blocks across a 47x47 footprint.')

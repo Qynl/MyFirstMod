@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "myfirstmod:block/ember_crucible_quenched"
+  }
+}

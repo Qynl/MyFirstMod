@@ -37,7 +37,7 @@ class RegionTests(unittest.TestCase):
         for biome in BIOMES:
             data=load(DATA/f'worldgen/biome/{biome}.json')
             vegetation=[f for stage in data['features'] for f in stage if 'signatures' in f]
-            self.assertEqual(bool(vegetation),biome in ('veil_highlands','drowned_stacks','shard_spires','ember_vents'),biome)
+            self.assertEqual(bool(vegetation),biome in ('veil_highlands','drowned_stacks','shard_spires','ember_vents','cinder_steps'),biome)
             structures=[f for stage in data['features'] for f in stage if 'archive' in f]
             self.assertEqual(bool(structures),biome=='drowned_stacks',biome)
     def test_region_blocks_are_complete_assets(self):

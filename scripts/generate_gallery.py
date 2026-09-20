@@ -118,6 +118,33 @@ for i,(title,tex,caption) in enumerate([('HUSHED GROVE','hushed_moss','Root arch
     s += [text(x,y,title,18,'#dce9e1'),image(ASSETS/'block'/f'{tex}.png',x,y+14,120,120),text(x,y+158,caption,12),
           f'<rect x="{x-6}" y="{y-22}" width="252" height="206" rx="10" fill="none" stroke="#22384a"/>']
 s.append(text(22,572,'Original block textures • Material palette, not a gameplay screenshot',13));s.append('</svg>');(OUT/'biome-palettes.svg').write_text('\n'.join(s)+'\n')
+
+# Ashen Foundry: top-down schematic diagram. A navigation aid, not a screenshot.
+CELL=30;OX=70;OY=150
+def fcell(dx,dz):
+    if abs(dx)==9 or abs(dz)==9:
+        return '#0d1721' if (dz==9 and abs(dx)<=1) else '#3a3f4a'
+    if max(abs(dx),abs(dz))==2:return '#ff8030'
+    if (dx,dz)==(0,0):return '#f0c040'
+    if (dx,dz)==(1,0):return '#8a6a30'
+    if abs(dz)==4 and abs(dx)<=7:return '#d05a20'
+    if (dx,dz) in [(5,5),(-5,5),(5,-5),(-5,-5)]:return '#6a6f78'
+    if (dx,dz) in [(6,0),(-6,0)]:return '#4a4f58'
+    if (dx,dz) in [(-6,6),(6,-6)]:return '#a03030'
+    if (dx,dz)==(0,8):return '#64d8c8'
+    return '#7a3020' if (dx+dz)%5==0 else '#23262c'
+s=svg(860,1020,'THE ASHEN FOUNDRY','Top-down schematic of the 19x19 forge hall in the Cinder Steps: fire shell, lava channels, vault and spawners. A navigation diagram, not an in-game screenshot.')
+for dz in range(-9,10):
+    for dx in range(-9,10):
+        s.append(f'<rect x="{OX+(dx+9)*CELL}" y="{OY+(dz+9)*CELL}" width="{CELL-1}" height="{CELL-1}" fill="{fcell(dx,dz)}"/>')
+s += [text(OX,OY-14,'19 x 19 forge hall, top down. Entrance at the south gap.',14)]
+for i,(color,label) in enumerate([('#3a3f4a','Brick walls / magma band'),('#7a3020','Blackstone floor with magma seams'),('#d05a20','Lava channels (cool to slagglass)'),('#ff8030','Fire shell around the dais'),('#f0c040','Ember Crucible on its dais'),('#8a6a30','Vault chest: the Cinder Seal'),('#6a6f78','Blast furnaces'),('#a03030','Magma cube / sentinel spawners'),('#64d8c8','Waystone at the entrance')]):
+    y=OY+19*CELL+34+i*24
+    s += [f'<rect x="{OX}" y="{y-14}" width="16" height="16" fill="{color}"/>',text(OX+26,y,label,13)]
+s.append(text(OX+420,OY+19*CELL+34,'Quench once with two seals attuned:',14))
+s.append(text(OX+420,OY+19*CELL+58,'the shell falls, channels cool,',13))
+s.append(text(OX+420,OY+19*CELL+80,'the vault opens. The quench holds.',13))
+s.append('</svg>');(OUT/'ashen-foundry.svg').write_text('\n'.join(s)+'\n')
 # Dimension route diagram, to exact portal block proportions.
 s=svg(1100,420,'AWAKEN THE ANCIENT CITY','22 by 8 reinforced-deepslate frame with a 20 by 6 opening. Three-second awakening, Echo Shard to the Null Realm sanctuary and its matching return gateway, then Hollow Keep after a Warden clear.')
 s.append(text(30,76,'Find the central monument • Right-click any frame block with one Echo Shard • hold it still for three seconds'))

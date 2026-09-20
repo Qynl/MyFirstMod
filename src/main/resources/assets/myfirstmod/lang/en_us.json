@@ -383,5 +383,21 @@
   "archive.myfirstmod.drained": "The tide obeys. %s blocks of water drain from the hall.",
   "archive.myfirstmod.dry": "The bell rings over an already dry hall.",
   "archive.myfirstmod.once": "The tide obeys only once.",
-  "archive.myfirstmod.unloaded": "The hall's waters lie beyond loaded chunks."
+  "archive.myfirstmod.unloaded": "The hall's waters lie beyond loaded chunks.",
+  "journal.myfirstmod.foundry": "ASHEN FOUNDRY\n\nA sealed forge hall in the Cinder Steps.\n\nThe Ember Crucible sleeps behind a shell of standing fire. Only a pilgrim attuned to two seals may quench it.\n\nThe quench holds: fire falls, channels cool to slagglass, the vault opens.",
+  "journal.myfirstmod.chain": "THE CHAIN OF SEALS\n\nRootbound, Drowned, Cinder.\n\nAttune a seal by holding it and using it in hand. The ledger remembers forever, and the sanctuary plinth counts the chain for all to see.\n\nOne seal still sleeps beneath the kingdom.",
+  "block.myfirstmod.slagglass": "Slagglass",
+  "block.myfirstmod.ember_crucible": "Ember Crucible",
+  "block.myfirstmod.seal_plinth": "Seal Plinth",
+  "item.myfirstmod.cinder_seal": "Cinder Seal",
+  "item.myfirstmod.cinder_seal.tooltip": "Recovered from the quenched foundry vault. Craft the Cinderwalk Charm with Slagglass and a Resonite Ingot.",
+  "item.myfirstmod.cinderwalk_charm": "Cinderwalk Charm",
+  "item.myfirstmod.cinderwalk_charm.tooltip": "Carried: magma floors no longer burn you and flames die on your skin. The foundry's answer to the vents.",
+  "foundry.myfirstmod.quenched": "The crucible sighs. The fire shell falls and the channels cool to slagglass.",
+  "foundry.myfirstmod.once": "The quench holds. This forge is already cold.",
+  "foundry.myfirstmod.unworthy": "The crucible answers only to a bearer of the Rootbound and Drowned seals.",
+  "foundry.myfirstmod.unloaded": "The forge's fire lies beyond loaded chunks.",
+  "seal.myfirstmod.attuned": "The %s binds to your ledger. The chain remembers.",
+  "seal.myfirstmod.known": "This seal is already bound to your ledger.",
+  "seal.myfirstmod.plinth": "The sanctuary plinth now bears %s seals."
 }

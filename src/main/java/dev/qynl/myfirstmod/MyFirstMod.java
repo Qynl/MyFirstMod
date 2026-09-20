@@ -18,6 +18,14 @@ public class MyFirstMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        net.fabricmc.fabric.api.event.interact.v1.UseItemCallback.register((player,world,hand)->{
+            if(!world.isClient&&player instanceof net.minecraft.server.network.ServerPlayerEntity serverPlayer){
+                ActionResult seal=dev.qynl.myfirstmod.kingdom.SealChain.useSeal(serverPlayer);
+                if(seal!=ActionResult.PASS)return net.minecraft.util.TypedActionResult.success(serverPlayer.getStackInHand(hand));
+            }
+            return net.minecraft.util.TypedActionResult.pass(player.getStackInHand(hand));
+        });
+        net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity,source,amount)->!(entity instanceof net.minecraft.server.network.ServerPlayerEntity player&&dev.qynl.myfirstmod.kingdom.SealChain.charmShields(player,source)));
         ModBlocks.register();
         ModItems.register();
         ModEntities.register();
@@ -25,6 +33,7 @@ public class MyFirstMod implements ModInitializer {
         dev.qynl.myfirstmod.realm.RealmScenery.register();
         dev.qynl.myfirstmod.realm.RegionSignatures.register();
         dev.qynl.myfirstmod.kingdom.ArchiveFeature.register();
+        dev.qynl.myfirstmod.kingdom.FoundryFeature.register();
         VoidPortalManager.registerGateCommand();
         dev.qynl.myfirstmod.keep.HollowKeep.registerCommands();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(dev.qynl.myfirstmod.keep.HollowKeep::resetTickets);
@@ -59,6 +68,8 @@ public class MyFirstMod implements ModInitializer {
                     &&VoidPortalManager.tryIgnite(serverPlayer,hit.getBlockPos(),hand))return ActionResult.SUCCESS;
                 return ActionResult.PASS;
             }
+            ActionResult quench=dev.qynl.myfirstmod.kingdom.FoundryQuench.interact(serverPlayer,hit.getBlockPos());
+            if(quench!=ActionResult.PASS)return quench;
             ActionResult tide=dev.qynl.myfirstmod.kingdom.ArchiveTides.interact(serverPlayer,hit.getBlockPos());
             if(tide!=ActionResult.PASS)return tide;
             ActionResult monastery=dev.qynl.myfirstmod.kingdom.Monastery.interact(serverPlayer,hit.getBlockPos());
@@ -97,6 +108,7 @@ public class MyFirstMod implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.item.AshenFlaskItem::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.realm.RealmExpedition::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.realm.RealmTrials::tick);
+        ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.kingdom.SealChain::tick);
         ServerTickEvents.END_SERVER_TICK.register(dev.qynl.myfirstmod.rift.RealmRifts::tick);
     }
 }

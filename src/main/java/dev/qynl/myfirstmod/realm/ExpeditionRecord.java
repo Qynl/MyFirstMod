@@ -26,6 +26,7 @@ public final class ExpeditionRecord {
     public boolean hasWaystone;
     public long boundWaystone;
     public final Set<String> biomes = new LinkedHashSet<>();
+    public int seals;
     public final Set<Long> courts = new LinkedHashSet<>();
     public void discoverCourt(long pos) {
         if (courts.size() >= 128 && !courts.contains(pos)) courts.remove(courts.iterator().next());
@@ -48,6 +49,7 @@ public final class ExpeditionRecord {
         record.cathedralsOpened=Math.max(0,nbt.getInt("CathedralsOpened"));
         record.hasWaystone=nbt.getBoolean("HasWaystone");
         record.boundWaystone=nbt.getLong("BoundWaystone");
+        record.seals=nbt.getInt("Seals")&7;
         record.riftsClosed=Math.max(0,nbt.getInt("RiftsClosed"));
         record.pendingRiftCores=Math.max(0,Math.min(64,nbt.getInt("PendingRiftCores")));
         record.vigorReadyAt=nbt.getLong("VigorReadyAt");record.galeReadyAt=nbt.getLong("GaleReadyAt");
@@ -57,7 +59,7 @@ public final class ExpeditionRecord {
         record.pendingNormal = Math.max(0,Math.min(64,nbt.getInt("PendingNormal")));
         record.pendingEcho = Math.max(0,Math.min(64,nbt.getInt("PendingEcho")));
         NbtList biomes = nbt.getList("Biomes", 8);
-        for (int i=0; i<Math.min(4, biomes.size()); i++) record.biomes.add(biomes.getString(i));
+        for (int i=0; i<Math.min(8, biomes.size()); i++) record.biomes.add(biomes.getString(i));
         long[] courts = nbt.getLongArray("Courts");
         for (int i=Math.max(0,courts.length-128); i<courts.length; i++) record.discoverCourt(courts[i]);
         return record;
@@ -73,7 +75,7 @@ public final class ExpeditionRecord {
         nbt.putInt("CathedralsOpened",cathedralsOpened);
         nbt.putInt("RiftsClosed",riftsClosed);nbt.putInt("PendingRiftCores",pendingRiftCores);
         nbt.putLong("VigorReadyAt",vigorReadyAt);nbt.putLong("GaleReadyAt",galeReadyAt);
-        nbt.putBoolean("HasWaystone",hasWaystone);nbt.putLong("BoundWaystone",boundWaystone);
+        nbt.putBoolean("HasWaystone",hasWaystone);nbt.putInt("Seals",seals);nbt.putLong("BoundWaystone",boundWaystone);
         nbt.putInt("PendingNormal",pendingNormal);nbt.putInt("PendingEcho",pendingEcho);
         nbt.putInt("Trials", trials); nbt.putInt("Tier", highestTier); nbt.putInt("Victories", victories);
         NbtList list = new NbtList();
