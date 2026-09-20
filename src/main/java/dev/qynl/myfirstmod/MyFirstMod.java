@@ -25,7 +25,10 @@ public class MyFirstMod implements ModInitializer {
             }
             return net.minecraft.util.TypedActionResult.pass(player.getStackInHand(hand));
         });
-        net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity,source,amount)->!(entity instanceof net.minecraft.server.network.ServerPlayerEntity player&&dev.qynl.myfirstmod.kingdom.SealChain.charmShields(player,source)||dev.qynl.myfirstmod.item.SilentCrown.shields(player,source)));
+        net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity,source,amount)->{
+            if(!(entity instanceof net.minecraft.server.network.ServerPlayerEntity player))return true;
+            return !(dev.qynl.myfirstmod.kingdom.SealChain.charmShields(player,source)||dev.qynl.myfirstmod.item.SilentCrown.shields(player,source));
+        });
         ModBlocks.register();
         ModItems.register();
         ModEntities.register();
