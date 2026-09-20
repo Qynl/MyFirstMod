@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "phase=0": {
+      "model": "myfirstmod:block/crown_gate_0"
+    },
+    "phase=1": {
+      "model": "myfirstmod:block/crown_gate_1"
+    },
+    "phase=2": {
+      "model": "myfirstmod:block/crown_gate_2"
+    }
+  }
+}

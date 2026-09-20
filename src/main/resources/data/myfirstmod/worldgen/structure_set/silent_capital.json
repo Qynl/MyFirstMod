@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "myfirstmod:silent_capital",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 47110023,
+    "spacing": 34,
+    "separation": 24
+  }
+}

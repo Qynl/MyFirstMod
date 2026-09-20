@@ -3,6 +3,8 @@
 
 **A dark-fantasy expedition through a ruined kingdom: awaken the great Ancient City gate, prepare at a sanctuary, ring the bells of a drowned-root monastery, recover forgotten memories, descend beneath cathedrals, and challenge the guardians of a broken realm.**
 
+> **2.0.0-alpha.4 — "The Silent Capital"** completes the kingdom: a unique fixed-place citadel at **(0, -352)**, the **Crown Gate**, the three-session **Silent Court**, the **Crown Seal** and the **Crown of the Silent Court**. See [docs/CAPITAL.md](docs/CAPITAL.md).
+>
 > **2.0.0-alpha.3 — "The Ashen Foundry"** adds the third dungeon: a forge hall behind a shell of standing fire, the one-way **Quench**, the **seal chain** with its sanctuary plinth, and the **Cinderwalk Charm**. See [docs/FOUNDRY.md](docs/FOUNDRY.md).
 >
 > **2.0.0-alpha.2 — "The Wider Kingdom"** grows the realm from four to **eight authored regions** with per-region terrain shaping and landmarks, adds the **Drowned Archive** dungeon with its one-shot **Tide Bell** drain, the **Drowned Seal → Tide Lantern** progression reward, and a passive **Veil Wisp**. It is an alpha — see [the Regions record](docs/REGIONS.md) and [the Kingdom record](docs/KINGDOM.md) for exactly what is and is not verified.
@@ -20,6 +22,7 @@ Built for **Minecraft 1.21.1 · Fabric · Java 21**. The mod includes an explora
 - [New in 2.0 alpha — The Kingdom Beyond the Gate](#new-in-20-alpha--the-kingdom-beyond-the-gate)
 - [The Wider Kingdom — eight regions](#the-wider-kingdom--eight-regions)
 - [The Ashen Foundry — the chain of seals](#the-ashen-foundry--the-chain-of-seals)
+- [The Silent Capital — coronation](#the-silent-capital--coronation)
 - [The Rootbound Monastery](#the-rootbound-monastery)
 - [New in 1.8 — The Ancient Threshold](#new-in-18--the-ancient-threshold)
 - [New in 1.7 — The Hollow Keep](#new-in-17--the-hollow-keep)
@@ -90,6 +93,16 @@ Regions are routed by climate bands, so they arrive in broad connected arcs rath
 - **A reward that changes play:** the vault's Cinder Seal crafts (with Slagglass + Resonite Ingot) the **Cinderwalk Charm** — carried, magma floors no longer burn you and flames die on your skin. The vents and the foundry become terrain, not a threat.
 - **Cinder Steps signature:** those terraces now raise **basalt chimneys with smoking campfires** and slag piles, so every young region has an authored silhouette.
 - **Journal:** new *Ashen Foundry* and *Chain of Seals* pages. One seal still sleeps beneath the kingdom.
+
+## The Silent Capital — coronation
+
+![Top-down map decoded from the real silent_capital template: walls, boulevard, gardens, plaza, throne and colonnaded palace](docs/images/silent-capital.svg)
+
+- **The kingdom's capital:** a **unique** 63×63 citadel at **(0, -352)** — due north of the sanctuary — placed by a structure type that only ever starts in one fixed chunk. Ring walls with crenellations, a lamp-lined boulevard, two veil gardens, a plaza with benches, a colonnaded palace roof over prismstone floors, and a throne on its dais. Existing worlds gain it the moment that chunk is generated; nothing else moves.
+- **The Crown Gate:** the south door sleeps sealed. Use it with **three seals attuned** and the **Silent Court convenes** — three escalating sessions of sentinels, shardstalkers and heralds called to the plaza corners. The gate's `phase` (sealed / in session / ruled) persists in the block.
+- **The fourth seal:** outlive the court and the throne treasury opens **once per world**: the **Crown Seal**, last of the chain, with resonite blocks and memory shards.
+- **The coronation reward:** the Crown Seal crafts (with a Resonite Block) the **Crown of the Silent Court** — worn, falls no longer break you and the realm's dark becomes sight while you walk it.
+- **The chain completes:** the sanctuary Seal Plinth now counts to **four**, and the journal gains *Silent Capital* and *Coronation* pages. One kingdom, four seals, one ledger.
 
 ## The Rootbound Monastery
 
@@ -438,6 +451,7 @@ Realm ores replace Nullstone below roughly Y=65 and require iron-tier tools or b
 
 | Gear | Use |
 | --- | --- |
+| **Crown of the Silent Court** | Coronation: Crown Seal + Resonite Block (shapeless). Worn: fall damage negated and Night Vision in the realm |
 | **Cinderwalk Charm** | Foundry reward: Cinder Seal + Slagglass + Resonite Ingot (shapeless). Carried: magma floors and flames no longer burn you |
 | **Tide Lantern** | Archive reward: Prism Lamp + Drowned Seal + Resonite Ingot (shapeless). Use for 40s Water Breathing + 20s Night Vision; 90s cooldown |
 | **Briarbrand** | Monastery weapon: hold one second, release a narrow 4-block thorn sweep for 9 damage, Slowness III for three seconds and one heart healed on a hit; 10-second cooldown, 3 durability, base melee 7 damage at 1.6 speed |
@@ -560,7 +574,7 @@ Windows: use `gradlew.bat`. Installable output is in `build/libs/`; omit source 
 3. A real Fabric dedicated-server smoke test.
 4. Separate installable-JAR and validation-report artifacts.
 
-The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, all five region signatures, a complete Drowned Archive, a complete Ashen Foundry and the full monastery template, inspects cathedral and monastery spawner IDs and chest loot tables, runs the custom monastery structure type, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
+The server test starts the realm, generates terrain, places ruins/vaults/shrines/observatories/cathedrals/memorials, all five region signatures, a complete Drowned Archive, a complete Ashen Foundry, the full capital template and the full monastery template, inspects cathedral and monastery spawner IDs and chest loot tables, runs the custom monastery structure type, exercises ore/nursery/ledger loot, summons entities/items, builds the actual Hollow Keep through its incremental constructor, inspects its room anchors and towers, summons the Regent, saves, and shuts down. Repeated memorial placements do not guarantee all random layouts were selected.
 
 **This is not a combat bot.** It does not prove that a human completed a rite, channelled a flask, bought from a ledger, used the atlas, or enjoyed the fight. Manual checks are listed in [TESTING.md](docs/TESTING.md).
 
@@ -580,6 +594,7 @@ python3 scripts/generate_pilgrimage.py
 python3 scripts/generate_remembrance.py
 python3 scripts/generate_keep.py
 python3 scripts/generate_kingdom.py
+python3 scripts/generate_capital.py
 python3 scripts/generate_gallery.py
 python3 -m unittest discover -s tests -v
 ```
@@ -605,6 +620,7 @@ The original generated textures are deterministic. Translations and Java models 
 
 ### Further reading and history
 
+- [2.0 alpha.4 Capital record](docs/CAPITAL.md)
 - [2.0 alpha.3 Foundry record](docs/FOUNDRY.md)
 - [2.0 alpha.2 Regions record](docs/REGIONS.md)
 - [2.0 alpha Kingdom record](docs/KINGDOM.md)

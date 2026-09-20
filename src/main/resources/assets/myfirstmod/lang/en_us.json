@@ -399,5 +399,17 @@
   "foundry.myfirstmod.unloaded": "The forge's fire lies beyond loaded chunks.",
   "seal.myfirstmod.attuned": "The %s binds to your ledger. The chain remembers.",
   "seal.myfirstmod.known": "This seal is already bound to your ledger.",
-  "seal.myfirstmod.plinth": "The sanctuary plinth now bears %s seals."
+  "seal.myfirstmod.plinth": "The sanctuary plinth now bears %s seals.",
+  "block.myfirstmod.crown_gate": "Crown Gate",
+  "item.myfirstmod.crown_seal": "Crown Seal",
+  "item.myfirstmod.crown_seal.tooltip": "The fourth seal, taken from the Silent Court. Craft the Crown of the Silent Court with a Resonite Block.",
+  "item.myfirstmod.silent_crown": "Crown of the Silent Court",
+  "item.myfirstmod.silent_crown.tooltip": "Worn: the realm no longer breaks your fall, and its dark becomes sight. The kingdom knows its crowned.",
+  "court.myfirstmod.unworthy": "The Crown Gate answers only to a bearer of three seals.",
+  "court.myfirstmod.session": "The court is in session. Stand your ground.",
+  "court.myfirstmod.ruled": "The court has ruled. Its treasury is open.",
+  "court.myfirstmod.wave": "The court calls its %s. hold the plaza.",
+  "court.myfirstmod.open": "The Crown Gate unfolds. The Silent Capital remembers its court.",
+  "journal.myfirstmod.capital": "SILENT CAPITAL\n\nDue north of the sanctuary, past the last ridge: (0, -352).\n\nWalls, boulevard, gardens, colonnades and a throne under a pale roof. The Crown Gate sleeps at the south door.",
+  "journal.myfirstmod.coronation": "CORONATION\n\nThree seals attuned, use the Crown Gate. The court convenes in three sessions.\n\nOutlive them and the throne treasury opens: the Crown Seal, last of the chain. Wear the crown and the realm softens."
 }

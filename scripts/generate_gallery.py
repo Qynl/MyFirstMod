@@ -145,6 +145,57 @@ s.append(text(OX+420,OY+19*CELL+34,'Quench once with two seals attuned:',14))
 s.append(text(OX+420,OY+19*CELL+58,'the shell falls, channels cool,',13))
 s.append(text(OX+420,OY+19*CELL+80,'the vault opens. The quench holds.',13))
 s.append('</svg>');(OUT/'ashen-foundry.svg').write_text('\n'.join(s)+'\n')
+
+# Silent Capital: top-down map decoded from the real template NBT. Not a screenshot.
+import gzip,struct as _st
+DATA=B/'src/main/resources/data/myfirstmod'
+def _capital_map():
+    raw=gzip.decompress((DATA/'structure/silent_capital.nbt').read_bytes())
+    state=[3]
+    def rs():
+        n=_st.unpack('>H',raw[state[0]:state[0]+2])[0];state[0]+=2
+        v=raw[state[0]:state[0]+n].decode();state[0]+=n;return v
+    def col(kind):
+        if kind==8:return rs()
+        if kind==3:
+            v=_st.unpack('>i',raw[state[0]:state[0]+4])[0];state[0]+=4;return v
+        if kind==10:
+            out={}
+            while True:
+                k=raw[state[0]];state[0]+=1
+                if k==0:return out
+                name=rs();out[name]=col(k)
+        if kind==9:
+            inner=raw[state[0]];state[0]+=1
+            n=_st.unpack('>i',raw[state[0]:state[0]+4])[0];state[0]+=4
+            return [col(inner) for _ in range(n)]
+        raise AssertionError(kind)
+    assert raw[0]==10
+    root={}
+    while True:
+        k=raw[state[0]];state[0]+=1
+        if k==0:break
+        name=rs();root[name]=col(k)
+    top={}
+    for b in root['blocks']:
+        x,y,z=b['pos'];name=root['palette'][b['state']]['Name']
+        if name=='minecraft:air':continue
+        if (x,z) not in top or y>top[(x,z)][1]:top[(x,z)]=(name,y)
+    return top
+COLORS={'myfirstmod:crown_gate':'#f0c040','myfirstmod:waystone':'#64d8c8','myfirstmod:nullstone_bricks':'#5a6472','myfirstmod:polished_nullstone':'#39424e','myfirstmod:veilstone':'#7e9096','myfirstmod:prismstone':'#6b5a8c','myfirstmod:hushed_moss':'#2f6b52','myfirstmod:hush_leaves':'#1f4a38','myfirstmod:prism_lamp':'#a0eee5','minecraft:spawner':'#a03030'}
+top=_capital_map()
+CELL=10;OX=60;OY=140
+s=svg(860,1080,'THE SILENT CAPITAL','Top-down map decoded from the real silent_capital template: walls, boulevard, gardens, plaza, throne and colonnaded palace. A navigation map, not an in-game screenshot.')
+for (x,z),(name,y) in sorted(top.items()):
+    s.append(f'<rect x="{OX+x*CELL}" y="{OY+z*CELL}" width="{CELL}" height="{CELL}" fill="{COLORS.get(name,"#23262c")}"/>')
+s.append(text(OX,OY-12,'63 x 63 citadel at (0, -352). Crown Gate at the south door; throne under the palace roof.',14))
+for i,(label,color) in enumerate(COLORS.items()):
+    y=OY+63*CELL+30+i*22
+    s += [f'<rect x="{OX}" y="{y-13}" width="14" height="14" fill="{color}"/>',text(OX+22,y,label.split(":")[1],12)]
+s.append(text(OX+320,OY+63*CELL+30,'Three seals attuned, use the Crown Gate:',14))
+s.append(text(OX+320,OY+63*CELL+54,'the Silent Court convenes in three sessions.',13))
+s.append(text(OX+320,OY+63*CELL+76,'Outlive them; the throne treasury opens once.',13))
+s.append('</svg>');(OUT/'silent-capital.svg').write_text('\n'.join(s)+'\n')
 # Dimension route diagram, to exact portal block proportions.
 s=svg(1100,420,'AWAKEN THE ANCIENT CITY','22 by 8 reinforced-deepslate frame with a 20 by 6 opening. Three-second awakening, Echo Shard to the Null Realm sanctuary and its matching return gateway, then Hollow Keep after a Warden clear.')
 s.append(text(30,76,'Find the central monument • Right-click any frame block with one Echo Shard • hold it still for three seconds'))

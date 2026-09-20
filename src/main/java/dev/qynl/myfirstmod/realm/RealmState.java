@@ -14,6 +14,9 @@ public final class RealmState extends PersistentState {
     public boolean sanctuaryBuilt,thresholdBuilt;
     public long plinthPos;
     public int worldSeals;
+    public long courtPos;
+    public int courtWave;
+    public final java.util.List<java.util.UUID> courtActors=new java.util.ArrayList<>();
     public int bossClears, contentVersion;
     public long rematchReadyAt;
     public final Map<java.util.UUID, ExpeditionRecord> expeditions = new HashMap<>();
@@ -32,7 +35,10 @@ public final class RealmState extends PersistentState {
         state.sanctuaryBuilt=nbt.getBoolean("SanctuaryBuilt");
         state.thresholdBuilt=nbt.getBoolean("ThresholdBuilt");
         state.plinthPos=nbt.getLong("PlinthPos");
-        state.worldSeals=nbt.getInt("WorldSeals")&7;
+        state.worldSeals=nbt.getInt("WorldSeals")&15;
+        state.courtPos=nbt.getLong("CourtPos");
+        state.courtWave=Math.max(0,Math.min(3,nbt.getInt("CourtWave")));
+        for(long id:nbt.getLongArray("CourtActors"))state.courtActors.add(new java.util.UUID(id>>32,id&0xffffffffL));
         state.contentVersion=nbt.getInt("ContentVersion");
         state.bossClears=Math.max(0,nbt.getInt("BossClears"));
         state.rematchReadyAt=nbt.getLong("RematchReadyAt");
@@ -60,6 +66,9 @@ public final class RealmState extends PersistentState {
         nbt.putBoolean("ThresholdBuilt",thresholdBuilt);
         nbt.putLong("PlinthPos",plinthPos);
         nbt.putInt("WorldSeals",worldSeals);
+        nbt.putLong("CourtPos",courtPos);
+        nbt.putInt("CourtWave",courtWave);
+        nbt.putLongArray("CourtActors",courtActors.stream().limit(16).mapToLong(id->id.getMostSignificantBits()<<32|id.getLeastSignificantBits()).toArray());
         nbt.putInt("BossClears",bossClears);
         nbt.putInt("ContentVersion",contentVersion);
         nbt.putLong("RematchReadyAt",rematchReadyAt);

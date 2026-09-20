@@ -1,0 +1,7 @@
+{
+  "type": "myfirstmod:silent_capital",
+  "biomes": "#myfirstmod:has_silent_capital",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "beard_thin"
+}

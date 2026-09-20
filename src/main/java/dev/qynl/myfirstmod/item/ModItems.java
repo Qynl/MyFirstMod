@@ -64,6 +64,8 @@ public final class ModItems {
     public static final Item ROOTBOUND_SEAL=register("rootbound_seal",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
     public static final Item BRIARBRAND=register("briarbrand",new BriarbrandItem(new Item.Settings().maxDamage(1800).fireproof().rarity(Rarity.EPIC)));
     public static final Item DROWNED_SEAL=register("drowned_seal",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
+    public static final Item CROWN_SEAL=register("crown_seal",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
+    public static final Item SILENT_CROWN=register("silent_crown",new net.minecraft.item.ArmorItem(ResoniteArmor.MATERIAL,net.minecraft.item.ArmorItem.Type.HELMET,new Item.Settings().maxCount(1).fireproof().rarity(Rarity.EPIC)));
     public static final Item CINDER_SEAL=register("cinder_seal",new Item(new Item.Settings().fireproof().rarity(Rarity.EPIC)));
     public static final Item CINDERWALK_CHARM=register("cinderwalk_charm",new Item(new Item.Settings().maxCount(1).fireproof().rarity(Rarity.RARE)));
     public static final Item TIDE_LANTERN=register("tide_lantern",new TideLanternItem(new Item.Settings().maxCount(1).fireproof().rarity(Rarity.RARE)));

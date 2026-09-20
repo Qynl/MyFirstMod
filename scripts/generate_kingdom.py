@@ -198,7 +198,7 @@ for quenched in [False,True]:
     suffix='' if not quenched else '_quenched'
     put(A,'models/block/ember_crucible'+suffix+'.json',{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/ember_crucible'+suffix}})
 put(A,'blockstates/ember_crucible.json',{'variants':{'quenched=false':{'model':'myfirstmod:block/ember_crucible'},'quenched=true':{'model':'myfirstmod:block/ember_crucible_quenched'}}})
-for seals in range(4):
+for seals in range(5):
     pixels=[]
     for y in range(16):
         for x in range(16):
@@ -209,7 +209,7 @@ for seals in range(4):
             pixels.append(c if len(c)==4 else c+(255,))
     png('block/seal_plinth_%d.png'%seals,16,16,pixels)
     put(A,'models/block/seal_plinth_%d.json'%seals,{'parent':'minecraft:block/cube_all','textures':{'all':'myfirstmod:block/seal_plinth_%d'%seals}})
-put(A,'blockstates/seal_plinth.json',{'variants':{'seals=0':{'model':'myfirstmod:block/seal_plinth_0'},'seals=1':{'model':'myfirstmod:block/seal_plinth_1'},'seals=2':{'model':'myfirstmod:block/seal_plinth_2'},'seals=3':{'model':'myfirstmod:block/seal_plinth_3'}}})
+put(A,'blockstates/seal_plinth.json',{'variants':{'seals=0':{'model':'myfirstmod:block/seal_plinth_0'},'seals=1':{'model':'myfirstmod:block/seal_plinth_1'},'seals=2':{'model':'myfirstmod:block/seal_plinth_2'},'seals=3':{'model':'myfirstmod:block/seal_plinth_3'},'seals=4':{'model':'myfirstmod:block/seal_plinth_4'}}})
 sprite('cinder_seal',[([(16,1),(29,10),(27,24),(16,31),(5,24),(3,10)],(70,36,26)), ([(16,5),(25,12),(23,23),(16,27),(9,23),(7,12)],(240,150,70)), ([(13,10),(19,10),(21,16),(16,22),(11,16)],(255,220,140)), ([(15,13),(17,13),(17,18),(15,18)],(120,50,20))])
 sprite('cinderwalk_charm',[([(14,2),(18,2),(18,5),(14,5)],(120,120,130)), ([(10,5),(22,5),(24,14),(16,26),(8,14)],(60,56,64)), ([(12,8),(20,8),(21,14),(16,21),(11,14)],(240,150,70)), ([(15,11),(17,11),(18,14),(16,17),(14,14)],(255,230,160)), ([(15,26),(17,26),(17,30),(15,30)],(90,86,96))])
 for name in ['cinder_seal','cinderwalk_charm']:

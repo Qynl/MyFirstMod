@@ -49,7 +49,7 @@ public final class ExpeditionRecord {
         record.cathedralsOpened=Math.max(0,nbt.getInt("CathedralsOpened"));
         record.hasWaystone=nbt.getBoolean("HasWaystone");
         record.boundWaystone=nbt.getLong("BoundWaystone");
-        record.seals=nbt.getInt("Seals")&7;
+        record.seals=nbt.getInt("Seals")&15;
         record.riftsClosed=Math.max(0,nbt.getInt("RiftsClosed"));
         record.pendingRiftCores=Math.max(0,Math.min(64,nbt.getInt("PendingRiftCores")));
         record.vigorReadyAt=nbt.getLong("VigorReadyAt");record.galeReadyAt=nbt.getLong("GaleReadyAt");

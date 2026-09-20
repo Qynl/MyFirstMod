@@ -17,12 +17,13 @@ import net.minecraft.util.math.BlockPos;
 /** The royal seals form a chain: attunement is permanent per player, the sanctuary plinth
  * counts the world's chain, and the Cinderwalk Charm answers the vents' heat. */
 public final class SealChain {
-    public static final int ROOT=1,DROWNED=2,CINDER=4;
+    public static final int ROOT=1,DROWNED=2,CINDER=4,CROWN=8;
     private SealChain(){}
     public static int bit(Item item){
         if(item==ModItems.ROOTBOUND_SEAL)return ROOT;
         if(item==ModItems.DROWNED_SEAL)return DROWNED;
         if(item==ModItems.CINDER_SEAL)return CINDER;
+        if(item==ModItems.CROWN_SEAL)return CROWN;
         return 0;}
     public static ActionResult useSeal(ServerPlayerEntity player){
         var stack=player.getMainHandStack();

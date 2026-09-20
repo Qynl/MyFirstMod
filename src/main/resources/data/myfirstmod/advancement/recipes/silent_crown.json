@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "seal": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "myfirstmod:crown_seal"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "myfirstmod:silent_crown"
+    ]
+  }
+}

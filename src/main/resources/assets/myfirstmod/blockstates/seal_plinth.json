@@ -11,6 +11,9 @@
     },
     "seals=3": {
       "model": "myfirstmod:block/seal_plinth_3"
+    },
+    "seals=4": {
+      "model": "myfirstmod:block/seal_plinth_4"
     }
   }
 }

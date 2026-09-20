@@ -20,7 +20,7 @@ class FoundryTests(unittest.TestCase):
             texture=ASSETS/('textures/'+load(ASSETS/('models/'+variant['model'].split(':',1)[1]+'.json'))['textures']['all'].split(':',1)[1]+'.png')
             self.assertTrue(texture.exists(),str(texture))
         plinth=load(ASSETS/'blockstates/seal_plinth.json')['variants']
-        self.assertEqual(sorted(plinth),['seals=0','seals=1','seals=2','seals=3'])
+        self.assertEqual(sorted(plinth),['seals=0','seals=1','seals=2','seals=3','seals=4'])
         for variant in plinth.values():
             self.assertTrue((ASSETS/('textures/'+variant['model'].split(':',1)[1]+'.png')).exists())
     def test_slagglass_is_a_full_block(self):
@@ -34,7 +34,7 @@ class FoundryTests(unittest.TestCase):
     def test_seal_chain_persistence(self):
         record=(SRC/'realm/ExpeditionRecord.java').read_text()
         self.assertIn('public int seals;',record)
-        self.assertIn('record.seals=nbt.getInt("Seals")&7;',record)
+        self.assertIn('record.seals=nbt.getInt("Seals")&15;',record)
         self.assertIn('nbt.putInt("Seals",seals);',record)
         self.assertIn('Math.min(8, biomes.size())',record)
         state=(SRC/'realm/RealmState.java').read_text()
@@ -52,7 +52,7 @@ class FoundryTests(unittest.TestCase):
         self.assertIn('ModBlocks.SLAGGLASS',quench)
         self.assertIn('isChunkLoaded',quench)
         chain=(SRC/'kingdom/SealChain.java').read_text()
-        self.assertIn('public static final int ROOT=1,DROWNED=2,CINDER=4;',chain)
+        self.assertIn('public static final int ROOT=1,DROWNED=2,CINDER=4,CROWN=8;',chain)
         self.assertIn('DamageTypes.HOT_FLOOR',chain)
         self.assertIn('setFireTicks(0)',chain)
         main=(SRC/'MyFirstMod.java').read_text()

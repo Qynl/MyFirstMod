@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "myfirstmod:crown_seal"
+    },
+    {
+      "item": "myfirstmod:resonite_block"
+    }
+  ],
+  "result": {
+    "id": "myfirstmod:silent_crown",
+    "count": 1
+  }
+}

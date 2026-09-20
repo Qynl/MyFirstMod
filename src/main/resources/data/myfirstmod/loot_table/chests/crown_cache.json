@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "myfirstmod:crown_seal"
+        }
+      ]
+    },
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "myfirstmod:resonite_block",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "myfirstmod:memory_shard",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:echo_shard",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}
