@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -45,7 +46,7 @@ public class PaladinMaceItem extends Item {
                     e -> e != player && e.isAlive() && FactionManager.isHostile(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
             for (LivingEntity enemy : enemies) {
-                float smiteDmg = enemy.isUndead() ? 18.0f : 10.0f;
+                float smiteDmg = enemy.getType().isIn(EntityTypeTags.UNDEAD) ? 18.0f : 10.0f;
                 enemy.damage(serverWorld.getDamageSources().magic(), smiteDmg);
                 serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 15, 0.3, 0.5, 0.3, 0.1);
             }

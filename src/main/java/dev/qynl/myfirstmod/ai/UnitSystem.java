@@ -19,6 +19,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
+import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -58,7 +59,7 @@ public final class UnitSystem {
         String factionId = unit.factionId;
 
         // Prevent custom undead units from burning in daytime sunlight
-        if (mob.isOnFire() && world.isDay() && mob.isUndead()) {
+        if (mob.isOnFire() && world.isDay() && mob.getType().isIn(EntityTypeTags.UNDEAD)) {
             mob.extinguish();
         }
 

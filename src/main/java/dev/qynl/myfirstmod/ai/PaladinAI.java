@@ -6,6 +6,7 @@ import dev.qynl.myfirstmod.unit.UnitDefinition;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -32,7 +33,7 @@ public final class PaladinAI {
             paladin.swingHand(Hand.MAIN_HAND);
 
             float damage = unit.attackDamage;
-            if (target.isUndead()) {
+            if (target.getType().isIn(EntityTypeTags.UNDEAD)) {
                 damage *= 1.6f; // Radiant smite bonus vs undead
                 world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, target.getX(), target.getBodyY(0.5), target.getZ(), 10, 0.3, 0.3, 0.3, 0.1);
             }
