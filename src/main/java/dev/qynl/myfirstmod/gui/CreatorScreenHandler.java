@@ -24,5 +24,8 @@ public class CreatorScreenHandler extends ScreenHandler {
         if(id==1){UnitDefinition u=new UnitDefinition("archer","Royal Archer",Identifier.of("minecraft","skeleton"));u.factionId="village";u.role="ranged";u.attackDamage=5;u.equipment.put(EquipmentSlot.MAINHAND,new ItemStack(Items.BOW));d.saveUnit(u);}
         if(id==2){d.factions.putIfAbsent("village",new Faction("village","Village Alliance"));d.factions.putIfAbsent("raiders",new Faction("raiders","Iron Raiders"));d.factions.get("village").relations.put("raiders",Faction.Relation.HOSTILE);d.factions.get("raiders").relations.put("village",Faction.Relation.HOSTILE);d.markDirty();}
         if(id==3){String first=d.firstUnit();if(!first.isBlank()){d.equipped.put(sp.getUuid(),first);d.markDirty();}}
+        if(id==4){String first=d.firstUnit();var source=d.units.get(first);if(source!=null){UnitDefinition copy=new UnitDefinition(source.toNbt());copy.id=first+"_copy";copy.name=source.name+" Copy";d.saveUnit(copy);}}
+        if(id==5){String first=d.firstUnit();if(!first.isBlank()){d.units.remove(first);d.markDirty();}}
+        if(id==6){var guard=d.units.get("guard");var archer=d.units.get("archer");if(guard!=null)dev.qynl.myfirstmod.unit.UnitSystem.spawnAt(sp,guard,sp.getX()+2,sp.getY(),sp.getZ()+2);if(archer!=null)dev.qynl.myfirstmod.unit.UnitSystem.spawnAt(sp,archer,sp.getX()+10,sp.getY(),sp.getZ()+10);}}
         return true; }
 }

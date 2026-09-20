@@ -32,8 +32,9 @@ public final class UnitSystem {
         return unit.attackHostile && target instanceof HostileEntity;
     }
     private static String tagValue(net.minecraft.entity.Entity e,String prefix){ return e.getCommandTags().stream().filter(s->s.startsWith(prefix)).map(s->s.substring(prefix.length())).findFirst().orElse(null); }
-    public static boolean spawn(ServerPlayerEntity player, UnitDefinition unit) {
+    public static boolean spawn(ServerPlayerEntity player, UnitDefinition unit) { return spawnAt(player, unit, player.getX()+2, player.getY(), player.getZ()+2); }
+    public static boolean spawnAt(ServerPlayerEntity player, UnitDefinition unit, double x, double y, double z) {
         var type=net.minecraft.registry.Registries.ENTITY_TYPE.getOrEmpty(unit.entityId).orElse(null); if(type==null||!type.isSummonable())return false; var entity=type.create(player.getServerWorld()); if(!(entity instanceof LivingEntity living))return false;
-        living.refreshPositionAndAngles(player.getX()+2,player.getY(),player.getZ()+2,player.getYaw(),0); unit.apply(living); living.getCommandTags().add("unit:"+unit.id); living.getCommandTags().add("faction:"+unit.factionId); player.getServerWorld().spawnEntity(living); return true;
+        living.refreshPositionAndAngles(x,y,z,player.getYaw(),0); unit.apply(living); living.getCommandTags().add("unit:"+unit.id); living.getCommandTags().add("faction:"+unit.factionId); player.getServerWorld().spawnEntity(living); return true;
     }
 }
