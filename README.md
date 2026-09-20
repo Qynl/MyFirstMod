@@ -60,3 +60,13 @@ Medic and support roles are active gameplay roles. They search a bounded area fo
 ```
 
 Commanders rally nearby faction members with Strength. Squad members follow their commander. Injured units consume food from their hand or compatible inventory. Kills and deaths are persisted per faction in server world data and can be viewed with `/unit stats`.
+
+## Target priorities and ammunition
+
+Units can prioritize commanders, medics, ranged units, weakest targets, or nearest targets:
+
+```text
+/unit set royal_guard priority commander
+```
+
+Ranged templates receive an ammunition budget from their saved arrow inventory. The simulation tracks that budget on each spawned unit and stops custom ranged units when ammunition is exhausted instead of silently granting unlimited supplies.

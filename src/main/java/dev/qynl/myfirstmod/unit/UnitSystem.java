@@ -30,9 +30,10 @@ public final class UnitSystem {
         if(unit.commander && mob.age%100==0) rally(world,mob);
         followSquad(world,mob);
         LivingEntity target = mob.getTarget(); if (!valid(server, unit, mob, target)) {
-            target = world.getEntitiesByClass(LivingEntity.class, mob.getBoundingBox().expand(unit.followRange), e -> e != mob && valid(server, unit, mob, e)).stream().min((a,b)->Double.compare(mob.squaredDistanceTo(a),mob.squaredDistanceTo(b))).orElse(null); mob.setTarget(target);
+            target = world.getEntitiesByClass(LivingEntity.class, mob.getBoundingBox().expand(unit.followRange), e -> e != mob && valid(server, unit, mob, e)).stream().min((a,b)->Double.compare(targetScore(server, unit, mob, a),targetScore(server, unit, mob, b))).orElse(null); mob.setTarget(target);
         }
-        if(target!=null){ if(unit.retreatHealth > 0 && mob.getHealth() <= mob.getMaxHealth() * unit.retreatHealth){ double dx=mob.getX()-target.getX(), dz=mob.getZ()-target.getZ(); mob.getNavigation().startMovingTo(mob.getX()+dx*4, mob.getY(), mob.getZ()+dz*4, 1.15); return; } double distance=mob.squaredDistanceTo(target); if(unit.role.equalsIgnoreCase("ranged")){ if(distance<64) mob.getNavigation().startMovingTo(target.getX(),target.getY(),target.getZ(),0.8); else if(distance>256) mob.getNavigation().startMovingTo(target,1.0); } else if(distance>4.0) mob.getNavigation().startMovingTo(target,1.0); else if(mob.age%10==0){ boolean alive=target.isAlive(); mob.tryAttack(target); if(alive&&!target.isAlive()){String a=tagValue(mob,"faction:"),v=tagValue(target,"faction:");if(a!=null)BattleStats.get(server).kill(a);if(v!=null)BattleStats.get(server).death(v);} } }
+        if(target!=null && unit.role.equalsIgnoreCase("ranged") && numericTag(mob,"ammo:") <= 0){ mob.setTarget(null); return; }
+        if(target!=null){ if(unit.role.equalsIgnoreCase("ranged") && mob.age%20==0) consumeAmmoTag(mob); if(unit.retreatHealth > 0 && mob.getHealth() <= mob.getMaxHealth() * unit.retreatHealth){ double dx=mob.getX()-target.getX(), dz=mob.getZ()-target.getZ(); mob.getNavigation().startMovingTo(mob.getX()+dx*4, mob.getY(), mob.getZ()+dz*4, 1.15); return; } double distance=mob.squaredDistanceTo(target); if(unit.role.equalsIgnoreCase("ranged")){ if(distance<64) mob.getNavigation().startMovingTo(target.getX(),target.getY(),target.getZ(),0.8); else if(distance>256) mob.getNavigation().startMovingTo(target,1.0); } else if(distance>4.0) mob.getNavigation().startMovingTo(target,1.0); else if(mob.age%10==0){ boolean alive=target.isAlive(); mob.tryAttack(target); if(alive&&!target.isAlive()){String a=tagValue(mob,"faction:"),v=tagValue(target,"faction:");if(a!=null)BattleStats.get(server).kill(a);if(v!=null)BattleStats.get(server).death(v);} } }
     }
     private static void eatWhenInjured(MobEntity mob, UnitDefinition unit) {
         if(mob.getHealth() > mob.getMaxHealth()*0.5f || mob.age%80!=0) return;
@@ -66,6 +67,15 @@ public final class UnitSystem {
             }
         }
     }
+    private static double targetScore(MinecraftServer server, UnitDefinition unit, MobEntity self, LivingEntity target) {
+        double score=self.squaredDistanceTo(target);
+        String targetUnit=tagValue(target,"unit:");
+        if(unit.targetPriority.equalsIgnoreCase("commander") && tagValue(target,"commander")!=null) score-=10000;
+        if(unit.targetPriority.equalsIgnoreCase("medic") && targetUnit!=null && server!=null){var t=UnitWorldData.get(server).units.get(targetUnit);if(t!=null&&(t.role.equalsIgnoreCase("medic")||t.role.equalsIgnoreCase("support")))score-=5000;}
+        if(unit.targetPriority.equalsIgnoreCase("ranged") && targetUnit!=null && server!=null){var t=UnitWorldData.get(server).units.get(targetUnit);if(t!=null&&t.role.equalsIgnoreCase("ranged"))score-=2500;}
+        if(unit.targetPriority.equalsIgnoreCase("weakest")) score += target.getHealth()*20;
+        return score;
+    }
     private static boolean valid(MinecraftServer server, UnitDefinition unit, MobEntity self, LivingEntity target) {
         if(target==null||!target.isAlive()||target.isSpectator())return false; if(target instanceof PlayerEntity && !unit.attackPlayers)return false;
         String mine=tagValue(self,"faction:"); String theirs=tagValue(target,"faction:"); if(mine!=null&&mine.equals(theirs))return false;
@@ -73,9 +83,11 @@ public final class UnitSystem {
         return unit.attackHostile && target instanceof HostileEntity;
     }
     private static String tagValue(net.minecraft.entity.Entity e,String prefix){ return e.getCommandTags().stream().filter(s->s.startsWith(prefix)).map(s->s.substring(prefix.length())).findFirst().orElse(null); }
+    private static int numericTag(net.minecraft.entity.Entity e,String prefix){try{return Integer.parseInt(tagValue(e,prefix));}catch(Exception ignored){return 0;}}
+    private static void consumeAmmoTag(net.minecraft.entity.Entity e){int amount=numericTag(e,"ammo:");if(amount>0){e.getCommandTags().remove("ammo:"+amount);e.getCommandTags().add("ammo:"+(amount-1));}}
     public static boolean spawn(ServerPlayerEntity player, UnitDefinition unit) { return spawnAt(player, unit, player.getX()+2, player.getY(), player.getZ()+2); }
     public static boolean spawnAt(ServerPlayerEntity player, UnitDefinition unit, double x, double y, double z) {
         var type=net.minecraft.registry.Registries.ENTITY_TYPE.getOrEmpty(unit.entityId).orElse(null); if(type==null||!type.isSummonable())return false; var entity=type.create(player.getServerWorld()); if(!(entity instanceof LivingEntity living))return false;
-        living.refreshPositionAndAngles(x,y,z,player.getYaw(),0); unit.apply(living); living.getCommandTags().add("unit:"+unit.id); living.getCommandTags().add("faction:"+unit.factionId); if(!unit.squad.isBlank()) living.getCommandTags().add("squad:"+unit.squad); if(unit.commander) living.getCommandTags().add("commander"); living.getCommandTags().add("rank:"+unit.rank); player.getServerWorld().spawnEntity(living); return true;
+        living.refreshPositionAndAngles(x,y,z,player.getYaw(),0); unit.apply(living); living.getCommandTags().add("unit:"+unit.id); living.getCommandTags().add("faction:"+unit.factionId); if(!unit.squad.isBlank()) living.getCommandTags().add("squad:"+unit.squad); if(unit.commander) living.getCommandTags().add("commander"); living.getCommandTags().add("rank:"+unit.rank); if(unit.role.equalsIgnoreCase("ranged")) living.getCommandTags().add("ammo:"+unit.inventory.stream().filter(s->s.isOf(net.minecraft.item.Items.ARROW)||s.isOf(net.minecraft.item.Items.SPECTRAL_ARROW)||s.isOf(net.minecraft.item.Items.TIPPED_ARROW)).mapToInt(net.minecraft.item.ItemStack::getCount).sum()); player.getServerWorld().spawnEntity(living); return true;
     }
 }
