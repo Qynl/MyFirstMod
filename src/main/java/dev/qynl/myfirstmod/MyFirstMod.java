@@ -18,7 +18,7 @@ public class MyFirstMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        net.fabricmc.fabric.api.event.interact.v1.UseItemCallback.register((player,world,hand)->{
+        net.fabricmc.fabric.api.event.player.UseItemCallback.register((player,world,hand)->{
             if(!world.isClient&&player instanceof net.minecraft.server.network.ServerPlayerEntity serverPlayer){
                 ActionResult seal=dev.qynl.myfirstmod.kingdom.SealChain.useSeal(serverPlayer);
                 if(seal!=ActionResult.PASS)return net.minecraft.util.TypedActionResult.success(serverPlayer.getStackInHand(hand));

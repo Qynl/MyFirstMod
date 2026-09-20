@@ -33,7 +33,7 @@ public final class SealChain {
         if((record.seals&bit)!=0){player.sendMessage(Text.translatable("seal.myfirstmod.known"),true);return ActionResult.SUCCESS;}
         record.seals|=bit;state.worldSeals|=bit;state.markDirty();
         player.sendMessage(Text.translatable("seal.myfirstmod.attuned",stack.getName()),false);
-        player.playSound(SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,SoundCategory.PLAYERS,1,1.1f);
+        player.playSound(SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME,1,1.1f);
         ensurePlinth(player.getServer());
         return ActionResult.SUCCESS;
     }
