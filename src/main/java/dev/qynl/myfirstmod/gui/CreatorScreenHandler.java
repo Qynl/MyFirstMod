@@ -19,7 +19,7 @@ public class CreatorScreenHandler extends ScreenHandler {
     private static final EquipmentSlot[] EDIT_SLOTS={EquipmentSlot.HEAD,EquipmentSlot.CHEST,EquipmentSlot.LEGS,EquipmentSlot.FEET,EquipmentSlot.MAINHAND,EquipmentSlot.OFFHAND};
     private final SimpleInventory editorInventory=new SimpleInventory(6);
     public CreatorScreenHandler(int syncId, PlayerInventory inventory){super(ModScreenHandlers.CREATOR,syncId);
-        for(int i=0;i<6;i++) addSlot(new Slot(editorInventory,i,225+(i%3)*22,88+(i/3)*22));
+        for(int i=0;i<6;i++) addSlot(new Slot(editorInventory,i,225+(i%3)*22,185+(i/3)*22));
         if(inventory.player instanceof ServerPlayerEntity server){var d=UnitWorldData.get(server.getServer());var u=d.units.get(d.firstUnit());if(u!=null) for(int i=0;i<6;i++) editorInventory.setStack(i,u.equipment.getOrDefault(EDIT_SLOTS[i],ItemStack.EMPTY).copy());}
     }
     @Override public ItemStack quickMove(PlayerEntity player,int slot){return ItemStack.EMPTY;}

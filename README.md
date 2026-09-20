@@ -83,3 +83,32 @@ Faction perks are data-driven and persistent:
 ```
 
 These affect real attributes or server-side healing rather than merely changing UI text.
+
+## Creator dashboard
+
+The creator is designed as a dashboard rather than a single-purpose spawner. It has separate Units, Factions, Battle, and Settings areas, a searchable unit library, template cards, duplicate/delete actions, and a synchronized six-slot equipment editor.
+
+![Unit and Faction Sandbox dashboard](docs/unit-sandbox-dashboard.png)
+
+> The image above is a design reference for the dashboard layout. In-game rendering uses Minecraft's native widgets and inventory slot rendering so the equipment is interactive and server-synchronized.
+
+### Unit authoring workflow
+
+1. Open the Unit Creator from the Tools creative tab or give it with `/give @s myfirstmod:unit_creator`.
+2. Create a guard, archer, or medic template from the Units tab.
+3. Drag armor and items into the equipment editor and press **Save Equipment**.
+4. Use `/unit` commands for arbitrary registry entity types, names, stats, roles, inventories, squads, ranks, and priorities.
+5. Equip the saved template and spawn it with the creator tool.
+
+### Gameplay loops
+
+- Build a faction with allied, neutral, or hostile relationships.
+- Create frontline, ranged, medic, scout, commander, and support units.
+- Give ranged units finite arrow supplies and medics finite potion supplies.
+- Assign squads and commanders so units rally and regroup.
+- Add faction perks that affect actual attributes and regeneration.
+- Start the sample battle and inspect persistent faction kill/death statistics.
+
+### Screenshots and future UI
+
+The UI is intentionally structured around reusable panels. The next editor expansion can add entity selection, numeric stat fields, behavior toggles, target-priority chips, inventory pages, faction relation matrices, and battle army composition without replacing the server-side data model.
