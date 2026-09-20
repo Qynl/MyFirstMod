@@ -1,54 +1,369 @@
 package dev.qynl.myfirstmod.command;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import dev.qynl.myfirstmod.battle.BattleSandbox;
 import dev.qynl.myfirstmod.faction.Faction;
-import dev.qynl.myfirstmod.unit.UnitDefinition;
+import dev.qynl.myfirstmod.faction.FactionPerk;
+import dev.qynl.myfirstmod.faction.FactionRelation;
 import dev.qynl.myfirstmod.unit.BattleStats;
-import dev.qynl.myfirstmod.unit.UnitSystem;
+import dev.qynl.myfirstmod.unit.UnitDefinition;
+import dev.qynl.myfirstmod.unit.UnitSpawner;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
-import net.minecraft.entity.EntityType;
+import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 
-/** Administrative and datapack-friendly editing surface for the same saved library used by the GUI. */
 public final class UnitCommands {
     private UnitCommands() {}
-    public static void register() { CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> dispatcher.register(CommandManager.literal("unit")
-        .then(CommandManager.literal("list").executes(c -> list(c.getSource())))
-        .then(CommandManager.literal("stats").executes(c -> stats(c.getSource())))
-        .then(CommandManager.literal("create").then(CommandManager.argument("id",StringArgumentType.word()).then(CommandManager.argument("entity",IdentifierArgumentType.identifier()).then(CommandManager.argument("name",StringArgumentType.greedyString()).executes(c -> create(c.getSource(),StringArgumentType.getString(c,"id"),IdentifierArgumentType.getIdentifier(c,"entity"),StringArgumentType.getString(c,"name")))))))
-        .then(CommandManager.literal("delete").then(CommandManager.argument("id",StringArgumentType.word()).executes(c -> delete(c.getSource(),StringArgumentType.getString(c,"id")))))
-        .then(CommandManager.literal("spawn").then(CommandManager.argument("id",StringArgumentType.word()).executes(c -> spawn(c.getSource(),StringArgumentType.getString(c,"id")))))
-        .then(CommandManager.literal("set").then(CommandManager.argument("id",StringArgumentType.word()).then(CommandManager.literal("health").then(CommandManager.argument("value",FloatArgumentType.floatArg(1,1024)).executes(c -> setHealth(c.getSource(),StringArgumentType.getString(c,"id"),FloatArgumentType.getFloat(c,"value"))))).then(CommandManager.literal("damage").then(CommandManager.argument("value",FloatArgumentType.floatArg(0,1024)).executes(c -> setDamage(c.getSource(),StringArgumentType.getString(c,"id"),FloatArgumentType.getFloat(c,"value"))))).then(CommandManager.literal("speed").then(CommandManager.argument("value",FloatArgumentType.floatArg(0.001f,10)).executes(c -> setSpeed(c.getSource(),StringArgumentType.getString(c,"id"),FloatArgumentType.getFloat(c,"value"))))).then(CommandManager.literal("role").then(CommandManager.argument("value",StringArgumentType.word()).executes(c -> setRole(c.getSource(),StringArgumentType.getString(c,"id"),StringArgumentType.getString(c,"value"))))).then(CommandManager.literal("rank").then(CommandManager.argument("value",StringArgumentType.word()).executes(c -> setRank(c.getSource(),StringArgumentType.getString(c,"id"),StringArgumentType.getString(c,"value"))))).then(CommandManager.literal("squad").then(CommandManager.argument("value",StringArgumentType.word()).executes(c -> setSquad(c.getSource(),StringArgumentType.getString(c,"id"),StringArgumentType.getString(c,"value"))))).then(CommandManager.literal("commander").then(CommandManager.argument("value",com.mojang.brigadier.arguments.BoolArgumentType.bool()).executes(c -> setCommander(c.getSource(),StringArgumentType.getString(c,"id"),com.mojang.brigadier.arguments.BoolArgumentType.getBool(c,"value"))))).then(CommandManager.literal("priority").then(CommandManager.argument("value",StringArgumentType.word()).executes(c -> setPriority(c.getSource(),StringArgumentType.getString(c,"id"),StringArgumentType.getString(c,"value"))))).then(CommandManager.literal("retreat").then(CommandManager.argument("value",FloatArgumentType.floatArg(0,0.99f)).executes(c -> setRetreat(c.getSource(),StringArgumentType.getString(c,"id"),FloatArgumentType.getFloat(c,"value"))))).then(CommandManager.literal("heal-range").then(CommandManager.argument("value",FloatArgumentType.floatArg(1,32)).executes(c -> setHealRange(c.getSource(),StringArgumentType.getString(c,"id"),FloatArgumentType.getFloat(c,"value"))))).then(CommandManager.literal("faction").then(CommandManager.argument("value",StringArgumentType.word()).executes(c -> setFaction(c.getSource(),StringArgumentType.getString(c,"id"),StringArgumentType.getString(c,"value"))))))).then(CommandManager.literal("equip").then(CommandManager.argument("id",StringArgumentType.word()).then(CommandManager.argument("slot",StringArgumentType.word()).then(CommandManager.argument("item",IdentifierArgumentType.identifier()).executes(c -> equip(c.getSource(),StringArgumentType.getString(c,"id"),StringArgumentType.getString(c,"slot"),IdentifierArgumentType.getIdentifier(c,"item"))))))).then(CommandManager.literal("inventory").then(CommandManager.argument("id",StringArgumentType.word()).then(CommandManager.argument("item",IdentifierArgumentType.identifier()).then(CommandManager.argument("count",com.mojang.brigadier.arguments.IntegerArgumentType.integer(1,64)).executes(c -> inventory(c.getSource(),StringArgumentType.getString(c,"id"),IdentifierArgumentType.getIdentifier(c,"item"),com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c,"count")))))))
-        .then(CommandManager.literal("faction").then(CommandManager.literal("create").then(CommandManager.argument("id",StringArgumentType.word()).then(CommandManager.argument("name",StringArgumentType.greedyString()).executes(c -> faction(c.getSource(),StringArgumentType.getString(c,"id"),StringArgumentType.getString(c,"name")))))).then(CommandManager.literal("relation").then(CommandManager.argument("from",StringArgumentType.word()).then(CommandManager.argument("to",StringArgumentType.word()).then(CommandManager.argument("relation",StringArgumentType.word()).executes(c -> relation(c.getSource(),StringArgumentType.getString(c,"from"),StringArgumentType.getString(c,"to"),StringArgumentType.getString(c,"relation"))))))).then(CommandManager.literal("perk").then(CommandManager.argument("faction",StringArgumentType.word()).then(CommandManager.argument("perk",StringArgumentType.word()).executes(c -> perk(c.getSource(),StringArgumentType.getString(c,"faction"),StringArgumentType.getString(c,"perk"))))))); }
-    private static int list(ServerCommandSource s){var d=UnitWorldData.get(s.getServer());s.sendFeedback(()->Text.literal("Units ("+d.units.size()+"): "+String.join(", ",d.units.keySet())),false);return d.units.size();}
-    private static int stats(ServerCommandSource s){var b=BattleStats.get(s.getServer());s.sendFeedback(()->Text.literal("Kills: "+b.kills+" | Deaths: "+b.deaths),false);return 1;}
-    private static int create(ServerCommandSource s,String id,Identifier entity,String name){var d=UnitWorldData.get(s.getServer());if(!net.minecraft.registry.Registries.ENTITY_TYPE.getOrEmpty(entity).isPresent()){s.sendError(Text.literal("Unknown entity type: "+entity));return 0;}if(d.units.containsKey(id)){s.sendError(Text.literal("A unit with that id already exists."));return 0;}d.saveUnit(new UnitDefinition(id,name,entity));s.sendFeedback(()->Text.literal("Created unit "+id),true);return 1;}
-    private static int delete(ServerCommandSource s,String id){var d=UnitWorldData.get(s.getServer());if(d.units.remove(id)==null){s.sendError(Text.literal("Unknown unit: "+id));return 0;}d.markDirty();return 1;}
-    private static int spawn(ServerCommandSource s,String id){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null||s.getEntity()==null){s.sendError(Text.literal("Unknown unit or command source is not an entity."));return 0;}if(!(s.getEntity() instanceof net.minecraft.server.network.ServerPlayerEntity p)||!UnitSystem.spawn(p,u)){s.sendError(Text.literal("This entity type cannot be spawned as a unit."));return 0;}return 1;}
-    private static int setHealth(ServerCommandSource s,String id,float value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.maxHealth=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setDamage(ServerCommandSource s,String id,float value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.attackDamage=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setSpeed(ServerCommandSource s,String id,float value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.movementSpeed=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setRole(ServerCommandSource s,String id,String value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.role=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setRank(ServerCommandSource s,String id,String value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.rank=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setSquad(ServerCommandSource s,String id,String value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.squad=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setCommander(ServerCommandSource s,String id,boolean value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.commander=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setPriority(ServerCommandSource s,String id,String value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.targetPriority=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setRetreat(ServerCommandSource s,String id,float value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.retreatHealth=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int setHealRange(ServerCommandSource s,String id,float value){var u=UnitWorldData.get(s.getServer()).units.get(id);if(u==null)return 0;u.healRange=value;UnitWorldData.get(s.getServer()).markDirty();return 1;}
-    private static int equip(ServerCommandSource s,String id,String slot,Identifier item){var d=UnitWorldData.get(s.getServer());var u=d.units.get(id);var i=Registries.ITEM.getOrEmpty(item).orElse(null);if(u==null||i==null){s.sendError(Text.literal("Unknown unit or item."));return 0;}try{u.equipment.put(EquipmentSlot.valueOf(slot.toUpperCase()),new ItemStack(i));d.markDirty();return 1;}catch(IllegalArgumentException e){s.sendError(Text.literal("Slot must be HEAD, CHEST, LEGS, FEET, MAINHAND, or OFFHAND."));return 0;}}
-    private static int inventory(ServerCommandSource s,String id,Identifier item,int count){var d=UnitWorldData.get(s.getServer());var u=d.units.get(id);var i=Registries.ITEM.getOrEmpty(item).orElse(null);if(u==null||i==null){s.sendError(Text.literal("Unknown unit or item."));return 0;}u.inventory.add(new ItemStack(i,count));d.markDirty();return 1;}
-    private static int setFaction(ServerCommandSource s,String id,String faction){var d=UnitWorldData.get(s.getServer());var u=d.units.get(id);if(u==null)return 0;u.factionId=faction;d.factions.putIfAbsent(faction,new Faction(faction,faction));d.markDirty();return 1;}
-    private static int faction(ServerCommandSource s,String id,String name){var d=UnitWorldData.get(s.getServer());d.factions.putIfAbsent(id,new Faction(id,name));d.markDirty();return 1;}
-    private static int perk(ServerCommandSource s,String faction,String perk){var d=UnitWorldData.get(s.getServer());var f=d.factions.get(faction);if(f==null){s.sendError(Text.literal("Unknown faction."));return 0;}f.perks.add(perk.toLowerCase());d.markDirty();return 1;}
-    private static int relation(ServerCommandSource s,String from,String to,String value){var d=UnitWorldData.get(s.getServer());var f=d.factions.get(from);if(f==null||d.factions.get(to)==null){s.sendError(Text.literal("Both factions must exist."));return 0;}try{f.relations.put(to,Faction.Relation.valueOf(value.toUpperCase()));d.markDirty();return 1;}catch(IllegalArgumentException e){s.sendError(Text.literal("Relation must be ALLIED, NEUTRAL, or HOSTILE."));return 0;}}
+
+    public static void register() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> {
+            // /unit commands
+            dispatcher.register(CommandManager.literal("unit")
+                    .then(CommandManager.literal("list").executes(c -> listUnits(c.getSource())))
+                    .then(CommandManager.literal("stats").executes(c -> showStats(c.getSource())))
+                    .then(CommandManager.literal("create")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .then(CommandManager.argument("entity", IdentifierArgumentType.identifier())
+                                            .then(CommandManager.argument("name", StringArgumentType.greedyString())
+                                                    .executes(c -> createUnit(c.getSource(), StringArgumentType.getString(c, "id"), IdentifierArgumentType.getIdentifier(c, "entity"), StringArgumentType.getString(c, "name")))))))
+                    .then(CommandManager.literal("delete")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .executes(c -> deleteUnit(c.getSource(), StringArgumentType.getString(c, "id")))))
+                    .then(CommandManager.literal("duplicate")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .executes(c -> duplicateUnit(c.getSource(), StringArgumentType.getString(c, "id")))))
+                    .then(CommandManager.literal("spawn")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .executes(c -> spawnUnit(c.getSource(), StringArgumentType.getString(c, "id"), 1, null))
+                                    .then(CommandManager.argument("count", IntegerArgumentType.integer(1, 50))
+                                            .executes(c -> spawnUnit(c.getSource(), StringArgumentType.getString(c, "id"), IntegerArgumentType.getInteger(c, "count"), null))
+                                            .then(CommandManager.argument("pos", Vec3ArgumentType.vec3())
+                                                    .executes(c -> spawnUnit(c.getSource(), StringArgumentType.getString(c, "id"), IntegerArgumentType.getInteger(c, "count"), Vec3ArgumentType.getVec3(c, "pos")))))))
+                    .then(CommandManager.literal("squad")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .executes(c -> spawnSquad(c.getSource(), StringArgumentType.getString(c, "id"), 5))
+                                    .then(CommandManager.argument("count", IntegerArgumentType.integer(1, 20))
+                                            .executes(c -> spawnSquad(c.getSource(), StringArgumentType.getString(c, "id"), IntegerArgumentType.getInteger(c, "count"))))))
+                    .then(CommandManager.literal("equip")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .then(CommandManager.argument("slot", StringArgumentType.word())
+                                            .then(CommandManager.argument("item", IdentifierArgumentType.identifier())
+                                                    .executes(c -> equipUnit(c.getSource(), StringArgumentType.getString(c, "id"), StringArgumentType.getString(c, "slot"), IdentifierArgumentType.getIdentifier(c, "item")))))))
+                    .then(CommandManager.literal("inventory")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .then(CommandManager.argument("item", IdentifierArgumentType.identifier())
+                                            .then(CommandManager.argument("count", IntegerArgumentType.integer(1, 64))
+                                                    .executes(c -> addInventory(c.getSource(), StringArgumentType.getString(c, "id"), IdentifierArgumentType.getIdentifier(c, "item"), IntegerArgumentType.getInteger(c, "count")))))))
+                    .then(CommandManager.literal("set")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .then(CommandManager.literal("health").then(CommandManager.argument("value", FloatArgumentType.floatArg(1, 10000)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "health", FloatArgumentType.getFloat(c, "value")))))
+                                    .then(CommandManager.literal("damage").then(CommandManager.argument("value", FloatArgumentType.floatArg(0, 10000)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "damage", FloatArgumentType.getFloat(c, "value")))))
+                                    .then(CommandManager.literal("speed").then(CommandManager.argument("value", FloatArgumentType.floatArg(0.01f, 5.0f)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "speed", FloatArgumentType.getFloat(c, "value")))))
+                                    .then(CommandManager.literal("armor").then(CommandManager.argument("value", FloatArgumentType.floatArg(0, 100)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "armor", FloatArgumentType.getFloat(c, "value")))))
+                                    .then(CommandManager.literal("role").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "role", StringArgumentType.getString(c, "value")))))
+                                    .then(CommandManager.literal("rank").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "rank", StringArgumentType.getString(c, "value")))))
+                                    .then(CommandManager.literal("squad").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "squad", StringArgumentType.getString(c, "value")))))
+                                    .then(CommandManager.literal("faction").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "faction", StringArgumentType.getString(c, "value")))))
+                                    .then(CommandManager.literal("commander").then(CommandManager.argument("value", BoolArgumentType.bool()).executes(c -> setBoolProp(c.getSource(), StringArgumentType.getString(c, "id"), "commander", BoolArgumentType.getBool(c, "value")))))
+                                    .then(CommandManager.literal("retreat").then(CommandManager.argument("value", FloatArgumentType.floatArg(0, 0.99f)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "retreat", FloatArgumentType.getFloat(c, "value")))))
+                                    .then(CommandManager.literal("heal-range").then(CommandManager.argument("value", FloatArgumentType.floatArg(1, 64)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "heal-range", FloatArgumentType.getFloat(c, "value")))))))
+            );
+
+            // /faction commands
+            dispatcher.register(CommandManager.literal("faction")
+                    .then(CommandManager.literal("list").executes(c -> listFactions(c.getSource())))
+                    .then(CommandManager.literal("create")
+                            .then(CommandManager.argument("id", StringArgumentType.word())
+                                    .then(CommandManager.argument("name", StringArgumentType.greedyString())
+                                            .executes(c -> createFaction(c.getSource(), StringArgumentType.getString(c, "id"), StringArgumentType.getString(c, "name"))))))
+                    .then(CommandManager.literal("relation")
+                            .then(CommandManager.argument("from", StringArgumentType.word())
+                                    .then(CommandManager.argument("to", StringArgumentType.word())
+                                            .then(CommandManager.argument("relation", StringArgumentType.word())
+                                                    .executes(c -> setRelation(c.getSource(), StringArgumentType.getString(c, "from"), StringArgumentType.getString(c, "to"), StringArgumentType.getString(c, "relation")))))))
+                    .then(CommandManager.literal("perk")
+                            .then(CommandManager.argument("faction", StringArgumentType.word())
+                                    .then(CommandManager.argument("perk", StringArgumentType.word())
+                                            .executes(c -> addPerk(c.getSource(), StringArgumentType.getString(c, "faction"), StringArgumentType.getString(c, "perk"))))))
+            );
+
+            // /battle commands
+            dispatcher.register(CommandManager.literal("battle")
+                    .then(CommandManager.literal("start")
+                            .then(CommandManager.argument("faction1", StringArgumentType.word())
+                                    .then(CommandManager.argument("faction2", StringArgumentType.word())
+                                            .executes(c -> startBattle(c.getSource(), StringArgumentType.getString(c, "faction1"), StringArgumentType.getString(c, "faction2"), 8))
+                                            .then(CommandManager.argument("size", IntegerArgumentType.integer(1, 50))
+                                                    .executes(c -> startBattle(c.getSource(), StringArgumentType.getString(c, "faction1"), StringArgumentType.getString(c, "faction2"), IntegerArgumentType.getInteger(c, "size")))))))
+                    .then(CommandManager.literal("clear").executes(c -> clearBattle(c.getSource())))
+                    .then(CommandManager.literal("stats").executes(c -> showStats(c.getSource())))
+                    .then(CommandManager.literal("reset").executes(c -> resetStats(c.getSource())))
+            );
+        });
+    }
+
+    private static int listUnits(ServerCommandSource s) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        s.sendFeedback(() -> Text.literal("Saved Units (" + data.units.size() + "): ").formatted(Formatting.GOLD)
+                .append(Text.literal(String.join(", ", data.units.keySet())).formatted(Formatting.WHITE)), false);
+        return data.units.size();
+    }
+
+    private static int showStats(ServerCommandSource s) {
+        BattleStats b = BattleStats.get(s.getServer());
+        s.sendFeedback(() -> Text.literal("=== Battle Statistics ===").formatted(Formatting.GOLD), false);
+        s.sendFeedback(() -> Text.literal("Kills: " + b.kills.toString()).formatted(Formatting.GREEN), false);
+        s.sendFeedback(() -> Text.literal("Deaths: " + b.deaths.toString()).formatted(Formatting.RED), false);
+        s.sendFeedback(() -> Text.literal("Damage Dealt: " + b.damageDealt.toString()).formatted(Formatting.YELLOW), false);
+        return 1;
+    }
+
+    private static int resetStats(ServerCommandSource s) {
+        BattleStats.get(s.getServer()).reset();
+        s.sendFeedback(() -> Text.literal("Battle statistics have been reset.").formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int createUnit(ServerCommandSource s, String id, Identifier entity, String name) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        if (!Registries.ENTITY_TYPE.getOrEmpty(entity).isPresent()) {
+            s.sendError(Text.literal("Unknown entity type: " + entity));
+            return 0;
+        }
+        if (data.units.containsKey(id)) {
+            s.sendError(Text.literal("Unit with id '" + id + "' already exists."));
+            return 0;
+        }
+        data.saveUnit(new UnitDefinition(id, name, entity));
+        s.sendFeedback(() -> Text.literal("Successfully created unit: " + name + " (" + id + ")").formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int deleteUnit(ServerCommandSource s, String id) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        if (!data.deleteUnit(id)) {
+            s.sendError(Text.literal("Unknown unit ID: " + id));
+            return 0;
+        }
+        s.sendFeedback(() -> Text.literal("Deleted unit: " + id).formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int duplicateUnit(ServerCommandSource s, String id) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition copy = data.duplicateUnit(id);
+        if (copy == null) {
+            s.sendError(Text.literal("Unknown unit ID: " + id));
+            return 0;
+        }
+        s.sendFeedback(() -> Text.literal("Duplicated unit to: " + copy.id).formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int spawnUnit(ServerCommandSource s, String id, int count, Vec3d pos) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition unit = data.units.get(id);
+        if (unit == null) {
+            s.sendError(Text.literal("Unknown unit ID: " + id));
+            return 0;
+        }
+
+        ServerPlayerEntity player = s.getPlayer();
+        if (player == null && pos == null) {
+            s.sendError(Text.literal("Position must be specified when executed from console."));
+            return 0;
+        }
+
+        Vec3d targetPos = pos != null ? pos : player.getPos().add(player.getRotationVector().multiply(2.0));
+        float yaw = player != null ? player.getYaw() : 0.0f;
+
+        for (int i = 0; i < count; i++) {
+            UnitSpawner.spawn(s.getWorld(), unit, targetPos.add(i * 0.8, 0, 0), yaw);
+        }
+
+        s.sendFeedback(() -> Text.literal("Spawned " + count + "x " + unit.name).formatted(Formatting.GREEN), true);
+        return count;
+    }
+
+    private static int spawnSquad(ServerCommandSource s, String id, int count) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition unit = data.units.get(id);
+        if (unit == null) {
+            s.sendError(Text.literal("Unknown unit ID: " + id));
+            return 0;
+        }
+        if (s.getPlayer() == null) {
+            s.sendError(Text.literal("Must be executed by a player."));
+            return 0;
+        }
+        UnitSpawner.spawnSquadAtPlayer(s.getPlayer(), unit, count);
+        s.sendFeedback(() -> Text.literal("Spawned squad of " + count + "x " + unit.name).formatted(Formatting.GREEN), true);
+        return count;
+    }
+
+    private static int equipUnit(ServerCommandSource s, String id, String slotStr, Identifier itemId) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition unit = data.units.get(id);
+        if (unit == null) {
+            s.sendError(Text.literal("Unknown unit ID: " + id));
+            return 0;
+        }
+        var item = Registries.ITEM.getOrEmpty(itemId).orElse(null);
+        if (item == null) {
+            s.sendError(Text.literal("Unknown item ID: " + itemId));
+            return 0;
+        }
+        try {
+            EquipmentSlot slot = EquipmentSlot.valueOf(slotStr.toUpperCase());
+            unit.equipment.put(slot, new ItemStack(item));
+            data.markDirty();
+            s.sendFeedback(() -> Text.literal("Equipped " + itemId + " in " + slot.getName() + " for " + id).formatted(Formatting.GREEN), true);
+            return 1;
+        } catch (IllegalArgumentException e) {
+            s.sendError(Text.literal("Invalid slot: " + slotStr + " (Use HEAD, CHEST, LEGS, FEET, MAINHAND, OFFHAND)"));
+            return 0;
+        }
+    }
+
+    private static int addInventory(ServerCommandSource s, String id, Identifier itemId, int count) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition unit = data.units.get(id);
+        if (unit == null) {
+            s.sendError(Text.literal("Unknown unit ID: " + id));
+            return 0;
+        }
+        var item = Registries.ITEM.getOrEmpty(itemId).orElse(null);
+        if (item == null) {
+            s.sendError(Text.literal("Unknown item ID: " + itemId));
+            return 0;
+        }
+        unit.inventory.add(new ItemStack(item, count));
+        data.markDirty();
+        s.sendFeedback(() -> Text.literal("Added " + count + "x " + itemId + " to inventory of " + id).formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int setAttribute(ServerCommandSource s, String id, String attr, float val) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition u = data.units.get(id);
+        if (u == null) return 0;
+        switch (attr) {
+            case "health" -> u.maxHealth = val;
+            case "damage" -> u.attackDamage = val;
+            case "speed" -> u.movementSpeed = val;
+            case "armor" -> u.armor = val;
+            case "retreat" -> u.retreatHealth = val;
+            case "heal-range" -> u.healRange = val;
+        }
+        data.markDirty();
+        s.sendFeedback(() -> Text.literal("Updated " + attr + " of " + id + " to " + val).formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int setStringProp(ServerCommandSource s, String id, String prop, String val) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition u = data.units.get(id);
+        if (u == null) return 0;
+        switch (prop) {
+            case "role" -> u.role = val;
+            case "rank" -> u.rank = val;
+            case "squad" -> u.squad = val;
+            case "faction" -> {
+                u.factionId = val;
+                data.factions.putIfAbsent(val, new Faction(val, val));
+            }
+        }
+        data.markDirty();
+        s.sendFeedback(() -> Text.literal("Updated " + prop + " of " + id + " to " + val).formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int setBoolProp(ServerCommandSource s, String id, String prop, boolean val) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition u = data.units.get(id);
+        if (u == null) return 0;
+        if ("commander".equals(prop)) {
+            u.commander = val;
+        }
+        data.markDirty();
+        s.sendFeedback(() -> Text.literal("Updated " + prop + " of " + id + " to " + val).formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int listFactions(ServerCommandSource s) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        s.sendFeedback(() -> Text.literal("Registered Factions (" + data.factions.size() + "): ").formatted(Formatting.GOLD)
+                .append(Text.literal(String.join(", ", data.factions.keySet())).formatted(Formatting.WHITE)), false);
+        return data.factions.size();
+    }
+
+    private static int createFaction(ServerCommandSource s, String id, String name) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        data.saveFaction(new Faction(id, name));
+        s.sendFeedback(() -> Text.literal("Created faction: " + name + " (" + id + ")").formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int setRelation(ServerCommandSource s, String from, String to, String relStr) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        Faction f1 = data.factions.get(from);
+        Faction f2 = data.factions.get(to);
+        if (f1 == null || f2 == null) {
+            s.sendError(Text.literal("Both factions must exist."));
+            return 0;
+        }
+        try {
+            FactionRelation rel = FactionRelation.valueOf(relStr.toUpperCase());
+            f1.relations.put(to, rel);
+            data.markDirty();
+            s.sendFeedback(() -> Text.literal("Set relation " + from + " -> " + to + " as " + rel.getDisplayName()).formatted(Formatting.GREEN), true);
+            return 1;
+        } catch (IllegalArgumentException e) {
+            s.sendError(Text.literal("Relation must be ALLIED, NEUTRAL, or HOSTILE."));
+            return 0;
+        }
+    }
+
+    private static int addPerk(ServerCommandSource s, String factionId, String perkName) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        Faction faction = data.factions.get(factionId);
+        if (faction == null) {
+            s.sendError(Text.literal("Unknown faction: " + factionId));
+            return 0;
+        }
+        faction.perks.add(perkName.toLowerCase());
+        data.markDirty();
+        s.sendFeedback(() -> Text.literal("Added perk '" + perkName + "' to faction " + faction.name).formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int startBattle(ServerCommandSource s, String faction1, String faction2, int size) {
+        ServerPlayerEntity player = s.getPlayer();
+        if (player == null) {
+            s.sendError(Text.literal("Must be executed by a player in the world."));
+            return 0;
+        }
+        BattleSandbox.startBattle(player, faction1, faction2, size);
+        return 1;
+    }
+
+    private static int clearBattle(ServerCommandSource s) {
+        int count = BattleSandbox.clearAllBattleMobs(s.getWorld());
+        s.sendFeedback(() -> Text.literal("Cleared " + count + " battle units from the world.").formatted(Formatting.GREEN), true);
+        return count;
+    }
 }

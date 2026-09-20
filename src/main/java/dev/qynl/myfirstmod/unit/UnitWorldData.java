@@ -1,25 +1,402 @@
 package dev.qynl.myfirstmod.unit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.qynl.myfirstmod.faction.Faction;
+import dev.qynl.myfirstmod.faction.FactionRelation;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
+
 import java.util.*;
 
-/** Server-authoritative library. Definitions are saved in the world, never in a client screen. */
 public final class UnitWorldData extends PersistentState {
     public final Map<String, UnitDefinition> units = new LinkedHashMap<>();
     public final Map<String, Faction> factions = new LinkedHashMap<>();
     public final Map<UUID, String> equipped = new HashMap<>();
-    private static final String KEY = "myfirstmod_units";
-    public UnitWorldData() { }
-    public static UnitWorldData get(MinecraftServer server) { PersistentStateManager p=server.getWorld(World.OVERWORLD).getPersistentStateManager(); return p.getOrCreate(new Type<>(UnitWorldData::new, UnitWorldData::fromNbt, null), KEY); }
-    public static UnitWorldData fromNbt(NbtCompound n) { UnitWorldData d=new UnitWorldData(); NbtList us=n.getList("units",10); for(int i=0;i<us.size();i++){ UnitDefinition u=new UnitDefinition(us.getCompound(i)); if(!u.id.isBlank()&&u.entityId!=null)d.units.put(u.id,u); } NbtList fs=n.getList("factions",10); for(int i=0;i<fs.size();i++){ Faction f=new Faction(fs.getCompound(i)); d.factions.put(f.id,f); } return d; }
-    @Override public NbtCompound writeNbt(NbtCompound n, RegistryWrapper.WrapperLookup lookup) { NbtList us=new NbtList(); units.values().forEach(u->us.add(u.toNbt())); n.put("units",us); NbtList fs=new NbtList(); factions.values().forEach(f->fs.add(f.toNbt())); n.put("factions",fs); return n; }
-    public void saveUnit(UnitDefinition unit) { units.put(unit.id,unit); markDirty(); }
-    public String firstUnit(){ return units.keySet().stream().findFirst().orElse(""); }
+
+    // Simulation Settings
+    public int aiTickInterval = 10;
+    public boolean buildingEnabled = true;
+    public boolean potionsEnabled = true;
+    public boolean fireworksEnabled = true;
+    public boolean shieldDefenseEnabled = true;
+    public boolean friendlyFireAllowed = false;
+    public int maxUnits = 100;
+
+    private static final String KEY = "myfirstmod_unit_data";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    public UnitWorldData() {
+        initDefaultsIfEmpty();
+    }
+
+    public static UnitWorldData get(MinecraftServer server) {
+        if (server == null) return new UnitWorldData();
+        PersistentStateManager psm = server.getWorld(World.OVERWORLD).getPersistentStateManager();
+        return psm.getOrCreate(new Type<>(UnitWorldData::new, UnitWorldData::fromNbt, null), KEY);
+    }
+
+    public static UnitWorldData fromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        UnitWorldData data = new UnitWorldData();
+        data.units.clear();
+        data.factions.clear();
+        data.equipped.clear();
+
+        if (nbt.contains("units")) {
+            NbtList list = nbt.getList("units", 10);
+            for (int i = 0; i < list.size(); i++) {
+                UnitDefinition def = new UnitDefinition(list.getCompound(i));
+                if (def.id != null && !def.id.isBlank() && def.entityId != null) {
+                    data.units.put(def.id, def);
+                }
+            }
+        }
+
+        if (nbt.contains("factions")) {
+            NbtList list = nbt.getList("factions", 10);
+            for (int i = 0; i < list.size(); i++) {
+                Faction faction = new Faction(list.getCompound(i));
+                if (faction.id != null && !faction.id.isBlank()) {
+                    data.factions.put(faction.id, faction);
+                }
+            }
+        }
+
+        if (nbt.contains("equipped")) {
+            NbtCompound eq = nbt.getCompound("equipped");
+            for (String key : eq.getKeys()) {
+                try {
+                    data.equipped.put(UUID.fromString(key), eq.getString(key));
+                } catch (IllegalArgumentException ignored) {}
+            }
+        }
+
+        if (nbt.contains("settings")) {
+            NbtCompound s = nbt.getCompound("settings");
+            data.aiTickInterval = s.contains("tick_interval") ? s.getInt("tick_interval") : 10;
+            data.buildingEnabled = !s.contains("building") || s.getBoolean("building");
+            data.potionsEnabled = !s.contains("potions") || s.getBoolean("potions");
+            data.fireworksEnabled = !s.contains("fireworks") || s.getBoolean("fireworks");
+            data.shieldDefenseEnabled = !s.contains("shield") || s.getBoolean("shield");
+            data.friendlyFireAllowed = s.getBoolean("friendly_fire");
+            data.maxUnits = s.contains("max_units") ? s.getInt("max_units") : 100;
+        }
+
+        data.initDefaultsIfEmpty();
+        return data;
+    }
+
+    @Override
+    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+        NbtList unitList = new NbtList();
+        for (UnitDefinition def : units.values()) {
+            unitList.add(def.toNbt());
+        }
+        nbt.put("units", unitList);
+
+        NbtList factionList = new NbtList();
+        for (Faction faction : factions.values()) {
+            factionList.add(faction.toNbt());
+        }
+        nbt.put("factions", factionList);
+
+        NbtCompound eq = new NbtCompound();
+        for (Map.Entry<UUID, String> entry : equipped.entrySet()) {
+            eq.putString(entry.getKey().toString(), entry.getValue());
+        }
+        nbt.put("equipped", eq);
+
+        NbtCompound s = new NbtCompound();
+        s.putInt("tick_interval", aiTickInterval);
+        s.putBoolean("building", buildingEnabled);
+        s.putBoolean("potions", potionsEnabled);
+        s.putBoolean("fireworks", fireworksEnabled);
+        s.putBoolean("shield", shieldDefenseEnabled);
+        s.putBoolean("friendly_fire", friendlyFireAllowed);
+        s.putInt("max_units", maxUnits);
+        nbt.put("settings", s);
+
+        return nbt;
+    }
+
+    public void initDefaultsIfEmpty() {
+        if (factions.isEmpty()) {
+            Faction kingdom = new Faction("kingdom", "Kingdom of Eldoria", "#3B82F6", "Noble kingdom defenders and knights.");
+            kingdom.perks.add("military_discipline");
+            kingdom.perks.add("heavy_armor");
+            kingdom.perks.add("rally");
+            kingdom.perks.add("regeneration");
+
+            Faction raiders = new Faction("raiders", "Iron Raiders", "#EF4444", "Savage raiders, warlords, and pyrotechnicians.");
+            raiders.perks.add("swift_army");
+            raiders.perks.add("pyrotechnics");
+            raiders.perks.add("veterans");
+
+            Faction villagers = new Faction("villagers", "Village Alliance", "#10B981", "Local militia and civilian guards.");
+            villagers.perks.add("holy_might");
+            villagers.perks.add("fortification");
+
+            kingdom.relations.put("raiders", FactionRelation.HOSTILE);
+            kingdom.relations.put("villagers", FactionRelation.ALLIED);
+
+            raiders.relations.put("kingdom", FactionRelation.HOSTILE);
+            raiders.relations.put("villagers", FactionRelation.HOSTILE);
+
+            villagers.relations.put("kingdom", FactionRelation.ALLIED);
+            villagers.relations.put("raiders", FactionRelation.HOSTILE);
+
+            factions.put(kingdom.id, kingdom);
+            factions.put(raiders.id, raiders);
+            factions.put(villagers.id, villagers);
+        }
+
+        if (units.isEmpty()) {
+            // 1. Royal Knight
+            UnitDefinition knight = new UnitDefinition("royal_knight", "Royal Knight", Identifier.of("minecraft", "villager"));
+            knight.description = "Frontline elite tank and swordsman of Eldoria.";
+            knight.factionId = "kingdom";
+            knight.role = "melee";
+            knight.rank = "captain";
+            knight.maxHealth = 40.0f;
+            knight.attackDamage = 7.5f;
+            knight.armor = 15.0f;
+            knight.armorToughness = 4.0f;
+            knight.knockbackResistance = 0.4f;
+            knight.canBlockShield = true;
+            knight.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.DIAMOND_HELMET));
+            knight.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.DIAMOND_CHESTPLATE));
+            knight.equipment.put(EquipmentSlot.LEGS, new ItemStack(Items.DIAMOND_LEGGINGS));
+            knight.equipment.put(EquipmentSlot.FEET, new ItemStack(Items.DIAMOND_BOOTS));
+            knight.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_SWORD));
+            knight.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
+            knight.inventory.add(new ItemStack(Items.COOKED_BEEF, 8));
+            units.put(knight.id, knight);
+
+            // 2. Royal Archer
+            UnitDefinition archer = new UnitDefinition("royal_archer", "Royal Archer", Identifier.of("minecraft", "skeleton"));
+            archer.description = "Long-range marksman supporting the Eldorian army.";
+            archer.factionId = "kingdom";
+            archer.role = "ranged";
+            archer.rank = "soldier";
+            archer.maxHealth = 24.0f;
+            archer.attackDamage = 5.0f;
+            archer.retreatHealth = 0.25f;
+            archer.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            archer.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.CHAINMAIL_CHESTPLATE));
+            archer.equipment.put(EquipmentSlot.LEGS, new ItemStack(Items.LEATHER_LEGGINGS));
+            archer.equipment.put(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
+            archer.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+            archer.inventory.add(new ItemStack(Items.ARROW, 64));
+            units.put(archer.id, archer);
+
+            // 3. Field Medic
+            UnitDefinition medic = new UnitDefinition("field_medic", "Field Medic", Identifier.of("minecraft", "villager"));
+            medic.description = "Dedicated combat healer with splash potions and regeneration rays.";
+            medic.factionId = "kingdom";
+            medic.role = "medic";
+            medic.rank = "specialist";
+            medic.maxHealth = 28.0f;
+            medic.healRange = 16.0f;
+            medic.healAllies = true;
+            medic.canThrowPotions = true;
+            medic.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
+            medic.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
+            medic.equipment.put(EquipmentSlot.FEET, new ItemStack(Items.GOLDEN_BOOTS));
+            medic.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.SPLASH_POTION));
+            medic.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.POTION));
+            medic.inventory.add(new ItemStack(Items.SPLASH_POTION, 6));
+            medic.inventory.add(new ItemStack(Items.GOLDEN_APPLE, 2));
+            units.put(medic.id, medic);
+
+            // 4. Royal Commander
+            UnitDefinition commander = new UnitDefinition("royal_commander", "Royal Commander", Identifier.of("minecraft", "vindicator"));
+            commander.description = "Tactical leader rallying troops with war horn buffs.";
+            commander.factionId = "kingdom";
+            commander.role = "melee";
+            commander.rank = "commander";
+            commander.commander = true;
+            commander.squad = "1st Royal Guard";
+            commander.maxHealth = 60.0f;
+            commander.attackDamage = 9.0f;
+            commander.armor = 16.0f;
+            commander.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.NETHERITE_HELMET));
+            commander.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.DIAMOND_CHESTPLATE));
+            commander.equipment.put(EquipmentSlot.LEGS, new ItemStack(Items.DIAMOND_LEGGINGS));
+            commander.equipment.put(EquipmentSlot.FEET, new ItemStack(Items.DIAMOND_BOOTS));
+            commander.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_AXE));
+            commander.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
+            units.put(commander.id, commander);
+
+            // 5. Royal Pyrotechnic (Fireworks Artillery)
+            UnitDefinition pyro = new UnitDefinition("royal_pyro", "Royal Pyrotechnic", Identifier.of("minecraft", "pillager"));
+            pyro.description = "Heavy artillery specialist bombarding enemies with explosive fireworks.";
+            pyro.factionId = "kingdom";
+            pyro.role = "pyrotechnic";
+            pyro.rank = "artillery";
+            pyro.maxHealth = 30.0f;
+            pyro.canShootFireworks = true;
+            pyro.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            pyro.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+            pyro.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.CROSSBOW));
+            pyro.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.FIREWORK_ROCKET));
+            pyro.inventory.add(new ItemStack(Items.FIREWORK_ROCKET, 64));
+            units.put(pyro.id, pyro);
+
+            // 6. Combat Engineer
+            UnitDefinition engineer = new UnitDefinition("combat_engineer", "Combat Engineer", Identifier.of("minecraft", "villager"));
+            engineer.description = "Field fortification builder placing defensive barricades and torches.";
+            engineer.factionId = "kingdom";
+            engineer.role = "engineer";
+            engineer.rank = "engineer";
+            engineer.maxHealth = 32.0f;
+            engineer.canBuild = true;
+            engineer.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            engineer.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+            engineer.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
+            engineer.inventory.add(new ItemStack(Items.COBBLESTONE, 64));
+            engineer.inventory.add(new ItemStack(Items.TORCH, 16));
+            engineer.inventory.add(new ItemStack(Items.LADDER, 8));
+            units.put(engineer.id, engineer);
+
+            // 7. Raider Berserker
+            UnitDefinition berserker = new UnitDefinition("raider_berserker", "Raider Berserker", Identifier.of("minecraft", "piglin_brute"));
+            berserker.description = "Furious warrior charging fearlessly into battle.";
+            berserker.factionId = "raiders";
+            berserker.role = "melee";
+            berserker.rank = "soldier";
+            berserker.maxHealth = 38.0f;
+            berserker.attackDamage = 8.5f;
+            berserker.armor = 10.0f;
+            berserker.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            berserker.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+            berserker.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_AXE));
+            units.put(berserker.id, berserker);
+
+            // 8. Raider Crossbowman
+            UnitDefinition crossbowman = new UnitDefinition("raider_crossbowman", "Raider Crossbowman", Identifier.of("minecraft", "pillager"));
+            crossbowman.description = "Ruthless ranged pillager firing rapid volleys.";
+            crossbowman.factionId = "raiders";
+            crossbowman.role = "ranged";
+            crossbowman.rank = "soldier";
+            crossbowman.maxHealth = 26.0f;
+            crossbowman.attackDamage = 5.5f;
+            crossbowman.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.CHAINMAIL_CHESTPLATE));
+            crossbowman.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.CROSSBOW));
+            crossbowman.inventory.add(new ItemStack(Items.ARROW, 64));
+            units.put(crossbowman.id, crossbowman);
+
+            // 9. Raider Alchemist (Throwable Potions)
+            UnitDefinition alchemist = new UnitDefinition("raider_alchemist", "Raider Alchemist", Identifier.of("minecraft", "witch"));
+            alchemist.description = "Sinister potion thrower launching poison and harm flasks.";
+            alchemist.factionId = "raiders";
+            alchemist.role = "support";
+            alchemist.rank = "specialist";
+            alchemist.maxHealth = 30.0f;
+            alchemist.canThrowPotions = true;
+            alchemist.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.SPLASH_POTION));
+            alchemist.inventory.add(new ItemStack(Items.SPLASH_POTION, 8));
+            units.put(alchemist.id, alchemist);
+        }
+    }
+
+    public void saveUnit(UnitDefinition unit) {
+        if (unit == null || unit.id == null || unit.id.isBlank()) return;
+        units.put(unit.id, unit);
+        markDirty();
+    }
+
+    public boolean deleteUnit(String id) {
+        if (id == null || !units.containsKey(id)) return false;
+        units.remove(id);
+        markDirty();
+        return true;
+    }
+
+    public UnitDefinition duplicateUnit(String id) {
+        UnitDefinition source = units.get(id);
+        if (source == null) return null;
+        String newId = id + "_copy";
+        int count = 1;
+        while (units.containsKey(newId)) {
+            count++;
+            newId = id + "_copy_" + count;
+        }
+        UnitDefinition copy = new UnitDefinition(source.toNbt());
+        copy.id = newId;
+        copy.name = source.name + " (" + count + ")";
+        units.put(newId, copy);
+        markDirty();
+        return copy;
+    }
+
+    public void saveFaction(Faction faction) {
+        if (faction == null || faction.id == null || faction.id.isBlank()) return;
+        factions.put(faction.id, faction);
+        markDirty();
+    }
+
+    public boolean deleteFaction(String id) {
+        if (id == null || !factions.containsKey(id)) return false;
+        factions.remove(id);
+        markDirty();
+        return true;
+    }
+
+    public String firstUnit() {
+        return units.keySet().stream().findFirst().orElse("");
+    }
+
+    public String getEquippedUnit(UUID playerUuid) {
+        String id = equipped.get(playerUuid);
+        if (id != null && units.containsKey(id)) {
+            return id;
+        }
+        return firstUnit();
+    }
+
+    public void setEquippedUnit(UUID playerUuid, String unitId) {
+        equipped.put(playerUuid, unitId);
+        markDirty();
+    }
+
+    public String cycleEquippedUnit(UUID playerUuid) {
+        if (units.isEmpty()) return "";
+        List<String> keys = new ArrayList<>(units.keySet());
+        String current = equipped.get(playerUuid);
+        int index = current == null ? -1 : keys.indexOf(current);
+        int nextIndex = (index + 1) % keys.size();
+        String nextUnitId = keys.get(nextIndex);
+        equipped.put(playerUuid, nextUnitId);
+        markDirty();
+        return nextUnitId;
+    }
+
+    public String exportToJson(String unitId) {
+        UnitDefinition unit = units.get(unitId);
+        if (unit == null) return "{}";
+        return GSON.toJson(unit.toJson());
+    }
+
+    public boolean importFromJson(String jsonString) {
+        try {
+            JsonObject obj = JsonParser.parseString(jsonString).getAsJsonObject();
+            UnitDefinition def = UnitDefinition.fromJson(obj);
+            if (def.id != null && !def.id.isBlank()) {
+                saveUnit(def);
+                return true;
+            }
+        } catch (Exception ignored) {}
+        return false;
+    }
 }

@@ -1,39 +1,236 @@
 package dev.qynl.myfirstmod.gui;
 
+import dev.qynl.myfirstmod.battle.BattleSandbox;
 import dev.qynl.myfirstmod.faction.Faction;
+import dev.qynl.myfirstmod.faction.FactionPerk;
+import dev.qynl.myfirstmod.faction.FactionRelation;
+import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
+import dev.qynl.myfirstmod.unit.UnitSpawner;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.List;
+
 public class CreatorScreenHandler extends ScreenHandler {
-    private static final EquipmentSlot[] EDIT_SLOTS={EquipmentSlot.HEAD,EquipmentSlot.CHEST,EquipmentSlot.LEGS,EquipmentSlot.FEET,EquipmentSlot.MAINHAND,EquipmentSlot.OFFHAND};
-    private final SimpleInventory editorInventory=new SimpleInventory(6);
-    public CreatorScreenHandler(int syncId, PlayerInventory inventory){super(ModScreenHandlers.CREATOR,syncId);
-        for(int i=0;i<6;i++) addSlot(new Slot(editorInventory,i,225+(i%3)*22,185+(i/3)*22));
-        if(inventory.player instanceof ServerPlayerEntity server){var d=UnitWorldData.get(server.getServer());var u=d.units.get(d.firstUnit());if(u!=null) for(int i=0;i<6;i++) editorInventory.setStack(i,u.equipment.getOrDefault(EDIT_SLOTS[i],ItemStack.EMPTY).copy());}
+    public static final EquipmentSlot[] EQUIPMENT_SLOTS = {
+            EquipmentSlot.HEAD,
+            EquipmentSlot.CHEST,
+            EquipmentSlot.LEGS,
+            EquipmentSlot.FEET,
+            EquipmentSlot.MAINHAND,
+            EquipmentSlot.OFFHAND
+    };
+
+    public final SimpleInventory equipmentInventory = new SimpleInventory(6);
+    public final SimpleInventory unitInventory = new SimpleInventory(9);
+    private final PlayerInventory playerInventory;
+
+    public CreatorScreenHandler(int syncId, PlayerInventory playerInventory) {
+        super(ModScreenHandlers.CREATOR, syncId);
+        this.playerInventory = playerInventory;
+
+        // Equipment slots (0..5)
+        for (int i = 0; i < 6; i++) {
+            this.addSlot(new Slot(equipmentInventory, i, 255 + (i * 20), 140));
+        }
+
+        // Unit Inventory slots (6..14) -> 9 slots (3x3 grid)
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                int index = col + row * 3;
+                this.addSlot(new Slot(unitInventory, index, 255 + (col * 20), 168 + (row * 20)));
+            }
+        }
+
+        // Player Inventory (3 rows of 9)
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) {
+                this.addSlot(new Slot(playerInventory, col + row * 9 + 9, 20 + col * 18, 160 + row * 18));
+            }
+        }
+
+        // Player Hotbar (9 slots)
+        for (int col = 0; col < 9; col++) {
+            this.addSlot(new Slot(playerInventory, col, 20 + col * 18, 218));
+        }
+
+        if (playerInventory.player instanceof ServerPlayerEntity serverPlayer) {
+            UnitWorldData data = UnitWorldData.get(serverPlayer.getServer());
+            String equippedId = data.getEquippedUnit(serverPlayer.getUuid());
+            UnitDefinition unit = data.units.get(equippedId);
+            if (unit == null) unit = data.units.get(data.firstUnit());
+            if (unit != null) {
+                loadUnitIntoSlots(unit);
+            }
+        }
     }
-    @Override public ItemStack quickMove(PlayerEntity player,int slot){return ItemStack.EMPTY;}
-    @Override public boolean canUse(PlayerEntity player){return true;}
-    @Override public boolean onButtonClick(PlayerEntity player,int id){ if(!(player instanceof ServerPlayerEntity sp))return true; UnitWorldData d=UnitWorldData.get(sp.getServer());
-        if(id==0){UnitDefinition u=new UnitDefinition("guard","Village Guard",Identifier.of("minecraft","villager"));u.description="A configurable faction defender.";u.factionId="village";u.maxHealth=30;u.attackDamage=7;u.armor=12;u.equipment.put(EquipmentSlot.HEAD,new ItemStack(Items.IRON_HELMET));u.equipment.put(EquipmentSlot.CHEST,new ItemStack(Items.IRON_CHESTPLATE));u.equipment.put(EquipmentSlot.LEGS,new ItemStack(Items.IRON_LEGGINGS));u.equipment.put(EquipmentSlot.FEET,new ItemStack(Items.IRON_BOOTS));u.equipment.put(EquipmentSlot.MAINHAND,new ItemStack(Items.IRON_SWORD));u.equipment.put(EquipmentSlot.OFFHAND,new ItemStack(Items.SHIELD));d.saveUnit(u);loadFirst(d);}
-        if(id==1){UnitDefinition u=new UnitDefinition("archer","Royal Archer",Identifier.of("minecraft","skeleton"));u.factionId="village";u.role="ranged";u.attackDamage=5;u.equipment.put(EquipmentSlot.MAINHAND,new ItemStack(Items.BOW));u.inventory.add(new ItemStack(Items.ARROW,64));d.saveUnit(u);loadFirst(d);}
-        if(id==8){UnitDefinition u=new UnitDefinition("medic","Field Medic",Identifier.of("minecraft","villager"));u.factionId="village";u.role="medic";u.maxHealth=24;u.healRange=14;u.equipment.put(EquipmentSlot.MAINHAND,new ItemStack(Items.SPLASH_POTION));u.inventory.add(new ItemStack(Items.SPLASH_POTION,4));d.saveUnit(u);loadFirst(d);}
-        if(id==2){d.factions.putIfAbsent("village",new Faction("village","Village Alliance"));d.factions.putIfAbsent("raiders",new Faction("raiders","Iron Raiders"));d.factions.get("village").relations.put("raiders",Faction.Relation.HOSTILE);d.factions.get("raiders").relations.put("village",Faction.Relation.HOSTILE);d.markDirty();}
-        if(id==3){String first=d.firstUnit();if(!first.isBlank()){d.equipped.put(sp.getUuid(),first);d.markDirty();}}
-        if(id==4){String first=d.firstUnit();var source=d.units.get(first);if(source!=null){UnitDefinition copy=new UnitDefinition(source.toNbt());copy.id=first+"_copy";copy.name=source.name+" Copy";d.saveUnit(copy);}}
-        if(id==5){String first=d.firstUnit();if(!first.isBlank()){d.units.remove(first);d.markDirty();}}
-        if(id==6){var guard=d.units.get("guard");var archer=d.units.get("archer");if(guard!=null)dev.qynl.myfirstmod.unit.UnitSystem.spawnAt(sp,guard,sp.getX()+2,sp.getY(),sp.getZ()+2);if(archer!=null)dev.qynl.myfirstmod.unit.UnitSystem.spawnAt(sp,archer,sp.getX()+10,sp.getY(),sp.getZ()+10);}
-        if(id==7){String first=d.firstUnit();var u=d.units.get(first);if(u!=null){for(int i=0;i<6;i++)u.equipment.put(EDIT_SLOTS[i],editorInventory.getStack(i).copy());d.markDirty();}}
-        return true; }
-    private void loadFirst(UnitWorldData d){var u=d.units.get(d.firstUnit());if(u!=null)for(int i=0;i<6;i++)editorInventory.setStack(i,u.equipment.getOrDefault(EDIT_SLOTS[i],ItemStack.EMPTY).copy());}
+
+    public void loadUnitIntoSlots(UnitDefinition unit) {
+        if (unit == null) return;
+        for (int i = 0; i < 6; i++) {
+            equipmentInventory.setStack(i, unit.equipment.getOrDefault(EQUIPMENT_SLOTS[i], ItemStack.EMPTY).copy());
+        }
+        for (int i = 0; i < 9; i++) {
+            if (i < unit.inventory.size()) {
+                unitInventory.setStack(i, unit.inventory.get(i).copy());
+            } else {
+                unitInventory.setStack(i, ItemStack.EMPTY);
+            }
+        }
+    }
+
+    public void saveSlotsToUnit(UnitDefinition unit) {
+        if (unit == null) return;
+        for (int i = 0; i < 6; i++) {
+            ItemStack stack = equipmentInventory.getStack(i);
+            if (!stack.isEmpty()) {
+                unit.equipment.put(EQUIPMENT_SLOTS[i], stack.copy());
+            } else {
+                unit.equipment.remove(EQUIPMENT_SLOTS[i]);
+            }
+        }
+        unit.inventory.clear();
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = unitInventory.getStack(i);
+            if (!stack.isEmpty()) {
+                unit.inventory.add(stack.copy());
+            }
+        }
+    }
+
+    @Override
+    public ItemStack quickMove(PlayerEntity player, int slotIndex) {
+        Slot slot = this.slots.get(slotIndex);
+        if (slot == null || !slot.hasStack()) return ItemStack.EMPTY;
+
+        ItemStack originalStack = slot.getStack();
+        ItemStack copy = originalStack.copy();
+
+        // If from editor slots (0..14), move to player inventory (15..50)
+        if (slotIndex < 15) {
+            if (!this.insertItem(originalStack, 15, 51, true)) {
+                return ItemStack.EMPTY;
+            }
+        } else {
+            // From player inventory to editor slots
+            if (!this.insertItem(originalStack, 0, 15, false)) {
+                return ItemStack.EMPTY;
+            }
+        }
+
+        if (originalStack.isEmpty()) {
+            slot.setStack(ItemStack.EMPTY);
+        } else {
+            slot.markDirty();
+        }
+
+        return copy;
+    }
+
+    @Override
+    public boolean canUse(PlayerEntity player) {
+        return true;
+    }
+
+    @Override
+    public boolean onButtonClick(PlayerEntity player, int id) {
+        if (!(player instanceof ServerPlayerEntity serverPlayer)) return true;
+        UnitWorldData data = UnitWorldData.get(serverPlayer.getServer());
+
+        switch (id) {
+            case 0 -> { // Save equipment/inventory to currently equipped unit
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    saveSlotsToUnit(unit);
+                    data.markDirty();
+                }
+            }
+            case 1 -> { // Spawn 1 equipped unit
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    UnitSpawner.spawnAtPlayer(serverPlayer, unit);
+                }
+            }
+            case 2 -> { // Spawn squad (5 units)
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    UnitSpawner.spawnSquadAtPlayer(serverPlayer, unit, 5);
+                }
+            }
+            case 3 -> { // Cycle to next unit
+                String nextId = data.cycleEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(nextId);
+                if (unit != null) {
+                    loadUnitIntoSlots(unit);
+                }
+            }
+            case 4 -> { // Duplicate currently equipped unit
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition copy = data.duplicateUnit(equippedId);
+                if (copy != null) {
+                    data.setEquippedUnit(player.getUuid(), copy.id);
+                    loadUnitIntoSlots(copy);
+                }
+            }
+            case 5 -> { // Delete currently equipped unit
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                if (!equippedId.isBlank()) {
+                    data.deleteUnit(equippedId);
+                    String next = data.firstUnit();
+                    data.setEquippedUnit(player.getUuid(), next);
+                    loadUnitIntoSlots(data.units.get(next));
+                }
+            }
+            case 10 -> { // Start standard battle (Kingdom vs Raiders)
+                BattleSandbox.startBattle(serverPlayer, "kingdom", "raiders", 8);
+            }
+            case 11 -> { // Clear all battle mobs
+                BattleSandbox.clearAllBattleMobs(serverPlayer.getServerWorld());
+            }
+            case 12 -> { // Reset battle stats
+                BattleStats.get(serverPlayer.getServer()).reset();
+            }
+            case 30 -> { // Restore default presets
+                data.units.clear();
+                data.factions.clear();
+                data.initDefaultsIfEmpty();
+                data.markDirty();
+                loadUnitIntoSlots(data.units.get(data.firstUnit()));
+            }
+            case 31 -> { // Toggle building AI
+                data.buildingEnabled = !data.buildingEnabled;
+                data.markDirty();
+            }
+            case 32 -> { // Toggle potion throwing AI
+                data.potionsEnabled = !data.potionsEnabled;
+                data.markDirty();
+            }
+            case 33 -> { // Toggle fireworks artillery AI
+                data.fireworksEnabled = !data.fireworksEnabled;
+                data.markDirty();
+            }
+            case 34 -> { // Toggle shield defense AI
+                data.shieldDefenseEnabled = !data.shieldDefenseEnabled;
+                data.markDirty();
+            }
+            case 35 -> { // Toggle friendly fire
+                data.friendlyFireAllowed = !data.friendlyFireAllowed;
+                data.markDirty();
+            }
+        }
+
+        return true;
+    }
 }

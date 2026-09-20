@@ -1,4 +1,25 @@
 {
   "item.myfirstmod.unit_creator": "Unit Creator",
-  "screen.myfirstmod.creator": "Unit & Faction Sandbox"
+  "itemGroup.myfirstmod.units": "Unit & Faction Sandbox",
+  "screen.myfirstmod.creator": "Unit & Faction Sandbox",
+
+  "perk.myfirstmod.military_discipline": "Military Discipline",
+  "perk.myfirstmod.heavy_armor": "Heavy Armor",
+  "perk.myfirstmod.swift_army": "Swift Army",
+  "perk.myfirstmod.rally": "Rallying Cry",
+  "perk.myfirstmod.regeneration": "Battle Regeneration",
+  "perk.myfirstmod.night_fighters": "Night Fighters",
+  "perk.myfirstmod.veterans": "Hardened Veterans",
+  "perk.myfirstmod.pyrotechnics": "Pyrotechnics",
+  "perk.myfirstmod.holy_might": "Holy Might",
+  "perk.myfirstmod.fortification": "Iron Fortification",
+
+  "role.myfirstmod.melee": "Melee Frontline",
+  "role.myfirstmod.ranged": "Ranged Marksman",
+  "role.myfirstmod.medic": "Field Medic / Healer",
+  "role.myfirstmod.pyrotechnic": "Pyrotechnic Artillery",
+  "role.myfirstmod.engineer": "Combat Engineer",
+  "role.myfirstmod.tank": "Heavy Tank",
+  "role.myfirstmod.assassin": "Flanking Assassin",
+  "role.myfirstmod.support": "Combat Support"
 }

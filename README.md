@@ -1,114 +1,162 @@
-# Unit & Faction Sandbox
+# Minecraft 1.21.1 Fabric Mod: Unit & Faction Sandbox
 
-A Fabric 1.21.1 foundation for creating configurable Minecraft units and autonomous faction battles. The project is deliberately data-driven: a unit is an entity type plus attributes, equipment, role, and faction metadata—not a special-case mob.
+A production-quality, server-authoritative Fabric 1.21.1 mod for creating, customizing, and simulating autonomous Minecraft units, factions, armies, and battles.
 
-## Version 0.1 vertical slice
+The mod is fully data-driven: any compatible living Minecraft entity can become a custom unit with tailored attributes, equipment, inventories, tactical roles, behavior toggles, ranks, squads, and faction affiliations.
 
-1. Give yourself the **Unit Creator** (`/give @s myfirstmod:unit_creator`).
-2. Right-click it to open the server-authoritative creator screen.
-3. Create a **Village Guard**, **Royal Archer**, and the sample hostile factions.
-4. Click **Equip first saved unit**, close the screen, then left-click a block or entity with the tool to spawn it.
-5. Spawn units from the two factions and watch the bounded, throttled faction AI acquire hostile targets. Same-faction units are never valid targets.
+---
 
-The guard demonstrates the important villager path: it is still a vanilla villager, with real armor, sword, shield, health, and attack attributes. The archer remains a skeleton and uses its vanilla ranged combat goals with the configured bow.
+## 🌟 Key Features
 
-## Architecture
+### 1. Main Creator Tool (`Unit Creator`)
+- **Right-Click**: Opens the full interactive **Creator Dashboard GUI**.
+- **Left-Click (Attack Block/Air)**: Spawns the currently equipped unit template at target.
+- **Shift + Right-Click**: Quick-cycles through saved units with audio feedback and action bar notification.
+- **Shift + Left-Click**: Spawns a structured **Squad Formation (5 units)**.
+- **Dynamic Tooltips**: Displays equipped unit, faction, role, base entity, health, damage, and controls.
 
-- `unit/UnitDefinition` is serializable template data and applies only real vanilla attributes/equipment.
-- `unit/UnitWorldData` stores the library in server PersistentState, so definitions survive reloads and restarts.
-- `faction/Faction` stores relationships (`ALLIED`, `NEUTRAL`, `HOSTILE`) and persists them with the library.
-- `unit/UnitSystem` runs every ten server ticks, performs spatially bounded target queries, caches existing targets, and never scans an entity cross-product.
-- `gui/` uses a normal server ScreenHandler. Buttons are validated and executed server-side; the client only renders controls.
-- `UnitCreatorItem` references a saved unit through server state rather than embedding a unit definition in the item.
+### 2. Tactical Roles & Combat Behaviors
+- **⚔ Melee Frontline & Tanks**: Custom melee combat for all mobs (including Villagers, Piglins, Golems) with attack animations, jump critical hits, and hit particles.
+- **🛡 Active Shield Defense**: Units equipped with shields in main-hand or off-hand actively raise their shield when attacked, deflecting damage and triggering shield block sounds and spark particles.
+- **🏹 Ranged Marksmen**: Bows and crossbows with tactical distance keeping (8–22 blocks), backpedaling, and real finite ammunition tracking (`ammo:` tag) or infinite ammo option.
+- **💖 Field Medics & Healers**: Scans for injured allies in `healRange`, casts divine restoration rays with amethyst chime audio and heart particles, throws splash potions of healing/regen, cleanses negative effects, and drinks potions when self is low.
+- **🧪 Throwable Potion Specialists & Alchemists**: Offensive units throw splash/lingering flasks of Harming, Poison, Slowness, and Weakness at enemy clusters, and buff flasks at allies.
+- **🎆 Pyrotechnic Artillery & Fireworks**: Launches explosive firework rocket salvos and crossbow artillery at enemy groups, dealing multi-colored explosion bursts and area splash damage.
+- **🏗 Combat Engineers**: Server-validated block placement! Builds defensive barricades/cover when under enemy fire, places torches in low light, and places ladders.
+- **🎺 Commanders & Rallying Cry**: Blows war horns (`SoundEvents.EVENT_RAID_HORN`), buffing nearby allies with Strength, Speed, and Resistance.
+- **👥 Squad Cohesion**: Squad members follow their commander, maintain formation, and focus-fire commander's target.
+- **🍗 Food Consumption**: Injured units consume food from hand/inventory to recover health with eating sounds and particles.
+- **🏃 Tactical Retreating**: Configurable retreat threshold (`retreatHealth`); low-health units retreat away from danger towards allies.
 
-The same library is also fully addressable from the server command layer, which is useful for operators, testing, and future datapack integration:
+### 3. Faction System, Perks & Friendly Fire
+- **Faction Model**: ID, Name, Custom Hex Color, Description, Relations Matrix, and Perks.
+- **Relations**: `ALLIED` (Green), `NEUTRAL` (Slate), `HOSTILE` (Red).
+- **Friendly Fire Protection**: Attacks and damage between members of the same or allied factions are strictly prevented.
+- **10 Data-Driven Faction Perks**:
+  - `Military Discipline`: +15% unit attack damage.
+  - `Heavy Armor`: +20% armor rating & bonus knockback resistance.
+  - `Swift Army`: +15% army movement speed.
+  - `Rallying Cry`: Commanders grant Strength II & Speed II.
+  - `Battle Regeneration`: Steady passive HP regeneration.
+  - `Night Fighters`: Night Vision & +25% combat power during night.
+  - `Hardened Veterans`: Extra HP & attack for surviving warriors.
+  - `Pyrotechnics`: +50% firework explosive splash damage & radius.
+  - `Holy Might`: +50% healer power & reach.
+  - `Iron Fortification`: 15% reduction to all incoming damage.
 
+### 4. Interactive Dashboard GUI
+- **Tab 0: Unit Editor**: Unit identity, role, rank, squad, commander toggle, stats overview, 6 equipment slots (Head, Chest, Legs, Feet, Main Hand, Off Hand) + 9 unit inventory slots + player inventory drag-and-drop.
+- **Tab 1: Saved Units Library**: Real-time search filter, unit cards with stats and badges, actions for Spawn, Spawn Squad, Cycle, Duplicate, and Delete.
+- **Tab 2: Faction Manager**: Faction profiles, color swatches, active perks display, relations matrix, friendly fire rules.
+- **Tab 3: Battle Sandbox**: Live army builder (Kingdom of Eldoria vs Iron Raiders), `[START BATTLE]`, `[CLEAR ALL BATTLE MOBS]`, `[RESET BATTLE STATS]`, live scoreboard.
+- **Tab 4: Simulation Settings**: AI tick rate, toggleable modules (Building AI, Potion Throwing, Fireworks Artillery, Shield Defense, Friendly Fire), factory reset button.
+
+### 5. Battle Statistics & World Persistence
+- Server PersistentState (`UnitWorldData`, `BattleStats`) survives world saves, restarts, and server reloads.
+- Tracks Kills, Deaths, Damage Dealt, and Battles Won per faction.
+
+---
+
+## 🎮 Commands
+
+### `/unit` Commands
 ```text
-/unit create royal_guard minecraft:villager Royal Guard
-/unit set royal_guard health 40
-/unit set royal_guard damage 8
-/unit set royal_guard role melee
-/unit equip royal_guard mainhand minecraft:iron_sword
-/unit equip royal_guard offhand minecraft:shield
-/unit inventory royal_guard minecraft:bread 16
-/unit set royal_guard retreat 0.20
-/unit faction create kingdom Kingdom of Eldoria
-/unit set royal_guard faction kingdom
-/unit faction create raiders Iron Raiders
-/unit faction relation kingdom raiders HOSTILE
-/unit spawn royal_guard
+/unit list                                    - List all saved unit templates
+/unit stats                                   - View persistent battle statistics
+/unit spawn <id> [count] [x y z]              - Spawn units at player or coordinate
+/unit squad <id> [count]                      - Spawn squad formation
+/unit create <id> <entity> <name>             - Create new unit template
+/unit delete <id>                             - Delete unit template
+/unit duplicate <id>                          - Clone unit template
+/unit equip <id> <slot> <item>                - Equip item to HEAD, CHEST, LEGS, FEET, MAINHAND, OFFHAND
+/unit inventory <id> <item> [count]           - Add items (arrows, potions, fireworks, blocks) to inventory
+/unit set <id> health/damage/speed/armor <val>- Set unit attribute
+/unit set <id> role <melee|ranged|medic|...>  - Set combat role
+/unit set <id> rank <soldier|captain|...>     - Set unit rank
+/unit set <id> squad <name>                   - Assign to squad
+/unit set <id> commander <true|false>         - Set commander status
+/unit set <id> faction <factionId>            - Assign faction
+/unit set <id> retreat <0.0 - 0.99>           - Set retreat health percentage
+/unit set <id> heal-range <blocks>            - Set healer reach
 ```
 
-This repository is now exclusively the Unit & Faction Sandbox. The former boss, portal, dimension, relic, and custom-renderer content has been removed rather than carried as unrelated legacy baggage. The core is deliberately ready for the next systems: inventories, item capabilities, squads, perks, building validation, imports/exports, and battle setup can all use the same saved definitions and server authority.
-
-## Build
-
-Minecraft 1.21.1, Fabric Loader 0.16.10+, Fabric API, and Java 21 are required. Run `gradle build` with a Gradle installation or use the repository's CI workflow.
-
-## Support and potion behavior
-
-Medic and support roles are active gameplay roles. They search a bounded area for injured members of their own faction, heal the most injured ally, apply regeneration, and consume potion items on a cooldown. Use the GUI's **New Medic** action or configure a saved template with `/unit set <id> role medic`. Potion, food, weapon, shield, ranged weapon, ammunition, tool, and block capability classification is centralized so future behaviors can add real world interactions without adding item-name special cases.
-
-## Squads, commanders, food, and battle stats
-
+### `/faction` Commands
 ```text
-/unit set royal_guard rank captain
-/unit set royal_guard squad first_guard
-/unit set royal_guard commander true
-/unit inventory royal_guard minecraft:bread 16
-/unit stats
+/faction list                                 - List all registered factions
+/faction create <id> <name>                   - Create a new faction
+/faction relation <from> <to> <relation>      - Set relation: ALLIED, NEUTRAL, HOSTILE
+/faction perk <faction> <perk>                - Add faction perk
 ```
 
-Commanders rally nearby faction members with Strength. Squad members follow their commander. Injured units consume food from their hand or compatible inventory. Kills and deaths are persisted per faction in server world data and can be viewed with `/unit stats`.
-
-## Target priorities and ammunition
-
-Units can prioritize commanders, medics, ranged units, weakest targets, or nearest targets:
-
+### `/battle` Commands
 ```text
-/unit set royal_guard priority commander
+/battle start <faction1> <faction2> [size]    - Start battle between two factions
+/battle clear                                 - Clear all active battle mobs from world
+/battle stats                                 - Display kill/death scoreboard
+/battle reset                                 - Reset all statistics
 ```
 
-Ranged templates receive an ammunition budget from their saved arrow inventory. The simulation tracks that budget on each spawned unit and stops custom ranged units when ammunition is exhausted instead of silently granting unlimited supplies.
+---
 
-## Faction perks
-
-Faction perks are data-driven and persistent:
+## 🏗 Modular Architecture
 
 ```text
-/unit faction perk kingdom military_discipline
-/unit faction perk kingdom heavy_armor
-/unit faction perk kingdom swift_army
-/unit faction perk kingdom regeneration
+dev.qynl.myfirstmod/
+├── MyFirstMod.java              - Mod entrypoint, item groups, attack events
+├── MyFirstModClient.java        - Client entrypoint, screen handler registry
+│
+├── item/
+│   ├── ModItems.java            - Item registry
+│   └── UnitCreatorItem.java     - Tool with right-click GUI, left-click spawn, shift-click actions
+│
+├── unit/
+│   ├── UnitDefinition.java      - Template data model (NBT & JSON serializable)
+│   ├── UnitSpawner.java         - Server entity spawner, perks, formatting, tags
+│   ├── UnitWorldData.java       - PersistentState storage & default presets
+│   └── BattleStats.java         - Persistent battle kill/death/damage metrics
+│
+├── faction/
+│   ├── Faction.java             - Faction model, colors, relations, perks
+│   ├── FactionRelation.java     - ALLIED, NEUTRAL, HOSTILE enum
+│   ├── FactionPerk.java         - 10 data-driven perk definitions
+│   └── FactionManager.java      - Faction relation queries & friendly fire logic
+│
+├── ai/
+│   ├── UnitSystem.java          - Central throttled server simulation loop
+│   ├── CombatAI.java            - Melee combat, attack animations, crits
+│   ├── RangedAI.java            - Bow & crossbow tactical distance and firing
+│   ├── HealerMedicAI.java       - Healing rays, splash healing, cleansing
+│   ├── ThrowablePotionAI.java   - Splash potions of harm/poison/slowness/strength
+│   ├── FireworksArtilleryAI.java- Crossbow artillery, rocket salvos, AoE bursts
+│   ├── ShieldDefenseAI.java     - Shield blocking defense against attacks
+│   ├── EngineerBuildingAI.java  - Server block placement, barricades, torches
+│   ├── SquadAI.java             - Squad follower behavior & leader protection
+│   ├── CommanderAI.java         - War horn rallies, strength & speed buffs
+│   ├── FoodAI.java              - Eating food when injured
+│   └── RetreatAI.java           - Low health tactical retreat
+│
+├── equipment/
+│   └── ItemCapabilities.java    - Classification: weapon, shield, ammo, potion, block, etc.
+│
+├── battle/
+│   └── BattleSandbox.java       - Army formation spawner, battle manager, cleanup
+│
+├── gui/
+│   ├── ModScreenHandlers.java   - Screen handler registry
+│   └── CreatorScreenHandler.java- Server-authoritative slots and button dispatch
+│
+├── client/
+│   └── CreatorScreen.java       - 5-tab GUI dashboard with unit editor & library
+│
+└── command/
+    └── UnitCommands.java        - Full command suite for units, factions, battles
 ```
 
-These affect real attributes or server-side healing rather than merely changing UI text.
+---
 
-## Creator dashboard
+## ⚙ Build & Requirements
 
-The creator is designed as a dashboard rather than a single-purpose spawner. It has separate Units, Factions, Battle, and Settings areas, a searchable unit library, template cards, duplicate/delete actions, and a synchronized six-slot equipment editor.
-
-![Unit and Faction Sandbox dashboard](docs/unit-sandbox-dashboard.png)
-
-> The image above is a design reference for the dashboard layout. In-game rendering uses Minecraft's native widgets and inventory slot rendering so the equipment is interactive and server-synchronized.
-
-### Unit authoring workflow
-
-1. Open the Unit Creator from the Tools creative tab or give it with `/give @s myfirstmod:unit_creator`.
-2. Create a guard, archer, or medic template from the Units tab.
-3. Drag armor and items into the equipment editor and press **Save Equipment**.
-4. Use `/unit` commands for arbitrary registry entity types, names, stats, roles, inventories, squads, ranks, and priorities.
-5. Equip the saved template and spawn it with the creator tool.
-
-### Gameplay loops
-
-- Build a faction with allied, neutral, or hostile relationships.
-- Create frontline, ranged, medic, scout, commander, and support units.
-- Give ranged units finite arrow supplies and medics finite potion supplies.
-- Assign squads and commanders so units rally and regroup.
-- Add faction perks that affect actual attributes and regeneration.
-- Start the sample battle and inspect persistent faction kill/death statistics.
-
-### Screenshots and future UI
-
-The UI is intentionally structured around reusable panels. The next editor expansion can add entity selection, numeric stat fields, behavior toggles, target-priority chips, inventory pages, faction relation matrices, and battle army composition without replacing the server-side data model.
+- **Minecraft**: 1.21.1
+- **Fabric Loader**: >=0.16.10
+- **Fabric API**: 0.116.17+1.21.1
+- **Java**: 21
