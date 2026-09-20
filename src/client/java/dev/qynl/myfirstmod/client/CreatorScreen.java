@@ -222,7 +222,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context);
+        renderBackground(context, mouseX, mouseY, delta);
         drawBackground(context, delta, mouseX, mouseY);
         drawTabContent(context, mouseX, mouseY);
 
