@@ -71,7 +71,7 @@ public final class KingdomLandmarks {
                 boolean ring=Math.max(Math.abs(dx),Math.abs(dz))==2;
                 for(int y=0;y<9;y++){
                     boolean door=dz==2&&dx==0&&y<=1;
-                    put(w,s.add(dx,y,dz),ring&&!door?Blocks.NULLSTONE_BRICKS:Blocks.AIR);
+                    put(w,s.add(dx,y,dz),ring&&!door?ModBlocks.NULLSTONE_BRICKS:Blocks.AIR);
                 }
             }
             put(w,s.add(1,2,1),Blocks.STONE_BRICK_STAIRS);put(w,s.add(-1,4,1),Blocks.STONE_BRICK_STAIRS);
