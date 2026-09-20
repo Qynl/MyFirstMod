@@ -25,7 +25,7 @@ public final class UnitSystem {
         String unitId = tagValue(mob,"unit:"); if(unitId==null)return; UnitDefinition unit=UnitWorldData.get(server).units.get(unitId); if(unit==null)return;
         if (!mob.isAlive()) return;
         if (unit.healAllies && (unit.role.equalsIgnoreCase("medic") || unit.role.equalsIgnoreCase("support")) && mob.age % 20 == 0) healNearbyAlly(world, mob, unit);
-        if (unit.role.equalsIgnoreCase("medic") || unit.role.equalsIgnoreCase("support")) useSupportPotion(mob, unit);
+        if (unit.role.equalsIgnoreCase("medic") || unit.role.equalsIgnoreCase("support")) useSupportPotion(world, mob, unit);
         LivingEntity target = mob.getTarget(); if (!valid(server, unit, mob, target)) {
             target = world.getEntitiesByClass(LivingEntity.class, mob.getBoundingBox().expand(unit.followRange), e -> e != mob && valid(server, unit, mob, e)).stream().min((a,b)->Double.compare(mob.squaredDistanceTo(a),mob.squaredDistanceTo(b))).orElse(null); mob.setTarget(target);
         }
@@ -36,12 +36,15 @@ public final class UnitSystem {
         LivingEntity ally=world.getEntitiesByClass(LivingEntity.class, medic.getBoundingBox().expand(unit.healRange), e -> e!=medic && e.isAlive() && tagValue(e,"faction:")!=null && tagValue(e,"faction:").equals(faction) && e.getHealth()<e.getMaxHealth()).stream().min((a,b)->Float.compare(a.getHealth()/a.getMaxHealth(),b.getHealth()/b.getMaxHealth())).orElse(null);
         if(ally!=null){ ally.heal(2.0f); ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,50,0)); medic.getLookControl().lookAt(ally); }
     }
-    private static void useSupportPotion(MobEntity medic, UnitDefinition unit) {
+    private static void useSupportPotion(ServerWorld world, MobEntity medic, UnitDefinition unit) {
         if(medic.age%100!=0)return;
         for(net.minecraft.entity.EquipmentSlot slot : new net.minecraft.entity.EquipmentSlot[]{net.minecraft.entity.EquipmentSlot.MAINHAND,net.minecraft.entity.EquipmentSlot.OFFHAND}){
             var stack=medic.getEquippedStack(slot);
             if(stack.isOf(Items.POTION)||stack.isOf(Items.SPLASH_POTION)||stack.isOf(Items.LINGERING_POTION)){
-                medic.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,100,1));
+                boolean splash=stack.isOf(Items.SPLASH_POTION)||stack.isOf(Items.LINGERING_POTION); String faction=tagValue(medic,"faction:");
+                var recipients=world.getEntitiesByClass(LivingEntity.class,medic.getBoundingBox().expand(splash?5:1.5),e->e.isAlive()&&tagValue(e,"faction:")!=null&&tagValue(e,"faction:").equals(faction));
+                if(recipients.isEmpty())recipients=java.util.List.of(medic);
+                for(LivingEntity ally:recipients){ally.heal(splash?5:2);ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,100,1));}
                 stack.decrement(1); medic.equipStack(slot,stack); return;
             }
         }
