@@ -18,6 +18,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CreatorScreenHandler extends ScreenHandler {
@@ -28,6 +29,27 @@ public class CreatorScreenHandler extends ScreenHandler {
             EquipmentSlot.FEET,
             EquipmentSlot.MAINHAND,
             EquipmentSlot.OFFHAND
+    };
+
+    private static final Identifier[] ENTITY_CYCLE = {
+            Identifier.of("minecraft", "villager"),
+            Identifier.of("minecraft", "skeleton"),
+            Identifier.of("minecraft", "zombie"),
+            Identifier.of("minecraft", "pillager"),
+            Identifier.of("minecraft", "vindicator"),
+            Identifier.of("minecraft", "piglin_brute"),
+            Identifier.of("minecraft", "witch"),
+            Identifier.of("minecraft", "evoker"),
+            Identifier.of("minecraft", "iron_golem"),
+            Identifier.of("minecraft", "wolf")
+    };
+
+    private static final String[] ROLE_CYCLE = {
+            "melee", "ranged", "medic", "pyrotechnic", "engineer", "tank", "assassin", "support"
+    };
+
+    private static final String[] RANK_CYCLE = {
+            "soldier", "veteran", "captain", "commander", "specialist", "recruit"
     };
 
     public final SimpleInventory equipmentInventory = new SimpleInventory(6);
@@ -193,7 +215,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     loadUnitIntoSlots(data.units.get(next));
                 }
             }
-            case 10 -> { // Start standard battle (Kingdom vs Raiders)
+            case 10 -> { // Start standard battle (8 vs 8)
                 BattleSandbox.startBattle(serverPlayer, "kingdom", "raiders", 8);
             }
             case 11 -> { // Clear all battle mobs
@@ -201,6 +223,12 @@ public class CreatorScreenHandler extends ScreenHandler {
             }
             case 12 -> { // Reset battle stats
                 BattleStats.get(serverPlayer.getServer()).reset();
+            }
+            case 20 -> { // Start large battle (16 vs 16)
+                BattleSandbox.startBattle(serverPlayer, "kingdom", "raiders", 16);
+            }
+            case 21 -> { // Start massive battle (24 vs 24)
+                BattleSandbox.startBattle(serverPlayer, "kingdom", "raiders", 24);
             }
             case 30 -> { // Restore default presets
                 data.units.clear();
@@ -228,6 +256,99 @@ public class CreatorScreenHandler extends ScreenHandler {
             case 35 -> { // Toggle friendly fire
                 data.friendlyFireAllowed = !data.friendlyFireAllowed;
                 data.markDirty();
+            }
+            case 50 -> { // Cycle Base Entity
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < ENTITY_CYCLE.length; i++) {
+                        if (ENTITY_CYCLE[i].equals(unit.entityId)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.entityId = ENTITY_CYCLE[(currentIndex + 1) % ENTITY_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 51 -> { // Cycle Role
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < ROLE_CYCLE.length; i++) {
+                        if (ROLE_CYCLE[i].equalsIgnoreCase(unit.role)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.role = ROLE_CYCLE[(currentIndex + 1) % ROLE_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 52 -> { // Cycle Faction
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null && !data.factions.isEmpty()) {
+                    List<String> fKeys = new ArrayList<>(data.factions.keySet());
+                    int idx = fKeys.indexOf(unit.factionId);
+                    unit.factionId = fKeys.get((idx + 1) % fKeys.size());
+                    data.markDirty();
+                }
+            }
+            case 53 -> { // Cycle Rank
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < RANK_CYCLE.length; i++) {
+                        if (RANK_CYCLE[i].equalsIgnoreCase(unit.rank)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.rank = RANK_CYCLE[(currentIndex + 1) % RANK_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 54 -> { // Toggle Commander
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    unit.commander = !unit.commander;
+                    data.markDirty();
+                }
+            }
+            case 70 -> { // Cycle Kingdom ↔ Raiders Relation
+                Faction k = data.factions.get("kingdom");
+                Faction r = data.factions.get("raiders");
+                if (k != null && r != null) {
+                    FactionRelation next = k.relations.getOrDefault("raiders", FactionRelation.HOSTILE).next();
+                    k.relations.put("raiders", next);
+                    r.relations.put("kingdom", next);
+                    data.markDirty();
+                }
+            }
+            case 71 -> { // Cycle Kingdom ↔ Villagers Relation
+                Faction k = data.factions.get("kingdom");
+                Faction v = data.factions.get("villagers");
+                if (k != null && v != null) {
+                    FactionRelation next = k.relations.getOrDefault("villagers", FactionRelation.ALLIED).next();
+                    k.relations.put("villagers", next);
+                    v.relations.put("kingdom", next);
+                    data.markDirty();
+                }
+            }
+            case 72 -> { // Cycle Raiders ↔ Villagers Relation
+                Faction r = data.factions.get("raiders");
+                Faction v = data.factions.get("villagers");
+                if (r != null && v != null) {
+                    FactionRelation next = r.relations.getOrDefault("villagers", FactionRelation.HOSTILE).next();
+                    r.relations.put("villagers", next);
+                    v.relations.put("raiders", next);
+                    data.markDirty();
+                }
             }
         }
 

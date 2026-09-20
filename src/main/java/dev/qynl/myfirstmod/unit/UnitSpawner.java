@@ -2,14 +2,18 @@ package dev.qynl.myfirstmod.unit;
 
 import dev.qynl.myfirstmod.faction.Faction;
 import dev.qynl.myfirstmod.faction.FactionPerk;
-import dev.qynl.myfirstmod.item.ModItems;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
@@ -21,9 +25,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public final class UnitSpawner {
@@ -44,6 +47,11 @@ public final class UnitSpawner {
 
         // Apply base definition (attributes, equipment, inventory, variants)
         unit.apply(living);
+
+        // Prevent Piglin/Piglin Brute zombification in the Overworld
+        if (living instanceof AbstractPiglinEntity piglin) {
+            piglin.setImmuneToZombification(true);
+        }
 
         // Apply faction perks
         applyFactionPerks(world, unit, living);

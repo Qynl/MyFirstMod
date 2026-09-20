@@ -8,6 +8,9 @@ import dev.qynl.myfirstmod.unit.UnitSpawner;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.projectile.FireworkRocketEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -51,14 +54,14 @@ public final class BattleSandbox {
         ServerWorld world = player.getServerWorld();
         Vec3d center = player.getPos();
 
-        double battleDistance = 25.0;
+        double battleDistance = 30.0;
         Vec3d sideAPos = center.add(-battleDistance / 2.0, 0, 0);
         Vec3d sideBPos = center.add(battleDistance / 2.0, 0, 0);
 
-        // Spawn Side A (facing Side B -> Yaw 90)
+        // Spawn Side A (facing East -> Yaw 90)
         spawnArmyFormation(world, unitsA, sideAPos, 90.0f, armySize);
 
-        // Spawn Side B (facing Side A -> Yaw -90)
+        // Spawn Side B (facing West -> Yaw -90)
         spawnArmyFormation(world, unitsB, sideBPos, -90.0f, armySize);
 
         // Sound battle horn
@@ -80,8 +83,16 @@ public final class BattleSandbox {
             int row = i / cols;
             int col = i % cols;
 
-            double offsetX = (row) * (yaw > 0 ? -2.0 : 2.0);
-            double offsetZ = (col - (cols / 2.0)) * 2.0;
+            // Offset frontline melee ahead, ranged in middle, support/commanders behind
+            double rowOffset = row * 2.5;
+            if (template.role.equalsIgnoreCase("melee") || template.role.equalsIgnoreCase("tank")) {
+                rowOffset -= 1.5;
+            } else if (template.role.equalsIgnoreCase("medic") || template.role.equalsIgnoreCase("pyrotechnic") || template.commander) {
+                rowOffset += 2.0;
+            }
+
+            double offsetX = yaw > 0 ? -rowOffset : rowOffset;
+            double offsetZ = (col - (cols / 2.0)) * 2.2;
 
             Vec3d spawnPos = basePos.add(offsetX, 0, offsetZ);
             LivingEntity entity = UnitSpawner.spawn(world, template, spawnPos, yaw);
@@ -120,5 +131,23 @@ public final class BattleSandbox {
             }
         }
         return count;
+    }
+
+    public static void announceVictory(ServerWorld world, String winningFactionId) {
+        MinecraftServer server = world.getServer();
+        if (server == null || winningFactionId == null) return;
+
+        UnitWorldData data = UnitWorldData.get(server);
+        Faction winner = data.factions.get(winningFactionId);
+        if (winner == null) return;
+
+        BattleStats.get(server).recordWin(winningFactionId);
+
+        Text victoryText = Text.literal("🏆 VICTORY: ")
+                .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true))
+                .append(Text.literal(winner.name).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(winner.getParsedColor())).withBold(true)))
+                .append(Text.literal(" has conquered the battlefield!").setStyle(Style.EMPTY.withColor(Formatting.YELLOW)));
+
+        server.getPlayerManager().broadcast(victoryText, false);
     }
 }

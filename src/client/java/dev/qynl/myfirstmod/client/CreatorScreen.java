@@ -18,7 +18,6 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private static final int COLOR_PANEL_INNER = 0xff0d1522;
     private static final int COLOR_CARD_BG = 0xff1a263d;
     private static final int COLOR_CARD_BORDER = 0xff2a3c5a;
-    private static final int COLOR_ACCENT_BLUE = 0xff3b82f6;
 
     // Simulation toggle states for UI display
     private boolean buildingEnabled = true;
@@ -65,25 +64,40 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         int rightX = x + 250;
 
         if (tab == 0) { // UNIT EDITOR
-            // Unit navigation / template buttons
+            // Unit navigation & quick editing buttons
             addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Next Unit"), b -> sendButton(3))
-                    .dimensions(leftX, y + 36, 110, 20).build());
+                    .dimensions(leftX, y + 36, 110, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate"), b -> sendButton(4))
-                    .dimensions(leftX + 115, y + 36, 110, 20).build());
+                    .dimensions(leftX + 115, y + 36, 110, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Entity: Cycle"), b -> sendButton(50))
+                    .dimensions(leftX, y + 56, 110, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Role: Cycle"), b -> sendButton(51))
+                    .dimensions(leftX + 115, y + 56, 110, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Faction: Cycle"), b -> sendButton(52))
+                    .dimensions(leftX, y + 76, 110, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Rank: Cycle"), b -> sendButton(53))
+                    .dimensions(leftX + 115, y + 76, 110, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Commander: Toggle"), b -> sendButton(54))
+                    .dimensions(leftX, y + 96, 225, 18).build());
 
             // Actions on right
-            addDrawableChild(ButtonWidget.builder(Text.literal("💾 Save Unit Slots"), b -> sendButton(0))
-                    .dimensions(rightX, y + 36, 160, 20).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("💾 Save Slots"), b -> sendButton(0))
+                    .dimensions(rightX, y + 36, 160, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn Unit (1)"), b -> sendButton(1))
-                    .dimensions(rightX, y + 60, 160, 20).build());
+                    .dimensions(rightX, y + 56, 160, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🛡 Spawn Squad (5)"), b -> sendButton(2))
-                    .dimensions(rightX, y + 84, 160, 20).build());
+                    .dimensions(rightX, y + 76, 160, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Delete Unit"), b -> sendButton(5))
-                    .dimensions(rightX, y + 108, 160, 18).build());
+                    .dimensions(rightX, y + 96, 160, 18).build());
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             searchField = new TextFieldWidget(textRenderer, leftX, y + 36, 220, 20, Text.literal("Search"));
@@ -106,18 +120,33 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                     .dimensions(rightX, y + 132, 160, 20).build());
 
         } else if (tab == 2) { // FACTIONS
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Refresh Presets"), b -> sendButton(30))
+            addDrawableChild(ButtonWidget.builder(Text.literal("Kingdom ↔ Raiders: Toggle"), b -> sendButton(70))
                     .dimensions(rightX, y + 36, 160, 20).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Kingdom ↔ Villagers: Toggle"), b -> sendButton(71))
+                    .dimensions(rightX, y + 60, 160, 20).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Raiders ↔ Villagers: Toggle"), b -> sendButton(72))
+                    .dimensions(rightX, y + 84, 160, 20).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Refresh Presets"), b -> sendButton(30))
+                    .dimensions(rightX, y + 115, 160, 20).build());
 
         } else if (tab == 3) { // BATTLE SANDBOX
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ START BATTLE (8 vs 8) ⚔"), b -> sendButton(10))
-                    .dimensions(leftX, y + 36, 210, 24).build());
+                    .dimensions(leftX, y + 36, 210, 22).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ LARGE BATTLE (16 vs 16) ⚔"), b -> sendButton(20))
+                    .dimensions(leftX, y + 60, 210, 20).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ MASSIVE BATTLE (24 vs 24) ⚔"), b -> sendButton(21))
+                    .dimensions(leftX, y + 82, 210, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🗑 CLEAR ALL BATTLE MOBS"), b -> sendButton(11))
-                    .dimensions(leftX, y + 64, 210, 20).build());
+                    .dimensions(leftX, y + 104, 210, 20).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Battle Stats"), b -> sendButton(12))
-                    .dimensions(leftX, y + 88, 210, 20).build());
+                    .dimensions(leftX, y + 126, 210, 18).build());
 
         } else if (tab == 4) { // SETTINGS
             addDrawableChild(ButtonWidget.builder(Text.literal("Building AI: " + (buildingEnabled ? "ON" : "OFF")), b -> {
@@ -206,17 +235,11 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
     private void drawTabContent(DrawContext context, int mouseX, int mouseY) {
         int leftX = x + 16;
-        int leftY = y + 62;
+        int leftY = y + 118;
 
         if (tab == 0) { // UNIT EDITOR CONTENT
-            context.drawTextWithShadow(textRenderer, Text.literal("EQUIPPED UNIT CONFIGURATION").formatted(Formatting.BOLD, Formatting.GOLD), leftX, leftY, 0xffffd700);
-
-            context.drawText(textRenderer, Text.literal("Faction: ").formatted(Formatting.GRAY).append(Text.literal("Kingdom of Eldoria").formatted(Formatting.BLUE, Formatting.BOLD)), leftX, leftY + 16, 0xffe2e8f0, false);
-            context.drawText(textRenderer, Text.literal("Role: ").formatted(Formatting.GRAY).append(Text.literal("Melee Frontline / Tank").formatted(Formatting.WHITE)), leftX, leftY + 28, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Base Entity: ").formatted(Formatting.GRAY).append(Text.literal("Villager (Armed)").formatted(Formatting.GREEN)), leftX, leftY + 40, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Health: ").formatted(Formatting.GRAY).append(Text.literal("40.0 HP  |  Damage: 7.5").formatted(Formatting.YELLOW)), leftX, leftY + 52, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Armor: ").formatted(Formatting.GRAY).append(Text.literal("15.0  |  Knockback Res: 0.4").formatted(Formatting.AQUA)), leftX, leftY + 64, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Shield Defense: ").formatted(Formatting.GRAY).append(Text.literal("Active Blocking Enabled").formatted(Formatting.GREEN)), leftX, leftY + 76, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("Health: 40.0 HP  |  Damage: 7.5  |  Armor: 15.0").formatted(Formatting.YELLOW), leftX, leftY, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("Shield Defense: Active Blocking  |  Potions: Enabled").formatted(Formatting.GREEN), leftX, leftY + 12, 0xffcbd5e1, false);
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             int cardY = y + 62;
@@ -264,10 +287,10 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             context.drawText(textRenderer, Text.literal("Formation: Frontline Tanks, Ranged, Medics, Pyro").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
             context.drawText(textRenderer, Text.literal("Tactical AI: Shield Block, Potions & Artillery Salvos").formatted(Formatting.AQUA), statsX, statsY + 58, 0xff38bdf8, false);
 
-            context.fill(leftX, y + 120, x + backgroundWidth - 16, y + backgroundHeight - 16, COLOR_PANEL_MAIN);
-            context.drawTextWithShadow(textRenderer, Text.literal("REAL-TIME BATTLE SIMULATION ACTIVE").formatted(Formatting.GREEN), leftX + 8, y + 128, 0xff4ade80);
-            context.drawText(textRenderer, Text.literal("Click 'START BATTLE' to spawn both factions in structured battlefield formation.").formatted(Formatting.GRAY), leftX + 8, y + 144, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("Healers will actively heal wounded allies, while Pyrotechnics launch fireworks!").formatted(Formatting.YELLOW), leftX + 8, y + 158, 0xfffde047, false);
+            context.fill(leftX, y + 152, x + backgroundWidth - 16, y + backgroundHeight - 16, COLOR_PANEL_MAIN);
+            context.drawTextWithShadow(textRenderer, Text.literal("REAL-TIME BATTLE SIMULATION ACTIVE").formatted(Formatting.GREEN), leftX + 8, y + 158, 0xff4ade80);
+            context.drawText(textRenderer, Text.literal("Select army size (8v8, 16v16, 24v24) to spawn structured battlefield formations.").formatted(Formatting.GRAY), leftX + 8, y + 172, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("Healers cast divine rays while Pyrotechnics launch fireworks salvos!").formatted(Formatting.YELLOW), leftX + 8, y + 186, 0xfffde047, false);
 
         } else if (tab == 4) { // SETTINGS
             int infoX = x + 215;
