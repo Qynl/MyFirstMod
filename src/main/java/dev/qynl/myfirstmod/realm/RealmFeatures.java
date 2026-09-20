@@ -23,6 +23,7 @@ public final class RealmFeatures {
         Registry.register(Registries.FEATURE, Identifier.of(MyFirstMod.MOD_ID, "realm_ruins"), new Ruins());
         Registry.register(Registries.FEATURE, Identifier.of(MyFirstMod.MOD_ID, "realm_flora"), new Flora());
         Registry.register(Registries.FEATURE, Identifier.of(MyFirstMod.MOD_ID, "realm_vault"), new Ruins(2));
+        KingdomLandmarks.register();
     }
 
     public static int surfaceHeight(StructureWorldAccess world,int x,int z) {

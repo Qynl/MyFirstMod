@@ -229,4 +229,19 @@ lang=json.loads((A/'lang/en_us.json').read_text());lang.update({
  'seal.myfirstmod.known':'This seal is already bound to your ledger.',
  'seal.myfirstmod.plinth':'The sanctuary plinth now bears %s seals.'
 });put(A,'lang/en_us.json',lang)
+
+# --- 2.0 alpha.5: landmark caches ---------------------------------------------------
+LANDMARK_LOOT={
+ 'watch_cache':([('myfirstmod:memory_shard',1)],['myfirstmod:resonite_ingot','myfirstmod:veilstone']),
+ 'chapel_cache':([('myfirstmod:memory_shard',1)],['myfirstmod:prism_dust','myfirstmod:brinesilt']),
+ 'geode_cache':([('minecraft:amethyst_shard',2)],['myfirstmod:prism_dust','myfirstmod:spire_crystal']),
+ 'camp_cache':([('myfirstmod:hushberry',2)],['myfirstmod:cinder_pearl','minecraft:bread']),
+ 'caravan_cache':([('myfirstmod:dusk_fiber',2)],['myfirstmod:resonite_ingot','myfirstmod:memory_shard']),
+ 'fissure_cache':([('minecraft:echo_shard',1)],['myfirstmod:raw_resonite','myfirstmod:memory_shard']),
+ 'circle_cache':([('myfirstmod:dusk_fiber',2)],['myfirstmod:hushberry','myfirstmod:memory_shard']),
+ 'shrine_cache':([('myfirstmod:prism_dust',2)],['myfirstmod:lumen_moss','minecraft:echo_shard'])}
+for table,(sure,pool) in LANDMARK_LOOT.items():
+    entries=[{'type':'minecraft:item','name':n,'functions':[{'function':'minecraft:set_count','count':c}]} for n,c in sure]
+    pool_entries=[{'type':'minecraft:item','name':n,'weight':2,'functions':[{'function':'minecraft:set_count','count':{'type':'minecraft:uniform','min':1,'max':3}}]} for n in pool]
+    put(D,'loot_table/chests/'+table+'.json',{'type':'minecraft:chest','pools':[{'rolls':1,'entries':entries},{'rolls':2,'entries':pool_entries}]})
 print('Generated Rootbound Monastery:',len(blocks),'blocks across a 47x47 footprint.')

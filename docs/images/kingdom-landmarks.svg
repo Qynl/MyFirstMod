@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="660" viewBox="0 0 1080 660" role="img" aria-labelledby="title desc"><title id="title">LANDMARKS OF THE KINGDOM</title><desc id="desc">Eight landmark families added across the regions: watchtowers, brine chapels, geode gardens, slag camps, caravan wrecks, echo fissures, heartwood circles and fen shrines. Schematic icons, not gameplay screenshots.</desc><rect width="100%" height="100%" fill="#0b121d"/>
+<text x="32" y="44" fill="#e2eee7" font-family="sans-serif" font-size="27" font-weight="bold">LANDMARKS OF THE KINGDOM</text>
+<rect x="16" y="84" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>
+<text x="26" y="110" fill="#dce9e1" font-family="sans-serif" font-size="17">VEIL WATCHTOWER</text>
+<g transform="translate(66,132) scale(2)">
+<rect x="28" y="20" width="24" height="60" fill="#5a6472"/>
+<rect x="24" y="12" width="32" height="8" fill="#7e9096"/>
+<rect x="36" y="6" width="8" height="8" fill="#a0eee5"/>
+<rect x="36" y="14" width="8" height="6" fill="#8a6a30"/>
+<rect x="34" y="44" width="6" height="6" fill="#39424e"/>
+<rect x="34" y="60" width="6" height="6" fill="#39424e"/>
+</g>
+<text x="26" y="296" fill="#9aaebc" font-family="sans-serif" font-size="12">Stair, beacon lamp, cache aloft</text>
+<rect x="282" y="84" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>
+<text x="292" y="110" fill="#dce9e1" font-family="sans-serif" font-size="17">BRINE CHAPEL</text>
+<g transform="translate(332,132) scale(2)">
+<rect x="16" y="30" width="48" height="30" fill="#4a6a72"/>
+<rect x="16" y="52" width="48" height="8" fill="#31667f"/>
+<rect x="34" y="22" width="12" height="10" fill="#f0c040"/>
+<rect x="20" y="38" width="8" height="8" fill="#7fb7d0"/>
+<rect x="52" y="38" width="8" height="8" fill="#7fb7d0"/>
+</g>
+<text x="292" y="296" fill="#9aaebc" font-family="sans-serif" font-size="12">Flooded nave, oxidized altar</text>
+<rect x="548" y="84" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>
+<text x="558" y="110" fill="#dce9e1" font-family="sans-serif" font-size="17">GEODE GARDEN</text>
+<g transform="translate(598,132) scale(2)">
+<rect x="12" y="28" width="8" height="22" fill="#8c78dc"/>
+<rect x="24" y="18" width="8" height="22" fill="#8c78dc"/>
+<rect x="44" y="18" width="8" height="22" fill="#8c78dc"/>
+<rect x="56" y="28" width="8" height="22" fill="#8c78dc"/>
+<rect x="12" y="48" width="8" height="22" fill="#8c78dc"/>
+<rect x="56" y="48" width="8" height="22" fill="#8c78dc"/>
+<rect x="32" y="40" width="16" height="14" fill="#d0b0ff"/>
+<rect x="28" y="58" width="24" height="8" fill="#64d8c8"/>
+</g>
+<text x="558" y="296" fill="#9aaebc" font-family="sans-serif" font-size="12">Crystal ring, amethyst heart</text>
+<rect x="814" y="84" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>
+<text x="824" y="110" fill="#dce9e1" font-family="sans-serif" font-size="17">SLAG CAMP</text>
+<g transform="translate(864,132) scale(2)">
+<rect x="34" y="44" width="12" height="12" fill="#f08030"/>
+<rect x="20" y="52" width="8" height="8" fill="#23262c"/>
+<rect x="52" y="52" width="8" height="8" fill="#23262c"/>
+<rect x="8" y="24" width="6" height="32" fill="#6b5236"/>
+<rect x="8" y="20" width="26" height="6" fill="#6b5236"/>
+<rect x="60" y="40" width="10" height="16" fill="#8a6a30"/>
+</g>
+<text x="824" y="296" fill="#9aaebc" font-family="sans-serif" font-size="12">Fire, lean-to, supply barrels</text>
+<rect x="16" y="350" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>
+<text x="26" y="376" fill="#dce9e1" font-family="sans-serif" font-size="17">CARAVAN WRECK</text>
+<g transform="translate(66,398) scale(2)">
+<rect x="12" y="40" width="56" height="10" fill="#6b5236"/>
+<rect x="16" y="50" width="10" height="10" fill="#4a3826"/>
+<rect x="54" y="50" width="10" height="10" fill="#4a3826"/>
+<rect x="24" y="30" width="12" height="10" fill="#8a6a30"/>
+<rect x="44" y="32" width="10" height="8" fill="#8a6a30"/>
+</g>
+<text x="26" y="562" fill="#9aaebc" font-family="sans-serif" font-size="12">Broken deck, spilled caches</text>
+<rect x="282" y="350" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>
+<text x="292" y="376" fill="#dce9e1" font-family="sans-serif" font-size="17">ECHO FISSURE</text>
+<g transform="translate(332,398) scale(2)">
+<rect x="12" y="24" width="56" height="10" fill="#23262c"/>
+<rect x="12" y="34" width="8" height="26" fill="#64d8c8"/>
+<rect x="60" y="34" width="8" height="26" fill="#64d8c8"/>
+<rect x="20" y="34" width="40" height="22" fill="#0b121d"/>
+<rect x="36" y="44" width="10" height="8" fill="#8a6a30"/>
+<rect x="24" y="20" width="6" height="6" fill="#7fd0c0"/>
+<rect x="50" y="20" width="6" height="6" fill="#7fd0c0"/>
+</g>
+<text x="292" y="562" fill="#9aaebc" font-family="sans-serif" font-size="12">Resonite trench, sentinel below</text>
+<rect x="548" y="350" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>
+<text x="558" y="376" fill="#dce9e1" font-family="sans-serif" font-size="17">HEARTWOOD CIRCLE</text>
+<g transform="translate(598,398) scale(2)">
+<rect x="10" y="24" width="8" height="26" fill="#6b5236"/>
+<rect x="26" y="16" width="8" height="26" fill="#6b5236"/>
+<rect x="46" y="16" width="8" height="26" fill="#6b5236"/>
+<rect x="62" y="24" width="8" height="26" fill="#6b5236"/>
+<rect x="10" y="50" width="8" height="26" fill="#6b5236"/>
+<rect x="62" y="50" width="8" height="26" fill="#6b5236"/>
+<rect x="10" y="12" width="60" height="8" fill="#2f6b52"/>
+<rect x="34" y="44" width="12" height="10" fill="#8a6a30"/>
+<rect x="32" y="38" width="16" height="8" fill="#2f6b52"/>
+</g>
+<text x="558" y="562" fill="#9aaebc" font-family="sans-serif" font-size="12">Eight trunks, covered cache</text>
+<rect x="814" y="350" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>
+<text x="824" y="376" fill="#dce9e1" font-family="sans-serif" font-size="17">FEN SHRINE</text>
+<g transform="translate(864,398) scale(2)">
+<rect x="12" y="40" width="10" height="10" fill="#a0eee5"/>
+<rect x="58" y="40" width="10" height="10" fill="#a0eee5"/>
+<rect x="34" y="34" width="12" height="16" fill="#2f6b52"/>
+<rect x="34" y="26" width="12" height="8" fill="#d0e8e0"/>
+<rect x="36" y="16" width="8" height="8" fill="#87c070"/>
+<rect x="34" y="52" width="12" height="8" fill="#8a6a30"/>
+</g>
+<text x="824" y="562" fill="#9aaebc" font-family="sans-serif" font-size="12">Lamp corners, spore crown</text>
+<text x="22" y="636" fill="#9aaebc" font-family="sans-serif" font-size="13">Every landmark is chunk-contained, sanctuary-aware, and carries a region-themed cache.</text>
+</svg>

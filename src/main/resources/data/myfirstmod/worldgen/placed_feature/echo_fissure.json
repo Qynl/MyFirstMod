@@ -1,0 +1,19 @@
+{
+  "feature": "myfirstmod:echo_fissure",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 26
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:heightmap",
+      "heightmap": "WORLD_SURFACE_WG"
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

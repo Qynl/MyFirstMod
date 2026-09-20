@@ -58,6 +58,7 @@ public final class ExpeditionJournal {
         page(pages,"journal.myfirstmod.chain");
         page(pages,"journal.myfirstmod.capital");
         page(pages,"journal.myfirstmod.coronation");
+        page(pages,"journal.myfirstmod.landmarks");
         page(pages,"journal.myfirstmod.seals");
         page(pages,"journal.myfirstmod.keep",record.keepClears);
         page(pages,"journal.myfirstmod.regent");

@@ -47,7 +47,7 @@ class ResourceTests(unittest.TestCase):
                 for feature in stage:
                     placed=load(DATA/('worldgen/placed_feature/'+feature.split(':')[1]+'.json'))
                     configured=load(DATA/('worldgen/configured_feature/'+placed['feature'].split(':')[1]+'.json'))
-                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial','myfirstmod:realm_scenery','myfirstmod:region_signatures','myfirstmod:drowned_archive','myfirstmod:ashen_foundry'])
+                    self.assertIn(configured['type'],['myfirstmod:realm_ruins','myfirstmod:realm_flora','myfirstmod:realm_resources','myfirstmod:waystone_shrine','myfirstmod:rift_observatory','myfirstmod:mourning_cathedral','myfirstmod:forgotten_memorial','myfirstmod:realm_scenery','myfirstmod:region_signatures','myfirstmod:drowned_archive','myfirstmod:ashen_foundry','myfirstmod:veil_watchtower','myfirstmod:brine_chapel','myfirstmod:geode_garden','myfirstmod:slag_camp','myfirstmod:caravan_wreck','myfirstmod:echo_fissure','myfirstmod:heartwood_circle','myfirstmod:fen_shrine'])
             monsters={s['type'] for s in biome['spawners']['monster']}
             self.assertTrue({'myfirstmod:rift_sentinel','myfirstmod:shardstalker'}<=monsters,path.name)
             self.assertEqual('minecraft:drowned' in monsters,path.stem=='drowned_stacks')

@@ -196,6 +196,43 @@ s.append(text(OX+320,OY+63*CELL+30,'Three seals attuned, use the Crown Gate:',14
 s.append(text(OX+320,OY+63*CELL+54,'the Silent Court convenes in three sessions.',13))
 s.append(text(OX+320,OY+63*CELL+76,'Outlive them; the throne treasury opens once.',13))
 s.append('</svg>');(OUT/'silent-capital.svg').write_text('\n'.join(s)+'\n')
+
+# Landmarks of the Kingdom: eight geometric icon cards. Schematic, not screenshots.
+def icon(kind):
+    r=[]
+    def rect(dx,dy,w,h,c):r.append(f'<rect x="{dx}" y="{dy}" width="{w}" height="{h}" fill="{c}"/>')
+    if kind=='watchtower':
+        rect(28,20,24,60,'#5a6472');rect(24,12,32,8,'#7e9096');rect(36,6,8,8,'#a0eee5');rect(36,14,8,6,'#8a6a30')
+        rect(34,44,6,6,'#39424e');rect(34,60,6,6,'#39424e')
+    if kind=='brine_chapel':
+        rect(16,30,48,30,'#4a6a72');rect(16,52,48,8,'#31667f');rect(34,22,12,10,'#f0c040');rect(20,38,8,8,'#7fb7d0');rect(52,38,8,8,'#7fb7d0')
+    if kind=='geode_garden':
+        for dx,dy in [(12,28),(24,18),(44,18),(56,28),(12,48),(56,48)]:rect(dx,dy,8,22,'#8c78dc')
+        rect(32,40,16,14,'#d0b0ff');rect(28,58,24,8,'#64d8c8')
+    if kind=='slag_camp':
+        rect(34,44,12,12,'#f08030');rect(20,52,8,8,'#23262c');rect(52,52,8,8,'#23262c');rect(8,24,6,32,'#6b5236');rect(8,20,26,6,'#6b5236');rect(60,40,10,16,'#8a6a30')
+    if kind=='caravan_wreck':
+        rect(12,40,56,10,'#6b5236');rect(16,50,10,10,'#4a3826');rect(54,50,10,10,'#4a3826');rect(24,30,12,10,'#8a6a30');rect(44,32,10,8,'#8a6a30')
+    if kind=='echo_fissure':
+        rect(12,24,56,10,'#23262c');rect(12,34,8,26,'#64d8c8');rect(60,34,8,26,'#64d8c8');rect(20,34,40,22,'#0b121d');rect(36,44,10,8,'#8a6a30');rect(24,20,6,6,'#7fd0c0');rect(50,20,6,6,'#7fd0c0')
+    if kind=='heartwood_circle':
+        for dx,dy in [(10,24),(26,16),(46,16),(62,24),(10,50),(62,50)]:rect(dx,dy,8,26,'#6b5236')
+        rect(10,12,60,8,'#2f6b52');rect(34,44,12,10,'#8a6a30');rect(32,38,16,8,'#2f6b52')
+    if kind=='fen_shrine':
+        rect(12,40,10,10,'#a0eee5');rect(58,40,10,10,'#a0eee5');rect(34,34,12,16,'#2f6b52');rect(34,26,12,8,'#d0e8e0');rect(36,16,8,8,'#87c070');rect(34,52,12,8,'#8a6a30')
+    return r
+s=svg(1080,660,'LANDMARKS OF THE KINGDOM','Eight landmark families added across the regions: watchtowers, brine chapels, geode gardens, slag camps, caravan wrecks, echo fissures, heartwood circles and fen shrines. Schematic icons, not gameplay screenshots.')
+CARDS=[('VEIL WATCHTOWER','watchtower','Stair, beacon lamp, cache aloft'),('BRINE CHAPEL','brine_chapel','Flooded nave, oxidized altar'),('GEODE GARDEN','geode_garden','Crystal ring, amethyst heart'),('SLAG CAMP','slag_camp','Fire, lean-to, supply barrels'),
+       ('CARAVAN WRECK','caravan_wreck','Broken deck, spilled caches'),('ECHO FISSURE','echo_fissure','Resonite trench, sentinel below'),('HEARTWOOD CIRCLE','heartwood_circle','Eight trunks, covered cache'),('FEN SHRINE','fen_shrine','Lamp corners, spore crown')]
+for i,(title,kind,caption) in enumerate(CARDS):
+    x=22+(i%4)*266;y=110+(i//4)*266
+    s.append(f'<rect x="{x-6}" y="{y-26}" width="252" height="228" rx="10" fill="#0d1721" stroke="#22384a"/>')
+    s.append(text(x+4,y,title,17,'#dce9e1'))
+    s.append(f'<g transform="translate({x+44},{y+22}) scale(2)">')
+    s += icon(kind)
+    s.append('</g>')
+    s.append(text(x+4,y+186,caption,12))
+s.append(text(22,636,'Every landmark is chunk-contained, sanctuary-aware, and carries a region-themed cache.',13));s.append('</svg>');(OUT/'kingdom-landmarks.svg').write_text('\n'.join(s)+'\n')
 # Dimension route diagram, to exact portal block proportions.
 s=svg(1100,420,'AWAKEN THE ANCIENT CITY','22 by 8 reinforced-deepslate frame with a 20 by 6 opening. Three-second awakening, Echo Shard to the Null Realm sanctuary and its matching return gateway, then Hollow Keep after a Warden clear.')
 s.append(text(30,76,'Find the central monument • Right-click any frame block with one Echo Shard • hold it still for three seconds'))

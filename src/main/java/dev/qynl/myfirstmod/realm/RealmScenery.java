@@ -10,7 +10,7 @@ import net.minecraft.world.gen.feature.util.FeatureContext;
 public final class RealmScenery extends Feature<DefaultFeatureConfig> {
     public RealmScenery(){super(DefaultFeatureConfig.CODEC);}
     public static void register(){Registry.register(Registries.FEATURE,Identifier.of("myfirstmod","realm_scenery"),new RealmScenery());}
-    private static boolean natural(BlockState state){return state.isOf(ModBlocks.HUSHED_MOSS)||state.isOf(ModBlocks.LUMEN_MOSS)||state.isOf(ModBlocks.PRISMSTONE)||state.isOf(ModBlocks.CINDERSTONE)||state.isOf(ModBlocks.BRINESILT)||state.isOf(ModBlocks.VEILSTONE)||state.isOf(ModBlocks.VENT_BASALT);}
+    public static boolean natural(BlockState state){return state.isOf(ModBlocks.HUSHED_MOSS)||state.isOf(ModBlocks.LUMEN_MOSS)||state.isOf(ModBlocks.PRISMSTONE)||state.isOf(ModBlocks.CINDERSTONE)||state.isOf(ModBlocks.BRINESILT)||state.isOf(ModBlocks.VEILSTONE)||state.isOf(ModBlocks.VENT_BASALT);}
     @Override public boolean generate(FeatureContext<DefaultFeatureConfig> c){
         var w=c.getWorld();var random=c.getRandom();int cx=c.getOrigin().getX()&~15,cz=c.getOrigin().getZ()&~15;
         if(Math.abs(cx+8)<96&&cz+8>-96&&cz+8<192)return false;
