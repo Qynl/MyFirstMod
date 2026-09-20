@@ -39,12 +39,12 @@ public final class BombardierAI {
 
             // Mortar launch sound
             world.playSound(null, bombardier.getX(), bombardier.getY(), bombardier.getZ(),
-                    SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.NEUTRAL, 0.8f, 1.8f);
+                    SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 0.8f, 1.8f);
 
             // Explosive canister impact
             world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, tx, ty + 0.5, tz, 2, 0.2, 0.2, 0.2, 0.0);
             world.spawnParticles(ParticleTypes.FLAME, tx, ty + 0.5, tz, 25, 1.0, 1.0, 1.0, 0.1);
-            world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.NEUTRAL, 1.5f, 1.0f);
+            world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1.5f, 1.0f);
 
             float damage = 10.0f;
             List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, target.getBoundingBox().expand(4.5),

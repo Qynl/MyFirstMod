@@ -52,7 +52,7 @@ public class FactionScepterItem extends Item {
             // Spawn waypoint marker particles & sound
             world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5, 25, 0.4, 0.8, 0.4, 0.05);
             world.spawnParticles(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 15, 0.3, 0.6, 0.3, 0.08);
-            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 1.2f, 1.6f);
+            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 1.2f, 1.6f);
 
             // Command nearby troops to march to this waypoint
             List<MobEntity> troops = world.getEntitiesByClass(MobEntity.class, player.getBoundingBox().expand(36.0),
@@ -87,7 +87,7 @@ public class FactionScepterItem extends Item {
             // Mark target with glowing and focus fire
             target.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 200, 0, false, false));
             world.spawnParticles(ParticleTypes.CRIT, target.getX(), target.getBodyY(0.5), target.getZ(), 20, 0.4, 0.4, 0.4, 0.1);
-            world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ITEM_TRIDENT_THUNDER.value(), SoundCategory.PLAYERS, 0.8f, 1.8f);
+            world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 0.8f, 1.8f);
 
             List<MobEntity> troops = world.getEntitiesByClass(MobEntity.class, player.getBoundingBox().expand(36.0),
                     e -> e != target && e.isAlive() && FactionManager.isAllied(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));

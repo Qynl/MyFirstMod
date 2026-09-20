@@ -55,6 +55,6 @@ public final class VeteranProgression {
         }
 
         world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, unit.getX(), unit.getY() + 1.0, unit.getZ(), 25, 0.4, 0.6, 0.4, 0.1);
-        world.playSound(null, unit.getX(), unit.getY(), unit.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE.value(), SoundCategory.PLAYERS, 1.0f, 1.2f);
+        world.playSound(null, unit.getX(), unit.getY(), unit.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.0f, 1.2f);
     }
 }

@@ -64,7 +64,7 @@ public class ReinforcementBeaconItem extends Item {
             // Epic visual lightning & beacon activation
             world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y + 1.0, center.z, 2, 0.2, 0.2, 0.2, 0.0);
             world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, center.x, center.y + 1.5, center.z, 40, 0.8, 1.2, 0.8, 0.15);
-            world.playSound(null, center.x, center.y, center.z, SoundEvents.ITEM_TRIDENT_THUNDER.value(), SoundCategory.PLAYERS, 1.4f, 1.2f);
+            world.playSound(null, center.x, center.y, center.z, SoundEvents.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.4f, 1.2f);
             world.playSound(null, center.x, center.y, center.z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.5f, 1.0f);
 
             int colorRgb = faction != null ? faction.getParsedColor() : 0x3B82F6;

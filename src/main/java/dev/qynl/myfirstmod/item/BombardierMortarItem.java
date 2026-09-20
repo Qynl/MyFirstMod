@@ -41,7 +41,7 @@ public class BombardierMortarItem extends Item {
             serverWorld.spawnParticles(ParticleTypes.FLAME, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 10, 0.2, 0.2, 0.2, 0.08);
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.PLAYERS, 1.2f, 1.6f);
+                    SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 1.6f);
 
             player.getItemCooldownManager().set(this, 60); // 3s cooldown
         }

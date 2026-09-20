@@ -39,7 +39,7 @@ public final class DruidAI {
             }
 
             if (!enemies.isEmpty()) {
-                world.playSound(null, druid.getX(), druid.getY(), druid.getZ(), SoundEvents.BLOCK_GRASS_BREAK.value(), SoundCategory.NEUTRAL, 1.2f, 0.8f);
+                world.playSound(null, druid.getX(), druid.getY(), druid.getZ(), SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.NEUTRAL, 1.2f, 0.8f);
             }
         }
 
@@ -62,7 +62,7 @@ public final class DruidAI {
 
                     world.spawnEntity(wolf);
                     world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, wolf.getX(), wolf.getY() + 0.5, wolf.getZ(), 15, 0.3, 0.4, 0.3, 0.05);
-                    world.playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(), SoundEvents.ENTITY_WOLF_HOWL.value(), SoundCategory.NEUTRAL, 1.0f, 1.2f);
+                    world.playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(), SoundEvents.ENTITY_WOLF_HOWL, SoundCategory.NEUTRAL, 1.0f, 1.2f);
                 }
             }
         }

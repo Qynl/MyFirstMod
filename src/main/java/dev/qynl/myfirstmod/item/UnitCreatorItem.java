@@ -55,7 +55,7 @@ public class UnitCreatorItem extends Item {
                                             .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(colorRgb)))),
                             true // Action bar
                     );
-                    world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.PLAYERS, 0.6f, 1.2f);
+                    world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_BUTTON_CLICK, SoundCategory.PLAYERS, 0.6f, 1.2f);
                 }
             } else {
                 // Right-Click: Open Creator GUI

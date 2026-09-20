@@ -57,7 +57,7 @@ public final class FireworksArtilleryAI {
             rocket.setVelocity(dx, dy + dist * 0.08, dz, 1.6f, 1.2f);
 
             world.spawnEntity(rocket);
-            world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH.value(), SoundCategory.NEUTRAL, 1.0f, 1.0f);
+            world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 
             // Trigger instantaneous bombardment impact effect at target area
             detonateFireworksBombardment(world, mob, target, unit);
@@ -86,8 +86,8 @@ public final class FireworksArtilleryAI {
         // Particle fireworks burst
         world.spawnParticles(ParticleTypes.FIREWORK, tx, ty + 1.0, tz, 40, 1.2, 1.2, 1.2, 0.15);
         world.spawnParticles(ParticleTypes.EXPLOSION, tx, ty + 0.5, tz, 3, 0.4, 0.4, 0.4, 0.0);
-        world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST.value(), SoundCategory.NEUTRAL, 1.8f, 1.0f);
-        world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_FIREWORK_ROCKET_TWINKLE.value(), SoundCategory.NEUTRAL, 1.4f, 1.2f);
+        world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.NEUTRAL, 1.8f, 1.0f);
+        world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_FIREWORK_ROCKET_TWINKLE, SoundCategory.NEUTRAL, 1.4f, 1.2f);
 
         // Apply explosive area damage to enemies
         List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, target.getBoundingBox().expand(radius),

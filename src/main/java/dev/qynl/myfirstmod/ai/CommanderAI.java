@@ -26,7 +26,7 @@ public final class CommanderAI {
         if (myFaction == null) return;
 
         // Sound rally horn
-        world.playSound(null, commander.getX(), commander.getY(), commander.getZ(), SoundEvents.EVENT_RAID_HORN.value(), SoundCategory.NEUTRAL, 1.4f, 1.0f);
+        world.playSound(null, commander.getX(), commander.getY(), commander.getZ(), SoundEvents.EVENT_RAID_HORN, SoundCategory.NEUTRAL, 1.4f, 1.0f);
         world.spawnParticles(ParticleTypes.RAID_OMEN, commander.getX(), commander.getY() + 1.2, commander.getZ(), 10, 0.4, 0.6, 0.4, 0.05);
         world.spawnParticles(ParticleTypes.ENCHANTED_HIT, commander.getX(), commander.getY() + 0.8, commander.getZ(), 15, 0.6, 0.4, 0.6, 0.1);
 

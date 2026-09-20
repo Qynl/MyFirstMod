@@ -63,7 +63,7 @@ public final class PaladinAI {
             }
 
             world.spawnParticles(ParticleTypes.ENCHANTED_HIT, target.getX(), target.getBodyY(0.5), target.getZ(), 8, 0.3, 0.3, 0.3, 0.05);
-            world.playSound(null, paladin.getX(), paladin.getY(), paladin.getZ(), SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME.value(), SoundCategory.NEUTRAL, 1.0f, 1.4f);
+            world.playSound(null, paladin.getX(), paladin.getY(), paladin.getZ(), SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.NEUTRAL, 1.0f, 1.4f);
         }
     }
 }

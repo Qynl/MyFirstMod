@@ -65,7 +65,7 @@ public final class BattleSandbox {
         spawnArmyFormation(world, unitsB, sideBPos, -90.0f, armySize);
 
         // Sound battle horn
-        world.playSound(null, center.x, center.y, center.z, SoundEvents.EVENT_RAID_HORN.value(), SoundCategory.NEUTRAL, 2.0f, 1.0f);
+        world.playSound(null, center.x, center.y, center.z, SoundEvents.EVENT_RAID_HORN, SoundCategory.NEUTRAL, 2.0f, 1.0f);
 
         Text startMsg = Text.literal("⚔ BATTLE COMMENCED: ")
                 .setStyle(Style.EMPTY.withColor(Formatting.GOLD).withBold(true))
@@ -156,7 +156,7 @@ public final class BattleSandbox {
         // Celebration fireworks in the sky
         for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
             world.spawnParticles(ParticleTypes.FIREWORK, p.getX(), p.getY() + 8.0, p.getZ(), 50, 2.0, 2.0, 2.0, 0.2);
-            world.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE.value(), SoundCategory.PLAYERS, 1.2f, 1.0f);
+            world.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.2f, 1.0f);
         }
     }
 }

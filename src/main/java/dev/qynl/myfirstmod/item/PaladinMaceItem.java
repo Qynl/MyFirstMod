@@ -61,9 +61,9 @@ public class PaladinMaceItem extends Item {
             }
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_ANVIL_LAND.value(), SoundCategory.PLAYERS, 1.2f, 1.4f);
+                    SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1.2f, 1.4f);
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.ITEM_TRIDENT_THUNDER.value(), SoundCategory.PLAYERS, 1.0f, 1.2f);
+                    SoundEvents.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.0f, 1.2f);
 
             serverPlayer.sendMessage(
                     Text.literal("⚡ Sunforge Smite: ").formatted(Formatting.GOLD, Formatting.BOLD)

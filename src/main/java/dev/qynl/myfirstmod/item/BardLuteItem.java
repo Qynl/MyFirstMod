@@ -51,9 +51,9 @@ public class BardLuteItem extends Item {
             }
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.PLAYERS, 1.8f, 1.2f);
+                    SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1.8f, 1.2f);
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 1.5f, 1.5f);
+                    SoundEvents.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1.5f, 1.5f);
 
             serverPlayer.sendMessage(
                     Text.literal("🎶 Harmonic War Hymn: ").formatted(Formatting.AQUA, Formatting.BOLD)

@@ -50,7 +50,7 @@ public class FactionBannerItem extends Item {
 
                 world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 20, 0.5, 0.8, 0.5, 0.05);
                 world.spawnParticles(ParticleTypes.PORTAL, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 15, 0.4, 0.4, 0.4, 0.1);
-                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE.value(), SoundCategory.BLOCKS, 1.0f, 1.2f);
+                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.0f, 1.2f);
 
                 int colorRgb = faction != null ? faction.getParsedColor() : 0x3B82F6;
                 String fName = faction != null ? faction.name : "Faction";

@@ -72,12 +72,12 @@ public final class AssassinAI {
                 if (isBackstab) {
                     damage *= 1.75f; // Huge critical backstab multiplier
                     world.spawnParticles(ParticleTypes.CRIT, target.getX(), target.getBodyY(0.5), target.getZ(), 12, 0.3, 0.3, 0.3, 0.15);
-                    world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT.value(), SoundCategory.NEUTRAL, 1.0f, 0.8f);
+                    world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.0f, 0.8f);
                 }
 
                 boolean targetWasAlive = target.isAlive();
                 target.damage(world.getDamageSources().mobAttack(assassin), damage);
-                world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG.value(), SoundCategory.NEUTRAL, 0.9f, 1.2f);
+                world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.NEUTRAL, 0.9f, 1.2f);
 
                 if (server != null) {
                     BattleStats stats = BattleStats.get(server);

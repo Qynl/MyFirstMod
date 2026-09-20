@@ -72,13 +72,13 @@ public class TacticalWhistleItem extends Item {
                         true // Action bar
                 );
                 serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.BLOCK_NOTE_BLOCK_BELL.value(), SoundCategory.PLAYERS, 1.2f, 1.8f);
+                        SoundEvents.BLOCK_NOTE_BLOCK_BELL, SoundCategory.PLAYERS, 1.2f, 1.8f);
                 return TypedActionResult.success(stack, false);
             }
 
             // Whistle audio effect
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 1.5f, 1.6f);
+                    SoundEvents.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1.5f, 1.6f);
 
             String equippedId = data.getEquippedUnit(player.getUuid());
             var unit = data.units.get(equippedId);

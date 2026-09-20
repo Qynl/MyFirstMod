@@ -78,7 +78,7 @@ public class CommanderHornItem extends Item {
 
             // Sound war horn
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.EVENT_RAID_HORN.value(), SoundCategory.PLAYERS, 2.0f, mode == OrderMode.CHARGE ? 1.2f : 1.0f);
+                    SoundEvents.EVENT_RAID_HORN, SoundCategory.PLAYERS, 2.0f, mode == OrderMode.CHARGE ? 1.2f : 1.0f);
 
             // Spawn golden rally particles
             serverWorld.spawnParticles(ParticleTypes.RAID_OMEN, player.getX(), player.getY() + 1.2, player.getZ(), 20, 0.5, 0.8, 0.5, 0.08);

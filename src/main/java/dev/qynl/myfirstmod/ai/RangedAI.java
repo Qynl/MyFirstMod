@@ -69,9 +69,9 @@ public final class RangedAI {
             world.spawnEntity(arrow);
 
             if (isCrossbow) {
-                world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT.value(), SoundCategory.NEUTRAL, 1.0f, 1.0f);
+                world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT, SoundCategory.NEUTRAL, 1.0f, 1.0f);
             } else {
-                world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_ARROW_SHOOT.value(), SoundCategory.NEUTRAL, 1.0f, 1.0f);
+                world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.NEUTRAL, 1.0f, 1.0f);
             }
 
             if (!infinite) {

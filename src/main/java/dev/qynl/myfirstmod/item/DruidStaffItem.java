@@ -60,9 +60,9 @@ public class DruidStaffItem extends Item {
             }
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_GRASS_BREAK.value(), SoundCategory.PLAYERS, 1.5f, 0.8f);
+                    SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.PLAYERS, 1.5f, 0.8f);
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.ENTITY_EVOKER_CAST_SPELL.value(), SoundCategory.PLAYERS, 1.0f, 1.3f);
+                    SoundEvents.ENTITY_EVOKER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.3f);
 
             serverPlayer.sendMessage(
                     Text.literal("🌿 Nature's Grasp: ").formatted(Formatting.GREEN, Formatting.BOLD)

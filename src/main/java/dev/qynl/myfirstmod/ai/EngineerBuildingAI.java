@@ -46,7 +46,7 @@ public final class EngineerBuildingAI {
 
         if (world.isAir(pos) && world.getBlockState(pos.down()).isSolidBlock(world, pos.down())) {
             world.setBlockState(pos, Blocks.TORCH.getDefaultState(), Block.NOTIFY_ALL);
-            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_WOOD_PLACE.value(), SoundCategory.BLOCKS, 0.8f, 1.0f);
+            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_WOOD_PLACE, SoundCategory.BLOCKS, 0.8f, 1.0f);
             consumeItem(mob, Items.TORCH, unit);
         }
     }
@@ -68,7 +68,7 @@ public final class EngineerBuildingAI {
             if (world.isAir(targetPos) || world.getBlockState(targetPos).isReplaceable()) {
                 if (world.getBlockState(targetPos.down()).isSolidBlock(world, targetPos.down()) || dy > 0) {
                     world.setBlockState(targetPos, blockToPlace.getDefaultState(), Block.NOTIFY_ALL);
-                    world.playSound(null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE.value(), SoundCategory.BLOCKS, 0.8f, 1.0f);
+                    world.playSound(null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.8f, 1.0f);
                     world.spawnParticles(ParticleTypes.POOF, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 4, 0.2, 0.2, 0.2, 0.05);
 
                     if (!unit.infiniteAmmo) {

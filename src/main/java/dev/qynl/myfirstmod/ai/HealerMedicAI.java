@@ -90,7 +90,7 @@ public final class HealerMedicAI {
             world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, mostInjured.getX(), mostInjured.getY() + 0.5, mostInjured.getZ(), 8, 0.4, 0.5, 0.4, 0.05);
 
             // Sound effect
-            world.playSound(null, mostInjured.getX(), mostInjured.getY(), mostInjured.getZ(), SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME.value(), SoundCategory.NEUTRAL, 0.9f, 1.4f);
+            world.playSound(null, mostInjured.getX(), mostInjured.getY(), mostInjured.getZ(), SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.NEUTRAL, 0.9f, 1.4f);
         }
     }
 
@@ -98,7 +98,7 @@ public final class HealerMedicAI {
         medic.heal(6.0f);
         medic.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 1));
         world.spawnParticles(ParticleTypes.HEART, medic.getX(), medic.getBodyY(0.5), medic.getZ(), 4, 0.2, 0.2, 0.2, 0.05);
-        world.playSound(null, medic.getX(), medic.getY(), medic.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP.value(), SoundCategory.NEUTRAL, 0.8f, 1.2f);
+        world.playSound(null, medic.getX(), medic.getY(), medic.getZ(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.8f, 1.2f);
     }
 
     private static boolean hasSplashPotion(MobEntity mob) {

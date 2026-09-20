@@ -35,7 +35,7 @@ public final class BardAI {
 
                 // Play pleasant musical chord
                 float pitch = 0.8f + (world.random.nextFloat() * 0.8f);
-                world.playSound(null, bard.getX(), bard.getY(), bard.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.NEUTRAL, 1.2f, pitch);
+                world.playSound(null, bard.getX(), bard.getY(), bard.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.NEUTRAL, 1.2f, pitch);
 
                 for (LivingEntity ally : allies) {
                     ally.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 100, 0, false, false));
