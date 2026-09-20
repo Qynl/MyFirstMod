@@ -27,8 +27,17 @@ jobs:
 
       - name: Build Mod with Gradle
         run: |
-          set -o pipefail
-          gradle build --stacktrace 2>&1 | tee gradle-build.log
+          gradle build --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
+          echo "### Gradle Build Output" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 120 gradle-build.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ "$BUILD_FAILED" = "1" ]; then
+            while IFS= read -r line; do
+              echo "::error title=Build Failure::$line"
+            done < <(grep -E "(error:|FAILURE:|FAILURE: Build failed|\> Compilation failed|\> Could not resolve|cannot find symbol|package .* does not exist)" gradle-build.log | head -n 40)
+            exit 1
+          fi
 
       - name: Upload Mod JAR Artifact
         uses: actions/upload-artifact@v4
