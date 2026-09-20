@@ -329,10 +329,7 @@ public final class UnitDefinition {
     }
 
     public void applyEquipment(LivingEntity entity) {
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemStack stack = equipment.getOrDefault(slot, ItemStack.EMPTY);
-            entity.equipStack(slot, stack.copy());
-        }
+        dev.qynl.myfirstmod.equipment.MobEquipmentAdapter.applyEquipment(entity, this);
     }
 
     public void applyInventory(LivingEntity entity) {

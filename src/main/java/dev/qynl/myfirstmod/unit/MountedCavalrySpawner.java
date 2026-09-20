@@ -6,8 +6,12 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.AbstractHorseEntity;
+import net.minecraft.entity.passive.CamelEntity;
 import net.minecraft.entity.passive.HorseEntity;
-import net.minecraft.entity.mob.SkeletonHorseEntity;
+import net.minecraft.entity.passive.PigEntity;
+import net.minecraft.entity.passive.StriderEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
@@ -33,19 +37,31 @@ public final class MountedCavalrySpawner {
         }
 
         mount.refreshPositionAndAngles(pos.x, pos.y, pos.z, yaw, 0.0f);
+        mount.setHeadYaw(yaw);
+        mount.setBodyYaw(yaw);
 
-        if (mount instanceof HorseEntity horse) {
+        // Tame and equip saddles on horses, camels, donkeys, striders, etc.
+        if (mount instanceof AbstractHorseEntity horse) {
             horse.setTame(true);
-            horse.equipStack(EquipmentSlot.BODY, new ItemStack(Items.DIAMOND_HORSE_ARMOR));
+            if (horse instanceof HorseEntity regHorse) {
+                regHorse.equipStack(EquipmentSlot.BODY, new ItemStack(Items.DIAMOND_HORSE_ARMOR));
+            }
             horse.equipStack(EquipmentSlot.FEET, new ItemStack(Items.SADDLE));
-        } else if (mount instanceof SkeletonHorseEntity skelHorse) {
-            skelHorse.setTame(true);
-            skelHorse.equipStack(EquipmentSlot.FEET, new ItemStack(Items.SADDLE));
+        } else if (mount instanceof CamelEntity camel) {
+            camel.setTame(true);
+            camel.equipStack(EquipmentSlot.FEET, new ItemStack(Items.SADDLE));
+        } else if (mount instanceof TameableEntity tameable) {
+            tameable.setTamed(true);
+        } else if (mount instanceof StriderEntity strider) {
+            strider.equipStack(EquipmentSlot.FEET, new ItemStack(Items.SADDLE));
+        } else if (mount instanceof PigEntity pig) {
+            pig.equipStack(EquipmentSlot.FEET, new ItemStack(Items.SADDLE));
         }
 
         mount.getCommandTags().add("faction:" + riderDef.factionId);
         mount.getCommandTags().add("cavalry_mount");
         mount.getCommandTags().add("battle_mob");
+        mount.setPersistent();
         world.spawnEntity(mount);
 
         LivingEntity rider = UnitSpawner.spawnDirect(world, riderDef, pos, yaw);

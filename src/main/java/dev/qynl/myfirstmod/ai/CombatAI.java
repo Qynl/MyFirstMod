@@ -52,6 +52,18 @@ public final class CombatAI {
                 world.spawnParticles(ParticleTypes.CRIT, target.getX(), target.getBodyY(0.5), target.getZ(), 8, 0.2, 0.2, 0.2, 0.1);
             }
 
+            // Empowered beast / weapon strike particles
+            if (mob.getCommandTags().contains("weapon_empowered")) {
+                world.spawnParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getBodyY(0.5), target.getZ(), 1, 0, 0, 0, 0);
+            }
+
+            // Fire aspect ignite check
+            int fireLevel = UnitSystem.getNumericTag(mob, "fire_aspect:");
+            if (fireLevel > 0) {
+                target.setOnFireFor(fireLevel * 4);
+                world.spawnParticles(ParticleTypes.FLAME, target.getX(), target.getBodyY(0.5), target.getZ(), 6, 0.2, 0.2, 0.2, 0.05);
+            }
+
             boolean targetWasAlive = target.isAlive();
             target.damage(world.getDamageSources().mobAttack(mob), damage);
 

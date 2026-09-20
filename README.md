@@ -15,12 +15,34 @@
 
 ## 📜 Welcome, Commander!
 
-Ever wanted to command a **50-strong battalion of heavily armored Royal Villager Knights charging on armored horses**, supported by **Bogged Snipers firing venom arrows**, **Tempest Breeze wind-mages**, **Pixie Combat Medics**, **Colossal 1.5x Iron Titans**, **Pyrotechnic Artillery launching firework volleys**, and **Necromancers summoning undead hordes**?
+Ever wanted to command a **50-strong battalion of heavily armored Royal Villager Knights charging on armored horses**, supported by **Bogged Snipers firing venom arrows**, **Tempest Breeze wind-mages**, **Savage War Wolves**, **Armored Battle Bears**, **Pixie Combat Medics**, **Colossal 1.5x Iron Titans**, **Desert Camel Dragoons**, **Pyrotechnic Artillery launching firework volleys**, and **Necromancers summoning undead hordes**?
 
 **Legions & Factions: Autonomous War Sandbox** transforms Minecraft into an **autonomous, server-authoritative tactical war simulator**. 
-Create any living Minecraft entity into a custom battle template, equip it with custom **3D modeled weapons, staves, lutes, and relics**, customize its scale, mount, aura and death explosions, assign it to a faction with unique perks, place outposts, whistle army formations, transmute wild mobs, and watch legendary battles unfold!
+Create any living Minecraft entity (or **any mob from installed mods like Naturalist, Alex's Mobs, etc.**) into a custom battle template, equip it with custom **3D modeled weapons, staves, lutes, and relics**, customize its scale, mount, aura and death explosions, assign it to a faction with unique perks, place outposts, whistle army formations, transmute wild mobs, and watch legendary battles unfold!
 
 ![Dashboard Overview](docs/unit-sandbox-dashboard.png)
+
+---
+
+## 🦁 Universal Modded Mob & Beast Support (Naturalist, Alex's Mobs & More)
+
+You can use **ANY mob from ANY installed mod** (e.g. *Naturalist* Lions, Bears, Elephants, Zebras, Rhinos, Boars, Snakes, Deer, Birds; *Alex's Mobs*; custom bosses) seamlessly without coding!
+
+```text
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ 🌟 DYNAMIC REGISTRY DISCOVERY (Zero Coding / Zero Config Needed!)          │
+ ├────────────────────────────────────────────────────────────────────────────┤
+ │ • Automatically scans Registries.ENTITY_TYPE for all loaded mods.          │
+ │ • Formats clean titles: "naturalist:lion" -> "Lion [Naturalist]"           │
+ │ • Cycle through them directly in the Creator GUI or /unit create!          │
+ └────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 🛡️ Smart Beast Equipment Adapter (`MobEquipmentAdapter`)
+When giving swords, axes, bows, or diamond/netherite armor to animals, beasts, quadrupeds, or modded creatures:
+- **Zero Visual Glitches**: Rather than awkwardly sticking a floating sword into an animal's belly or rendering stretched humanoid chestplates, the system automatically translates weapon damage, enchantments (Sharpness, Fire Aspect, Knockback, Smite), and armor protection directly into native combat attributes (`GENERIC_ATTACK_DAMAGE`, `GENERIC_ARMOR`, `GENERIC_ARMOR_TOUGHNESS`, `GENERIC_KNOCKBACK_RESISTANCE`).
+- **Empowered Beast Attacks**: Beasts equipped with weapons emit critical slash particles, burn enemies with Fire Aspect bites, and gain heavy runic armor defense glints!
+- **Sunlight Immunity**: Non-bipedal undead mobs or beasts equipped with helmets gain sunlight immunity so they can wage war in the daylight without burning!
 
 ---
 
@@ -52,7 +74,9 @@ Every non-vanilla item in **Legions & Factions** features a **custom 3D voxel-sc
                      [ CAVALRY & VANGUARD ]
                🐎 Armored Knights on Warhorses
                💀 Dread Wither Cavalry on Skeleton Steeds
-               🕷 Spider Riders & Wolf Cavalry
+               🐫 Desert Camel Dragoons & Marksmen
+               🐺 Savage War Wolves & Battle Bears
+               🕷 Spider Riders & Modded Mounts
                          │
                      [ FRONT LINE ]
                ⚔ Melee Tanks & Knights
@@ -76,13 +100,13 @@ Every non-vanilla item in **Legions & Factions** features a **custom 3D voxel-sc
                👑 Commanders & Tacticians
 ```
 
-### 1. 🐎 Mounted Cavalry System (`MountedCavalrySpawner`)
-- Units can ride **Armored Warhorses**, **Skeletal Steeds**, **Cave Spiders**, **Dire Wolves**, and **Ravagers**.
-- Mounted units gain increased movement speed, charge impact knockback, and synchronized rider AI!
+### 1. 🐎 Universal Mount & Cavalry System (`MountedCavalrySpawner`)
+- Units can ride **Armored Warhorses**, **Skeletal Steeds**, **Camels**, **Polar Bears**, **Spiders**, **Striders**, **Pigs**, and **Modded Mounts** (like Naturalist Elephants, Rhinos, Zebras).
+- Mounted units gain increased movement speed, elevation reach advantage, and synchronized navigation!
 
 ### 2. 📏 Entity Scaling (0.25x Miniature to 5.0x Colossus)
-- Scale any warrior up or down via the attributes engine (`EntityAttributes.GENERIC_SCALE`).
-- Create colossal **Iron Titan Juggernauts** or miniature **Goblin Swarms** with matching hitboxes and step heights!
+- Scale any warrior or beast up or down via the 1.21 attributes engine (`EntityAttributes.GENERIC_SCALE`).
+- Create colossal **Iron Titan Juggernauts** or miniature **Goblin Swarms** with matching hitboxes, step heights, and reach!
 
 ### 3. 🧠 Dynamic Morale & Panic System (`MoraleSystem`)
 - **Commander Casualties**: When a squad leader dies, recruit-tier units suffer **Morale Break** (retreating in panic with crying particles).
@@ -128,8 +152,8 @@ Surviving warriors gain battle experience and battlefield promotions!
  ┌───────────────────────┬────────────┬──────────────────────────────────────┐
  │ Faction               │ Color      │ Signature Units                      │
  ├───────────────────────┼────────────┼──────────────────────────────────────┤
- │ 🔵 Kingdom of Eldoria │ Royal Blue │ Royal Knights, Archers, Medics, Pyro │
- │ 🔴 Iron Raiders       │ Red        │ Berserkers, Bombardiers, Alchemists  │
+ │ 🔵 Kingdom of Eldoria │ Royal Blue │ Royal Knights, Archers, Medics, Wolves│
+ │ 🔴 Iron Raiders       │ Red        │ Berserkers, Bombardiers, Battle Bears│
  │ 🟢 Village Alliance   │ Emerald    │ Town Militia, Druids, Iron Titans    │
  │ 🟣 Undead Legion      │ Purple     │ Necromancers, Dread Cavalry, Bogged  │
  │ 🔷 Arcane Order       │ Cyan       │ Bards, Tempest Breeze, Pixie Medics  │
@@ -146,9 +170,9 @@ Surviving warriors gain battle experience and battlefield promotions!
   ├────────────────────────────────────────────────────────────────────────┤
   │                                                                        │
   │  [⮜ Next Unit]     [➕ Duplicate]         [💾 Save Slots]             │
-  │  [Entity: Cycle]   [Role: Cycle]          [⚔ Spawn Unit (1)]          │
+  │  [Entity: Next ⮞]  [Role: Cycle]          [⚔ Spawn Unit (1)]          │
   │  [Faction: Cycle]  [Rank: Cycle]          [🛡 Spawn Squad (5)]         │
-  │  [Mount: Cycle]    [Aura: Cycle]          [🗑 Delete Unit]             │
+  │  [Mount: Next ⮞]   [Aura: Cycle]          [🗑 Delete Unit]             │
   │  [Death: Cycle]    [Scale: Cycle]                                      │
   │  [Commander: Toggle ON/OFF]                                            │
   │                                                                        │
@@ -168,14 +192,15 @@ Surviving warriors gain battle experience and battlefield promotions!
 /unit stats                                   # View persistent battle statistics
 /unit spawn <id> [count] [x y z]              # Spawn unit at player or coordinates
 /unit squad <id> [count]                      # Spawn structured squad
-/unit create <id> <entity> <name>             # Create new template
+/unit create <id> <entity> <name>             # Create new template (vanilla or modded!)
 /unit delete <id>                             # Delete template
 /unit duplicate <id>                          # Clone template
 /unit equip <id> <slot> <item>                # Equip armor or weapons
 /unit inventory <id> <item> [count]           # Add ammunition, food, potions, blocks
+/unit set <id> entity <entity_id>             # Set entity type (e.g. naturalist:lion)
 /unit set <id> health/damage/speed/armor <v>  # Edit attribute
 /unit set <id> scale <0.25 - 5.0>             # Set entity visual scale
-/unit set <id> mount <entity_id>              # Set cavalry mount (e.g. minecraft:horse)
+/unit set <id> mount <entity_id>              # Set cavalry mount (e.g. minecraft:camel)
 /unit set <id> aura <flame|portal|heart|...>  # Set visual particle aura
 /unit set <id> death <explosion|healing|...>  # Set death effect action
 /unit set <id> role <role>                    # Set combat role (melee, ranged, etc.)
@@ -203,7 +228,7 @@ Surviving warriors gain battle experience and battlefield promotions!
 * **100% Server Authoritative**: Client screens only send validated requests; all spawning, stats, inventory, equipment, and AI execute on the server.
 * **Spatial & Throttled Queries**: AI ticks every 10 ticks and uses spatial bounding box queries—**zero full-world O(N²) scans**.
 * **Zero Zombification in Overworld**: Piglin and Piglin Brute units automatically have zombification disabled so Nether units can fight in the Overworld!
-* **Sunlight Protection**: Custom undead units (Zombies, Skeletons) do not burn during daytime battles.
+* **Sunlight Protection**: Custom undead units (Zombies, Skeletons) and helmeted beasts do not burn during daytime battles.
 * **Persistent World Data**: All units, factions, relationships, perks, and battle statistics persist across world reloads and server restarts.
 
 ---

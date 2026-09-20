@@ -81,6 +81,7 @@ public final class UnitCommands {
                                     .then(CommandManager.literal("commander").then(CommandManager.argument("value", BoolArgumentType.bool()).executes(c -> setBoolProp(c.getSource(), StringArgumentType.getString(c, "id"), "commander", BoolArgumentType.getBool(c, "value")))))
                                     .then(CommandManager.literal("retreat").then(CommandManager.argument("value", FloatArgumentType.floatArg(0, 0.99f)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "retreat", FloatArgumentType.getFloat(c, "value")))))
                                     .then(CommandManager.literal("scale").then(CommandManager.argument("value", FloatArgumentType.floatArg(0.1f, 10.0f)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "scale", FloatArgumentType.getFloat(c, "value")))))
+                                    .then(CommandManager.literal("entity").then(CommandManager.argument("value", IdentifierArgumentType.identifier()).executes(c -> setEntityProp(c.getSource(), StringArgumentType.getString(c, "id"), IdentifierArgumentType.getIdentifier(c, "value")))))
                                     .then(CommandManager.literal("mount").then(CommandManager.argument("value", StringArgumentType.string()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "mount", StringArgumentType.getString(c, "value")))))
                                     .then(CommandManager.literal("aura").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "aura", StringArgumentType.getString(c, "value")))))
                                     .then(CommandManager.literal("death").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "death", StringArgumentType.getString(c, "value")))))
@@ -276,6 +277,20 @@ public final class UnitCommands {
         }
         data.markDirty();
         s.sendFeedback(() -> Text.literal("Updated " + attr + " of " + id + " to " + val).formatted(Formatting.GREEN), true);
+        return 1;
+    }
+
+    private static int setEntityProp(ServerCommandSource s, String id, Identifier entity) {
+        UnitWorldData data = UnitWorldData.get(s.getServer());
+        UnitDefinition u = data.units.get(id);
+        if (u == null) return 0;
+        if (!Registries.ENTITY_TYPE.getOrEmpty(entity).isPresent()) {
+            s.sendError(Text.literal("Unknown entity type: " + entity));
+            return 0;
+        }
+        u.entityId = entity;
+        data.markDirty();
+        s.sendFeedback(() -> Text.literal("Updated entity type of " + id + " to " + entity).formatted(Formatting.GREEN), true);
         return 1;
     }
 

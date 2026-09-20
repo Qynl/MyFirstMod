@@ -301,18 +301,19 @@ public class CreatorScreenHandler extends ScreenHandler {
                 data.friendlyFireAllowed = !data.friendlyFireAllowed;
                 data.markDirty();
             }
-            case 50 -> { // Cycle Base Entity
+            case 49 -> { // Prev Base Entity
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
-                    int currentIndex = 0;
-                    for (int i = 0; i < ENTITY_CYCLE.length; i++) {
-                        if (ENTITY_CYCLE[i].equals(unit.entityId)) {
-                            currentIndex = i;
-                            break;
-                        }
-                    }
-                    unit.entityId = ENTITY_CYCLE[(currentIndex + 1) % ENTITY_CYCLE.length];
+                    unit.entityId = dev.qynl.myfirstmod.entity.DynamicEntityRegistry.cycleEntity(unit.entityId, -1);
+                    data.markDirty();
+                }
+            }
+            case 50 -> { // Cycle Base Entity (Next)
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    unit.entityId = dev.qynl.myfirstmod.entity.DynamicEntityRegistry.cycleEntity(unit.entityId, 1);
                     data.markDirty();
                 }
             }
@@ -364,18 +365,19 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
-            case 55 -> { // Cycle Mount
+            case 55 -> { // Cycle Mount (Next)
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
-                    int currentIndex = 0;
-                    for (int i = 0; i < MOUNT_CYCLE.length; i++) {
-                        if (MOUNT_CYCLE[i].equalsIgnoreCase(unit.mount)) {
-                            currentIndex = i;
-                            break;
-                        }
-                    }
-                    unit.mount = MOUNT_CYCLE[(currentIndex + 1) % MOUNT_CYCLE.length];
+                    unit.mount = dev.qynl.myfirstmod.entity.DynamicEntityRegistry.cycleMount(unit.mount, 1);
+                    data.markDirty();
+                }
+            }
+            case 59 -> { // Prev Mount
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    unit.mount = dev.qynl.myfirstmod.entity.DynamicEntityRegistry.cycleMount(unit.mount, -1);
                     data.markDirty();
                 }
             }

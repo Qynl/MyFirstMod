@@ -493,6 +493,49 @@ public final class UnitWorldData extends PersistentState {
             golem.armorToughness = 8.0f;
             golem.knockbackResistance = 1.0f;
             units.put(golem.id, golem);
+
+            // 21. Savage War Wolf (Beast Archetype)
+            UnitDefinition wolf = new UnitDefinition("war_wolf", "Savage War Wolf", Identifier.of("minecraft", "wolf"));
+            wolf.description = "Fierce combat beast with razor fangs and adapted armor enhancements.";
+            wolf.factionId = "kingdom";
+            wolf.role = "berserker";
+            wolf.rank = "soldier";
+            wolf.scale = 1.15f;
+            wolf.maxHealth = 36.0f;
+            wolf.attackDamage = 8.0f;
+            wolf.movementSpeed = 0.32f;
+            wolf.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_SWORD));
+            wolf.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.ARMADILLO_SCUTE));
+            units.put(wolf.id, wolf);
+
+            // 22. Armored Battle Bear
+            UnitDefinition bear = new UnitDefinition("battle_bear", "Armored Battle Bear", Identifier.of("minecraft", "polar_bear"));
+            bear.description = "Heavy apex predator juggernaut crushing enemy defenses.";
+            bear.factionId = "raiders";
+            bear.role = "tank";
+            bear.rank = "warlord";
+            bear.scale = 1.25f;
+            bear.maxHealth = 85.0f;
+            bear.attackDamage = 12.0f;
+            bear.armor = 14.0f;
+            bear.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.NETHERITE_CHESTPLATE));
+            bear.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.NETHERITE_AXE));
+            units.put(bear.id, bear);
+
+            // 23. Desert Camel Dragoon
+            UnitDefinition camelDragoon = new UnitDefinition("camel_dragoon", "Desert Camel Dragoon", Identifier.of("minecraft", "villager"));
+            camelDragoon.description = "Mounted marksman elevated high above enemy ranks on a swift desert camel.";
+            camelDragoon.factionId = "kingdom";
+            camelDragoon.role = "ranged";
+            camelDragoon.rank = "veteran";
+            camelDragoon.mount = "minecraft:camel";
+            camelDragoon.maxHealth = 48.0f;
+            camelDragoon.attackDamage = 7.0f;
+            camelDragoon.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            camelDragoon.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.CHAINMAIL_CHESTPLATE));
+            camelDragoon.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.CROSSBOW));
+            camelDragoon.inventory.add(new ItemStack(Items.ARROW, 64));
+            units.put(camelDragoon.id, camelDragoon);
         }
     }
 

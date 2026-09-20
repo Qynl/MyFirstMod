@@ -1,5 +1,6 @@
 package dev.qynl.myfirstmod.client;
 
+import dev.qynl.myfirstmod.entity.DynamicEntityRegistry;
 import dev.qynl.myfirstmod.gui.CreatorScreenHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -70,7 +71,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate"), b -> sendButton(4))
                     .dimensions(leftX + 115, y + 36, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Entity: Cycle"), b -> sendButton(50))
+            addDrawableChild(ButtonWidget.builder(Text.literal("Entity: Next ⮞"), b -> sendButton(50))
                     .dimensions(leftX, y + 56, 110, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Role: Cycle"), b -> sendButton(51))
@@ -82,7 +83,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             addDrawableChild(ButtonWidget.builder(Text.literal("Rank: Cycle"), b -> sendButton(53))
                     .dimensions(leftX + 115, y + 76, 110, 18).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Mount: Cycle"), b -> sendButton(55))
+            addDrawableChild(ButtonWidget.builder(Text.literal("Mount: Next ⮞"), b -> sendButton(55))
                     .dimensions(leftX, y + 96, 110, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Aura: Cycle"), b -> sendButton(56))
@@ -112,7 +113,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             searchField = new TextFieldWidget(textRenderer, leftX, y + 36, 220, 20, Text.literal("Search"));
-            searchField.setPlaceholder(Text.literal("Search units (knight, archer, titan, paladin)..."));
+            searchField.setPlaceholder(Text.literal("Search (knight, wolf, bear, dragoon, titan)..."));
             addDrawableChild(searchField);
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn Equipped"), b -> sendButton(1))
@@ -255,8 +256,8 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         int leftY = y + 160;
 
         if (tab == 0) { // UNIT EDITOR CONTENT
-            context.drawText(textRenderer, Text.literal("Scale & Mounts Supported! Active Unit Stats:").formatted(Formatting.GOLD), leftX, leftY, 0xffffd700, false);
-            context.drawText(textRenderer, Text.literal("Shield Defense: Active Blocking  |  Potions: Enabled").formatted(Formatting.GREEN), leftX, leftY + 12, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("Dynamic Modded Mobs & Beasts Supported!").formatted(Formatting.GOLD), leftX, leftY, 0xffffd700, false);
+            context.drawText(textRenderer, Text.literal("Non-humanoid mobs adapt weapon damage & armor seamlessly.").formatted(Formatting.GREEN), leftX, leftY + 12, 0xffcbd5e1, false);
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             int cardY = y + 62;
@@ -266,6 +267,9 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             String[][] allUnits = {
                     {"Royal Knight", "VILLAGER • MELEE TANK • 40 HP • 7.5 DMG", "0xff3b82f6", "royal knight villager melee tank"},
                     {"Royal Heavy Cavalry", "HORSE • MOUNTED KNIGHT • 45 HP • 9.0 DMG", "0xff3b82f6", "royal cavalry horse mount"},
+                    {"Savage War Wolf", "WOLF • BERSERKER BEAST • 36 HP • 8.0 DMG", "0xfff97316", "war wolf beast berserker animal canine naturalist"},
+                    {"Armored Battle Bear", "POLAR BEAR • 1.25x TANK JUGGERNAUT • 85 HP", "0xff38bdf8", "battle bear polar grizzly bear naturalist tank"},
+                    {"Desert Camel Dragoon", "CAMEL MOUNT • CROSSBOW RANGED • 48 HP", "0xffeab308", "desert camel dragoon mount ranged marksman"},
                     {"Royal Archer", "SKELETON • RANGED • 24 HP • 5.0 DMG", "0xff38bdf8", "royal archer skeleton ranged"},
                     {"Field Medic", "VILLAGER • HEALER • 28 HP • POTIONS", "0xff10b981", "field medic villager healer support potion"},
                     {"Holy Paladin Crusader", "PALADIN • SMITE & ABSORPTION • 55 HP", "0xfffacc15", "holy paladin crusader mace sunforge"},

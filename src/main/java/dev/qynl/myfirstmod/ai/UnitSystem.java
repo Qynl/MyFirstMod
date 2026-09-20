@@ -61,8 +61,13 @@ public final class UnitSystem {
         String factionId = unit.factionId;
 
         // Prevent custom undead units from burning in daytime sunlight
-        if (mob.isOnFire() && world.isDay() && mob.getType().isIn(EntityTypeTags.UNDEAD)) {
+        if (mob.isOnFire() && world.isDay() && (mob.getType().isIn(EntityTypeTags.UNDEAD) || mob.getCommandTags().contains("sun_immune"))) {
             mob.extinguish();
+        }
+
+        // Armored beast aura glint
+        if (mob.age % 20 == 0 && mob.getCommandTags().contains("armored_beast")) {
+            world.spawnParticles(net.minecraft.particle.ParticleTypes.ENCHANTED_HIT, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 2, 0.25, 0.3, 0.25, 0.02);
         }
 
         // Fire mastery perk: clear fire and immune
