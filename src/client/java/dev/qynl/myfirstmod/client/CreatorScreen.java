@@ -82,8 +82,20 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             addDrawableChild(ButtonWidget.builder(Text.literal("Rank: Cycle"), b -> sendButton(53))
                     .dimensions(leftX + 115, y + 76, 110, 18).build());
 
+            addDrawableChild(ButtonWidget.builder(Text.literal("Mount: Cycle"), b -> sendButton(55))
+                    .dimensions(leftX, y + 96, 110, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Aura: Cycle"), b -> sendButton(56))
+                    .dimensions(leftX + 115, y + 96, 110, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Death: Cycle"), b -> sendButton(57))
+                    .dimensions(leftX, y + 116, 110, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("Scale: Cycle"), b -> sendButton(58))
+                    .dimensions(leftX + 115, y + 116, 110, 18).build());
+
             addDrawableChild(ButtonWidget.builder(Text.literal("Commander: Toggle"), b -> sendButton(54))
-                    .dimensions(leftX, y + 96, 225, 18).build());
+                    .dimensions(leftX, y + 136, 225, 18).build());
 
             // Actions on right
             addDrawableChild(ButtonWidget.builder(Text.literal("💾 Save Slots"), b -> sendButton(0))
@@ -240,10 +252,10 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
     private void drawTabContent(DrawContext context, int mouseX, int mouseY) {
         int leftX = x + 16;
-        int leftY = y + 118;
+        int leftY = y + 160;
 
         if (tab == 0) { // UNIT EDITOR CONTENT
-            context.drawText(textRenderer, Text.literal("Health: 40.0 HP  |  Damage: 7.5  |  Armor: 15.0").formatted(Formatting.YELLOW), leftX, leftY, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("Scale & Mounts Supported! Active Unit Stats:").formatted(Formatting.GOLD), leftX, leftY, 0xffffd700, false);
             context.drawText(textRenderer, Text.literal("Shield Defense: Active Blocking  |  Potions: Enabled").formatted(Formatting.GREEN), leftX, leftY + 12, 0xffcbd5e1, false);
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY

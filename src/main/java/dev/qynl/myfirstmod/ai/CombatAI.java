@@ -74,6 +74,9 @@ public final class CombatAI {
                     if (attackerFaction != null) stats.recordKill(attackerFaction);
                     if (victimFaction != null) stats.recordDeath(victimFaction);
                     VeteranProgression.recordKillForUnit(world, mob);
+
+                    String deathAction = UnitSystem.getTagValue(target, "death:");
+                    DeathActionHandler.handleDeath(world, target, deathAction, victimFaction);
                 }
             }
         }

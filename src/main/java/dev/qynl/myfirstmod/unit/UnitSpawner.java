@@ -10,10 +10,6 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.AbstractPiglinEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
@@ -25,14 +21,28 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
 public final class UnitSpawner {
     private UnitSpawner() {}
 
     public static LivingEntity spawn(ServerWorld world, UnitDefinition unit, Vec3d pos, float yaw) {
+        if (world == null || unit == null || unit.entityId == null) return null;
+
+        // Check if mounted cavalry
+        if (unit.mount != null && !unit.mount.isEmpty() && !unit.mount.equalsIgnoreCase("none")) {
+            Identifier mountId = Identifier.tryParse(unit.mount);
+            if (mountId != null) {
+                return MountedCavalrySpawner.spawnMounted(world, unit, mountId, pos, yaw);
+            }
+        }
+
+        return spawnDirect(world, unit, pos, yaw);
+    }
+
+    public static LivingEntity spawnDirect(ServerWorld world, UnitDefinition unit, Vec3d pos, float yaw) {
         if (world == null || unit == null || unit.entityId == null) return null;
 
         EntityType<?> type = Registries.ENTITY_TYPE.getOrEmpty(unit.entityId).orElse(null);
@@ -45,7 +55,7 @@ public final class UnitSpawner {
         living.setHeadYaw(yaw);
         living.setBodyYaw(yaw);
 
-        // Apply base definition (attributes, equipment, inventory, variants)
+        // Apply base definition (attributes, scale, equipment, inventory, variants)
         unit.apply(living);
 
         // Prevent Piglin/Piglin Brute zombification in the Overworld
@@ -72,6 +82,12 @@ public final class UnitSpawner {
         }
         if (unit.infiniteAmmo) {
             living.getCommandTags().add("infinite_ammo");
+        }
+        if (unit.particleAura != null && !unit.particleAura.equalsIgnoreCase("none")) {
+            living.getCommandTags().add("aura:" + unit.particleAura.toLowerCase());
+        }
+        if (unit.deathAction != null && !unit.deathAction.equalsIgnoreCase("none")) {
+            living.getCommandTags().add("death:" + unit.deathAction.toLowerCase());
         }
 
         // Count ammunition in inventory

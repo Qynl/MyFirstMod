@@ -38,18 +38,44 @@ public class CreatorScreenHandler extends ScreenHandler {
             Identifier.of("minecraft", "pillager"),
             Identifier.of("minecraft", "vindicator"),
             Identifier.of("minecraft", "piglin_brute"),
+            Identifier.of("minecraft", "piglin"),
             Identifier.of("minecraft", "witch"),
             Identifier.of("minecraft", "evoker"),
             Identifier.of("minecraft", "iron_golem"),
-            Identifier.of("minecraft", "wolf")
+            Identifier.of("minecraft", "wolf"),
+            Identifier.of("minecraft", "breeze"),
+            Identifier.of("minecraft", "bogged"),
+            Identifier.of("minecraft", "allay"),
+            Identifier.of("minecraft", "blaze"),
+            Identifier.of("minecraft", "wither_skeleton"),
+            Identifier.of("minecraft", "stray"),
+            Identifier.of("minecraft", "drowned"),
+            Identifier.of("minecraft", "warden"),
+            Identifier.of("minecraft", "ravager")
     };
 
     private static final String[] ROLE_CYCLE = {
-            "melee", "ranged", "medic", "pyrotechnic", "engineer", "tank", "assassin", "scout", "necromancer", "berserker", "bard", "support"
+            "melee", "ranged", "medic", "pyrotechnic", "engineer", "tank", "assassin", "scout", "necromancer", "berserker", "bard", "bombardier", "druid", "paladin", "support"
     };
 
     private static final String[] RANK_CYCLE = {
-            "soldier", "veteran", "captain", "commander", "specialist", "recruit"
+            "soldier", "veteran", "captain", "commander", "warlord", "specialist", "recruit"
+    };
+
+    private static final String[] MOUNT_CYCLE = {
+            "", "minecraft:horse", "minecraft:skeleton_horse", "minecraft:spider", "minecraft:wolf", "minecraft:ravager"
+    };
+
+    private static final String[] AURA_CYCLE = {
+            "none", "flame", "soul_flame", "enchanted", "portal", "heart", "totem", "electric_spark"
+    };
+
+    private static final String[] DEATH_CYCLE = {
+            "none", "fireworks", "healing_mist", "explosion", "lightning", "poison_cloud"
+    };
+
+    private static final float[] SCALE_CYCLE = {
+            0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f
     };
 
     private static int battleFactionAIdx = 0;
@@ -335,6 +361,66 @@ public class CreatorScreenHandler extends ScreenHandler {
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
                     unit.commander = !unit.commander;
+                    data.markDirty();
+                }
+            }
+            case 55 -> { // Cycle Mount
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < MOUNT_CYCLE.length; i++) {
+                        if (MOUNT_CYCLE[i].equalsIgnoreCase(unit.mount)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.mount = MOUNT_CYCLE[(currentIndex + 1) % MOUNT_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 56 -> { // Cycle Aura
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < AURA_CYCLE.length; i++) {
+                        if (AURA_CYCLE[i].equalsIgnoreCase(unit.particleAura)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.particleAura = AURA_CYCLE[(currentIndex + 1) % AURA_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 57 -> { // Cycle Death Action
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 0;
+                    for (int i = 0; i < DEATH_CYCLE.length; i++) {
+                        if (DEATH_CYCLE[i].equalsIgnoreCase(unit.deathAction)) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.deathAction = DEATH_CYCLE[(currentIndex + 1) % DEATH_CYCLE.length];
+                    data.markDirty();
+                }
+            }
+            case 58 -> { // Cycle Scale
+                String equippedId = data.getEquippedUnit(player.getUuid());
+                UnitDefinition unit = data.units.get(equippedId);
+                if (unit != null) {
+                    int currentIndex = 2; // default 1.0f
+                    for (int i = 0; i < SCALE_CYCLE.length; i++) {
+                        if (Math.abs(SCALE_CYCLE[i] - unit.scale) < 0.05f) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    unit.scale = SCALE_CYCLE[(currentIndex + 1) % SCALE_CYCLE.length];
                     data.markDirty();
                 }
             }

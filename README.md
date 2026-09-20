@@ -1,5 +1,5 @@
 # ⚔️ LEGIONS & FACTIONS: Autonomous War Sandbox ⚔️
-### *The Ultimate Autonomous Army, Faction & War Simulation Sandbox for Minecraft 1.21.1 (Fabric)*
+### *The Ultimate Autonomous Army, Faction, Cavalry & War Simulation Sandbox for Minecraft 1.21.1 (Fabric)*
 
 ```text
   ██████╗ ███████╗ ██████╗ ██╗ ██████╗ ███╗   ██╗███████╗
@@ -15,24 +15,26 @@
 
 ## 📜 Welcome, Commander!
 
-Ever wanted to command a **50-strong battalion of heavily armored Royal Villager Knights**, supported by **Skeleton Marksmen firing arrow volleys**, **Field Medics spraying healing mists**, **Pyrotechnic Artillery bombarding with firework rockets**, and **Necromancers summoning zombie hordes**?
+Ever wanted to command a **50-strong battalion of heavily armored Royal Villager Knights charging on armored horses**, supported by **Bogged Snipers firing venom arrows**, **Tempest Breeze wind-mages**, **Pixie Combat Medics**, **Colossal 1.5x Iron Titans**, **Pyrotechnic Artillery launching firework volleys**, and **Necromancers summoning undead hordes**?
 
-**Legions & Factions** transforms Minecraft into a **server-authoritative tactical war simulator**. 
-Create any living Minecraft entity into a custom battle template, equip it, configure its AI behaviors, assign it to a faction with unique perks, place outposts, whistle custom army formations, and watch legendary battles unfold!
+**Legions & Factions: Autonomous War Sandbox** transforms Minecraft into an **autonomous, server-authoritative tactical war simulator**. 
+Create any living Minecraft entity into a custom battle template, equip it, customize its scale, mount, aura and death explosions, assign it to a faction with unique perks, place outposts, whistle army formations, transmute wild mobs, and watch legendary battles unfold!
 
 ![Dashboard Overview](docs/unit-sandbox-dashboard.png)
 
 ---
 
-## 🎮 The Commander's Arsenal (Items & Tools)
+## 🎮 The Commander's Arsenal (8 Interactive Tactical Tools)
 
 | Item | Name | Primary Action | Shift Action | Tactical Role |
 | :--- | :--- | :--- | :--- | :--- |
-| 🪄 | **Legion Creator Tool** | **Right-Click**: Open Creator GUI<br>**Left-Click**: Spawn equipped unit<br>**Right-Click Unit**: View dossier | **Shift + Right-Click**: Quick-cycle units<br>**Shift + Left-Click**: Spawn 5-unit squad | Army creation, inspection & unit deployment |
-| 📯 | **Tactical Formation Whistle** | **Right-Click**: Instantly reposition troops into formation | **Shift + Right-Click**: Cycle formation mode (*Shield Wall, Wedge, Circle, Spread*) | Battlefield unit positioning & battlelines |
-| 🪄 | **Faction Commander's Scepter** | **Right-Click Block**: Set Move/Rally waypoint<br>**Right-Click Enemy**: Mark priority focus target | **Action bar**: View troops in radius | Real-time battlefield tactical command |
+| 🪄 | **Legion Creator Tool** | **Right-Click**: Open Creator GUI<br>**Left-Click**: Spawn equipped unit<br>**Right-Click Unit**: View dossier | **Shift + Right-Click**: Quick-cycle units<br>**Shift + Left-Click**: Spawn 5-unit squad | Full unit creation, inspection & deployment |
+| 📯 | **Tactical Formation Whistle** | **Right-Click**: Instantly order nearby troops into formation | **Shift + Right-Click**: Cycle formation mode (*Shield Wall, Wedge, Circle, Spread*) | Tactical positioning & battlelines |
+| 🌟 | **Unit Transmutation Wand** | **Right-Click Living Mob**: Transmute/Recruit into active unit template | *Plays totem flash & syncs gear/faction* | Rapid recruitment of wild mobs |
+| 💖 | **Grand Healer's Divine Staff** | **Right-Click**: Cast massive 16-block restoration wave (8 HP + Regen II + Cleanse) | *Cooldown: 5s* | Direct army healing & support |
+| 🪄 | **Faction Commander's Scepter** | **Right-Click Block**: Set Move/Rally waypoint<br>**Right-Click Enemy**: Mark focus target | **Action bar**: View active troops in radius | Real-time battlefield tactical command |
 | 🎺 | **Commander's Tactical War Horn** | **Right-Click**: Sound rally horn (Area Strength & Speed) | **Shift + Right-Click**: Cycle orders (*Rally / Charge / Hold*) | Morale boosts & squad rally |
-| ⚡ | **Reinforcement Drop Beacon** | **Right-Click Block**: Call down a 4-unit elite drop wave | *Cooldown: 10s* | Emergency reinforcements |
+| ⚡ | **Reinforcement Drop Beacon** | **Right-Click Block**: Call down a 4-unit elite drop wave | *Cooldown: 10s* | Emergency frontline reinforcements |
 | 🚩 | **Faction Outpost Standard** | **Right-Click Block**: Establish faction outpost territory | *Defensive Zone: 32 blocks* | "Home Turf" territorial defense |
 
 ---
@@ -40,64 +42,74 @@ Create any living Minecraft entity into a custom battle template, equip it, conf
 ## 🛡️ Tactical Roles & Combat Behaviors
 
 ```text
-              [ FRONT LINE ]
-        ⚔ Melee Tanks & Knights
-        🛡 Shield Wall Formations
-                   │
-              [ MID LINE ]
-        🏹 Ranged Marksmen & Snipers
-        💣 Siege Bombardiers & Mortars
-        🎆 Pyrotechnic Fireworks Artillery
-                   │
-              [ BACK LINE ]
-        💖 Field Medics & Healers
-        🎶 Battlefield Bards (War Songs)
-        ☠ Dark Necromancers & Summoners
-        👑 Commanders & Tacticians
+                     [ CAVALRY & VANGUARD ]
+               🐎 Armored Knights on Warhorses
+               🕷 Spider Riders & Wolf Cavalry
+                         │
+                     [ FRONT LINE ]
+               ⚔ Melee Tanks & Knights
+               🛡 Shield Wall Formations
+               ⚡ Colossal Iron Titans
+                         │
+                     [ MID LINE ]
+               🏹 Ranged Marksmen & Bogged Snipers
+               💣 Siege Bombardiers & Mortars
+               🎆 Pyrotechnic Fireworks Artillery
+               🌪 Tempest Breeze Wind Casters
+                         │
+                     [ BACK LINE ]
+               💖 Field Medics & Allay Pixie Healers
+               🎶 Battlefield Bards (War Songs)
+               ☠ Dark Necromancers & Summoners
+               👑 Commanders & Tacticians
 ```
 
-### 1. ⚔ Melee Tanks & Knights (`TankAI` / `CombatAI`)
-- **Armed & Dangerous**: Gives melee weapons, custom attack animations, and sprint crits to *any* mob (even Villagers!).
-- **Shield Deflection**: Raises shields during combat, deflecting incoming attacks with spark bursts.
-- **Taunt**: Draws enemy fire away from squishy medics and archers.
+### 1. 🐎 Mounted Cavalry System (`MountedCavalrySpawner`)
+- Units can ride **Armored Warhorses**, **Skeletal Steeds**, **Cave Spiders**, **Dire Wolves**, and **Ravagers**.
+- Mounted units gain increased movement speed, charge impact knockback, and synchronized rider AI!
 
-### 2. 🎆 Pyrotechnic Artillery & Fireworks (`FireworksArtilleryAI`)
-- **Long-Range Salvos**: Pyros fire fireworks rockets and explosive crossbow shells into enemy ranks.
-- **Detonation Fireworks**: Deals massive AoE splash damage and triggers colorful particle fireworks explosions!
+### 2. 📏 Entity Scaling (0.25x Miniature to 5.0x Colossus)
+- Scale any warrior up or down via the attributes engine (`EntityAttributes.SCALE`).
+- Create colossal **Iron Titan Juggernauts** or miniature **Goblin Swarms** with matching hitboxes and step heights!
 
-### 3. 💖 Field Medics & Healers (`HealerMedicAI`)
-- **Restoration Rays**: Scans for wounded allies in `healRange`, casts divine restoration beams, cleanses negative status effects (Poison/Wither), and throws splash healing flasks.
-- **Self-Preservation**: Consumes healing potions or golden apples when injured.
+### 3. 🧠 Dynamic Morale & Panic System (`MoraleSystem`)
+- **Commander Casualties**: When a squad leader dies, recruit-tier units suffer **Morale Break** (retreating in panic with smoke particles).
+- **Vengeance Rage**: Veteran and Captain units enter **Vengeance Fury** (+40% speed and damage) to avenge fallen officers!
 
-### 4. 🧪 Throwable Potion Alchemists (`ThrowablePotionAI`)
-- **Ballistic Splash Flasks**: Launches splash and lingering flasks of Harming, Poison, Slowness, and Weakness over enemy frontline units.
+### 4. ✨ Particle Auras & 💥 Death Actions
+- **Custom Visual Auras**: `Flame`, `Soul Flame`, `Enchanted Hit`, `Portal`, `Heart`, `Totem of Undying`, `Electric Spark`.
+- **Lethal Death Actions**: `Explosion`, `Healing Mist`, `Victory Fireworks`, `Lightning Strike`, `Poison Cloud`.
 
-### 5. ☠ Dark Necromancers (`NecromancerAI`)
-- **Unholy Summoning**: Channels dark summoning pentagrams in combat to summon armed skeleton and zombie thralls.
+### 5. 🎆 Pyrotechnic Artillery (`FireworksArtilleryAI`)
+- Pyros fire fireworks rockets and explosive crossbow shells into enemy ranks with colorful particle explosions.
 
-### 6. 🩸 Bloodrage Berserkers (`BerserkerAI`)
-- **Bloodrage**: When falling below 50% HP, roars fiercely and enters Bloodrage (gaining Strength II, Speed II, and Haste II with fire auras).
+### 6. 💖 Field Medics & Flying Pixies (`HealerMedicAI` / `SpecialEntityAI`)
+- Casts divine restoration beams, cleanses negative debuffs (Poison/Wither), and throws splash healing flasks.
+- Allay Combat Medics fly between wounded troops delivering healing fairy dust!
 
-### 7. 🎶 Battlefield Bards (`BardAI`)
-- **War Song Melodies**: Plays harp chords and emits musical note particles, providing ongoing Speed, Regeneration, and Resistance to all nearby allies.
+### 7. 🧪 Potion Alchemists (`ThrowablePotionAI`)
+- Ballistic splash flasks of Harming, Poison, Slowness, and Weakness over enemy frontline units.
 
-### 8. 💣 Siege Bombardiers (`BombardierAI`)
-- **Mortar Canisters**: Launches explosive charges at enemy fortifications, cracking enemy lines with shockwaves.
+### 8. ☠ Dark Necromancers (`NecromancerAI`)
+- Channels dark summoning circles in combat to summon armed skeleton and zombie thralls.
 
-### 9. 🌿 Nature Druids (`DruidAI`)
-- **Rooting Vines**: Entangles enemies in thorny roots (Slowness IV) and summons Nature Spirit Wolves.
+### 9. 🩸 Bloodrage Berserkers (`BerserkerAI`)
+- Roars fiercely when injured and enters Bloodrage (gaining Strength II, Speed II, and Haste II with fire auras).
 
-### 10. ✨ Holy Paladins (`PaladinAI`)
-- **Holy Smite**: Radiates golden light, deals +60% radiant damage to undead, and releases healing waves to nearby allies on hit.
+### 10. 🎶 Battlefield Bards (`BardAI`)
+- Plays melodic horn songs that grant Speed, Regeneration, and Resistance to all nearby allies.
 
-### 11. 🗡 Flanking Assassins (`AssassinAI`)
-- **Backstabs**: Sprints behind enemy lines to assassinate high-value commanders and medics with +175% backstab critical damage.
+### 11. 💣 Siege Bombardiers (`BombardierAI`)
+- Heavy sappers launching explosive TNT mortar charges at enemy lines.
 
-### 12. 🦅 Recon Scouts (`ScoutAI`)
-- **Enemy Spotting**: High-speed recon unit that spots enemies, marks hostile commanders with Glowing, and alerts squadmates.
+### 12. 🌿 Nature Druids (`DruidAI`)
+- Entangles enemies in thorny roots (Slowness IV) and summons Nature Spirit Wolves.
 
-### 13. 🏗 Combat Engineers (`EngineerBuildingAI`)
-- **Field Barricades**: Places 2-block high tactical barricades when under fire, builds torches in dark areas, and places ladders.
+### 13. ✨ Holy Paladins (`PaladinAI`)
+- Golden crusaders dealing +60% radiant damage to undead and releasing healing waves on hit.
+
+### 14. 🗡 Flanking Assassins (`AssassinAI`)
+- Sprints behind enemy lines to backstab commanders and medics with +175% critical damage.
 
 ---
 
@@ -122,28 +134,12 @@ Surviving warriors gain battle experience and battlefield promotions!
  │ Faction               │ Color      │ Signature Units                      │
  ├───────────────────────┼────────────┼──────────────────────────────────────┤
  │ 🔵 Kingdom of Eldoria │ Royal Blue │ Royal Knights, Archers, Medics, Pyro │
- │ 🔴 Iron Raiders       │ Red        │ Berserkers, Crossbowmen, Alchemists  │
- │ 🟢 Village Alliance   │ Emerald    │ Town Militia, Guards, Cleric Healers │
- │ 🟣 Undead Legion      │ Purple     │ Necromancers, Dread Knights, Snipers │
- │ 🔷 Arcane Order       │ Cyan       │ Battle Mages, Bards, Arcane Golems   │
+ │ 🔴 Iron Raiders       │ Red        │ Berserkers, Bombardiers, Alchemists  │
+ │ 🟢 Village Alliance   │ Emerald    │ Town Militia, Druids, Iron Titans    │
+ │ 🟣 Undead Legion      │ Purple     │ Necromancers, Dread Cavalry, Bogged  │
+ │ 🔷 Arcane Order       │ Cyan       │ Bards, Tempest Breeze, Pixie Medics  │
  └───────────────────────┴────────────┴──────────────────────────────────────┘
 ```
-
-### 14 Faction Perks:
-1. **Military Discipline**: +15% unit attack damage.
-2. **Heavy Armor**: +20% armor rating & bonus knockback resistance.
-3. **Swift Army**: +15% army movement speed.
-4. **Rallying Cry**: Commanders grant boosted Strength II & Speed II.
-5. **Battle Regeneration**: Steady passive HP regeneration.
-6. **Night Fighters**: Night Vision & +25% combat power at night.
-7. **Hardened Veterans**: Permanent extra HP & damage for battle veterans.
-8. **Pyrotechnics**: +50% firework explosive splash damage & radius.
-9. **Holy Might**: +50% healer potency & reach.
-10. **Iron Fortification**: 15% reduction to all incoming damage.
-11. **Dark Necromancy**: Slain warriors rise as friendly undead thralls.
-12. **Berserk Fury**: Injured units automatically enter Bloodrage.
-13. **Harmonic War Song**: Allied units in battle gain passive speed and regeneration.
-14. **Fire Mastery**: Attacks ignite targets and units are immune to fire.
 
 ---
 
@@ -154,10 +150,11 @@ Surviving warriors gain battle experience and battlefield promotions!
   │ [⚔ EDITOR]  [📋 UNITS]  [🛡 FACTIONS]  [💥 BATTLE]  [⚙ SETTINGS]       │
   ├────────────────────────────────────────────────────────────────────────┤
   │                                                                        │
-  │  [⮜ Next Unit]  [➕ Duplicate]           [💾 Save Slots]               │
-  │  [Entity: Villager ⮞ Skeleton ⮞ ...]     [⚔ Spawn Unit (1)]           │
-  │  [Role: Melee ⮞ Ranged ⮞ Medic ⮞ ...]    [🛡 Spawn Squad (5)]          │
-  │  [Faction: Kingdom ⮞ Raiders ⮞ ...]      [🗑 Delete Unit]              │
+  │  [⮜ Next Unit]     [➕ Duplicate]         [💾 Save Slots]             │
+  │  [Entity: Cycle]   [Role: Cycle]          [⚔ Spawn Unit (1)]          │
+  │  [Faction: Cycle]  [Rank: Cycle]          [🛡 Spawn Squad (5)]         │
+  │  [Mount: Cycle]    [Aura: Cycle]          [🗑 Delete Unit]             │
+  │  [Death: Cycle]    [Scale: Cycle]                                      │
   │  [Commander: Toggle ON/OFF]                                            │
   │                                                                        │
   │  Equipment Slots:  [ H ] [ C ] [ L ] [ F ]  |  [ Main ] [ Offhand ]    │
@@ -171,7 +168,7 @@ Surviving warriors gain battle experience and battlefield promotions!
 ## 🕹️ Command Reference
 
 ```bash
-# Unit Management
+# Unit Management & Customization
 /unit list                                    # List all saved unit templates
 /unit stats                                   # View persistent battle statistics
 /unit spawn <id> [count] [x y z]              # Spawn unit at player or coordinates
@@ -182,7 +179,11 @@ Surviving warriors gain battle experience and battlefield promotions!
 /unit equip <id> <slot> <item>                # Equip armor or weapons
 /unit inventory <id> <item> [count]           # Add ammunition, food, potions, blocks
 /unit set <id> health/damage/speed/armor <v>  # Edit attribute
-/unit set <id> role <role>                    # Set role (melee, ranged, medic, etc.)
+/unit set <id> scale <0.25 - 5.0>             # Set entity visual scale
+/unit set <id> mount <entity_id>              # Set cavalry mount (e.g. minecraft:horse)
+/unit set <id> aura <flame|portal|heart|...>  # Set visual particle aura
+/unit set <id> death <explosion|healing|...>  # Set death effect action
+/unit set <id> role <role>                    # Set combat role (melee, ranged, etc.)
 /unit set <id> rank <rank>                    # Set rank (soldier, captain, etc.)
 /unit set <id> squad <name>                   # Assign squad name
 /unit set <id> commander <true|false>         # Toggle commander status

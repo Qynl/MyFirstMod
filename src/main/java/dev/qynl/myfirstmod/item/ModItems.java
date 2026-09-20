@@ -43,6 +43,18 @@ public final class ModItems {
             new ReinforcementBeaconItem(new Item.Settings().maxCount(1))
     );
 
+    public static final Item TRANSMUTATION_WAND = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "transmutation_wand"),
+            new TransmutationWandItem(new Item.Settings().maxCount(1))
+    );
+
+    public static final Item HEALING_STAFF = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "healing_staff"),
+            new HealingStaffItem(new Item.Settings().maxCount(1))
+    );
+
     private ModItems() {}
 
     public static void register() {}

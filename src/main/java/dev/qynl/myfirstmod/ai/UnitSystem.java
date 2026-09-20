@@ -67,8 +67,24 @@ public final class UnitSystem {
             mob.extinguish();
         }
 
+        // Particle Auras
+        if (mob.age % 10 == 0 && unit.particleAura != null && !unit.particleAura.equalsIgnoreCase("none")) {
+            switch (unit.particleAura.toLowerCase()) {
+                case "flame" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.FLAME, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 3, 0.2, 0.2, 0.2, 0.02);
+                case "soul_flame" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.SOUL_FIRE_FLAME, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 3, 0.2, 0.2, 0.2, 0.02);
+                case "enchanted" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.ENCHANTED_HIT, mob.getX(), mob.getBodyY(0.6), mob.getZ(), 4, 0.25, 0.3, 0.25, 0.05);
+                case "portal" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.PORTAL, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 4, 0.3, 0.3, 0.3, 0.05);
+                case "heart" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.HEART, mob.getX(), mob.getBodyY(0.7), mob.getZ(), 2, 0.2, 0.2, 0.2, 0.02);
+                case "totem" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.TOTEM_OF_UNDYING, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 3, 0.25, 0.3, 0.25, 0.05);
+                case "electric_spark" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.ELECTRIC_SPARK, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 4, 0.25, 0.3, 0.25, 0.05);
+            }
+        }
+
         // Territory check for home turf buffs
         TerritoryManager.checkTerritory(world, mob);
+
+        // Morale System check (routing or vengeance)
+        MoraleSystem.updateMorale(world, mob, unit);
 
         // Apply passive faction perks
         if (FactionManager.hasPerk(server, factionId, FactionPerk.REGENERATION) && mob.age % 40 == 0) {
@@ -136,6 +152,11 @@ public final class UnitSystem {
         }
 
         if (target != null && target.isAlive()) {
+            // Special 1.21 Mob handling (Breeze, Warden, Allay healer, Blaze)
+            if (SpecialEntityAI.handleSpecialEntity(world, mob, target, unit)) {
+                return;
+            }
+
             // Tactical retreat check
             if (RetreatAI.executeRetreat(world, mob, target, unit)) {
                 return;

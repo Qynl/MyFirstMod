@@ -80,6 +80,10 @@ public final class UnitCommands {
                                     .then(CommandManager.literal("faction").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "faction", StringArgumentType.getString(c, "value")))))
                                     .then(CommandManager.literal("commander").then(CommandManager.argument("value", BoolArgumentType.bool()).executes(c -> setBoolProp(c.getSource(), StringArgumentType.getString(c, "id"), "commander", BoolArgumentType.getBool(c, "value")))))
                                     .then(CommandManager.literal("retreat").then(CommandManager.argument("value", FloatArgumentType.floatArg(0, 0.99f)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "retreat", FloatArgumentType.getFloat(c, "value")))))
+                                    .then(CommandManager.literal("scale").then(CommandManager.argument("value", FloatArgumentType.floatArg(0.1f, 10.0f)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "scale", FloatArgumentType.getFloat(c, "value")))))
+                                    .then(CommandManager.literal("mount").then(CommandManager.argument("value", StringArgumentType.string()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "mount", StringArgumentType.getString(c, "value")))))
+                                    .then(CommandManager.literal("aura").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "aura", StringArgumentType.getString(c, "value")))))
+                                    .then(CommandManager.literal("death").then(CommandManager.argument("value", StringArgumentType.word()).executes(c -> setStringProp(c.getSource(), StringArgumentType.getString(c, "id"), "death", StringArgumentType.getString(c, "value")))))
                                     .then(CommandManager.literal("heal-range").then(CommandManager.argument("value", FloatArgumentType.floatArg(1, 64)).executes(c -> setAttribute(c.getSource(), StringArgumentType.getString(c, "id"), "heal-range", FloatArgumentType.getFloat(c, "value")))))))
             );
 
@@ -268,6 +272,7 @@ public final class UnitCommands {
             case "armor" -> u.armor = val;
             case "retreat" -> u.retreatHealth = val;
             case "heal-range" -> u.healRange = val;
+            case "scale" -> u.scale = val;
         }
         data.markDirty();
         s.sendFeedback(() -> Text.literal("Updated " + attr + " of " + id + " to " + val).formatted(Formatting.GREEN), true);
@@ -282,6 +287,9 @@ public final class UnitCommands {
             case "role" -> u.role = val;
             case "rank" -> u.rank = val;
             case "squad" -> u.squad = val;
+            case "mount" -> u.mount = val;
+            case "aura" -> u.particleAura = val;
+            case "death" -> u.deathAction = val;
             case "faction" -> {
                 u.factionId = val;
                 data.factions.putIfAbsent(val, new Faction(val, val));

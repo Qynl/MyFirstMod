@@ -360,6 +360,126 @@ public final class UnitWorldData extends PersistentState {
             bard.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
             bard.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.GOAT_HORN));
             units.put(bard.id, bard);
+
+            // 12. Royal Heavy Cavalry
+            UnitDefinition cav = new UnitDefinition("royal_cavalry", "Royal Heavy Cavalry", Identifier.of("minecraft", "villager"));
+            cav.description = "Armored mounted knight charging with lance speed.";
+            cav.factionId = "kingdom";
+            cav.role = "melee";
+            cav.rank = "veteran";
+            cav.mount = "minecraft:horse";
+            cav.maxHealth = 45.0f;
+            cav.attackDamage = 9.0f;
+            cav.armor = 14.0f;
+            cav.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.DIAMOND_HELMET));
+            cav.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.DIAMOND_CHESTPLATE));
+            cav.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_SWORD));
+            cav.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
+            units.put(cav.id, cav);
+
+            // 13. Dread Skeleton Cavalry
+            UnitDefinition dreadCav = new UnitDefinition("dread_cavalry", "Dread Skeleton Cavalry", Identifier.of("minecraft", "wither_skeleton"));
+            dreadCav.description = "Terrifying wither knight riding a skeletal steed.";
+            dreadCav.factionId = "undead";
+            dreadCav.role = "melee";
+            dreadCav.rank = "veteran";
+            dreadCav.mount = "minecraft:skeleton_horse";
+            dreadCav.particleAura = "soul_flame";
+            dreadCav.maxHealth = 48.0f;
+            dreadCav.attackDamage = 10.0f;
+            dreadCav.armor = 12.0f;
+            dreadCav.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.NETHERITE_HELMET));
+            dreadCav.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.NETHERITE_SWORD));
+            units.put(dreadCav.id, dreadCav);
+
+            // 14. Holy Paladin
+            UnitDefinition paladin = new UnitDefinition("holy_paladin", "Holy Paladin Crusader", Identifier.of("minecraft", "villager"));
+            paladin.description = "Divine crusader striking smite lightning and shielding allies.";
+            paladin.factionId = "kingdom";
+            paladin.role = "paladin";
+            paladin.rank = "captain";
+            paladin.particleAura = "totem";
+            paladin.deathAction = "healing_mist";
+            paladin.maxHealth = 55.0f;
+            paladin.attackDamage = 8.5f;
+            paladin.armor = 16.0f;
+            paladin.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
+            paladin.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.DIAMOND_CHESTPLATE));
+            paladin.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.MACE));
+            paladin.equipment.put(EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
+            units.put(paladin.id, paladin);
+
+            // 15. Nature Druid
+            UnitDefinition druid = new UnitDefinition("nature_druid", "Grove Druid", Identifier.of("minecraft", "villager"));
+            druid.description = "Nature mystic casting entangling roots and healing mists.";
+            druid.factionId = "villagers";
+            druid.role = "druid";
+            druid.rank = "specialist";
+            druid.particleAura = "heart";
+            druid.maxHealth = 32.0f;
+            druid.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.TURTLE_HELMET));
+            druid.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
+            druid.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.STICK));
+            units.put(druid.id, druid);
+
+            // 16. Siege Bombardier
+            UnitDefinition bomb = new UnitDefinition("siege_bombardier", "Siege Bombardier", Identifier.of("minecraft", "piglin"));
+            bomb.description = "Heavy sapper launching cluster TNT charges.";
+            bomb.factionId = "raiders";
+            bomb.role = "bombardier";
+            bomb.rank = "artillery";
+            bomb.particleAura = "flame";
+            bomb.deathAction = "explosion";
+            bomb.maxHealth = 35.0f;
+            bomb.equipment.put(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+            bomb.equipment.put(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
+            bomb.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.TNT));
+            units.put(bomb.id, bomb);
+
+            // 17. Tempest Breeze
+            UnitDefinition breeze = new UnitDefinition("tempest_breeze", "Tempest Breeze", Identifier.of("minecraft", "breeze"));
+            breeze.description = "Whirlwind elemental blasting enemies backwards with wind charges.";
+            breeze.factionId = "arcane";
+            breeze.role = "ranged";
+            breeze.rank = "specialist";
+            breeze.particleAura = "portal";
+            breeze.deathAction = "fireworks";
+            breeze.maxHealth = 40.0f;
+            units.put(breeze.id, breeze);
+
+            // 18. Poison Bogged
+            UnitDefinition bogged = new UnitDefinition("poison_bogged", "Mossy Bogged Sniper", Identifier.of("minecraft", "bogged"));
+            bogged.description = "Swamp sharpshooter firing deadly venom-tipped arrows.";
+            bogged.factionId = "undead";
+            bogged.role = "ranged";
+            bogged.rank = "soldier";
+            bogged.maxHealth = 26.0f;
+            bogged.equipment.put(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+            units.put(bogged.id, bogged);
+
+            // 19. Fairy Combat Medic (Allay)
+            UnitDefinition allay = new UnitDefinition("fairy_medic", "Celestial Pixie Medic", Identifier.of("minecraft", "allay"));
+            allay.description = "Flying aerial medic bestowing fairy dust and rapid regeneration.";
+            allay.factionId = "arcane";
+            allay.role = "medic";
+            allay.rank = "specialist";
+            allay.particleAura = "heart";
+            allay.maxHealth = 25.0f;
+            units.put(allay.id, allay);
+
+            // 20. Colossal Iron Golem Titan
+            UnitDefinition golem = new UnitDefinition("iron_titan", "Colossal Iron Titan", Identifier.of("minecraft", "iron_golem"));
+            golem.description = "Towering 1.5x scale juggernaut smashing entire enemy ranks.";
+            golem.factionId = "villagers";
+            golem.role = "tank";
+            golem.rank = "warlord";
+            golem.scale = 1.35f;
+            golem.maxHealth = 150.0f;
+            golem.attackDamage = 16.0f;
+            golem.armor = 20.0f;
+            golem.armorToughness = 8.0f;
+            golem.knockbackResistance = 1.0f;
+            units.put(golem.id, golem);
         }
     }
 

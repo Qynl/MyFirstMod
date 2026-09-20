@@ -3,21 +3,24 @@ package dev.qynl.myfirstmod.unit;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.qynl.myfirstmod.equipment.ItemCapabilities;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.InventoryOwner;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
-import net.minecraft.village.VillagerProfession;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -43,10 +46,16 @@ public final class UnitDefinition {
     public float scale = 1.0f;
 
     // Role, Rank & Organization
-    public String role = "melee"; // melee, ranged, medic, pyrotechnic, engineer, tank, assassin, scout, support
+    public String role = "melee"; // melee, ranged, medic, pyrotechnic, engineer, tank, assassin, scout, necromancer, berserker, bard, bombardier, druid, paladin, support
     public String rank = "soldier"; // recruit, soldier, veteran, captain, commander, warlord, specialist
     public String squad = "";
     public boolean commander = false;
+
+    // Mount & Aesthetics
+    public String mount = ""; // "", "minecraft:horse", "minecraft:skeleton_horse", "minecraft:ravager", "minecraft:spider", "minecraft:wolf"
+    public String particleAura = "none"; // none, flame, soul_flame, enchanted, portal, heart, totem, electric_spark
+    public String deathAction = "none"; // none, fireworks, healing_mist, explosion
+    public boolean enchantedGear = false;
 
     // Behavior & Targeting
     public String targetPriority = "nearest"; // nearest, commander, medic, ranged, weakest, players
@@ -67,9 +76,10 @@ public final class UnitDefinition {
     public String variant = "";
     public boolean isBaby = false;
 
-    // Equipment & Inventory
+    // Equipment, Inventory & Passive Effects
     public final Map<EquipmentSlot, ItemStack> equipment = new LinkedHashMap<>();
     public final List<ItemStack> inventory = new ArrayList<>();
+    public final List<String> passiveEffects = new ArrayList<>();
 
     public UnitDefinition(String id, String name, Identifier entityId) {
         this.id = id;
@@ -99,6 +109,11 @@ public final class UnitDefinition {
         this.rank = nbt.contains("rank") ? nbt.getString("rank") : "soldier";
         this.squad = nbt.getString("squad");
         this.commander = nbt.getBoolean("commander");
+
+        this.mount = nbt.getString("mount");
+        this.particleAura = nbt.contains("aura") ? nbt.getString("aura") : "none";
+        this.deathAction = nbt.contains("death_action") ? nbt.getString("death_action") : "none";
+        this.enchantedGear = nbt.getBoolean("enchanted");
 
         this.targetPriority = nbt.contains("priority") ? nbt.getString("priority") : "nearest";
         this.attackHostile = !nbt.contains("attack_hostile") || nbt.getBoolean("attack_hostile");
@@ -130,6 +145,13 @@ public final class UnitDefinition {
                 inventory.add(ItemStack.fromNbtOrEmpty(lookup, list.getCompound(i)));
             }
         }
+
+        if (nbt.contains("passives")) {
+            NbtList list = nbt.getList("passives", 8);
+            for (int i = 0; i < list.size(); i++) {
+                passiveEffects.add(list.getString(i));
+            }
+        }
     }
 
     public NbtCompound toNbt() {
@@ -154,6 +176,11 @@ public final class UnitDefinition {
         nbt.putString("rank", rank == null ? "soldier" : rank);
         nbt.putString("squad", squad == null ? "" : squad);
         nbt.putBoolean("commander", commander);
+
+        nbt.putString("mount", mount == null ? "" : mount);
+        nbt.putString("aura", particleAura == null ? "none" : particleAura);
+        nbt.putString("death_action", deathAction == null ? "none" : deathAction);
+        nbt.putBoolean("enchanted", enchantedGear);
 
         nbt.putString("priority", targetPriority == null ? "nearest" : targetPriority);
         nbt.putBoolean("attack_hostile", attackHostile);
@@ -187,6 +214,12 @@ public final class UnitDefinition {
         }
         nbt.put("inventory", list);
 
+        NbtList pList = new NbtList();
+        for (String p : passiveEffects) {
+            pList.add(NbtString.of(p));
+        }
+        nbt.put("passives", pList);
+
         return nbt;
     }
 
@@ -214,6 +247,9 @@ public final class UnitDefinition {
         org.addProperty("rank", rank);
         org.addProperty("squad", squad);
         org.addProperty("commander", commander);
+        org.addProperty("mount", mount);
+        org.addProperty("aura", particleAura);
+        org.addProperty("death_action", deathAction);
         json.add("organization", org);
 
         JsonObject beh = new JsonObject();
@@ -231,25 +267,6 @@ public final class UnitDefinition {
         beh.addProperty("can_build", canBuild);
         beh.addProperty("infinite_ammo", infiniteAmmo);
         json.add("behavior", beh);
-
-        JsonObject equip = new JsonObject();
-        for (Map.Entry<EquipmentSlot, ItemStack> e : equipment.entrySet()) {
-            if (e.getValue() != null && !e.getValue().isEmpty()) {
-                equip.addProperty(e.getKey().getName(), Registries.ITEM.getId(e.getValue().getItem()).toString());
-            }
-        }
-        json.add("equipment", equip);
-
-        JsonArray invArr = new JsonArray();
-        for (ItemStack s : inventory) {
-            if (s != null && !s.isEmpty()) {
-                JsonObject itemObj = new JsonObject();
-                itemObj.addProperty("item", Registries.ITEM.getId(s.getItem()).toString());
-                itemObj.addProperty("count", s.getCount());
-                invArr.add(itemObj);
-            }
-        }
-        json.add("inventory", invArr);
 
         return json;
     }
@@ -281,43 +298,9 @@ public final class UnitDefinition {
             if (o.has("rank")) def.rank = o.get("rank").getAsString();
             if (o.has("squad")) def.squad = o.get("squad").getAsString();
             if (o.has("commander")) def.commander = o.get("commander").getAsBoolean();
-        }
-
-        if (json.has("behavior")) {
-            JsonObject b = json.getAsJsonObject("behavior");
-            if (b.has("target_priority")) def.targetPriority = b.get("target_priority").getAsString();
-            if (b.has("attack_hostile")) def.attackHostile = b.get("attack_hostile").getAsBoolean();
-            if (b.has("protect_allies")) def.protectAllies = b.get("protect_allies").getAsBoolean();
-            if (b.has("attack_players")) def.attackPlayers = b.get("attack_players").getAsBoolean();
-            if (b.has("heal_allies")) def.healAllies = b.get("heal_allies").getAsBoolean();
-            if (b.has("heal_range")) def.healRange = b.get("heal_range").getAsFloat();
-            if (b.has("retreat_health")) def.retreatHealth = b.get("retreat_health").getAsFloat();
-            if (b.has("can_block")) def.canBlockShield = b.get("can_block").getAsBoolean();
-            if (b.has("can_potions")) def.canUsePotions = b.get("can_potions").getAsBoolean();
-            if (b.has("can_throw_potions")) def.canThrowPotions = b.get("can_throw_potions").getAsBoolean();
-            if (b.has("can_fireworks")) def.canShootFireworks = b.get("can_fireworks").getAsBoolean();
-            if (b.has("can_build")) def.canBuild = b.get("can_build").getAsBoolean();
-            if (b.has("infinite_ammo")) def.infiniteAmmo = b.get("infinite_ammo").getAsBoolean();
-        }
-
-        if (json.has("equipment")) {
-            JsonObject eq = json.getAsJsonObject("equipment");
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                if (eq.has(slot.getName())) {
-                    var item = Registries.ITEM.get(Identifier.tryParse(eq.get(slot.getName()).getAsString()));
-                    if (item != null) def.equipment.put(slot, new ItemStack(item));
-                }
-            }
-        }
-
-        if (json.has("inventory")) {
-            JsonArray arr = json.getAsJsonArray("inventory");
-            for (int i = 0; i < arr.size(); i++) {
-                JsonObject itemObj = arr.get(i).getAsJsonObject();
-                var item = Registries.ITEM.get(Identifier.tryParse(itemObj.get("item").getAsString()));
-                int count = itemObj.has("count") ? itemObj.get("count").getAsInt() : 1;
-                if (item != null) def.inventory.add(new ItemStack(item, count));
-            }
+            if (o.has("mount")) def.mount = o.get("mount").getAsString();
+            if (o.has("aura")) def.particleAura = o.get("aura").getAsString();
+            if (o.has("death_action")) def.deathAction = o.get("death_action").getAsString();
         }
 
         return def;
@@ -362,15 +345,7 @@ public final class UnitDefinition {
 
     public void applyVariants(LivingEntity entity) {
         if (entity instanceof VillagerEntity villager) {
-            if (this.variant != null && !this.variant.isBlank()) {
-                var prof = Registries.VILLAGER_PROFESSION.get(Identifier.tryParse(this.variant));
-                if (prof != null) {
-                    villager.setVillagerData(villager.getVillagerData().withProfession(prof));
-                }
-            }
-            if (this.isBaby) {
-                villager.setBaby(true);
-            }
+            if (this.isBaby) villager.setBaby(true);
         }
     }
 
