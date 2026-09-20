@@ -39,7 +39,7 @@ The same library is also fully addressable from the server command layer, which 
 /unit spawn royal_guard
 ```
 
-The existing Null Warden content remains registered as legacy content while this new simulation layer becomes the main mod identity. The core is deliberately ready for the next systems: inventories, item capabilities, squads, perks, building validation, imports/exports, and battle setup can all use the same saved definitions and server authority.
+This repository is now exclusively the Unit & Faction Sandbox. The former boss, portal, dimension, relic, and custom-renderer content has been removed rather than carried as unrelated legacy baggage. The core is deliberately ready for the next systems: inventories, item capabilities, squads, perks, building validation, imports/exports, and battle setup can all use the same saved definitions and server authority.
 
 ## Build
 
