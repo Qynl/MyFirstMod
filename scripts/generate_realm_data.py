@@ -26,7 +26,7 @@ terrace = {'type':'minecraft:range_choice','input':noise('basins',1,0),'min_incl
            'when_out_of_range':{'type':'minecraft:range_choice','input':noise('basins',1,0),'min_inclusive':.1,'max_exclusive':.5,'when_in_range':1,'when_out_of_range':1.5}}}
 stacks = mul(M_STACKS, mul(.8, add(terrace, -.75)))
 # Shard Spires: vanilla's steep ridge function, gated to the spire band.
-spires = mul(M_SPIRES, mul(1.2, {'type':'minecraft:steep'}))
+spires = mul(M_SPIRES, mul(1.2, add({'type':'minecraft:ridge'},-.5)))
 # Veil Highlands: a lifted plateau with its own broad swell.
 high = mul(M_HIGH, add(.5, mul(.35, noise('basins',.6,0))))
 basins_coef = add(.8, add(mul(-.5, M_STACKS), mul(-.55, M_VENTS)))
@@ -55,7 +55,7 @@ REGIONS = [
  ('prism_wastes',[.35,.6],0x302646,0x271839,'end_rod','soul_sand_valley.loop',[]),
  ('shard_spires',[.6,.8],0x2A2A4E,0x232045,'glow','soul_sand_valley.loop',[('creature','myfirstmod:veil_wisp',12,1,2)]),
  ('cinder_steps',[.8,.92],0x352B38,0x281A30,'ash','basalt_deltas.loop',[]),
- ('ember_vents',[.92,1.01],0x3A2A26,0x2E1F1C,'white_ash','basalt_deltas.loop',[])]
+ ('ember_vents',[.92,1.0],0x3A2A26,0x2E1F1C,'white_ash','basalt_deltas.loop',[])]
 for name,temp,fog,sky,particle,loop,extra in REGIONS:
     biomes.append({'biome':'myfirstmod:'+name,'parameters':{'temperature':temp,'humidity':[-1,1],'continentalness':[-1,1],'erosion':[-1,1],'depth':[-1,1],'weirdness':[-1,1],'offset':0}})
     spawners={'monster':[{'type':'myfirstmod:rift_sentinel','weight':25,'minCount':1,'maxCount':2},{'type':'myfirstmod:shardstalker','weight':35,'minCount':1,'maxCount':2}]}

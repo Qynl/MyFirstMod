@@ -249,7 +249,11 @@
                         "type": "minecraft:mul",
                         "argument1": 1.2,
                         "argument2": {
-                          "type": "minecraft:steep"
+                          "type": "minecraft:add",
+                          "argument1": {
+                            "type": "minecraft:ridge"
+                          },
+                          "argument2": -0.5
                         }
                       }
                     }
@@ -549,7 +553,11 @@
                                 "type": "minecraft:mul",
                                 "argument1": 1.2,
                                 "argument2": {
-                                  "type": "minecraft:steep"
+                                  "type": "minecraft:add",
+                                  "argument1": {
+                                    "type": "minecraft:ridge"
+                                  },
+                                  "argument2": -0.5
                                 }
                               }
                             }
@@ -850,7 +858,11 @@
                               "type": "minecraft:mul",
                               "argument1": 1.2,
                               "argument2": {
-                                "type": "minecraft:steep"
+                                "type": "minecraft:add",
+                                "argument1": {
+                                  "type": "minecraft:ridge"
+                                },
+                                "argument2": -0.5
                               }
                             }
                           }

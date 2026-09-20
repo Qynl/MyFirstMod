@@ -28,7 +28,7 @@ class RegionTests(unittest.TestCase):
     def test_terrain_shaping_is_gated_by_climate(self):
         router=load(DATA/'worldgen/noise_settings/null_realm.json')['noise_router']
         terrain=json.dumps(router['initial_density_without_jaggedness'])
-        for token in ['range_choice','minecraft:steep','myfirstmod:climate','myfirstmod:basins']:
+        for token in ['range_choice','minecraft:ridge','myfirstmod:climate','myfirstmod:basins']:
             self.assertIn(token,terrain)
         surface=json.dumps(load(DATA/'worldgen/noise_settings/null_realm.json')['surface_rule'])
         for top in ['brinesilt','veilstone','vent_basalt']:

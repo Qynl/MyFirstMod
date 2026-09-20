@@ -221,7 +221,7 @@
           "parameters": {
             "temperature": [
               0.92,
-              1.01
+              1.0
             ],
             "humidity": [
               -1,
