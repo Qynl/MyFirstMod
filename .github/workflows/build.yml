@@ -27,11 +27,9 @@ jobs:
 
       - name: Build Mod with Gradle
         run: |
-          gradle remapJar build --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
-          echo "=== BUILD LOG ==="
-          cat gradle-build.log
-          echo "=== ALL JAR FILES ==="
-          find . -name "*.jar"
+          gradle build --stacktrace 2>&1 | tee gradle-build.log || BUILD_FAILED=1
+          echo "::notice title=Found Jars::$(find . -name '*.jar' | tr '\n' ' ')"
+          echo "::notice title=Build Dir::$(find build -maxdepth 3 | tr '\n' ' ')"
           if [ "$BUILD_FAILED" = "1" ]; then
             exit 1
           fi
