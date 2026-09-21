@@ -43,13 +43,14 @@ public class BardLuteItem extends Item {
             List<LivingEntity> allies = serverWorld.getEntitiesByClass(LivingEntity.class, player.getBoundingBox().expand(18.0),
                     e -> e.isAlive() && FactionManager.isAllied(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
-            // Harmonic musical wave particle rings
-            for (int i = 0; i < 24; i++) {
-                double angle = (2 * Math.PI * i) / 24;
-                for (double r = 4.0; r <= 16.0; r += 4.0) {
+            // Harmonic musical wave particle rings: Concentric Melody Waves
+            for (int i = 0; i < 32; i++) {
+                double angle = (2 * Math.PI * i) / 32.0;
+                for (double r = 3.0; r <= 18.0; r += 3.0) {
                     double px = player.getX() + r * Math.cos(angle);
                     double pz = player.getZ() + r * Math.sin(angle);
-                    serverWorld.spawnParticles(ParticleTypes.NOTE, px, player.getY() + 0.5, pz, 1, (i % 24) / 24.0, 0, 0, 0.5);
+                    double noteColor = (i % 24) / 24.0;
+                    serverWorld.spawnParticles(ParticleTypes.NOTE, px, player.getY() + 0.4 + Math.sin(r) * 0.3, pz, 1, noteColor, 0, 0, 0.6);
                 }
             }
 
@@ -57,7 +58,8 @@ public class BardLuteItem extends Item {
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 240, 1));
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 240, 0));
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 160, 0));
-                serverWorld.spawnParticles(ParticleTypes.NOTE, ally.getX(), ally.getBodyY(0.7), ally.getZ(), 6, 0.3, 0.4, 0.3, 0.1);
+                serverWorld.spawnParticles(ParticleTypes.NOTE, ally.getX(), ally.getBodyY(0.7), ally.getZ(), 8, 0.3, 0.4, 0.3, 0.1);
+                serverWorld.spawnParticles(ParticleTypes.ENCHANTED_HIT, ally.getX(), ally.getBodyY(0.5), ally.getZ(), 4, 0.2, 0.3, 0.2, 0.05);
             }
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),

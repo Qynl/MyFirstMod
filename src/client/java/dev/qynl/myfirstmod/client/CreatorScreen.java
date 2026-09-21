@@ -463,11 +463,16 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             context.fill(leftX, leftY - 4, leftX + 220, y + backgroundHeight - 12, COLOR_CARD_BG);
             context.fill(leftX, leftY - 4, leftX + 3, y + backgroundHeight - 12, COLOR_GOLD_ACCENT);
 
-            context.drawText(textRenderer, Text.literal("⚔ SOLO SANDBOX COMMANDER ACTIVE").formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, leftY, COLOR_GOLD_ACCENT, false);
-            context.drawText(textRenderer, Text.literal("• Drag sliders to edit stats in real-time").formatted(Formatting.WHITE), leftX + 8, leftY + 14, 0xffe2e8f0, false);
-            context.drawText(textRenderer, Text.literal("• Spawn for any faction instantly with right buttons").formatted(Formatting.GREEN), leftX + 8, leftY + 26, 0xff4ade80, false);
-            context.drawText(textRenderer, Text.literal("• Pit blue knights vs red raiders anywhere in solo!").formatted(Formatting.YELLOW), leftX + 8, leftY + 38, 0xfffde047, false);
-            context.drawText(textRenderer, Text.literal("• Shift-Right-Click creator tool to cycle spawn faction").formatted(Formatting.GRAY), leftX + 8, leftY + 50, 0xff94a3b8, false);
+            // Live Stat Bars & Rating Dashboard
+            context.drawText(textRenderer, Text.literal("⚔ UNIT COMBAT PROFILE").formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, leftY, COLOR_GOLD_ACCENT, false);
+
+            drawStatBar(context, leftX + 8, leftY + 12, "❤ HP", (float) sliderHealth, 300.0f, 0xffef4444);
+            drawStatBar(context, leftX + 8, leftY + 24, "🗡 DMG", (float) sliderDamage, 50.0f, 0xfff97316);
+            drawStatBar(context, leftX + 8, leftY + 36, "🛡 ARM", (float) sliderArmor, 30.0f, 0xff38bdf8);
+            drawStatBar(context, leftX + 8, leftY + 48, "⚡ SPD", (float) (sliderSpeed * 100), 60.0f, 0xffeab308);
+            drawStatBar(context, leftX + 8, leftY + 60, "📏 SCL", (float) sliderScale, 3.0f, 0xffa855f7);
+
+            context.drawText(textRenderer, Text.literal("• Live Synchronized Solo Sandbox Profile").formatted(Formatting.DARK_GRAY), leftX + 8, leftY + 74, 0xff94a3b8, false);
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             int cardY = y + 58;
@@ -532,7 +537,19 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             context.drawText(textRenderer, Text.literal("⚔ TACTICAL SIMULATION MATCHUP:").formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, bannerY + 4, COLOR_GOLD_ACCENT, false);
             context.drawText(textRenderer, Text.literal("Side A: " + summaryA).formatted(Formatting.AQUA), leftX + 8, bannerY + 16, 0xff38bdf8, false);
             context.drawText(textRenderer, Text.literal("Side B: " + summaryB).formatted(Formatting.RED), leftX + 8, bannerY + 28, 0xfff87171, false);
-            context.drawText(textRenderer, Text.literal("• Snaps to terrain heightmaps • Live Actionbar Kill HUD • Fanfare Victory").formatted(Formatting.GRAY), leftX + 8, bannerY + 40, 0xff94a3b8, false);
+
+            // Tactical Power Balance Meter
+            int meterX = leftX + 8;
+            int meterY = bannerY + 40;
+            int meterWidth = backgroundWidth - 44;
+            float ratio = (float) countA / Math.max(1, countA + countB);
+            int splitW = (int) (meterWidth * ratio);
+
+            context.fill(meterX, meterY, meterX + splitW, meterY + 6, 0xff3b82f6); // Side A Blue
+            context.fill(meterX + splitW, meterY, meterX + meterWidth, meterY + 6, 0xffef4444); // Side B Red
+            context.fill(meterX + splitW - 1, meterY - 1, meterX + splitW + 1, meterY + 7, 0xffffffff); // Center Marker
+
+            context.drawText(textRenderer, Text.literal("Power Ratio: " + (int)(ratio * 100) + "% vs " + (100 - (int)(ratio * 100)) + "%").formatted(Formatting.DARK_GRAY), meterX, meterY + 10, 0xff94a3b8, false);
 
         } else if (tab == 4) { // SETTINGS & SIMULATION
             int infoX = x + 218;
@@ -543,6 +560,16 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             context.drawText(textRenderer, Text.literal("• Spatial queries protect TPS performance").formatted(Formatting.GRAY), infoX, infoY + 40, 0xffcbd5e1, false);
             context.drawText(textRenderer, Text.literal("• Full data persistence across restarts").formatted(Formatting.GREEN), infoX, infoY + 52, 0xff4ade80, false);
         }
+    }
+
+    private void drawStatBar(DrawContext context, int barX, int barY, String label, float val, float maxVal, int barColor) {
+        context.drawText(textRenderer, Text.literal(label), barX, barY, 0xffcbd5e1, false);
+        int trackX = barX + 50;
+        int trackW = 150;
+        context.fill(trackX, barY + 2, trackX + trackW, barY + 7, 0xff0f172a);
+        int fillW = Math.max(0, Math.min(trackW, (int) ((val / maxVal) * trackW)));
+        context.fill(trackX, barY + 2, trackX + fillW, barY + 7, barColor);
+    }
     }
 
     private boolean matches(String query, String tags) {

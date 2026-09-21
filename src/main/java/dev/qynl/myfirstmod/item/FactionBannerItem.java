@@ -48,9 +48,25 @@ public class FactionBannerItem extends Item {
                 world.setBlockState(pos, Blocks.BLUE_BANNER.getDefaultState(), Block.NOTIFY_ALL);
                 TerritoryManager.registerOutpost(factionId, pos);
 
-                world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 20, 0.5, 0.8, 0.5, 0.05);
-                world.spawnParticles(ParticleTypes.PORTAL, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 15, 0.4, 0.4, 0.4, 0.1);
-                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.0f, 1.2f);
+                // Ascending banner pillar
+                for (double dy = 0; dy <= 12.0; dy += 0.5) {
+                    world.spawnParticles(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + dy, pos.getZ() + 0.5, 2, 0.1, 0.1, 0.1, 0.01);
+                    world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + dy, pos.getZ() + 0.5, 1, 0.2, 0.2, 0.2, 0.02);
+                }
+
+                // 32-Block Territory Perimeter Ring preview
+                for (int i = 0; i < 48; i++) {
+                    double angle = (2 * Math.PI * i) / 48.0;
+                    double bx = pos.getX() + 0.5 + Math.cos(angle) * 32.0;
+                    double bz = pos.getZ() + 0.5 + Math.sin(angle) * 32.0;
+                    world.spawnParticles(ParticleTypes.PORTAL, bx, pos.getY() + 0.5, bz, 2, 0.1, 0.2, 0.1, 0.02);
+                    if (i % 4 == 0) {
+                        world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, bx, pos.getY() + 0.8, bz, 2, 0.1, 0.2, 0.1, 0.02);
+                    }
+                }
+
+                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.4f, 1.2f);
+                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.8f, 1.4f);
 
                 int colorRgb = faction != null ? faction.getParsedColor() : 0x3B82F6;
                 String fName = faction != null ? faction.name : "Faction";

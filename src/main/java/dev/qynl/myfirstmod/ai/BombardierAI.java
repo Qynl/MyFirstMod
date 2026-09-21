@@ -54,10 +54,11 @@ public final class BombardierAI {
             }
 
             // Explosive canister impact & shockwave
-            world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, tx, ty + 0.5, tz, 2, 0.2, 0.2, 0.2, 0.0);
-            world.spawnParticles(ParticleTypes.FLAME, tx, ty + 0.5, tz, 30, 1.2, 1.0, 1.2, 0.1);
-            world.spawnParticles(ParticleTypes.LAVA, tx, ty + 0.5, tz, 6, 0.4, 0.4, 0.4, 0.05);
-            world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1.6f, 0.9f);
+            world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, tx, ty + 0.5, tz, 3, 0.3, 0.3, 0.3, 0.0);
+            world.spawnParticles(ParticleTypes.FLAME, tx, ty + 0.5, tz, 40, 1.5, 1.2, 1.5, 0.15);
+            world.spawnParticles(ParticleTypes.LAVA, tx, ty + 0.5, tz, 8, 0.5, 0.5, 0.5, 0.08);
+            world.spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, tx, ty + 0.8, tz, 12, 0.4, 0.6, 0.4, 0.05);
+            world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1.8f, 0.85f);
 
             float damage = 12.0f;
             List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, target.getBoundingBox().expand(4.5),

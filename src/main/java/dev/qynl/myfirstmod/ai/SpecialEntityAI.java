@@ -84,6 +84,14 @@ public final class SpecialEntityAI {
                 world.playSound(null, breeze.getX(), breeze.getY(), breeze.getZ(), SoundEvents.ENTITY_BREEZE_SHOOT, SoundCategory.HOSTILE, 1.2f, 1.0f);
                 world.spawnParticles(ParticleTypes.GUST_EMITTER_LARGE, target.getX(), target.getY() + 0.5, target.getZ(), 1, 0, 0, 0, 0);
 
+                // Expanding wind swirl ring
+                for (int i = 0; i < 16; i++) {
+                    double angle = (2 * Math.PI * i) / 16.0;
+                    double px = target.getX() + Math.cos(angle) * 3.5;
+                    double pz = target.getZ() + Math.sin(angle) * 3.5;
+                    world.spawnParticles(ParticleTypes.CLOUD, px, target.getY() + 0.2, pz, 1, 0, 0.1, 0, 0.05);
+                }
+
                 List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, target.getBoundingBox().expand(4.0),
                         e -> e.isAlive() && FactionManager.isHostile(server, myFaction, UnitSystem.getTagValue(e, "faction:")));
 
@@ -172,7 +180,15 @@ public final class SpecialEntityAI {
         if (mob instanceof RavagerEntity ravager && target != null && target.isAlive()) {
             if (mob.age % 60 == 0 && mob.squaredDistanceTo(target) < 25.0) {
                 world.playSound(null, ravager.getX(), ravager.getY(), ravager.getZ(), SoundEvents.ENTITY_RAVAGER_ROAR, SoundCategory.HOSTILE, 1.8f, 0.9f);
-                world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, ravager.getX(), ravager.getY() + 0.5, ravager.getZ(), 1, 0, 0, 0, 0);
+                world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, ravager.getX(), ravager.getY() + 0.5, ravager.getZ(), 2, 0, 0, 0, 0);
+
+                // Earthshaker ground radial shockwave
+                for (int i = 0; i < 24; i++) {
+                    double angle = (2 * Math.PI * i) / 24.0;
+                    double px = ravager.getX() + Math.cos(angle) * 5.0;
+                    double pz = ravager.getZ() + Math.sin(angle) * 5.0;
+                    world.spawnParticles(ParticleTypes.CLOUD, px, ravager.getY() + 0.2, pz, 1, 0, 0.15, 0, 0.05);
+                }
 
                 List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, ravager.getBoundingBox().expand(6.0),
                         e -> e != ravager && e.isAlive() && FactionManager.isHostile(server, myFaction, UnitSystem.getTagValue(e, "faction:")));

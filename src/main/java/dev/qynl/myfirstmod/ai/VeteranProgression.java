@@ -55,8 +55,14 @@ public final class VeteranProgression {
         }
 
         unit.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 1));
-        world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, unit.getX(), unit.getY() + 1.0, unit.getZ(), 25, 0.4, 0.6, 0.4, 0.1);
-        world.spawnParticles(ParticleTypes.FIREWORK, unit.getX(), unit.getY() + 1.2, unit.getZ(), 15, 0.3, 0.5, 0.3, 0.1);
-        world.playSound(null, unit.getX(), unit.getY(), unit.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.0f, 1.2f);
+        // Ascending celestial promotion pillar
+        for (double dy = 0; dy <= 4.0; dy += 0.4) {
+            world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, unit.getX(), unit.getY() + dy, unit.getZ(), 4, 0.3, 0.2, 0.3, 0.05);
+            world.spawnParticles(ParticleTypes.END_ROD, unit.getX(), unit.getY() + dy, unit.getZ(), 1, 0.1, 0.1, 0.1, 0.01);
+        }
+        world.spawnParticles(ParticleTypes.FIREWORK, unit.getX(), unit.getY() + 1.5, unit.getZ(), 25, 0.4, 0.6, 0.4, 0.15);
+        world.spawnParticles(ParticleTypes.FLASH, unit.getX(), unit.getY() + 1.0, unit.getZ(), 1, 0, 0, 0, 0);
+        world.playSound(null, unit.getX(), unit.getY(), unit.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.2f, 1.1f);
+        world.playSound(null, unit.getX(), unit.getY(), unit.getZ(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 0.8f, 1.4f);
     }
 }

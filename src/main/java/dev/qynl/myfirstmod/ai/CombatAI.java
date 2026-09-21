@@ -28,6 +28,11 @@ public final class CombatAI {
 
         // Pathfind towards target
         if (distSq > reachSq) {
+            // Galloping dust clouds when mounted cavalry is pursuing
+            if (mob.hasVehicle() && mob.age % 4 == 0) {
+                world.spawnParticles(ParticleTypes.CLOUD, mob.getX(), mob.getY() + 0.1, mob.getZ(), 2, 0.2, 0.05, 0.2, 0.02);
+            }
+
             // Jump Attack / Lunge when closing the final 4-6 blocks
             if (distSq <= 36.0 && distSq > reachSq && mob.isOnGround() && mob.age % 30 == 0) {
                 Vec3d leapDir = target.getPos().subtract(mob.getPos()).normalize();

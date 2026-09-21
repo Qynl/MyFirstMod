@@ -45,16 +45,30 @@ public class PaladinMaceItem extends Item {
             List<LivingEntity> enemies = serverWorld.getEntitiesByClass(LivingEntity.class, player.getBoundingBox().expand(10.0),
                     e -> e != player && e.isAlive() && FactionManager.isHostile(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
-            // Holy radiant smite burst VFX
-            for (double dy = 0.0; dy <= 6.0; dy += 0.5) {
-                serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + dy, player.getZ(), 4, 0.4, 0.2, 0.4, 0.05);
-                serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY() + dy, player.getZ(), 2, 0.3, 0.2, 0.3, 0.05);
+            // Holy radiant smite burst: Celestial Beam & Halo
+            for (double dy = 0.0; dy <= 8.0; dy += 0.4) {
+                serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + dy, player.getZ(), 4, 0.3, 0.2, 0.3, 0.05);
+                serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY() + dy, player.getZ(), 3, 0.25, 0.2, 0.25, 0.05);
+            }
+
+            // Expanding Sunburst shockwave rings on ground
+            for (int r = 2; r <= 8; r += 2) {
+                for (int i = 0; i < 18; i++) {
+                    double angle = (2 * Math.PI * i) / 18.0;
+                    double px = player.getX() + Math.cos(angle) * r;
+                    double pz = player.getZ() + Math.sin(angle) * r;
+                    serverWorld.spawnParticles(ParticleTypes.ENCHANTED_HIT, px, player.getY() + 0.1, pz, 1, 0, 0, 0, 0);
+                    if (i % 2 == 0) {
+                        serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK, px, player.getY() + 0.2, pz, 1, 0, 0, 0, 0.02);
+                    }
+                }
             }
 
             for (LivingEntity enemy : enemies) {
                 float smiteDmg = enemy.getType().isIn(EntityTypeTags.UNDEAD) ? 18.0f : 10.0f;
                 enemy.damage(serverWorld.getDamageSources().magic(), smiteDmg);
-                serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 15, 0.3, 0.5, 0.3, 0.1);
+                serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 25, 0.4, 0.6, 0.4, 0.15);
+                serverWorld.spawnParticles(ParticleTypes.FLASH, enemy.getX(), enemy.getY() + 0.8, enemy.getZ(), 1, 0, 0, 0, 0);
             }
 
             // Shielding on allies

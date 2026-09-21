@@ -110,9 +110,18 @@ public final class BattleSandbox {
         battleActive = true;
         battleTickTimer = 0;
 
-        // Sound battle horn and spawn particle blast
+        // Sound battle horn and spawn particle blast & battlefield perimeter markers
         world.playSound(null, center.x, center.y, center.z, SoundEvents.EVENT_RAID_HORN, SoundCategory.NEUTRAL, 2.5f, 1.0f);
-        world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y + 1, center.z, 2, 0.5, 0.5, 0.5, 0.0);
+        world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y + 1, center.z, 3, 0.5, 0.5, 0.5, 0.0);
+        world.spawnParticles(ParticleTypes.FLASH, center.x, center.y + 1.5, center.z, 2, 0.1, 0.1, 0.1, 0.0);
+
+        // Clashing faction perimeter marker ring
+        for (int i = 0; i < 36; i++) {
+            double angle = (2 * Math.PI * i) / 36.0;
+            double px = center.x + Math.cos(angle) * (battleDist / 2.0);
+            double pz = center.z + Math.sin(angle) * (battleDist / 2.0);
+            world.spawnParticles(i % 2 == 0 ? ParticleTypes.FLAME : ParticleTypes.SOUL_FIRE_FLAME, px, center.y + 0.3, pz, 1, 0, 0, 0, 0.02);
+        }
 
         String descA = ("all".equalsIgnoreCase(unitAId) ? "Battalion" : unitAId) + " (" + countA + "x)";
         String descB = ("all".equalsIgnoreCase(unitBId) ? "Battalion" : unitBId) + " (" + countB + "x)";
@@ -321,10 +330,13 @@ public final class BattleSandbox {
         server.getPlayerManager().broadcast(Text.literal("      Total Kills Recorded: " + BattleStats.get(server).getKills(winningFactionId)).formatted(Formatting.AQUA), false);
         server.getPlayerManager().broadcast(Text.literal("🏆 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 🏆").formatted(Formatting.GOLD), false);
 
-        // Celebration fireworks in the sky
+        // Celebration fireworks in the sky: Multi-stage firework extravaganza
         for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
-            world.spawnParticles(ParticleTypes.FIREWORK, p.getX(), p.getY() + 8.0, p.getZ(), 50, 2.0, 2.0, 2.0, 0.2);
-            world.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.2f, 1.0f);
+            world.spawnParticles(ParticleTypes.FIREWORK, p.getX(), p.getY() + 8.0, p.getZ(), 60, 3.0, 2.5, 3.0, 0.25);
+            world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, p.getX(), p.getY() + 4.0, p.getZ(), 40, 2.0, 1.5, 2.0, 0.15);
+            world.spawnParticles(ParticleTypes.FLASH, p.getX(), p.getY() + 6.0, p.getZ(), 3, 0.5, 0.5, 0.5, 0.0);
+            world.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.5f, 1.0f);
+            world.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS, 2.0f, 1.0f);
         }
     }
 }

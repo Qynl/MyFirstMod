@@ -52,10 +52,16 @@ public class ReinforcementBeaconItem extends Item {
             // Spawn 4 reinforcement units around target point
             Vec3d center = new Vec3d(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 
-            // Orbital beam descent particles from the sky
-            for (double dy = 0; dy <= 24; dy += 1.0) {
-                world.spawnParticles(ParticleTypes.END_ROD, center.x, center.y + dy, center.z, 2, 0.1, 0.1, 0.1, 0.01);
-                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, center.x, center.y + dy, center.z, 2, 0.2, 0.2, 0.2, 0.05);
+            // Orbital beam descent particles from the clouds
+            for (double dy = 0; dy <= 36; dy += 0.8) {
+                world.spawnParticles(ParticleTypes.END_ROD, center.x, center.y + dy, center.z, 3, 0.15, 0.15, 0.15, 0.01);
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, center.x, center.y + dy, center.z, 2, 0.25, 0.25, 0.25, 0.05);
+
+                // Spiral particle vortex descending along the beam
+                double spiralAngle = (dy * 0.8) % (2 * Math.PI);
+                double sx = center.x + Math.cos(spiralAngle) * 0.8;
+                double sz = center.z + Math.sin(spiralAngle) * 0.8;
+                world.spawnParticles(ParticleTypes.ENCHANTED_HIT, sx, center.y + dy, sz, 1, 0, 0, 0, 0);
             }
 
             for (int i = 0; i < 4; i++) {
@@ -63,16 +69,28 @@ public class ReinforcementBeaconItem extends Item {
                 double ox = (i % 2 == 0 ? 1 : -1) * 1.8;
                 double oz = (i / 2 == 0 ? 1 : -1) * 1.8;
                 Vec3d sPos = center.add(ox, 0, oz);
-                UnitSpawner.spawn(world, def, sPos, serverPlayer.getYaw());
+                LivingEntity droppedUnit = UnitSpawner.spawn(world, def, sPos, serverPlayer.getYaw());
+                if (droppedUnit != null) {
+                    world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, sPos.x, sPos.y + 0.8, sPos.z, 15, 0.3, 0.4, 0.3, 0.08);
+                }
             }
 
-            // Epic visual landing shockwave & beacon activation
-            world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y + 0.5, center.z, 3, 0.3, 0.3, 0.3, 0.0);
-            world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, center.x, center.y + 1.2, center.z, 60, 1.2, 1.5, 1.2, 0.2);
-            world.spawnParticles(ParticleTypes.FLASH, center.x, center.y + 1.0, center.z, 2, 0.1, 0.1, 0.1, 0.0);
-            world.playSound(null, center.x, center.y, center.z, SoundEvents.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.5f, 1.2f);
-            world.playSound(null, center.x, center.y, center.z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 1.8f, 1.0f);
-            world.playSound(null, center.x, center.y, center.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.9f, 1.4f);
+            // Epic visual landing shockwave: expanding concentric ground ring
+            for (int r = 1; r <= 3; r++) {
+                for (int i = 0; i < 20; i++) {
+                    double angle = (2 * Math.PI * i) / 20.0;
+                    double px = center.x + Math.cos(angle) * (r * 1.8);
+                    double pz = center.z + Math.sin(angle) * (r * 1.8);
+                    world.spawnParticles(ParticleTypes.CLOUD, px, center.y + 0.1, pz, 1, 0.1, 0.05, 0.1, 0.02);
+                }
+            }
+
+            world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y + 0.5, center.z, 4, 0.4, 0.4, 0.4, 0.0);
+            world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, center.x, center.y + 1.2, center.z, 80, 1.4, 1.8, 1.4, 0.25);
+            world.spawnParticles(ParticleTypes.FLASH, center.x, center.y + 1.0, center.z, 3, 0.1, 0.1, 0.1, 0.0);
+            world.playSound(null, center.x, center.y, center.z, SoundEvents.ITEM_TRIDENT_THUNDER, SoundCategory.PLAYERS, 1.8f, 1.2f);
+            world.playSound(null, center.x, center.y, center.z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 2.0f, 1.0f);
+            world.playSound(null, center.x, center.y, center.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.1f, 1.4f);
 
             int colorRgb = faction != null ? faction.getParsedColor() : 0x3B82F6;
             String fName = faction != null ? faction.name : "Army";

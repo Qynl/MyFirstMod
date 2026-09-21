@@ -135,7 +135,9 @@ public class TacticalWhistleItem extends Item {
                 }
 
                 troop.getNavigation().startMovingTo(targetSlot.x, targetSlot.y, targetSlot.z, 1.35);
-                serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, targetSlot.x, targetSlot.y + 0.2, targetSlot.z, 6, 0.2, 0.2, 0.2, 0.05);
+                serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, targetSlot.x, targetSlot.y + 0.3, targetSlot.z, 8, 0.2, 0.2, 0.2, 0.05);
+                serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK, targetSlot.x, targetSlot.y + 0.1, targetSlot.z, 4, 0.15, 0.1, 0.15, 0.02);
+                serverWorld.spawnParticles(ParticleTypes.ENCHANTED_HIT, troop.getX(), troop.getBodyY(0.5), troop.getZ(), 4, 0.2, 0.3, 0.2, 0.05);
             }
 
             serverPlayer.sendMessage(

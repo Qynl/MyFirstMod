@@ -44,22 +44,24 @@ public class DruidStaffItem extends Item {
             List<LivingEntity> enemies = serverWorld.getEntitiesByClass(LivingEntity.class, player.getBoundingBox().expand(14.0),
                     e -> e != player && e.isAlive() && FactionManager.isHostile(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
-            // Nature bloom ring particles
-            for (int i = 0; i < 28; i++) {
-                double angle = (2 * Math.PI * i) / 28;
-                for (double r = 3.0; r <= 14.0; r += 3.5) {
+            // Nature bloom ring particles: Expanding Triple Floral Array
+            for (int i = 0; i < 32; i++) {
+                double angle = (2 * Math.PI * i) / 32.0;
+                for (double r = 2.5; r <= 14.0; r += 3.0) {
                     double px = player.getX() + r * Math.cos(angle);
                     double pz = player.getZ() + r * Math.sin(angle);
                     serverWorld.spawnParticles(ParticleTypes.COMPOSTER, px, player.getY() + 0.2, pz, 1, 0, 0, 0, 0);
-                    if (i % 3 == 0) {
-                        serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, px, player.getY() + 0.4, pz, 1, 0, 0, 0, 0);
-                    }
+                    serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, px, player.getY() + 0.4, pz, 1, 0, 0, 0, 0);
                 }
             }
 
             for (LivingEntity enemy : enemies) {
                 enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100, 4));
                 enemy.damage(serverWorld.getDamageSources().magic(), 6.0f);
+                // Entangling roots bursting from floor around enemy
+                for (double dy = 0; dy <= 1.5; dy += 0.3) {
+                    serverWorld.spawnParticles(ParticleTypes.COMPOSTER, enemy.getX(), enemy.getY() + dy, enemy.getZ(), 4, 0.3, 0.1, 0.3, 0.02);
+                }
                 serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, enemy.getX(), enemy.getY() + 0.5, enemy.getZ(), 15, 0.4, 0.5, 0.4, 0.05);
             }
 

@@ -75,16 +75,39 @@ public final class UnitSystem {
             mob.extinguish();
         }
 
-        // Particle Auras
-        if (mob.age % 10 == 0 && unit.particleAura != null && !unit.particleAura.equalsIgnoreCase("none")) {
+        // Particle Auras: Dynamic Rotating Orbital Arrays
+        if (mob.age % 4 == 0 && unit.particleAura != null && !unit.particleAura.equalsIgnoreCase("none")) {
+            double angle = (mob.age * 0.2) % (2 * Math.PI);
+            double radius = Math.max(0.6, mob.getWidth() * 0.85);
+            double ox = Math.cos(angle) * radius;
+            double oz = Math.sin(angle) * radius;
+            double oy = mob.getBodyY(0.4) + Math.sin(angle * 2.0) * 0.2;
+
             switch (unit.particleAura.toLowerCase()) {
-                case "flame" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.FLAME, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 3, 0.2, 0.2, 0.2, 0.02);
-                case "soul_flame" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.SOUL_FIRE_FLAME, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 3, 0.2, 0.2, 0.2, 0.02);
-                case "enchanted" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.ENCHANTED_HIT, mob.getX(), mob.getBodyY(0.6), mob.getZ(), 4, 0.25, 0.3, 0.25, 0.05);
-                case "portal" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.PORTAL, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 4, 0.3, 0.3, 0.3, 0.05);
-                case "heart" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.HEART, mob.getX(), mob.getBodyY(0.7), mob.getZ(), 2, 0.2, 0.2, 0.2, 0.02);
-                case "totem" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.TOTEM_OF_UNDYING, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 3, 0.25, 0.3, 0.25, 0.05);
-                case "electric_spark" -> world.spawnParticles(net.minecraft.particle.ParticleTypes.ELECTRIC_SPARK, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 4, 0.25, 0.3, 0.25, 0.05);
+                case "flame" -> {
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.FLAME, mob.getX() + ox, oy, mob.getZ() + oz, 1, 0, 0, 0, 0.01);
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.SMOKE, mob.getX() - ox, oy, mob.getZ() - oz, 1, 0, 0, 0, 0.01);
+                }
+                case "soul_flame" -> {
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.SOUL_FIRE_FLAME, mob.getX() + ox, oy, mob.getZ() + oz, 1, 0, 0, 0, 0.01);
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.SOUL, mob.getX() - ox, oy + 0.2, mob.getZ() - oz, 1, 0, 0, 0, 0.01);
+                }
+                case "enchanted" -> {
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.ENCHANTED_HIT, mob.getX() + ox, oy, mob.getZ() + oz, 2, 0.1, 0.1, 0.1, 0.05);
+                }
+                case "portal" -> {
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.PORTAL, mob.getX() + ox, oy, mob.getZ() + oz, 3, 0.1, 0.1, 0.1, 0.05);
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.REVERSE_PORTAL, mob.getX() - ox, oy, mob.getZ() - oz, 2, 0.1, 0.1, 0.1, 0.05);
+                }
+                case "heart" -> {
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.HEART, mob.getX() + ox, mob.getY() + mob.getHeight() + 0.3, mob.getZ() + oz, 1, 0, 0, 0, 0.01);
+                }
+                case "totem" -> {
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.TOTEM_OF_UNDYING, mob.getX() + ox, oy, mob.getZ() + oz, 2, 0.1, 0.2, 0.1, 0.05);
+                }
+                case "electric_spark" -> {
+                    world.spawnParticles(net.minecraft.particle.ParticleTypes.ELECTRIC_SPARK, mob.getX() + ox, oy, mob.getZ() + oz, 2, 0.1, 0.1, 0.1, 0.05);
+                }
             }
         }
 

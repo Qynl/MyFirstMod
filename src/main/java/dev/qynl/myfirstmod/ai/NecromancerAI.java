@@ -86,14 +86,20 @@ public final class NecromancerAI {
         minion.setTarget(target);
         world.spawnEntity(minion);
 
-        // Visual summoning pentagram & portal burst
-        for (int i = 0; i < 16; i++) {
-            double angle = (2 * Math.PI * i) / 16;
-            double px = sx + Math.cos(angle) * 1.5;
-            double pz = sz + Math.sin(angle) * 1.5;
-            world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, px, sy + 0.1, pz, 2, 0.1, 0.1, 0.1, 0.02);
+        // Visual summoning pentagram: Concentric Soul Array & Portal Vortex
+        for (int i = 0; i < 24; i++) {
+            double angle = (2 * Math.PI * i) / 24.0;
+            double px1 = sx + Math.cos(angle) * 1.8;
+            double pz1 = sz + Math.sin(angle) * 1.8;
+            world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, px1, sy + 0.1, pz1, 2, 0.05, 0.05, 0.05, 0.01);
+
+            double px2 = sx + Math.cos(angle) * 0.9;
+            double pz2 = sz + Math.sin(angle) * 0.9;
+            world.spawnParticles(ParticleTypes.SMOKE, px2, sy + 0.1, pz2, 1, 0, 0, 0, 0);
         }
-        world.spawnParticles(ParticleTypes.PORTAL, sx, sy + 0.8, sz, 30, 0.4, 0.6, 0.4, 0.15);
-        world.playSound(null, sx, sy, sz, SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 1.2f, 0.9f);
+        for (double dy = 0; dy <= 2.5; dy += 0.3) {
+            world.spawnParticles(ParticleTypes.PORTAL, sx, sy + dy, sz, 10, 0.3, 0.2, 0.3, 0.1);
+        }
+        world.playSound(null, sx, sy, sz, SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 1.3f, 0.85f);
     }
 }

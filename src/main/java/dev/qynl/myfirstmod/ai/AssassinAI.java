@@ -57,8 +57,10 @@ public final class AssassinAI {
         if (distSq >= 36.0 && distSq <= 196.0 && assassin.age % 80 == 0) {
             Vec3d behindTarget = target.getPos().add(target.getRotationVector().multiply(-1.8));
             world.spawnParticles(ParticleTypes.PORTAL, assassin.getX(), assassin.getY() + 0.8, assassin.getZ(), 20, 0.3, 0.5, 0.3, 0.1);
+            world.spawnParticles(ParticleTypes.REVERSE_PORTAL, assassin.getX(), assassin.getY() + 0.5, assassin.getZ(), 10, 0.2, 0.3, 0.2, 0.05);
             assassin.requestTeleport(behindTarget.x, behindTarget.y, behindTarget.z);
             world.spawnParticles(ParticleTypes.SMOKE, behindTarget.x, behindTarget.y + 0.5, behindTarget.z, 25, 0.3, 0.5, 0.3, 0.05);
+            world.spawnParticles(ParticleTypes.DRAGON_BREATH, behindTarget.x, behindTarget.y + 0.3, behindTarget.z, 8, 0.2, 0.2, 0.2, 0.02);
             world.playSound(null, behindTarget.x, behindTarget.y, behindTarget.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1.0f, 1.4f);
             assassin.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 60, 2, false, false));
         }

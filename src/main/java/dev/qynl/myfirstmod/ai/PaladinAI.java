@@ -37,8 +37,11 @@ public final class PaladinAI {
 
             if (isUndead) {
                 damage *= 1.75f; // Huge Radiant Smite bonus vs Undead
-                world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, target.getX(), target.getBodyY(0.5), target.getZ(), 20, 0.4, 0.6, 0.4, 0.15);
-                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getBodyY(0.5), target.getZ(), 15, 0.3, 0.4, 0.3, 0.1);
+                world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, target.getX(), target.getBodyY(0.5), target.getZ(), 30, 0.4, 0.8, 0.4, 0.2);
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getBodyY(0.5), target.getZ(), 20, 0.4, 0.5, 0.4, 0.15);
+                world.spawnParticles(ParticleTypes.FLASH, target.getX(), target.getBodyY(0.8), target.getZ(), 1, 0, 0, 0, 0);
+            } else {
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getBodyY(0.5), target.getZ(), 8, 0.3, 0.3, 0.3, 0.08);
             }
 
             boolean targetWasAlive = target.isAlive();

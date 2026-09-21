@@ -38,8 +38,10 @@ public final class DruidAI {
                 for (LivingEntity enemy : enemies) {
                     enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 3, false, false));
                     enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 80, 1, false, false));
-                    world.spawnParticles(ParticleTypes.COMPOSTER, enemy.getX(), enemy.getY() + 0.3, enemy.getZ(), 15, 0.4, 0.4, 0.4, 0.05);
-                    world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, enemy.getX(), enemy.getY() + 0.6, enemy.getZ(), 8, 0.3, 0.4, 0.3, 0.05);
+                    for (double dy = 0; dy <= 1.2; dy += 0.3) {
+                        world.spawnParticles(ParticleTypes.COMPOSTER, enemy.getX(), enemy.getY() + dy, enemy.getZ(), 4, 0.3, 0.1, 0.3, 0.02);
+                    }
+                    world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, enemy.getX(), enemy.getY() + 0.6, enemy.getZ(), 10, 0.3, 0.4, 0.3, 0.05);
                 }
                 world.playSound(null, druid.getX(), druid.getY(), druid.getZ(), SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.NEUTRAL, 1.2f, 0.8f);
             }

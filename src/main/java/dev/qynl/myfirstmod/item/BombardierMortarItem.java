@@ -37,11 +37,12 @@ public class BombardierMortarItem extends Item {
             tnt.setFuse(30); // 1.5 second air-burst fuse
             serverWorld.spawnEntity(tnt);
 
-            serverWorld.spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 15, 0.2, 0.2, 0.2, 0.05);
-            serverWorld.spawnParticles(ParticleTypes.FLAME, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 10, 0.2, 0.2, 0.2, 0.08);
+            serverWorld.spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 20, 0.3, 0.3, 0.3, 0.08);
+            serverWorld.spawnParticles(ParticleTypes.FLAME, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 15, 0.3, 0.3, 0.3, 0.1);
+            serverWorld.spawnParticles(ParticleTypes.LAVA, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 4, 0.2, 0.2, 0.2, 0.05);
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 1.6f);
+                    SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.4f, 1.5f);
 
             player.getItemCooldownManager().set(this, 60); // 3s cooldown
         }
