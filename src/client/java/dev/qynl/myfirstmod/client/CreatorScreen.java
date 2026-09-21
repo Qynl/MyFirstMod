@@ -206,10 +206,6 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                     .dimensions(rightX + 84, y + 134, 78, 18).build());
 
         } else if (tab == 2) { // FACTIONS & DIPLOMACY
-            drawFactionCard(context, leftX, y + 34, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Raiders, Undead", 0xff3b82f6);
-            drawFactionCard(context, leftX, y + 72, "Iron Raiders", "Red (#EF4444) • 3 Units • Hostile: Kingdom, Village", 0xffef4444);
-            drawFactionCard(context, leftX, y + 110, "Village Alliance", "Green (#10B981) • 3 Units • Allied: Kingdom", 0xff10b981);
-
             addDrawableChild(ButtonWidget.builder(Text.literal("Kingdom ↔ Raiders: Toggle"), b -> sendButton(70))
                     .dimensions(rightX, y + 34, 162, 20).build());
 
@@ -407,6 +403,10 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             }
 
         } else if (tab == 2) { // FACTIONS & DIPLOMACY
+            drawFactionCard(context, leftX, y + 34, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Raiders, Undead", 0xff3b82f6);
+            drawFactionCard(context, leftX, y + 72, "Iron Raiders", "Red (#EF4444) • 3 Units • Hostile: Kingdom, Village", 0xffef4444);
+            drawFactionCard(context, leftX, y + 110, "Village Alliance", "Green (#10B981) • 3 Units • Allied: Kingdom", 0xff10b981);
+
             int infoY = y + 152;
             context.drawTextWithShadow(textRenderer, Text.literal("FACTION PERKS & FRIENDLY FIRE DIPLOMACY").formatted(Formatting.BOLD, Formatting.GOLD), leftX, infoY, 0xffffd700);
             context.drawText(textRenderer, Text.literal("• Military Discipline (+15% DMG)  • Heavy Armor (+20% Armor)").formatted(Formatting.WHITE), leftX, infoY + 14, 0xffe2e8f0, false);
