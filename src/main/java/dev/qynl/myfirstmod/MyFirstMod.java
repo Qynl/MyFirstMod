@@ -24,6 +24,7 @@ public final class MyFirstMod implements ModInitializer {
     @Override
     public void onInitialize() {
         dev.qynl.myfirstmod.entity.DynamicEntityRegistry.ensureInitialized();
+        dev.qynl.myfirstmod.network.ModPackets.register();
         ModItems.register();
         ModScreenHandlers.register();
         UnitCommands.register();

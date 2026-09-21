@@ -46,6 +46,26 @@ When giving swords, axes, bows, or diamond/netherite armor to animals, beasts, q
 
 ---
 
+## 🕹️ Solo Sandbox Warfare & Real-Time Attribute Sliders
+
+Want to test custom battles alone in singleplayer? **Legions & Factions** features a complete **Solo Sandbox Suite**:
+
+```text
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ 🎮 SOLO WARFARE CONTROLS & LIVE ATTRIBUTE SLIDERS                          │
+ ├────────────────────────────────────────────────────────────────────────────┤
+ │ • Interactive Sliders: Health (5-300 HP), Damage (1-50 DMG), Armor (0-30), │
+ │   Scale (0.25x-3.0x), Speed (0.10-0.60), and Retreat threshold (0-75%).    │
+ │ • Real-Time Synchronization: Sliders sync instantly to the server.        │
+ │ • Quick Solo Faction Spawner: Deploy units for Kingdom, Raiders, Undead,   │
+ │   Villagers, or Arcane Order on the spot from the dashboard!               │
+ │ • Tool Faction Cycling: Shift + Right-Click Creator Tool to cycle your     │
+ │   active spawn faction without opening any menu!                           │
+ └────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## 🎮 The Commander's 3D Arsenal (13 Custom 3D Modeled Weapons & Tools)
 
 Every non-vanilla item in **Legions & Factions** features a **custom 3D voxel-sculpted model with authentic first-person, third-person, ground, and GUI display transforms**!

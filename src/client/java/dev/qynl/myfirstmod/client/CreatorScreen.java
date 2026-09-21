@@ -2,14 +2,16 @@ package dev.qynl.myfirstmod.client;
 
 import dev.qynl.myfirstmod.entity.DynamicEntityRegistry;
 import dev.qynl.myfirstmod.gui.CreatorScreenHandler;
+import dev.qynl.myfirstmod.network.ModPackets;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private int tab = 0;
@@ -26,6 +28,14 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private static final int COLOR_CYAN_ACCENT = 0xff06b6d4;
     private static final int COLOR_GREEN_ACCENT = 0xff10b981;
     private static final int COLOR_RED_ACCENT = 0xffef4444;
+
+    // Live Slider Values (Interactive Solo Editing)
+    private double sliderHealth = 40.0;
+    private double sliderDamage = 7.5;
+    private double sliderArmor = 15.0;
+    private double sliderScale = 1.0;
+    private double sliderSpeed = 0.25;
+    private double sliderRetreat = 0.20;
 
     // Simulation toggle states for UI display
     private boolean buildingEnabled = true;
@@ -71,65 +81,94 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         int leftX = x + 14;
         int rightX = x + 252;
 
-        if (tab == 0) { // UNIT EDITOR
-            // Unit Selector (Prev / Next)
+        if (tab == 0) { // UNIT EDITOR WITH REAL-TIME SLIDERS
+            // Unit Selectors
             addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Prev Unit"), b -> sendButton(6))
-                    .dimensions(leftX, y + 34, 110, 18).build());
+                    .dimensions(leftX, y + 32, 108, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Next Unit ⮞"), b -> sendButton(3))
-                    .dimensions(leftX + 115, y + 34, 110, 18).build());
+                    .dimensions(leftX + 112, y + 32, 108, 16).build());
 
-            // Entity Type Cycle (Dual Direction: Left Click = Next, Shift Click = Prev)
+            // 1. Health Slider (5 to 300 HP)
+            addDrawableChild(new TacticalSliderWidget(leftX, y + 50, 108, 16, "Health", "HP", 5.0, 300.0, sliderHealth, val -> {
+                sliderHealth = val;
+                syncSlidersToServer();
+            }));
+
+            // 2. Attack Damage Slider (1 to 50 DMG)
+            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 50, 108, 16, "Damage", "DMG", 1.0, 50.0, sliderDamage, val -> {
+                sliderDamage = val;
+                syncSlidersToServer();
+            }));
+
+            // 3. Armor Slider (0 to 30 Armor)
+            addDrawableChild(new TacticalSliderWidget(leftX, y + 68, 108, 16, "Armor", "pts", 0.0, 30.0, sliderArmor, val -> {
+                sliderArmor = val;
+                syncSlidersToServer();
+            }));
+
+            // 4. Visual Scale Slider (0.25x to 3.00x)
+            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 68, 108, 16, "Scale", "x", 0.25, 3.0, sliderScale, val -> {
+                sliderScale = val;
+                syncSlidersToServer();
+            }));
+
+            // 5. Movement Speed Slider (0.10 to 0.60)
+            addDrawableChild(new TacticalSliderWidget(leftX, y + 86, 108, 16, "Speed", "spd", 0.10, 0.60, sliderSpeed, val -> {
+                sliderSpeed = val;
+                syncSlidersToServer();
+            }));
+
+            // 6. Retreat Threshold Slider (0% to 75%)
+            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 86, 108, 16, "Retreat", "%", 0.0, 0.75, sliderRetreat, val -> {
+                sliderRetreat = val;
+                syncSlidersToServer();
+            }));
+
+            // Quick Category Cyclers
             addDrawableChild(ButtonWidget.builder(Text.literal("🦁 ⮜ Entity ⮞"), b -> sendButton(hasShiftDown() ? 49 : 50))
-                    .dimensions(leftX, y + 54, 110, 18).build());
+                    .dimensions(leftX, y + 104, 108, 16).build());
 
-            // Combat Role Cycle
             addDrawableChild(ButtonWidget.builder(Text.literal("🎯 ⮜ Role ⮞"), b -> sendButton(hasShiftDown() ? 48 : 51))
-                    .dimensions(leftX + 115, y + 54, 110, 18).build());
+                    .dimensions(leftX + 112, y + 104, 108, 16).build());
 
-            // Faction Allegiance Cycle
-            addDrawableChild(ButtonWidget.builder(Text.literal("🚩 ⮜ Faction ⮞"), b -> sendButton(hasShiftDown() ? 47 : 52))
-                    .dimensions(leftX, y + 74, 110, 18).build());
-
-            // Military Rank Cycle
-            addDrawableChild(ButtonWidget.builder(Text.literal("🎖 ⮜ Rank ⮞"), b -> sendButton(hasShiftDown() ? 46 : 53))
-                    .dimensions(leftX + 115, y + 74, 110, 18).build());
-
-            // Mount & Cavalry Steed Cycle
             addDrawableChild(ButtonWidget.builder(Text.literal("🐎 ⮜ Mount ⮞"), b -> sendButton(hasShiftDown() ? 59 : 55))
-                    .dimensions(leftX, y + 94, 110, 18).build());
+                    .dimensions(leftX, y + 122, 108, 16).build());
 
-            // Visual Particle Aura Cycle
-            addDrawableChild(ButtonWidget.builder(Text.literal("✨ ⮜ Aura ⮞"), b -> sendButton(hasShiftDown() ? 45 : 56))
-                    .dimensions(leftX + 115, y + 94, 110, 18).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🚩 ⮜ Faction ⮞"), b -> sendButton(hasShiftDown() ? 47 : 52))
+                    .dimensions(leftX + 112, y + 122, 108, 16).build());
 
-            // Death Action Effect Cycle
-            addDrawableChild(ButtonWidget.builder(Text.literal("💥 ⮜ Death ⮞"), b -> sendButton(hasShiftDown() ? 44 : 57))
-                    .dimensions(leftX, y + 114, 110, 18).build());
-
-            // Entity Visual Scale Cycle
-            addDrawableChild(ButtonWidget.builder(Text.literal("📏 ⮜ Scale ⮞"), b -> sendButton(hasShiftDown() ? 43 : 58))
-                    .dimensions(leftX + 115, y + 114, 110, 18).build());
-
-            // Commander Toggle Button
             addDrawableChild(ButtonWidget.builder(Text.literal("★ Commander Status: Toggle"), b -> sendButton(54))
-                    .dimensions(leftX, y + 134, 225, 18).build());
+                    .dimensions(leftX, y + 140, 220, 16).build());
 
-            // Actions on right panel
+            // Right Panel: Solo Faction Quick-Deployment Bar
             addDrawableChild(ButtonWidget.builder(Text.literal("💾 Save Unit Slots"), b -> sendButton(0))
-                    .dimensions(rightX, y + 34, 162, 18).build());
+                    .dimensions(rightX, y + 32, 162, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn Unit (1)"), b -> sendButton(1))
-                    .dimensions(rightX, y + 54, 162, 18).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔵 Kingdom: 1x"), b -> spawnSoloFaction("kingdom", 1))
+                    .dimensions(rightX, y + 50, 78, 16).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔵 Squad (5)"), b -> spawnSoloFaction("kingdom", 5))
+                    .dimensions(rightX + 84, y + 50, 78, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🛡 Spawn Squad (5)"), b -> sendButton(2))
-                    .dimensions(rightX, y + 74, 162, 18).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔴 Raiders: 1x"), b -> spawnSoloFaction("raiders", 1))
+                    .dimensions(rightX, y + 68, 78, 16).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔴 Squad (5)"), b -> spawnSoloFaction("raiders", 5))
+                    .dimensions(rightX + 84, y + 68, 78, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate Unit"), b -> sendButton(4))
-                    .dimensions(rightX, y + 94, 78, 18).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🟢 Village: 1x"), b -> spawnSoloFaction("villagers", 1))
+                    .dimensions(rightX, y + 86, 78, 16).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🟢 Squad (5)"), b -> spawnSoloFaction("villagers", 5))
+                    .dimensions(rightX + 84, y + 86, 78, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Delete Unit"), b -> sendButton(5))
-                    .dimensions(rightX + 84, y + 94, 78, 18).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🟣 Undead: 1x"), b -> spawnSoloFaction("undead", 1))
+                    .dimensions(rightX, y + 104, 78, 16).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🟣 Squad (5)"), b -> spawnSoloFaction("undead", 5))
+                    .dimensions(rightX + 84, y + 104, 78, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate"), b -> sendButton(4))
+                    .dimensions(rightX, y + 122, 78, 16).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Delete"), b -> sendButton(5))
+                    .dimensions(rightX + 84, y + 122, 78, 16).build());
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             searchField = new TextFieldWidget(textRenderer, leftX, y + 34, 224, 20, Text.literal("Search"));
@@ -167,6 +206,10 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                     .dimensions(rightX + 84, y + 134, 78, 18).build());
 
         } else if (tab == 2) { // FACTIONS & DIPLOMACY
+            drawFactionCard(context, leftX, y + 34, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Raiders, Undead", 0xff3b82f6);
+            drawFactionCard(context, leftX, y + 72, "Iron Raiders", "Red (#EF4444) • 3 Units • Hostile: Kingdom, Village", 0xffef4444);
+            drawFactionCard(context, leftX, y + 110, "Village Alliance", "Green (#10B981) • 3 Units • Allied: Kingdom", 0xff10b981);
+
             addDrawableChild(ButtonWidget.builder(Text.literal("Kingdom ↔ Raiders: Toggle"), b -> sendButton(70))
                     .dimensions(rightX, y + 34, 162, 20).build());
 
@@ -243,6 +286,21 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         }
     }
 
+    private void syncSlidersToServer() {
+        ClientPlayNetworking.send(new ModPackets.UpdateUnitAttributesPayload(
+                (float) sliderHealth,
+                (float) sliderDamage,
+                (float) sliderArmor,
+                (float) sliderScale,
+                (float) sliderSpeed,
+                (float) sliderRetreat
+        ));
+    }
+
+    private void spawnSoloFaction(String factionId, int count) {
+        ClientPlayNetworking.send(new ModPackets.SpawnFactionUnitPayload(factionId, count));
+    }
+
     private void sendButton(int id) {
         if (client != null && client.interactionManager != null) {
             client.interactionManager.clickButton(handler.syncId, id);
@@ -290,26 +348,24 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
     private void drawSlotLabels(DrawContext context) {
         int eqX = x + 255;
-        int eqY = y + 126;
+        int eqY = y + 144;
         context.drawText(textRenderer, Text.literal("H   C   L   F   M   O").formatted(Formatting.DARK_GRAY), eqX + 3, eqY, 0xff8294ad, false);
-        context.drawText(textRenderer, Text.literal("Unit Equipment & Inventory").formatted(Formatting.AQUA), eqX, y + 113, 0xff9ecbff, false);
-        context.drawText(textRenderer, Text.literal("Player Inventory (Drag Items to Unit)").formatted(Formatting.GRAY), x + 18, y + 148, 0xff8294ad, false);
+        context.drawText(textRenderer, Text.literal("Unit Equipment & Inventory").formatted(Formatting.AQUA), eqX, y + 130, 0xff9ecbff, false);
     }
 
     private void drawTabContent(DrawContext context, int mouseX, int mouseY) {
         int leftX = x + 14;
-        int leftY = y + 160;
+        int leftY = y + 162;
 
         if (tab == 0) { // UNIT EDITOR CONTENT & STAT HUD
-            // Stat Bars and Active Unit Badges
-            context.fill(leftX, leftY - 4, leftX + 225, y + backgroundHeight - 12, COLOR_CARD_BG);
+            context.fill(leftX, leftY - 4, leftX + 220, y + backgroundHeight - 12, COLOR_CARD_BG);
             context.fill(leftX, leftY - 4, leftX + 3, y + backgroundHeight - 12, COLOR_GOLD_ACCENT);
 
-            context.drawText(textRenderer, Text.literal("⚔ ACTIVE TEMPLATE OVERVIEW").formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, leftY, COLOR_GOLD_ACCENT, false);
-            context.drawText(textRenderer, Text.literal("• Scale, Mounts & Modded Mobs (Naturalist) Supported").formatted(Formatting.WHITE), leftX + 8, leftY + 14, 0xffe2e8f0, false);
-            context.drawText(textRenderer, Text.literal("• Shift-Click buttons to cycle backwards instantly").formatted(Formatting.YELLOW), leftX + 8, leftY + 26, 0xfffde047, false);
-            context.drawText(textRenderer, Text.literal("• Weapon damage & armor adapt cleanly to beasts & mounts").formatted(Formatting.GREEN), leftX + 8, leftY + 38, 0xff4ade80, false);
-            context.drawText(textRenderer, Text.literal("• Shield Block, Potions & Morale Active in Combat").formatted(Formatting.GRAY), leftX + 8, leftY + 50, 0xff94a3b8, false);
+            context.drawText(textRenderer, Text.literal("⚔ SOLO SANDBOX COMMANDER ACTIVE").formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, leftY, COLOR_GOLD_ACCENT, false);
+            context.drawText(textRenderer, Text.literal("• Drag sliders to edit stats in real-time").formatted(Formatting.WHITE), leftX + 8, leftY + 14, 0xffe2e8f0, false);
+            context.drawText(textRenderer, Text.literal("• Spawn for any faction instantly with right buttons").formatted(Formatting.GREEN), leftX + 8, leftY + 26, 0xff4ade80, false);
+            context.drawText(textRenderer, Text.literal("• Pit blue knights vs red raiders anywhere in solo!").formatted(Formatting.YELLOW), leftX + 8, leftY + 38, 0xfffde047, false);
+            context.drawText(textRenderer, Text.literal("• Shift-Right-Click creator tool to cycle spawn faction").formatted(Formatting.GRAY), leftX + 8, leftY + 50, 0xff94a3b8, false);
 
         } else if (tab == 1) { // SAVED UNITS LIBRARY
             int cardY = y + 58;
@@ -351,10 +407,6 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             }
 
         } else if (tab == 2) { // FACTIONS & DIPLOMACY
-            drawFactionCard(context, leftX, y + 34, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Raiders, Undead", 0xff3b82f6);
-            drawFactionCard(context, leftX, y + 72, "Iron Raiders", "Red (#EF4444) • 3 Units • Hostile: Kingdom, Village", 0xffef4444);
-            drawFactionCard(context, leftX, y + 110, "Village Alliance", "Green (#10B981) • 3 Units • Allied: Kingdom", 0xff10b981);
-
             int infoY = y + 152;
             context.drawTextWithShadow(textRenderer, Text.literal("FACTION PERKS & FRIENDLY FIRE DIPLOMACY").formatted(Formatting.BOLD, Formatting.GOLD), leftX, infoY, 0xffffd700);
             context.drawText(textRenderer, Text.literal("• Military Discipline (+15% DMG)  • Heavy Armor (+20% Armor)").formatted(Formatting.WHITE), leftX, infoY + 14, 0xffe2e8f0, false);
@@ -365,7 +417,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             int statsX = x + 242;
             int statsY = y + 34;
 
-            context.drawTextWithShadow(textRenderer, Text.literal("LIVE WAR SANDBOX").formatted(Formatting.BOLD, Formatting.GOLD), statsX, statsY, 0xffffd700);
+            context.drawTextWithShadow(textRenderer, Text.literal("SOLO WAR SANDBOX").formatted(Formatting.BOLD, Formatting.GOLD), statsX, statsY, 0xffffd700);
             context.drawText(textRenderer, Text.literal("Side A / B: Select Factions").formatted(Formatting.AQUA), statsX, statsY + 16, 0xff38bdf8, false);
             context.drawText(textRenderer, Text.literal("5 Scale Sizes: 8v8 up to 48v48!").formatted(Formatting.GRAY), statsX, statsY + 30, 0xff94a3b8, false);
             context.drawText(textRenderer, Text.literal("Terrain-Snapped Frontlines").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
@@ -418,5 +470,43 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    // Interactive Slider Widget for Live Attribute Customization
+    private class TacticalSliderWidget extends SliderWidget {
+        private final String label;
+        private final String unit;
+        private final double min;
+        private final double max;
+        private final java.util.function.Consumer<Double> onValueChange;
+
+        public TacticalSliderWidget(int x, int y, int width, int height, String label, String unit, double min, double max, double current, java.util.function.Consumer<Double> onValueChange) {
+            super(x, y, width, height, Text.empty(), (current - min) / (max - min));
+            this.label = label;
+            this.unit = unit;
+            this.min = min;
+            this.max = max;
+            this.onValueChange = onValueChange;
+            updateMessage();
+        }
+
+        public double getActualValue() {
+            return min + (value * (max - min));
+        }
+
+        @Override
+        protected void updateMessage() {
+            double actual = getActualValue();
+            String formatted = actual >= 10.0 ? String.format("%.0f", actual) : String.format("%.2f", actual);
+            setMessage(Text.literal(label + ": " + formatted + " " + unit));
+        }
+
+        @Override
+        protected void applyValue() {
+            updateMessage();
+            if (onValueChange != null) {
+                onValueChange.accept(getActualValue());
+            }
+        }
     }
 }
