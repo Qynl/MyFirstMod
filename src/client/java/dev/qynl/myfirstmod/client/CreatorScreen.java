@@ -570,7 +570,6 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         int fillW = Math.max(0, Math.min(trackW, (int) ((val / maxVal) * trackW)));
         context.fill(trackX, barY + 2, trackX + fillW, barY + 7, barColor);
     }
-    }
 
     private boolean matches(String query, String tags) {
         if (query.isBlank()) return true;
