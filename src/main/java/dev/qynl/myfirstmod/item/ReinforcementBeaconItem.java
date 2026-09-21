@@ -4,6 +4,7 @@ import dev.qynl.myfirstmod.faction.Faction;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import dev.qynl.myfirstmod.unit.UnitSpawner;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
