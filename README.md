@@ -307,13 +307,31 @@ Surviving warriors gain battle experience and battlefield promotions!
 
 ---
 
-## ⚡ Performance & Server Authority
+## ⚡ Enterprise-Grade Performance & Server Authority
 
-* **100% Server Authoritative**: Client screens only send validated requests; all spawning, stats, inventory, equipment, and AI execute on the server.
-* **Spatial & Throttled Queries**: AI ticks every 10 ticks and uses spatial bounding box queries—**zero full-world O(N²) scans**.
+```text
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ 🚀 CORE ARCHITECTURAL PILLARS & SCALABILITY                                │
+ ├────────────────────────────────────────────────────────────────────────────┤
+ │ 1. ⚡ Active Unit Registry (O(1) lookups instead of O(N) world scans)       │
+ │    • Zero iterateEntities() overhead. Only active mod units are ticked.    │
+ │    • Event-driven load/unload lifecycle tracking with auto-cleanup.        │
+ │ 2. 🔐 Multiplayer Security & Payload Validation                            │
+ │    • Strict permission checks, player rate-limiting & ID sanitization.     │
+ │    • Server-side hard bounds clamping on all attributes, counts & ranges.   │
+ │ 3. 💾 Persistent Territory & Multi-Instance Battle Engine                  │
+ │    • Outposts fully persist across server restarts via UnitWorldData NBT.  │
+ │    • Isolated BattleInstance objects allow multiple simultaneous battles.   │
+ │ 4. 🧪 Automated JUnit 5 Unit & Integration Test Suite                      │
+ │    • Tests faction relations, AI target scoring, morale, math, and codecs. │
+ └────────────────────────────────────────────────────────────────────────────┘
+```
+
+* **100% Server Authoritative**: Client screens only send validated requests; all spawning, stats, inventory, equipment, and AI execute strictly on the server.
+* **Spatial & Throttled Queries**: AI ticks on configured intervals and uses spatial bounding box queries—**zero global entity scans**.
 * **Zero Zombification in Overworld**: Piglin and Piglin Brute units automatically have zombification disabled so Nether units can fight in the Overworld!
 * **Sunlight Protection**: Custom undead units (Zombies, Skeletons) and helmeted beasts do not burn during daytime battles.
-* **Persistent World Data**: All units, factions, relationships, perks, and battle statistics persist across world reloads and server restarts.
+* **Persistent World Data**: All units, factions, relationships, perks, outposts, and battle statistics persist across world reloads and server restarts.
 
 ---
 
