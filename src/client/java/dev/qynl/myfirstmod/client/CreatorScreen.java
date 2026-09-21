@@ -1,6 +1,5 @@
 package dev.qynl.myfirstmod.client;
 
-import dev.qynl.myfirstmod.entity.DynamicEntityRegistry;
 import dev.qynl.myfirstmod.gui.CreatorScreenHandler;
 import dev.qynl.myfirstmod.network.ModPackets;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -22,7 +21,6 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private static final int COLOR_PANEL_MAIN = 0xff0f172a;
     private static final int COLOR_PANEL_INNER = 0xff090e1a;
     private static final int COLOR_CARD_BG = 0xff1e293b;
-    private static final int COLOR_CARD_HOVER = 0xff334155;
     private static final int COLOR_CARD_BORDER = 0xff475569;
     private static final int COLOR_GOLD_ACCENT = 0xfff59e0b;
     private static final int COLOR_CYAN_ACCENT = 0xff06b6d4;
@@ -36,6 +34,40 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private double sliderScale = 1.0;
     private double sliderSpeed = 0.25;
     private double sliderRetreat = 0.20;
+
+    // Custom Battle Composition Controls
+    private static final String[] FACTION_OPTIONS = {"kingdom", "raiders", "villagers", "undead", "arcane"};
+    private static final String[] FACTION_NAMES = {"🔵 Kingdom", "🔴 Raiders", "🟢 Villagers", "🟣 Undead", "🔷 Arcane"};
+
+    private static final String[] UNIT_OPTIONS = {
+            "all", "royal_knight", "royal_cavalry", "war_wolf", "battle_bear",
+            "desert_dragoon", "holy_paladin", "iron_titan", "grove_druid",
+            "royal_pyro", "siege_bombardier", "raider_berserker", "undead_necromancer",
+            "shadow_assassin", "dread_cavalry", "bogged_sniper", "tempest_breeze", "pixie_medic"
+    };
+    private static final String[] UNIT_NAMES = {
+            "All (Mixed Battalion)", "Royal Knight", "Royal Cavalry", "War Wolf", "Battle Bear",
+            "Camel Dragoon", "Holy Paladin", "Colossal Iron Titan", "Grove Druid",
+            "Fireworks Artillery", "Siege Bombardier", "Raider Berserker", "Undead Necromancer",
+            "Shadow Assassin", "Dread Cavalry", "Bogged Sniper", "Tempest Breeze", "Pixie Medic"
+    };
+
+    private static final String[] FORMATION_OPTIONS = {"line", "flank", "ambush"};
+    private static final String[] FORMATION_NAMES = {"Line vs Line", "Pincer Flank", "Ambush Encircle"};
+
+    private static final float[] DISTANCE_OPTIONS = {18.0f, 32.0f, 50.0f};
+    private static final String[] DISTANCE_NAMES = {"Close (18m)", "Standard (32m)", "Long (50m)"};
+
+    private int battleFactionAIdx = 0; // Kingdom
+    private int battleUnitAIdx = 0;    // All
+    private double battleCountA = 12.0;
+
+    private int battleFactionBIdx = 1; // Raiders
+    private int battleUnitBIdx = 0;    // All
+    private double battleCountB = 12.0;
+
+    private int battleFormationIdx = 0;
+    private int battleDistanceIdx = 1;
 
     // Simulation toggle states for UI display
     private boolean buildingEnabled = true;
@@ -218,33 +250,76 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Restore Defaults"), b -> sendButton(30))
                     .dimensions(rightX, y + 110, 162, 20).build());
 
-        } else if (tab == 3) { // BATTLE SANDBOX
-            addDrawableChild(ButtonWidget.builder(Text.literal("Faction A: Cycle"), b -> sendButton(65))
-                    .dimensions(leftX, y + 34, 108, 18).build());
+        } else if (tab == 3) { // CUSTOM BATTLE SANDBOX & ARMY COMPOSITION BUILDER
+            int colW = 196;
+            int col1 = leftX;
+            int col2 = leftX + colW + 12;
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("Faction B: Cycle"), b -> sendButton(66))
-                    .dimensions(leftX + 116, y + 34, 108, 18).build());
+            // --- SIDE A BUILDER ---
+            addDrawableChild(ButtonWidget.builder(Text.literal("Side A: " + FACTION_NAMES[battleFactionAIdx]), b -> {
+                battleFactionAIdx = (battleFactionAIdx + 1) % FACTION_OPTIONS.length;
+                rebuildInterface();
+            }).dimensions(col1, y + 32, colW, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ QUICK CLASH (8 vs 8) ⚔"), b -> sendButton(10))
-                    .dimensions(leftX, y + 54, 224, 18).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("Unit: " + UNIT_NAMES[battleUnitAIdx]), b -> {
+                battleUnitAIdx = (battleUnitAIdx + 1) % UNIT_OPTIONS.length;
+                rebuildInterface();
+            }).dimensions(col1, y + 50, colW, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ LARGE BATTLE (16 vs 16) ⚔"), b -> sendButton(20))
-                    .dimensions(leftX, y + 74, 224, 18).build());
+            addDrawableChild(new TacticalSliderWidget(col1, y + 68, colW, 16, "Troops A", "units", 1.0, 50.0, battleCountA, val -> {
+                battleCountA = val;
+            }));
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ EPIC WARFARE (24 vs 24) ⚔"), b -> sendButton(21))
-                    .dimensions(leftX, y + 94, 224, 18).build());
+            // --- SIDE B BUILDER ---
+            addDrawableChild(ButtonWidget.builder(Text.literal("Side B: " + FACTION_NAMES[battleFactionBIdx]), b -> {
+                battleFactionBIdx = (battleFactionBIdx + 1) % FACTION_OPTIONS.length;
+                rebuildInterface();
+            }).dimensions(col2, y + 32, colW, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ MEGA WAR (32 vs 32) ⚔"), b -> sendButton(22))
-                    .dimensions(leftX, y + 114, 224, 18).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("Unit: " + UNIT_NAMES[battleUnitBIdx]), b -> {
+                battleUnitBIdx = (battleUnitBIdx + 1) % UNIT_OPTIONS.length;
+                rebuildInterface();
+            }).dimensions(col2, y + 50, colW, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ TITAN CLASH (48 vs 48) ⚔"), b -> sendButton(23))
-                    .dimensions(leftX, y + 134, 224, 18).build());
+            addDrawableChild(new TacticalSliderWidget(col2, y + 68, colW, 16, "Troops B", "units", 1.0, 50.0, battleCountB, val -> {
+                battleCountB = val;
+            }));
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 CLEAR ALL BATTLE MOBS"), b -> sendButton(11))
-                    .dimensions(rightX, y + 104, 162, 22).build());
+            // --- MODIFIERS: FORMATION & DISTANCE ---
+            addDrawableChild(ButtonWidget.builder(Text.literal("Formation: " + FORMATION_NAMES[battleFormationIdx]), b -> {
+                battleFormationIdx = (battleFormationIdx + 1) % FORMATION_OPTIONS.length;
+                rebuildInterface();
+            }).dimensions(col1, y + 86, colW, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Battle Stats"), b -> sendButton(12))
-                    .dimensions(rightX, y + 130, 162, 22).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("Distance: " + DISTANCE_NAMES[battleDistanceIdx]), b -> {
+                battleDistanceIdx = (battleDistanceIdx + 1) % DISTANCE_OPTIONS.length;
+                rebuildInterface();
+            }).dimensions(col2, y + 86, colW, 16).build());
+
+            // --- LAUNCH BUTTON ---
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ LAUNCH CUSTOM WAR CLASH ⚔"), b -> launchCustomBattle())
+                    .dimensions(leftX, y + 104, backgroundWidth - 28, 18).build());
+
+            // --- PRESET BUTTONS (4 Quick Epic Setups) ---
+            int presetW = 96;
+            addDrawableChild(ButtonWidget.builder(Text.literal("👑 1 Titan vs 25"), b -> launchPreset("titan_vs_swarm"))
+                    .dimensions(leftX + (0 * (presetW + 6)), y + 124, presetW, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("🐎 12v12 Cavalry"), b -> launchPreset("cavalry_charge"))
+                    .dimensions(leftX + (1 * (presetW + 6)), y + 124, presetW, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("💀 10v30 Siege"), b -> launchPreset("undead_siege"))
+                    .dimensions(leftX + (2 * (presetW + 6)), y + 124, presetW, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚡ 8 vs 24 Smite"), b -> launchPreset("paladin_crusade"))
+                    .dimensions(leftX + (3 * (presetW + 6)), y + 124, presetW, 16).build());
+
+            // --- UTILITY CONTROLS ---
+            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Clear Battle Mobs"), b -> sendButton(11))
+                    .dimensions(leftX, y + 142, 196, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Stats Scoreboard"), b -> sendButton(12))
+                    .dimensions(leftX + 208, y + 142, 196, 16).build());
 
         } else if (tab == 4) { // SETTINGS & SIMULATION
             addDrawableChild(ButtonWidget.builder(Text.literal("Building AI: " + (buildingEnabled ? "ON [Active]" : "OFF [Disabled]")), b -> {
@@ -280,6 +355,37 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Everything to Defaults"), b -> sendButton(30))
                     .dimensions(rightX, y + 34, 162, 22).build());
         }
+    }
+
+    private void launchCustomBattle() {
+        String fA = FACTION_OPTIONS[battleFactionAIdx];
+        String uA = UNIT_OPTIONS[battleUnitAIdx];
+        int cA = (int) Math.round(battleCountA);
+
+        String fB = FACTION_OPTIONS[battleFactionBIdx];
+        String uB = UNIT_OPTIONS[battleUnitBIdx];
+        int cB = (int) Math.round(battleCountB);
+
+        String form = FORMATION_OPTIONS[battleFormationIdx];
+        float dist = DISTANCE_OPTIONS[battleDistanceIdx];
+
+        ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload(
+                fA, uA, cA, fB, uB, cB, form, dist
+        ));
+        close();
+    }
+
+    private void launchPreset(String preset) {
+        if ("titan_vs_swarm".equals(preset)) {
+            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("villagers", "village_titan", 1, "raiders", "raider_berserker", 25, "ambush", 24.0f));
+        } else if ("cavalry_charge".equals(preset)) {
+            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("kingdom", "royal_cavalry", 12, "undead", "undead_cavalry", 12, "line", 40.0f));
+        } else if ("undead_siege".equals(preset)) {
+            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("villagers", "all", 10, "undead", "all", 30, "ambush", 28.0f));
+        } else if ("paladin_crusade".equals(preset)) {
+            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("kingdom", "paladin_crusader", 8, "undead", "undead_archer", 24, "line", 30.0f));
+        }
+        close();
     }
 
     private void syncSlidersToServer() {
@@ -413,19 +519,20 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             context.drawText(textRenderer, Text.literal("• Pyrotechnics (+50% Fireworks AoE) • Holy Might (+50% Heals)").formatted(Formatting.WHITE), leftX, infoY + 26, 0xffe2e8f0, false);
             context.drawText(textRenderer, Text.literal("• Zero friendly fire damage between allied or same-faction forces.").formatted(Formatting.GREEN), leftX, infoY + 38, 0xff4ade80, false);
 
-        } else if (tab == 3) { // BATTLE SANDBOX
-            int statsX = x + 242;
-            int statsY = y + 34;
+        } else if (tab == 3) { // CUSTOM BATTLE SANDBOX BANNER
+            int bannerY = y + 164;
+            context.fill(leftX, bannerY, leftX + backgroundWidth - 28, y + backgroundHeight - 10, COLOR_CARD_BG);
+            context.fill(leftX, bannerY, leftX + 4, y + backgroundHeight - 10, COLOR_GOLD_ACCENT);
 
-            context.drawTextWithShadow(textRenderer, Text.literal("SOLO WAR SANDBOX").formatted(Formatting.BOLD, Formatting.GOLD), statsX, statsY, 0xffffd700);
-            context.drawText(textRenderer, Text.literal("Side A / B: Select Factions").formatted(Formatting.AQUA), statsX, statsY + 16, 0xff38bdf8, false);
-            context.drawText(textRenderer, Text.literal("5 Scale Sizes: 8v8 up to 48v48!").formatted(Formatting.GRAY), statsX, statsY + 30, 0xff94a3b8, false);
-            context.drawText(textRenderer, Text.literal("Terrain-Snapped Frontlines").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
+            int countA = (int) Math.round(battleCountA);
+            int countB = (int) Math.round(battleCountB);
+            String summaryA = countA + "x " + UNIT_NAMES[battleUnitAIdx] + " (" + FACTION_NAMES[battleFactionAIdx] + ")";
+            String summaryB = countB + "x " + UNIT_NAMES[battleUnitBIdx] + " (" + FACTION_NAMES[battleFactionBIdx] + ")";
 
-            context.fill(leftX, y + 152, x + backgroundWidth - 14, y + backgroundHeight - 10, COLOR_PANEL_MAIN);
-            context.drawTextWithShadow(textRenderer, Text.literal("AUTOMATED CASUALTY TRACKING & VICTORY SYSTEM").formatted(Formatting.GREEN, Formatting.BOLD), leftX + 8, y + 158, 0xff4ade80);
-            context.drawText(textRenderer, Text.literal("• Armies automatically adapt to terrain heightmaps on deployment.").formatted(Formatting.WHITE), leftX + 8, y + 172, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("• When all units of one faction fall, victory fireworks and horn sound!").formatted(Formatting.YELLOW), leftX + 8, y + 184, 0xfffde047, false);
+            context.drawText(textRenderer, Text.literal("⚔ TACTICAL SIMULATION MATCHUP:").formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, bannerY + 4, COLOR_GOLD_ACCENT, false);
+            context.drawText(textRenderer, Text.literal("Side A: " + summaryA).formatted(Formatting.AQUA), leftX + 8, bannerY + 16, 0xff38bdf8, false);
+            context.drawText(textRenderer, Text.literal("Side B: " + summaryB).formatted(Formatting.RED), leftX + 8, bannerY + 28, 0xfff87171, false);
+            context.drawText(textRenderer, Text.literal("• Snaps to terrain heightmaps • Live Actionbar Kill HUD • Fanfare Victory").formatted(Formatting.GRAY), leftX + 8, bannerY + 40, 0xff94a3b8, false);
 
         } else if (tab == 4) { // SETTINGS & SIMULATION
             int infoX = x + 218;
@@ -497,7 +604,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         @Override
         protected void updateMessage() {
             double actual = getActualValue();
-            String formatted = actual >= 10.0 ? String.format("%.0f", actual) : String.format("%.2f", actual);
+            String formatted = actual >= 1.0 ? String.format("%.0f", actual) : String.format("%.2f", actual);
             setMessage(Text.literal(label + ": " + formatted + " " + unit));
         }
 

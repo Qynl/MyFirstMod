@@ -1,12 +1,12 @@
 package dev.qynl.myfirstmod.command;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.qynl.myfirstmod.battle.BattleSandbox;
 import dev.qynl.myfirstmod.faction.Faction;
-import dev.qynl.myfirstmod.faction.FactionPerk;
 import dev.qynl.myfirstmod.faction.FactionRelation;
 import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
@@ -49,14 +49,14 @@ public final class UnitCommands {
                     .then(CommandManager.literal("spawn")
                             .then(CommandManager.argument("id", StringArgumentType.word())
                                     .executes(c -> spawnUnit(c.getSource(), StringArgumentType.getString(c, "id"), 1, null))
-                                    .then(CommandManager.argument("count", IntegerArgumentType.integer(1, 50))
+                                    .then(CommandManager.argument("count", IntegerArgumentType.integer(1, 100))
                                             .executes(c -> spawnUnit(c.getSource(), StringArgumentType.getString(c, "id"), IntegerArgumentType.getInteger(c, "count"), null))
                                             .then(CommandManager.argument("pos", Vec3ArgumentType.vec3())
                                                     .executes(c -> spawnUnit(c.getSource(), StringArgumentType.getString(c, "id"), IntegerArgumentType.getInteger(c, "count"), Vec3ArgumentType.getVec3(c, "pos")))))))
                     .then(CommandManager.literal("squad")
                             .then(CommandManager.argument("id", StringArgumentType.word())
                                     .executes(c -> spawnSquad(c.getSource(), StringArgumentType.getString(c, "id"), 5))
-                                    .then(CommandManager.argument("count", IntegerArgumentType.integer(1, 20))
+                                    .then(CommandManager.argument("count", IntegerArgumentType.integer(1, 50))
                                             .executes(c -> spawnSquad(c.getSource(), StringArgumentType.getString(c, "id"), IntegerArgumentType.getInteger(c, "count"))))))
                     .then(CommandManager.literal("equip")
                             .then(CommandManager.argument("id", StringArgumentType.word())
@@ -112,8 +112,45 @@ public final class UnitCommands {
                             .then(CommandManager.argument("faction1", StringArgumentType.word())
                                     .then(CommandManager.argument("faction2", StringArgumentType.word())
                                             .executes(c -> startBattle(c.getSource(), StringArgumentType.getString(c, "faction1"), StringArgumentType.getString(c, "faction2"), 8))
-                                            .then(CommandManager.argument("size", IntegerArgumentType.integer(1, 50))
+                                            .then(CommandManager.argument("size", IntegerArgumentType.integer(1, 100))
                                                     .executes(c -> startBattle(c.getSource(), StringArgumentType.getString(c, "faction1"), StringArgumentType.getString(c, "faction2"), IntegerArgumentType.getInteger(c, "size")))))))
+                    .then(CommandManager.literal("custom")
+                            .then(CommandManager.argument("factionA", StringArgumentType.word())
+                                    .then(CommandManager.argument("unitA", StringArgumentType.word())
+                                            .then(CommandManager.argument("countA", IntegerArgumentType.integer(1, 100))
+                                                    .then(CommandManager.argument("factionB", StringArgumentType.word())
+                                                            .then(CommandManager.argument("unitB", StringArgumentType.word())
+                                                                    .then(CommandManager.argument("countB", IntegerArgumentType.integer(1, 100))
+                                                                            .executes(c -> startCustomBattle(c.getSource(),
+                                                                                    StringArgumentType.getString(c, "factionA"),
+                                                                                    StringArgumentType.getString(c, "unitA"),
+                                                                                    IntegerArgumentType.getInteger(c, "countA"),
+                                                                                    StringArgumentType.getString(c, "factionB"),
+                                                                                    StringArgumentType.getString(c, "unitB"),
+                                                                                    IntegerArgumentType.getInteger(c, "countB"),
+                                                                                    "line", 32.0))
+                                                                            .then(CommandManager.argument("formation", StringArgumentType.word())
+                                                                                    .executes(c -> startCustomBattle(c.getSource(),
+                                                                                            StringArgumentType.getString(c, "factionA"),
+                                                                                            StringArgumentType.getString(c, "unitA"),
+                                                                                            IntegerArgumentType.getInteger(c, "countA"),
+                                                                                            StringArgumentType.getString(c, "factionB"),
+                                                                                            StringArgumentType.getString(c, "unitB"),
+                                                                                            IntegerArgumentType.getInteger(c, "countB"),
+                                                                                            StringArgumentType.getString(c, "formation"), 32.0))
+                                                                                    .then(CommandManager.argument("distance", DoubleArgumentType.doubleArg(10.0, 80.0))
+                                                                                            .executes(c -> startCustomBattle(c.getSource(),
+                                                                                                    StringArgumentType.getString(c, "factionA"),
+                                                                                                    StringArgumentType.getString(c, "unitA"),
+                                                                                                    IntegerArgumentType.getInteger(c, "countA"),
+                                                                                                    StringArgumentType.getString(c, "factionB"),
+                                                                                                    StringArgumentType.getString(c, "unitB"),
+                                                                                                    IntegerArgumentType.getInteger(c, "countB"),
+                                                                                                    StringArgumentType.getString(c, "formation"),
+                                                                                                    DoubleArgumentType.getDouble(c, "distance")))))))))))
+                    .then(CommandManager.literal("preset")
+                            .then(CommandManager.argument("presetName", StringArgumentType.word())
+                                    .executes(c -> startPresetBattle(c.getSource(), StringArgumentType.getString(c, "presetName")))))
                     .then(CommandManager.literal("clear").executes(c -> clearBattle(c.getSource())))
                     .then(CommandManager.literal("stats").executes(c -> showStats(c.getSource())))
                     .then(CommandManager.literal("reset").executes(c -> resetStats(c.getSource())))
@@ -381,6 +418,35 @@ public final class UnitCommands {
             return 0;
         }
         BattleSandbox.startBattle(player, faction1, faction2, size);
+        return 1;
+    }
+
+    private static int startCustomBattle(ServerCommandSource s, String factionA, String unitA, int countA, String factionB, String unitB, int countB, String formation, double distance) {
+        ServerPlayerEntity player = s.getPlayer();
+        if (player == null) {
+            s.sendError(Text.literal("Must be executed by a player in the world."));
+            return 0;
+        }
+        BattleSandbox.startCustomBattle(player, factionA, unitA, countA, factionB, unitB, countB, formation, distance);
+        return 1;
+    }
+
+    private static int startPresetBattle(ServerCommandSource s, String presetName) {
+        ServerPlayerEntity player = s.getPlayer();
+        if (player == null) {
+            s.sendError(Text.literal("Must be executed by a player in the world."));
+            return 0;
+        }
+        String p = presetName.toLowerCase();
+        switch (p) {
+            case "titan_vs_swarm" -> BattleSandbox.startCustomBattle(player, "villagers", "village_titan", 1, "raiders", "raider_berserker", 25, "ambush", 24.0);
+            case "cavalry_charge" -> BattleSandbox.startCustomBattle(player, "kingdom", "royal_cavalry", 12, "undead", "undead_cavalry", 12, "line", 40.0);
+            case "pitched_battle" -> BattleSandbox.startCustomBattle(player, "kingdom", "all", 16, "raiders", "all", 16, "line", 32.0);
+            case "undead_siege" -> BattleSandbox.startCustomBattle(player, "villagers", "all", 10, "undead", "all", 30, "ambush", 28.0);
+            case "paladin_crusade" -> BattleSandbox.startCustomBattle(player, "kingdom", "paladin_crusader", 8, "undead", "undead_archer", 24, "line", 30.0);
+            case "dragoon_skirmish" -> BattleSandbox.startCustomBattle(player, "raiders", "desert_dragoon", 10, "kingdom", "royal_archer", 15, "flank", 35.0);
+            default -> s.sendError(Text.literal("Unknown preset. Available: titan_vs_swarm, cavalry_charge, pitched_battle, undead_siege, paladin_crusade, dragoon_skirmish"));
+        }
         return 1;
     }
 

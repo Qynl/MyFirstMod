@@ -1,5 +1,6 @@
 package dev.qynl.myfirstmod.network;
 
+import dev.qynl.myfirstmod.battle.BattleSandbox;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import dev.qynl.myfirstmod.unit.UnitSpawner;
 import dev.qynl.myfirstmod.unit.UnitWorldData;
@@ -63,9 +64,42 @@ public final class ModPackets {
         }
     }
 
+    // 3. Start Granular Custom Battle with Precise Unit Composition & Counts
+    public record StartCustomBattlePayload(
+            String factionA,
+            String unitA,
+            int countA,
+            String factionB,
+            String unitB,
+            int countB,
+            String formation,
+            float distance
+    ) implements CustomPayload {
+        public static final CustomPayload.Id<StartCustomBattlePayload> ID =
+                new CustomPayload.Id<>(Identifier.of("myfirstmod", "start_custom_battle"));
+
+        public static final PacketCodec<RegistryByteBuf, StartCustomBattlePayload> CODEC = PacketCodec.tuple(
+                PacketCodecs.STRING, StartCustomBattlePayload::factionA,
+                PacketCodecs.STRING, StartCustomBattlePayload::unitA,
+                PacketCodecs.INTEGER, StartCustomBattlePayload::countA,
+                PacketCodecs.STRING, StartCustomBattlePayload::factionB,
+                PacketCodecs.STRING, StartCustomBattlePayload::unitB,
+                PacketCodecs.INTEGER, StartCustomBattlePayload::countB,
+                PacketCodecs.STRING, StartCustomBattlePayload::formation,
+                PacketCodecs.FLOAT, StartCustomBattlePayload::distance,
+                StartCustomBattlePayload::new
+        );
+
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return ID;
+        }
+    }
+
     public static void register() {
         PayloadTypeRegistry.playC2S().register(UpdateUnitAttributesPayload.ID, UpdateUnitAttributesPayload.CODEC);
         PayloadTypeRegistry.playC2S().register(SpawnFactionUnitPayload.ID, SpawnFactionUnitPayload.CODEC);
+        PayloadTypeRegistry.playC2S().register(StartCustomBattlePayload.ID, StartCustomBattlePayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(UpdateUnitAttributesPayload.ID, (payload, context) -> {
             context.server().execute(() -> {
@@ -94,7 +128,6 @@ public final class ModPackets {
                 String equippedId = data.getEquippedUnit(player.getUuid());
                 UnitDefinition unit = data.units.get(equippedId);
                 if (unit != null) {
-                    // Clone unit template and override with chosen faction for dynamic solo spawning
                     UnitDefinition soloSpawnUnit = new UnitDefinition(unit.toNbt());
                     if (payload.factionId() != null && !payload.factionId().isBlank()) {
                         soloSpawnUnit.factionId = payload.factionId();
@@ -106,6 +139,24 @@ public final class ModPackets {
                         UnitSpawner.spawnSquadAtPlayer(player, soloSpawnUnit, Math.min(25, payload.count()));
                     }
                 }
+            });
+        });
+
+        ServerPlayNetworking.registerGlobalReceiver(StartCustomBattlePayload.ID, (payload, context) -> {
+            context.server().execute(() -> {
+                ServerPlayerEntity player = context.player();
+                if (player == null || player.getServer() == null) return;
+                BattleSandbox.startCustomBattle(
+                        player,
+                        payload.factionA(),
+                        payload.unitA(),
+                        payload.countA(),
+                        payload.factionB(),
+                        payload.unitB(),
+                        payload.countB(),
+                        payload.formation(),
+                        payload.distance()
+                );
             });
         });
     }

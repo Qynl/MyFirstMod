@@ -48,7 +48,7 @@ When giving swords, axes, bows, or diamond/netherite armor to animals, beasts, q
 
 ## 🕹️ Solo Sandbox Warfare & Real-Time Attribute Sliders
 
-Want to test custom battles alone in singleplayer? **Legions & Factions** features a complete **Solo Sandbox Suite**:
+Want to test custom battles alone in singleplayer? **Legions & Factions** features a complete **Solo Sandbox Suite** with **100% free sandbox freedom (zero costs/credits or restrictions)**:
 
 ```text
  ┌────────────────────────────────────────────────────────────────────────────┐
@@ -61,6 +61,26 @@ Want to test custom battles alone in singleplayer? **Legions & Factions** featur
  │   Villagers, or Arcane Order on the spot from the dashboard!               │
  │ • Tool Faction Cycling: Shift + Right-Click Creator Tool to cycle your     │
  │   active spawn faction without opening any menu!                           │
+ └────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 💥 Granular Battle Sandbox & Custom Army Builder
+
+Design asymmetric, custom army battles between any faction or specific unit types with fine-grained troop numbers!
+
+```text
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ ⚔️ CUSTOM BATTLE SIMULATOR (Tab 3: BATTLE)                                 │
+ ├────────────────────────────────────────────────────────────────────────────┤
+ │ • Side A Builder: Choose Faction, Specific Unit (or Mixed), and Count (1-50)│
+ │ • Side B Builder: Choose Faction, Specific Unit (or Mixed), and Count (1-50)│
+ │ • Formations: Classic Line vs Line, Pincer Flank, Ambush Encirclement.     │
+ │ • Battle Distances: Close Quarters (18m), Standard (32m), Long Range (50m)│
+ │ • Real-Time Action Bar HUD: "⚔ 🔵 Kingdom: 12 Alive ⚡ VS ⚡ 🔴 Raiders: 8 ⚔"│
+ │ • Quick Presets: 1 Titan vs 25 Swarm, 12v12 Cavalry Charge, 10v30 Siege,   │
+ │   8 Paladins vs 24 Undead Skeletons!                                       │
  └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -236,6 +256,8 @@ Surviving warriors gain battle experience and battlefield promotions!
 
 # Battle Sandbox
 /battle start <faction1> <faction2> [size]    # Deploy armies in battlefield formation
+/battle custom <facA> <unitA|all> <cntA> <facB> <unitB|all> <cntB> [formation] [distance]
+/battle preset <titan_vs_swarm|cavalry_charge|pitched_battle|undead_siege|paladin_crusade|dragoon_skirmish>
 /battle clear                                 # Despawn all active battle mobs
 /battle stats                                 # View kills & deaths scoreboard
 /battle reset                                 # Reset statistics
