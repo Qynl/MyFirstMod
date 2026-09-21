@@ -20,6 +20,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CreatorScreenHandler extends ScreenHandler {
     public static final EquipmentSlot[] EQUIPMENT_SLOTS = {
