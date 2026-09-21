@@ -78,16 +78,27 @@ public final class ModPackets {
         public static final CustomPayload.Id<StartCustomBattlePayload> ID =
                 new CustomPayload.Id<>(Identifier.of("myfirstmod", "start_custom_battle"));
 
-        public static final PacketCodec<RegistryByteBuf, StartCustomBattlePayload> CODEC = PacketCodec.tuple(
-                PacketCodecs.STRING, StartCustomBattlePayload::factionA,
-                PacketCodecs.STRING, StartCustomBattlePayload::unitA,
-                PacketCodecs.INTEGER, StartCustomBattlePayload::countA,
-                PacketCodecs.STRING, StartCustomBattlePayload::factionB,
-                PacketCodecs.STRING, StartCustomBattlePayload::unitB,
-                PacketCodecs.INTEGER, StartCustomBattlePayload::countB,
-                PacketCodecs.STRING, StartCustomBattlePayload::formation,
-                PacketCodecs.FLOAT, StartCustomBattlePayload::distance,
-                StartCustomBattlePayload::new
+        public static final PacketCodec<RegistryByteBuf, StartCustomBattlePayload> CODEC = PacketCodec.of(
+                (value, buf) -> {
+                    buf.writeString(value.factionA());
+                    buf.writeString(value.unitA());
+                    buf.writeInt(value.countA());
+                    buf.writeString(value.factionB());
+                    buf.writeString(value.unitB());
+                    buf.writeInt(value.countB());
+                    buf.writeString(value.formation());
+                    buf.writeFloat(value.distance());
+                },
+                buf -> new StartCustomBattlePayload(
+                        buf.readString(),
+                        buf.readString(),
+                        buf.readInt(),
+                        buf.readString(),
+                        buf.readString(),
+                        buf.readInt(),
+                        buf.readString(),
+                        buf.readFloat()
+                )
         );
 
         @Override
