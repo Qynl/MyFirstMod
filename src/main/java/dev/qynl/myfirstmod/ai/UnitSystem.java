@@ -38,15 +38,16 @@ public final class UnitSystem {
         UnitWorldData data = UnitWorldData.get(server);
         int interval = Math.max(1, data.aiTickInterval);
 
-        if (server.getTicks() % interval != 0) return;
-
         for (ServerWorld world : server.getWorlds()) {
             dev.qynl.myfirstmod.battle.BattleSandbox.tickBattleCheck(world);
             dev.qynl.myfirstmod.visual.FloatingCombatText.tickFloatingTexts(world);
 
             for (MobEntity mob : ActiveUnitManager.getActiveUnits(world)) {
                 if (mob != null && mob.isAlive()) {
-                    simulateMob(server, world, mob, data);
+                    // Stagger execution across ticks based on entity ID to eliminate CPU spikes
+                    if ((mob.getId() + server.getTicks()) % interval == 0) {
+                        simulateMob(server, world, mob, data);
+                    }
                 }
             }
         }
@@ -176,9 +177,13 @@ public final class UnitSystem {
 
         FoodAI.executeFood(world, mob, unit);
 
-        // Target acquisition & combat loop
+        // Target acquisition & combat loop with intelligent caching
         LivingEntity target = mob.getTarget();
-        if (!isValidTarget(server, unit, mob, target, data)) {
+        boolean hasValidTarget = target != null && target.isAlive()
+                && mob.squaredDistanceTo(target) <= (unit.followRange * unit.followRange)
+                && isValidTarget(server, unit, mob, target, data);
+
+        if (!hasValidTarget) {
             target = findBestTarget(server, world, mob, unit, data);
             mob.setTarget(target);
         }

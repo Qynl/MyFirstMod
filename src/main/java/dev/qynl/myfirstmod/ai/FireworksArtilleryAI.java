@@ -5,6 +5,7 @@ import dev.qynl.myfirstmod.faction.FactionPerk;
 import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.InventoryOwner;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
@@ -31,6 +32,14 @@ public final class FireworksArtilleryAI {
 
         double dist = Math.sqrt(distSq);
 
+        // Physical rocket inventory check
+        boolean infinite = unit.infiniteAmmo || mob.getCommandTags().contains("infinite_ammo");
+        ItemStack physicalRocket = findPhysicalRocket(mob);
+
+        if (!infinite && physicalRocket.isEmpty()) {
+            return;
+        }
+
         // Keep artillery distance (10 - 25 blocks)
         if (dist < 8.0) {
             double dx = mob.getX() - target.getX();
@@ -52,18 +61,20 @@ public final class FireworksArtilleryAI {
             double dy = target.getBodyY(0.5) - (mob.getEyeY() - 0.1);
             double dz = target.getZ() - mob.getZ();
 
-            ItemStack rocketStack = new ItemStack(Items.FIREWORK_ROCKET);
+            ItemStack rocketStack = physicalRocket.isEmpty() ? new ItemStack(Items.FIREWORK_ROCKET) : physicalRocket.copy();
+            rocketStack.setCount(1);
+
             FireworkRocketEntity rocket = new FireworkRocketEntity(world, mob.getX(), mob.getEyeY() - 0.1, mob.getZ(), rocketStack);
             rocket.setVelocity(dx, dy + dist * 0.08, dz, 1.6f, 1.2f);
 
             world.spawnEntity(rocket);
             world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.NEUTRAL, 1.0f, 1.0f);
 
-            // Trigger instantaneous bombardment impact effect at target area
+            // Trigger bombardment impact effect at target area
             detonateFireworksBombardment(world, mob, target, unit);
 
-            if (!unit.infiniteAmmo) {
-                UnitSystem.consumeTag(mob, "fireworks:");
+            if (!infinite && !physicalRocket.isEmpty()) {
+                physicalRocket.decrement(1);
             }
         }
     }
@@ -96,6 +107,7 @@ public final class FireworksArtilleryAI {
         for (LivingEntity enemy : enemies) {
             boolean wasAlive = enemy.isAlive();
             enemy.damage(world.getDamageSources().explosion(shooter, null), damage);
+            dev.qynl.myfirstmod.visual.FloatingCombatText.spawnDamage(world, enemy.getX(), enemy.getBodyY(0.75), enemy.getZ(), damage, true);
             enemy.takeKnockback(0.4, shooter.getX() - enemy.getX(), shooter.getZ() - enemy.getZ());
 
             if (server != null) {
@@ -109,5 +121,20 @@ public final class FireworksArtilleryAI {
                 }
             }
         }
+    }
+
+    public static ItemStack findPhysicalRocket(MobEntity mob) {
+        if (mob == null) return ItemStack.EMPTY;
+        if (mob.getOffHandStack().isOf(Items.FIREWORK_ROCKET)) return mob.getOffHandStack();
+        if (mob.getMainHandStack().isOf(Items.FIREWORK_ROCKET)) return mob.getMainHandStack();
+        if (mob instanceof InventoryOwner owner) {
+            for (int i = 0; i < owner.getInventory().size(); i++) {
+                ItemStack stack = owner.getInventory().getStack(i);
+                if (stack.isOf(Items.FIREWORK_ROCKET)) {
+                    return stack;
+                }
+            }
+        }
+        return ItemStack.EMPTY;
     }
 }

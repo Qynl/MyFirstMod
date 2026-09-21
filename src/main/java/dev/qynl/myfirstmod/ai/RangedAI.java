@@ -3,6 +3,7 @@ package dev.qynl.myfirstmod.ai;
 import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.InventoryOwner;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
@@ -24,11 +25,12 @@ public final class RangedAI {
         double distSq = mob.squaredDistanceTo(target);
         double dist = Math.sqrt(distSq);
 
-        // Check ammunition
+        // Physical inventory arrow authority
         boolean infinite = unit.infiniteAmmo || mob.getCommandTags().contains("infinite_ammo");
-        int ammo = UnitSystem.getNumericTag(mob, "ammo:");
-        if (!infinite && ammo <= 0) {
-            // Out of ammo: switch to melee or retreat
+        ItemStack arrowStack = findPhysicalArrow(mob);
+
+        if (!infinite && arrowStack.isEmpty()) {
+            // Out of physical arrows: switch seamlessly to melee combat
             CombatAI.executeMelee(world, mob, target, unit);
             return;
         }
@@ -65,8 +67,11 @@ public final class RangedAI {
             double dy = (target.getBodyY(0.5)) - (mob.getEyeY() - 0.1);
             double dz = target.getZ() - mob.getZ();
 
-            // Arrow projectile with authentic velocity & spread
-            ArrowEntity arrow = new ArrowEntity(world, mob, new ItemStack(Items.ARROW), weapon);
+            // Arrow projectile with physical item replication
+            ItemStack projectileItem = arrowStack.isEmpty() ? new ItemStack(Items.ARROW) : arrowStack.copy();
+            projectileItem.setCount(1);
+
+            ArrowEntity arrow = new ArrowEntity(world, mob, projectileItem, weapon);
             arrow.setPosition(mob.getX(), mob.getEyeY() - 0.1, mob.getZ());
             arrow.setVelocity(dx, dy + dist * 0.045, dz, 1.9f, 1.2f);
             arrow.setDamage(Math.max(3.0, unit.attackDamage));
@@ -85,9 +90,28 @@ public final class RangedAI {
                 world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.NEUTRAL, 1.1f, 0.9f + (world.random.nextFloat() * 0.2f));
             }
 
-            if (!infinite) {
-                UnitSystem.consumeTag(mob, "ammo:");
+            // Consume from physical inventory
+            if (!infinite && !arrowStack.isEmpty()) {
+                arrowStack.decrement(1);
             }
         }
+    }
+
+    public static ItemStack findPhysicalArrow(MobEntity mob) {
+        if (mob == null) return ItemStack.EMPTY;
+        if (isArrow(mob.getOffHandStack())) return mob.getOffHandStack();
+        if (mob instanceof InventoryOwner owner) {
+            for (int i = 0; i < owner.getInventory().size(); i++) {
+                ItemStack stack = owner.getInventory().getStack(i);
+                if (isArrow(stack)) {
+                    return stack;
+                }
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    private static boolean isArrow(ItemStack stack) {
+        return stack != null && (stack.isOf(Items.ARROW) || stack.isOf(Items.SPECTRAL_ARROW) || stack.isOf(Items.TIPPED_ARROW));
     }
 }
