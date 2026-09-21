@@ -159,6 +159,7 @@ public final class UnitCommands {
                     .then(CommandManager.literal("preset")
                             .then(CommandManager.argument("presetName", StringArgumentType.word())
                                     .executes(c -> startPresetBattle(c.getSource(), StringArgumentType.getString(c, "presetName")))))
+                    .then(CommandManager.literal("spectate").executes(c -> toggleSpectate(c.getSource())))
                     .then(CommandManager.literal("clear").executes(c -> clearBattle(c.getSource())))
                     .then(CommandManager.literal("stats").executes(c -> showStats(c.getSource())))
                     .then(CommandManager.literal("reset").executes(c -> resetStats(c.getSource())))
@@ -454,6 +455,23 @@ public final class UnitCommands {
             case "paladin_crusade" -> BattleSandbox.startCustomBattle(player, "kingdom", "paladin_crusader", 8, "undead", "undead_archer", 24, "line", 30.0);
             case "dragoon_skirmish" -> BattleSandbox.startCustomBattle(player, "raiders", "desert_dragoon", 10, "kingdom", "royal_archer", 15, "flank", 35.0);
             default -> s.sendError(Text.literal("Unknown preset. Available: titan_vs_swarm, cavalry_charge, pitched_battle, undead_siege, paladin_crusade, dragoon_skirmish"));
+        }
+        return 1;
+    }
+
+    private static int toggleSpectate(ServerCommandSource s) {
+        ServerPlayerEntity player = s.getPlayer();
+        if (player == null) {
+            s.sendError(Text.literal("Must be executed by a player in the world."));
+            return 0;
+        }
+
+        if (player.isSpectator()) {
+            player.changeGameMode(net.minecraft.world.GameMode.SURVIVAL);
+            s.sendFeedback(() -> Text.literal("Exited Spectator Mode.").formatted(Formatting.YELLOW), true);
+        } else {
+            player.changeGameMode(net.minecraft.world.GameMode.SPECTATOR);
+            s.sendFeedback(() -> Text.literal("Entered Battle Spectator Mode! Fly freely to observe the battlefield.").formatted(Formatting.AQUA, Formatting.BOLD), true);
         }
         return 1;
     }

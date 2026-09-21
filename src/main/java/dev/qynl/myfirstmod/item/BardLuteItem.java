@@ -43,6 +43,16 @@ public class BardLuteItem extends Item {
             List<LivingEntity> allies = serverWorld.getEntitiesByClass(LivingEntity.class, player.getBoundingBox().expand(18.0),
                     e -> e.isAlive() && FactionManager.isAllied(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
+            // Harmonic musical wave particle rings
+            for (int i = 0; i < 24; i++) {
+                double angle = (2 * Math.PI * i) / 24;
+                for (double r = 4.0; r <= 16.0; r += 4.0) {
+                    double px = player.getX() + r * Math.cos(angle);
+                    double pz = player.getZ() + r * Math.sin(angle);
+                    serverWorld.spawnParticles(ParticleTypes.NOTE, px, player.getY() + 0.5, pz, 1, (i % 24) / 24.0, 0, 0, 0.5);
+                }
+            }
+
             for (LivingEntity ally : allies) {
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 240, 1));
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 240, 0));

@@ -44,6 +44,19 @@ public class HealingStaffItem extends Item {
             List<LivingEntity> allies = serverWorld.getEntitiesByClass(LivingEntity.class, player.getBoundingBox().expand(16.0),
                     e -> e.isAlive() && FactionManager.isAllied(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
+            // Expanding radiant healing ring VFX
+            for (int i = 0; i < 32; i++) {
+                double angle = (2 * Math.PI * i) / 32;
+                for (double r = 3.0; r <= 15.0; r += 4.0) {
+                    double px = player.getX() + r * Math.cos(angle);
+                    double pz = player.getZ() + r * Math.sin(angle);
+                    serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, px, player.getY() + 0.2, pz, 1, 0, 0, 0, 0);
+                    if (i % 4 == 0) {
+                        serverWorld.spawnParticles(ParticleTypes.HEART, px, player.getY() + 0.5, pz, 1, 0, 0, 0, 0);
+                    }
+                }
+            }
+
             for (LivingEntity ally : allies) {
                 ally.heal(8.0f);
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 160, 1));

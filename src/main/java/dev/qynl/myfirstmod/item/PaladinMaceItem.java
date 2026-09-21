@@ -45,6 +45,12 @@ public class PaladinMaceItem extends Item {
             List<LivingEntity> enemies = serverWorld.getEntitiesByClass(LivingEntity.class, player.getBoundingBox().expand(10.0),
                     e -> e != player && e.isAlive() && FactionManager.isHostile(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
+            // Holy radiant smite burst VFX
+            for (double dy = 0.0; dy <= 6.0; dy += 0.5) {
+                serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + dy, player.getZ(), 4, 0.4, 0.2, 0.4, 0.05);
+                serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY() + dy, player.getZ(), 2, 0.3, 0.2, 0.3, 0.05);
+            }
+
             for (LivingEntity enemy : enemies) {
                 float smiteDmg = enemy.getType().isIn(EntityTypeTags.UNDEAD) ? 18.0f : 10.0f;
                 enemy.damage(serverWorld.getDamageSources().magic(), smiteDmg);

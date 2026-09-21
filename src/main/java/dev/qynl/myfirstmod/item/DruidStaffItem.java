@@ -44,6 +44,19 @@ public class DruidStaffItem extends Item {
             List<LivingEntity> enemies = serverWorld.getEntitiesByClass(LivingEntity.class, player.getBoundingBox().expand(14.0),
                     e -> e != player && e.isAlive() && FactionManager.isHostile(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
+            // Nature bloom ring particles
+            for (int i = 0; i < 28; i++) {
+                double angle = (2 * Math.PI * i) / 28;
+                for (double r = 3.0; r <= 14.0; r += 3.5) {
+                    double px = player.getX() + r * Math.cos(angle);
+                    double pz = player.getZ() + r * Math.sin(angle);
+                    serverWorld.spawnParticles(ParticleTypes.COMPOSTER, px, player.getY() + 0.2, pz, 1, 0, 0, 0, 0);
+                    if (i % 3 == 0) {
+                        serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, px, player.getY() + 0.4, pz, 1, 0, 0, 0, 0);
+                    }
+                }
+            }
+
             for (LivingEntity enemy : enemies) {
                 enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100, 4));
                 enemy.damage(serverWorld.getDamageSources().magic(), 6.0f);
