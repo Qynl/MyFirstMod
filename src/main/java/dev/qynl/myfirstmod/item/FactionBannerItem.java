@@ -46,7 +46,7 @@ public class FactionBannerItem extends Item {
 
             if (world.isAir(pos) || world.getBlockState(pos).isReplaceable()) {
                 world.setBlockState(pos, Blocks.BLUE_BANNER.getDefaultState(), Block.NOTIFY_ALL);
-                TerritoryManager.registerOutpost(factionId, pos);
+                TerritoryManager.registerOutpost(serverPlayer.getServer(), factionId, pos);
 
                 // Ascending banner pillar
                 dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 14.0, ParticleTypes.END_ROD, ParticleTypes.HAPPY_VILLAGER);

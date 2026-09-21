@@ -109,6 +109,7 @@ public final class UnitSpawner {
 
         if (living instanceof MobEntity mob) {
             mob.setPersistent();
+            dev.qynl.myfirstmod.ai.ActiveUnitManager.registerUnit(world, mob);
         }
 
         world.spawnEntity(living);

@@ -25,6 +25,7 @@ public final class UnitWorldData extends PersistentState {
     public final Map<String, UnitDefinition> units = new LinkedHashMap<>();
     public final Map<String, Faction> factions = new LinkedHashMap<>();
     public final Map<UUID, String> equipped = new HashMap<>();
+    public final Map<String, net.minecraft.util.math.BlockPos> outposts = new HashMap<>();
 
     // Simulation Settings
     public int aiTickInterval = 10;
@@ -83,6 +84,16 @@ public final class UnitWorldData extends PersistentState {
             }
         }
 
+        if (nbt.contains("outposts")) {
+            NbtCompound outpostsTag = nbt.getCompound("outposts");
+            for (String factionKey : outpostsTag.getKeys()) {
+                int[] coords = outpostsTag.getIntArray(factionKey);
+                if (coords.length == 3) {
+                    data.outposts.put(factionKey, new net.minecraft.util.math.BlockPos(coords[0], coords[1], coords[2]));
+                }
+            }
+        }
+
         if (nbt.contains("settings")) {
             NbtCompound s = nbt.getCompound("settings");
             data.aiTickInterval = s.contains("tick_interval") ? s.getInt("tick_interval") : 10;
@@ -117,6 +128,13 @@ public final class UnitWorldData extends PersistentState {
             eq.putString(entry.getKey().toString(), entry.getValue());
         }
         nbt.put("equipped", eq);
+
+        NbtCompound outpostsTag = new NbtCompound();
+        for (Map.Entry<String, net.minecraft.util.math.BlockPos> entry : outposts.entrySet()) {
+            net.minecraft.util.math.BlockPos p = entry.getValue();
+            outpostsTag.putIntArray(entry.getKey(), new int[]{p.getX(), p.getY(), p.getZ()});
+        }
+        nbt.put("outposts", outpostsTag);
 
         NbtCompound s = new NbtCompound();
         s.putInt("tick_interval", aiTickInterval);
