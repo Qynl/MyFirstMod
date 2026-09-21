@@ -86,9 +86,11 @@ public class TacticalWhistleItem extends Item {
                 return TypedActionResult.success(stack, false);
             }
 
-            // Whistle audio effect
+            // Whistle audio effect & sonic ripple
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1.5f, 1.6f);
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(serverWorld, player.getX(), player.getY(), player.getZ(), 4.0, ParticleTypes.CLOUD, ParticleTypes.ELECTRIC_SPARK);
+            dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(serverWorld, player.getX(), player.getY() + 1.2, player.getZ(), "📯 FORMATION!", currentFormation.color);
 
             String equippedId = data.getEquippedUnit(player.getUuid());
             var unit = data.units.get(equippedId);

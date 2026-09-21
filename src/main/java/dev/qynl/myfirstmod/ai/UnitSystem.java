@@ -42,6 +42,7 @@ public final class UnitSystem {
 
         for (ServerWorld world : server.getWorlds()) {
             dev.qynl.myfirstmod.battle.BattleSandbox.tickBattleCheck(world);
+            dev.qynl.myfirstmod.visual.FloatingCombatText.tickFloatingTexts(world);
 
             for (Entity entity : world.iterateEntities()) {
                 if (entity instanceof MobEntity mob && entity.isAlive()) {

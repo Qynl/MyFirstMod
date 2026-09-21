@@ -50,6 +50,8 @@ public class FactionScepterItem extends Item {
             String factionId = unit != null ? unit.factionId : "kingdom";
 
             // Spawn waypoint marker particles & sound
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 6.0, ParticleTypes.END_ROD, ParticleTypes.HAPPY_VILLAGER);
+            dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5, "📍 RALLY POINT", Formatting.GOLD);
             world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5, 25, 0.4, 0.8, 0.4, 0.05);
             world.spawnParticles(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 15, 0.3, 0.6, 0.3, 0.08);
             world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 1.2f, 1.6f);

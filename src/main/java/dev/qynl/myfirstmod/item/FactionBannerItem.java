@@ -49,10 +49,8 @@ public class FactionBannerItem extends Item {
                 TerritoryManager.registerOutpost(factionId, pos);
 
                 // Ascending banner pillar
-                for (double dy = 0; dy <= 12.0; dy += 0.5) {
-                    world.spawnParticles(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + dy, pos.getZ() + 0.5, 2, 0.1, 0.1, 0.1, 0.01);
-                    world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + dy, pos.getZ() + 0.5, 1, 0.2, 0.2, 0.2, 0.02);
-                }
+                dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 14.0, ParticleTypes.END_ROD, ParticleTypes.HAPPY_VILLAGER);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, pos.getX() + 0.5, pos.getY() + 2.0, pos.getZ() + 0.5, "🚩 OUTPOST ESTABLISHED", Formatting.GOLD);
 
                 // 32-Block Territory Perimeter Ring preview
                 for (int i = 0; i < 48; i++) {

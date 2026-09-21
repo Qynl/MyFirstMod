@@ -332,6 +332,7 @@ public final class BattleSandbox {
 
         // Celebration fireworks in the sky: Multi-stage firework extravaganza
         for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(world, p.getX(), p.getY(), p.getZ(), 10.0, ParticleTypes.TOTEM_OF_UNDYING, ParticleTypes.FIREWORK);
             world.spawnParticles(ParticleTypes.FIREWORK, p.getX(), p.getY() + 8.0, p.getZ(), 60, 3.0, 2.5, 3.0, 0.25);
             world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, p.getX(), p.getY() + 4.0, p.getZ(), 40, 2.0, 1.5, 2.0, 0.15);
             world.spawnParticles(ParticleTypes.FLASH, p.getX(), p.getY() + 6.0, p.getZ(), 3, 0.5, 0.5, 0.5, 0.0);

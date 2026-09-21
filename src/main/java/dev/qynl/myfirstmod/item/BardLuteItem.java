@@ -44,20 +44,13 @@ public class BardLuteItem extends Item {
                     e -> e.isAlive() && FactionManager.isAllied(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
             // Harmonic musical wave particle rings: Concentric Melody Waves
-            for (int i = 0; i < 32; i++) {
-                double angle = (2 * Math.PI * i) / 32.0;
-                for (double r = 3.0; r <= 18.0; r += 3.0) {
-                    double px = player.getX() + r * Math.cos(angle);
-                    double pz = player.getZ() + r * Math.sin(angle);
-                    double noteColor = (i % 24) / 24.0;
-                    serverWorld.spawnParticles(ParticleTypes.NOTE, px, player.getY() + 0.4 + Math.sin(r) * 0.3, pz, 1, noteColor, 0, 0, 0.6);
-                }
-            }
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(serverWorld, player.getX(), player.getY(), player.getZ(), 18.0, ParticleTypes.NOTE, ParticleTypes.ENCHANTED_HIT);
 
             for (LivingEntity ally : allies) {
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 240, 1));
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 240, 0));
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 160, 0));
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(serverWorld, ally.getX(), ally.getBodyY(1.1), ally.getZ(), "🎶 INSPIRED!", Formatting.AQUA);
                 serverWorld.spawnParticles(ParticleTypes.NOTE, ally.getX(), ally.getBodyY(0.7), ally.getZ(), 8, 0.3, 0.4, 0.3, 0.1);
                 serverWorld.spawnParticles(ParticleTypes.ENCHANTED_HIT, ally.getX(), ally.getBodyY(0.5), ally.getZ(), 4, 0.2, 0.3, 0.2, 0.05);
             }

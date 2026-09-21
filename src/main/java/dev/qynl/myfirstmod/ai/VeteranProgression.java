@@ -55,11 +55,8 @@ public final class VeteranProgression {
         }
 
         unit.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 1));
-        // Ascending celestial promotion pillar
-        for (double dy = 0; dy <= 4.0; dy += 0.4) {
-            world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, unit.getX(), unit.getY() + dy, unit.getZ(), 4, 0.3, 0.2, 0.3, 0.05);
-            world.spawnParticles(ParticleTypes.END_ROD, unit.getX(), unit.getY() + dy, unit.getZ(), 1, 0.1, 0.1, 0.1, 0.01);
-        }
+        dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, unit.getX(), unit.getY() + 1.2, unit.getZ(), "⭐ " + title.toUpperCase() + "!", format);
+        dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(world, unit.getX(), unit.getY(), unit.getZ(), 5.0, ParticleTypes.TOTEM_OF_UNDYING, ParticleTypes.END_ROD);
         world.spawnParticles(ParticleTypes.FIREWORK, unit.getX(), unit.getY() + 1.5, unit.getZ(), 25, 0.4, 0.6, 0.4, 0.15);
         world.spawnParticles(ParticleTypes.FLASH, unit.getX(), unit.getY() + 1.0, unit.getZ(), 1, 0, 0, 0, 0);
         world.playSound(null, unit.getX(), unit.getY(), unit.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.2f, 1.1f);

@@ -46,27 +46,14 @@ public class PaladinMaceItem extends Item {
                     e -> e != player && e.isAlive() && FactionManager.isHostile(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
             // Holy radiant smite burst: Celestial Beam & Halo
-            for (double dy = 0.0; dy <= 8.0; dy += 0.4) {
-                serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + dy, player.getZ(), 4, 0.3, 0.2, 0.3, 0.05);
-                serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY() + dy, player.getZ(), 3, 0.25, 0.2, 0.25, 0.05);
-            }
-
-            // Expanding Sunburst shockwave rings on ground
-            for (int r = 2; r <= 8; r += 2) {
-                for (int i = 0; i < 18; i++) {
-                    double angle = (2 * Math.PI * i) / 18.0;
-                    double px = player.getX() + Math.cos(angle) * r;
-                    double pz = player.getZ() + Math.sin(angle) * r;
-                    serverWorld.spawnParticles(ParticleTypes.ENCHANTED_HIT, px, player.getY() + 0.1, pz, 1, 0, 0, 0, 0);
-                    if (i % 2 == 0) {
-                        serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK, px, player.getY() + 0.2, pz, 1, 0, 0, 0, 0.02);
-                    }
-                }
-            }
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(serverWorld, player.getX(), player.getY(), player.getZ(), 8.0, ParticleTypes.TOTEM_OF_UNDYING, ParticleTypes.ELECTRIC_SPARK);
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(serverWorld, player.getX(), player.getY(), player.getZ(), 8.0, ParticleTypes.ENCHANTED_HIT, ParticleTypes.ELECTRIC_SPARK);
 
             for (LivingEntity enemy : enemies) {
                 float smiteDmg = enemy.getType().isIn(EntityTypeTags.UNDEAD) ? 18.0f : 10.0f;
                 enemy.damage(serverWorld.getDamageSources().magic(), smiteDmg);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnDamage(serverWorld, enemy.getX(), enemy.getBodyY(0.75), enemy.getZ(), smiteDmg, true);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(serverWorld, enemy.getX(), enemy.getBodyY(1.1), enemy.getZ(), "⚡ SUNFORGE SMITE!", Formatting.GOLD);
                 serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 25, 0.4, 0.6, 0.4, 0.15);
                 serverWorld.spawnParticles(ParticleTypes.FLASH, enemy.getX(), enemy.getY() + 0.8, enemy.getZ(), 1, 0, 0, 0, 0);
             }
@@ -78,6 +65,7 @@ public class PaladinMaceItem extends Item {
             for (LivingEntity ally : allies) {
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 300, 1));
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 0));
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(serverWorld, ally.getX(), ally.getBodyY(1.0), ally.getZ(), "🛡 HOLY SHIELD", Formatting.AQUA);
                 serverWorld.spawnParticles(ParticleTypes.ENCHANTED_HIT, ally.getX(), ally.getBodyY(0.6), ally.getZ(), 10, 0.3, 0.4, 0.3, 0.05);
             }
 

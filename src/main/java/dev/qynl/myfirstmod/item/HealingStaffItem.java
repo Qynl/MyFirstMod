@@ -45,21 +45,8 @@ public class HealingStaffItem extends Item {
                     e -> e.isAlive() && FactionManager.isAllied(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
             // Expanding radiant healing ring VFX: Celestial Restoration Wave
-            for (double dy = 0; dy <= 6.0; dy += 0.5) {
-                serverWorld.spawnParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + dy, player.getZ(), 2, 0.1, 0.1, 0.1, 0.01);
-            }
-
-            for (int i = 0; i < 36; i++) {
-                double angle = (2 * Math.PI * i) / 36.0;
-                for (double r = 3.0; r <= 16.0; r += 3.5) {
-                    double px = player.getX() + r * Math.cos(angle);
-                    double pz = player.getZ() + r * Math.sin(angle);
-                    serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, px, player.getY() + 0.2, pz, 1, 0, 0, 0, 0);
-                    if (i % 3 == 0) {
-                        serverWorld.spawnParticles(ParticleTypes.HEART, px, player.getY() + 0.5, pz, 1, 0, 0, 0, 0);
-                    }
-                }
-            }
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(serverWorld, player.getX(), player.getY(), player.getZ(), 7.0, ParticleTypes.END_ROD, ParticleTypes.HEART);
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(serverWorld, player.getX(), player.getY(), player.getZ(), 16.0, ParticleTypes.HAPPY_VILLAGER, ParticleTypes.HEART);
 
             for (LivingEntity ally : allies) {
                 ally.heal(8.0f);
@@ -67,6 +54,9 @@ public class HealingStaffItem extends Item {
                 ally.removeStatusEffect(StatusEffects.POISON);
                 ally.removeStatusEffect(StatusEffects.WITHER);
                 ally.removeStatusEffect(StatusEffects.SLOWNESS);
+
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnHeal(serverWorld, ally.getX(), ally.getBodyY(0.7), ally.getZ(), 8.0f);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(serverWorld, ally.getX(), ally.getBodyY(1.1), ally.getZ(), "💖 RESTORED!", Formatting.GREEN);
 
                 serverWorld.spawnParticles(ParticleTypes.HEART, ally.getX(), ally.getBodyY(0.6), ally.getZ(), 8, 0.3, 0.4, 0.3, 0.05);
                 serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, ally.getX(), ally.getY() + 0.5, ally.getZ(), 10, 0.4, 0.5, 0.4, 0.05);

@@ -64,6 +64,7 @@ public class UnitCreatorItem extends Item {
                                     .append(Text.literal(fName).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(colorRgb)).withBold(true))),
                             true // Action bar
                     );
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, player.getX(), player.getY() + 1.2, player.getZ(), "🚩 " + fName.toUpperCase(), Formatting.GOLD);
                     world.playSound(null, player.getX(), player.getY(), player.getZ(),
                             SoundEvents.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.PLAYERS, 1.2f, 1.5f);
                 }

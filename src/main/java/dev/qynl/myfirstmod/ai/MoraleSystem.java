@@ -38,12 +38,16 @@ public final class MoraleSystem {
                 if (!mob.hasStatusEffect(StatusEffects.STRENGTH)) {
                     mob.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 200, 1, false, true));
                     mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 200, 1, false, true));
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, mob.getX(), mob.getEyeY() + 0.8, mob.getZ(), "🔥 VENGEANCE!", net.minecraft.util.Formatting.RED);
                     world.spawnParticles(ParticleTypes.ANGRY_VILLAGER, mob.getX(), mob.getEyeY() + 0.3, mob.getZ(), 4, 0.2, 0.2, 0.2, 0.05);
                     world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENTITY_PIGLIN_BRUTE_ANGRY, SoundCategory.NEUTRAL, 0.8f, 1.2f);
                 }
             } else if (!unit.commander && mob.getHealth() < mob.getMaxHealth() * 0.5f) {
                 // Panic State for recruits
                 mob.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 60, 0, false, false));
+                if (mob.age % 120 == 0) {
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, mob.getX(), mob.getEyeY() + 0.8, mob.getZ(), "💦 PANIC!", net.minecraft.util.Formatting.BLUE);
+                }
                 world.spawnParticles(ParticleTypes.SPLASH, mob.getX(), mob.getEyeY() + 0.3, mob.getZ(), 6, 0.2, 0.2, 0.2, 0.05);
 
                 if (mob.age % 120 == 0) {

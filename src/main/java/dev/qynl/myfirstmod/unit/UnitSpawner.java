@@ -114,15 +114,7 @@ public final class UnitSpawner {
         world.spawnEntity(living);
 
         // Visual and auditory spawn effects: Concentric Portal Array
-        for (int i = 0; i < 16; i++) {
-            double angle = (2 * Math.PI * i) / 16.0;
-            double px = pos.x + Math.cos(angle) * 1.2;
-            double pz = pos.z + Math.sin(angle) * 1.2;
-            world.spawnParticles(ParticleTypes.PORTAL, px, pos.y + 0.1, pz, 1, 0, 0, 0, 0.05);
-            if (i % 2 == 0) {
-                world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, px, pos.y + 0.3, pz, 1, 0, 0, 0, 0.02);
-            }
-        }
+        dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(world, pos.x, pos.y, pos.z, 2.5, ParticleTypes.PORTAL, ParticleTypes.HAPPY_VILLAGER);
         world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.x, pos.y + 0.8, pos.z, 15, 0.4, 0.5, 0.4, 0.05);
         world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, pos.x, pos.y + 0.6, pos.z, 12, 0.3, 0.4, 0.3, 0.08);
         world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.NEUTRAL, 0.85f, 1.4f);

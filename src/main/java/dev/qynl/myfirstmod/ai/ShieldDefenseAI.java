@@ -33,6 +33,7 @@ public final class ShieldDefenseAI {
                 world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.NEUTRAL, 0.8f, 1.15f);
                 world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 5, 0.3, 0.3, 0.3, 0.05);
                 world.spawnParticles(ParticleTypes.CRIT, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 3, 0.2, 0.2, 0.2, 0.02);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, mob.getX(), mob.getBodyY(1.0), mob.getZ(), "🛡 BLOCKED!", net.minecraft.util.Formatting.AQUA);
             }
         } else {
             if (mob.isUsingItem()) {

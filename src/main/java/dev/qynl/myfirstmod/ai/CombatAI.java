@@ -94,6 +94,7 @@ public final class CombatAI {
 
             boolean targetWasAlive = target.isAlive();
             target.damage(world.getDamageSources().mobAttack(mob), damage);
+            dev.qynl.myfirstmod.visual.FloatingCombatText.spawnDamage(world, target.getX(), target.getBodyY(0.75), target.getZ(), damage, isCrit);
 
             // Audio feedback
             world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.NEUTRAL, 0.9f, 0.95f + (world.random.nextFloat() * 0.15f));

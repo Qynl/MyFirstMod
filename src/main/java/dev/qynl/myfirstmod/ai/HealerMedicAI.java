@@ -79,6 +79,7 @@ public final class HealerMedicAI {
 
             mostInjured.heal(healAmount);
             mostInjured.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 80, 0));
+            dev.qynl.myfirstmod.visual.FloatingCombatText.spawnHeal(world, mostInjured.getX(), mostInjured.getBodyY(0.6), mostInjured.getZ(), healAmount);
 
             // Cleanse negative status effects
             mostInjured.removeStatusEffect(StatusEffects.POISON);

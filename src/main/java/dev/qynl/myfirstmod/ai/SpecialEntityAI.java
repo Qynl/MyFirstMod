@@ -52,6 +52,7 @@ public final class SpecialEntityAI {
                     allay.getNavigation().startMovingTo(ally, 1.4);
                     ally.heal(4.0f);
                     ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 1, false, false));
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnHeal(world, ally.getX(), ally.getBodyY(0.6), ally.getZ(), 4.0f);
                     world.spawnParticles(ParticleTypes.HEART, ally.getX(), ally.getBodyY(0.6), ally.getZ(), 5, 0.25, 0.25, 0.25, 0.05);
                     world.playSound(null, ally.getX(), ally.getY(), ally.getZ(), SoundEvents.ENTITY_ALLAY_ITEM_TAKEN, SoundCategory.NEUTRAL, 1.0f, 1.4f);
                 }
@@ -71,6 +72,8 @@ public final class SpecialEntityAI {
 
                 target.damage(world.getDamageSources().sonicBoom(warden), 16.0f);
                 target.takeKnockback(1.5, -dx, -dz);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnDamage(world, target.getX(), target.getBodyY(0.75), target.getZ(), 16.0f, true);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, target.getX(), target.getBodyY(1.1), target.getZ(), "💥 SONIC BOOM!", net.minecraft.util.Formatting.DARK_AQUA);
             }
             return false;
         }
@@ -96,9 +99,12 @@ public final class SpecialEntityAI {
                         e -> e.isAlive() && FactionManager.isHostile(server, myFaction, UnitSystem.getTagValue(e, "faction:")));
 
                 for (LivingEntity enemy : enemies) {
-                    enemy.damage(world.getDamageSources().mobAttack(breeze), unit.attackDamage * 1.2f);
+                    float gustDmg = unit.attackDamage * 1.2f;
+                    enemy.damage(world.getDamageSources().mobAttack(breeze), gustDmg);
                     enemy.takeKnockback(1.8, -dx, -dz);
                     enemy.addVelocity(0.0, 0.45, 0.0);
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnDamage(world, enemy.getX(), enemy.getBodyY(0.75), enemy.getZ(), gustDmg, false);
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, enemy.getX(), enemy.getBodyY(1.1), enemy.getZ(), "🌪 GUST KNOCKBACK!", net.minecraft.util.Formatting.AQUA);
                 }
             }
             return false;
@@ -194,9 +200,12 @@ public final class SpecialEntityAI {
                         e -> e != ravager && e.isAlive() && FactionManager.isHostile(server, myFaction, UnitSystem.getTagValue(e, "faction:")));
 
                 for (LivingEntity enemy : enemies) {
-                    enemy.damage(world.getDamageSources().mobAttack(ravager), unit.attackDamage * 1.5f);
+                    float stompDmg = unit.attackDamage * 1.5f;
+                    enemy.damage(world.getDamageSources().mobAttack(ravager), stompDmg);
                     enemy.addVelocity(0.0, 0.65, 0.0);
                     enemy.takeKnockback(1.4, ravager.getX() - enemy.getX(), ravager.getZ() - enemy.getZ());
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnDamage(world, enemy.getX(), enemy.getBodyY(0.75), enemy.getZ(), stompDmg, true);
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, enemy.getX(), enemy.getBodyY(1.1), enemy.getZ(), "💥 EARTHSHAKER!", net.minecraft.util.Formatting.RED);
                 }
             }
             return false;

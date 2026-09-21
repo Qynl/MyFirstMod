@@ -36,11 +36,14 @@ public class AssassinDaggerItem extends Item {
 
             // Shadow step blink
             serverWorld.spawnParticles(ParticleTypes.PORTAL, player.getX(), player.getY() + 1.0, player.getZ(), 25, 0.3, 0.5, 0.3, 0.1);
+            serverWorld.spawnParticles(ParticleTypes.REVERSE_PORTAL, player.getX(), player.getY() + 0.5, player.getZ(), 15, 0.2, 0.3, 0.2, 0.05);
             player.requestTeleport(targetPos.x, targetPos.y, targetPos.z);
             serverWorld.spawnParticles(ParticleTypes.SMOKE, targetPos.x, targetPos.y + 0.5, targetPos.z, 20, 0.3, 0.5, 0.3, 0.05);
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(serverWorld, targetPos.x, targetPos.y, targetPos.z, 3.5, ParticleTypes.PORTAL, ParticleTypes.SMOKE);
 
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 80, 0));
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 80, 2));
+            dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(serverWorld, targetPos.x, targetPos.y + 1.0, targetPos.z, "🗡 SHADOW STEP", Formatting.DARK_PURPLE);
 
             serverWorld.playSound(null, targetPos.x, targetPos.y, targetPos.z,
                     SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.4f);

@@ -68,6 +68,8 @@ public class TransmutationWandItem extends Item {
                 }
 
                 // Recruitment visual effect
+                dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(world, entity.getX(), entity.getY(), entity.getZ(), 4.0, ParticleTypes.TOTEM_OF_UNDYING, ParticleTypes.ENCHANTED_HIT);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, entity.getX(), entity.getY() + 1.2, entity.getZ(), "✨ RECRUITED!", Formatting.GOLD);
                 world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, entity.getX(), entity.getY() + 1.0, entity.getZ(), 30, 0.4, 0.6, 0.4, 0.15);
                 world.spawnParticles(ParticleTypes.ENCHANTED_HIT, entity.getX(), entity.getY() + 0.5, entity.getZ(), 20, 0.5, 0.5, 0.5, 0.1);
                 world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.0f, 1.4f);

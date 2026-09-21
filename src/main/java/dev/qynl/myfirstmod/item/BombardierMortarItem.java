@@ -37,9 +37,9 @@ public class BombardierMortarItem extends Item {
             tnt.setFuse(30); // 1.5 second air-burst fuse
             serverWorld.spawnEntity(tnt);
 
-            serverWorld.spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 20, 0.3, 0.3, 0.3, 0.08);
-            serverWorld.spawnParticles(ParticleTypes.FLAME, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 15, 0.3, 0.3, 0.3, 0.1);
-            serverWorld.spawnParticles(ParticleTypes.LAVA, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 4, 0.2, 0.2, 0.2, 0.05);
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnDirectionalCone(serverWorld, player.getEyePos(), look, 3.0, 30.0, ParticleTypes.FLAME, 25);
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnDirectionalCone(serverWorld, player.getEyePos(), look, 4.0, 35.0, ParticleTypes.CAMPFIRE_COSY_SMOKE, 20);
+            serverWorld.spawnParticles(ParticleTypes.LAVA, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z, 6, 0.2, 0.2, 0.2, 0.05);
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.4f, 1.5f);

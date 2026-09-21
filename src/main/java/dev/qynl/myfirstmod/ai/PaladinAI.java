@@ -46,6 +46,10 @@ public final class PaladinAI {
 
             boolean targetWasAlive = target.isAlive();
             target.damage(world.getDamageSources().mobAttack(paladin), damage);
+            dev.qynl.myfirstmod.visual.FloatingCombatText.spawnDamage(world, target.getX(), target.getBodyY(0.75), target.getZ(), damage, isUndead);
+            if (isUndead) {
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, target.getX(), target.getBodyY(1.1), target.getZ(), "⚡ SMITE!", net.minecraft.util.Formatting.GOLD);
+            }
 
             // Holy Smite healing wave for nearby allies
             MinecraftServer server = world.getServer();
@@ -57,6 +61,7 @@ public final class PaladinAI {
 
                 for (LivingEntity ally : allies) {
                     ally.heal(2.5f);
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnHeal(world, ally.getX(), ally.getBodyY(0.6), ally.getZ(), 2.5f);
                     world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, ally.getX(), ally.getY() + 0.5, ally.getZ(), 4, 0.2, 0.2, 0.2, 0.05);
                 }
 

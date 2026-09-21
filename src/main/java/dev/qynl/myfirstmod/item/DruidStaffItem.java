@@ -45,19 +45,14 @@ public class DruidStaffItem extends Item {
                     e -> e != player && e.isAlive() && FactionManager.isHostile(serverPlayer.getServer(), factionId, UnitSystem.getTagValue(e, "faction:")));
 
             // Nature bloom ring particles: Expanding Triple Floral Array
-            for (int i = 0; i < 32; i++) {
-                double angle = (2 * Math.PI * i) / 32.0;
-                for (double r = 2.5; r <= 14.0; r += 3.0) {
-                    double px = player.getX() + r * Math.cos(angle);
-                    double pz = player.getZ() + r * Math.sin(angle);
-                    serverWorld.spawnParticles(ParticleTypes.COMPOSTER, px, player.getY() + 0.2, pz, 1, 0, 0, 0, 0);
-                    serverWorld.spawnParticles(ParticleTypes.HAPPY_VILLAGER, px, player.getY() + 0.4, pz, 1, 0, 0, 0, 0);
-                }
-            }
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnArcaneCircle(serverWorld, player.getX(), player.getY(), player.getZ(), 8.0, ParticleTypes.COMPOSTER, ParticleTypes.HAPPY_VILLAGER);
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(serverWorld, player.getX(), player.getY(), player.getZ(), 14.0, ParticleTypes.HAPPY_VILLAGER, ParticleTypes.COMPOSTER);
 
             for (LivingEntity enemy : enemies) {
                 enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100, 4));
                 enemy.damage(serverWorld.getDamageSources().magic(), 6.0f);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnDamage(serverWorld, enemy.getX(), enemy.getBodyY(0.75), enemy.getZ(), 6.0f, false);
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(serverWorld, enemy.getX(), enemy.getBodyY(1.1), enemy.getZ(), "🌿 ENTANGLED!", Formatting.GREEN);
                 // Entangling roots bursting from floor around enemy
                 for (double dy = 0; dy <= 1.5; dy += 0.3) {
                     serverWorld.spawnParticles(ParticleTypes.COMPOSTER, enemy.getX(), enemy.getY() + dy, enemy.getZ(), 4, 0.3, 0.1, 0.3, 0.02);
@@ -72,6 +67,7 @@ public class DruidStaffItem extends Item {
             for (LivingEntity ally : allies) {
                 ally.heal(6.0f);
                 ally.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 120, 1));
+                dev.qynl.myfirstmod.visual.FloatingCombatText.spawnHeal(serverWorld, ally.getX(), ally.getBodyY(0.7), ally.getZ(), 6.0f);
             }
 
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),

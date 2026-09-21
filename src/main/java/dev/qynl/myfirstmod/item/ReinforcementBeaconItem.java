@@ -54,16 +54,8 @@ public class ReinforcementBeaconItem extends Item {
             Vec3d center = new Vec3d(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 
             // Orbital beam descent particles from the clouds
-            for (double dy = 0; dy <= 36; dy += 0.8) {
-                world.spawnParticles(ParticleTypes.END_ROD, center.x, center.y + dy, center.z, 3, 0.15, 0.15, 0.15, 0.01);
-                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, center.x, center.y + dy, center.z, 2, 0.25, 0.25, 0.25, 0.05);
-
-                // Spiral particle vortex descending along the beam
-                double spiralAngle = (dy * 0.8) % (2 * Math.PI);
-                double sx = center.x + Math.cos(spiralAngle) * 0.8;
-                double sz = center.z + Math.sin(spiralAngle) * 0.8;
-                world.spawnParticles(ParticleTypes.ENCHANTED_HIT, sx, center.y + dy, sz, 1, 0, 0, 0, 0);
-            }
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnOrbitalLightPillar(world, center.x, center.y, center.z, 40.0, ParticleTypes.END_ROD, ParticleTypes.ELECTRIC_SPARK);
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(world, center.x, center.y, center.z, 6.0, ParticleTypes.CLOUD, ParticleTypes.TOTEM_OF_UNDYING);
 
             for (int i = 0; i < 4; i++) {
                 UnitDefinition def = factionUnits.get(i % factionUnits.size());
@@ -72,6 +64,7 @@ public class ReinforcementBeaconItem extends Item {
                 Vec3d sPos = center.add(ox, 0, oz);
                 LivingEntity droppedUnit = UnitSpawner.spawn(world, def, sPos, serverPlayer.getYaw());
                 if (droppedUnit != null) {
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, sPos.x, sPos.y + 1.2, sPos.z, "⚡ REINFORCEMENTS!", Formatting.GOLD);
                     world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, sPos.x, sPos.y + 0.8, sPos.z, 15, 0.3, 0.4, 0.3, 0.08);
                 }
             }

@@ -88,22 +88,11 @@ public class CommanderHornItem extends Item {
             String factionId = unitDef != null ? unitDef.factionId : "kingdom";
             Faction faction = data.factions.get(factionId);
 
-            // Sound war horn
+            // Sound war horn & sonic wave
             serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EVENT_RAID_HORN, SoundCategory.PLAYERS, 2.0f, mode == OrderMode.CHARGE ? 1.2f : 1.0f);
-
-            // Spawn golden acoustic rally particle shockwave rings
-            for (int r = 3; r <= 15; r += 3) {
-                for (int i = 0; i < 20; i++) {
-                    double angle = (2 * Math.PI * i) / 20.0;
-                    double px = player.getX() + Math.cos(angle) * r;
-                    double pz = player.getZ() + Math.sin(angle) * r;
-                    serverWorld.spawnParticles(ParticleTypes.ENCHANTED_HIT, px, player.getY() + 0.3, pz, 1, 0, 0, 0, 0);
-                    if (i % 2 == 0) {
-                        serverWorld.spawnParticles(ParticleTypes.RAID_OMEN, px, player.getY() + 0.5, pz, 1, 0, 0, 0, 0.02);
-                    }
-                }
-            }
+            dev.qynl.myfirstmod.visual.CombatVisualEffects.spawnExpandingShockwave(serverWorld, player.getX(), player.getY(), player.getZ(), 16.0, ParticleTypes.RAID_OMEN, ParticleTypes.ENCHANTED_HIT);
+            dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(serverWorld, player.getX(), player.getY() + 1.2, player.getZ(), "🎺 " + mode.name.toUpperCase() + "!", mode.format);
 
             serverWorld.spawnParticles(ParticleTypes.RAID_OMEN, player.getX(), player.getY() + 1.2, player.getZ(), 25, 0.5, 0.8, 0.5, 0.08);
             serverWorld.spawnParticles(ParticleTypes.ENCHANTED_HIT, player.getX(), player.getY() + 0.8, player.getZ(), 30, 0.8, 0.5, 0.8, 0.1);

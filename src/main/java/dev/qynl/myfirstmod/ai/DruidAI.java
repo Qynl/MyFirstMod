@@ -38,6 +38,7 @@ public final class DruidAI {
                 for (LivingEntity enemy : enemies) {
                     enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 3, false, false));
                     enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 80, 1, false, false));
+                    dev.qynl.myfirstmod.visual.FloatingCombatText.spawnStatus(world, enemy.getX(), enemy.getBodyY(1.0), enemy.getZ(), "🌿 ROOTED!", net.minecraft.util.Formatting.GREEN);
                     for (double dy = 0; dy <= 1.2; dy += 0.3) {
                         world.spawnParticles(ParticleTypes.COMPOSTER, enemy.getX(), enemy.getY() + dy, enemy.getZ(), 4, 0.3, 0.1, 0.3, 0.02);
                     }
