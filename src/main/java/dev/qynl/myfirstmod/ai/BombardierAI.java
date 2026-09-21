@@ -4,7 +4,6 @@ import dev.qynl.myfirstmod.faction.FactionManager;
 import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.TntEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
@@ -26,7 +25,7 @@ public final class BombardierAI {
 
         // Mortar canister salvo every 50 ticks
         if (bombardier.age % 50 == 0) {
-            bombardier.getLookControl().lookAt(target, 40.0f, 40.0f);
+            bombardier.getLookControl().lookAt(target, 45.0f, 45.0f);
             bombardier.swingHand(Hand.MAIN_HAND);
 
             MinecraftServer server = world.getServer();
@@ -37,23 +36,38 @@ public final class BombardierAI {
             double ty = target.getY() + 0.5;
             double tz = target.getZ();
 
+            // Muzzle flash particles at shooter
+            world.spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, bombardier.getX(), bombardier.getEyeY(), bombardier.getZ(), 10, 0.2, 0.2, 0.2, 0.05);
+            world.spawnParticles(ParticleTypes.FLAME, bombardier.getX(), bombardier.getEyeY(), bombardier.getZ(), 8, 0.2, 0.2, 0.2, 0.08);
+
             // Mortar launch sound
             world.playSound(null, bombardier.getX(), bombardier.getY(), bombardier.getZ(),
-                    SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 0.8f, 1.8f);
+                    SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1.0f, 1.8f);
 
-            // Explosive canister impact
+            // Ballistic arc tracer particles
+            for (int i = 1; i < 6; i++) {
+                double progress = i / 6.0;
+                double px = bombardier.getX() + (tx - bombardier.getX()) * progress;
+                double pz = bombardier.getZ() + (tz - bombardier.getZ()) * progress;
+                double py = bombardier.getEyeY() + (ty - bombardier.getEyeY()) * progress + Math.sin(progress * Math.PI) * 3.5;
+                world.spawnParticles(ParticleTypes.SMOKE, px, py, pz, 1, 0, 0, 0, 0);
+            }
+
+            // Explosive canister impact & shockwave
             world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, tx, ty + 0.5, tz, 2, 0.2, 0.2, 0.2, 0.0);
-            world.spawnParticles(ParticleTypes.FLAME, tx, ty + 0.5, tz, 25, 1.0, 1.0, 1.0, 0.1);
-            world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1.5f, 1.0f);
+            world.spawnParticles(ParticleTypes.FLAME, tx, ty + 0.5, tz, 30, 1.2, 1.0, 1.2, 0.1);
+            world.spawnParticles(ParticleTypes.LAVA, tx, ty + 0.5, tz, 6, 0.4, 0.4, 0.4, 0.05);
+            world.playSound(null, tx, ty, tz, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.NEUTRAL, 1.6f, 0.9f);
 
-            float damage = 10.0f;
+            float damage = 12.0f;
             List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, target.getBoundingBox().expand(4.5),
                     e -> e != bombardier && e.isAlive() && FactionManager.isHostile(server, myFaction, UnitSystem.getTagValue(e, "faction:")));
 
             for (LivingEntity enemy : enemies) {
                 boolean wasAlive = enemy.isAlive();
                 enemy.damage(world.getDamageSources().explosion(bombardier, null), damage);
-                enemy.takeKnockback(0.6, bombardier.getX() - enemy.getX(), bombardier.getZ() - enemy.getZ());
+                enemy.takeKnockback(0.8, bombardier.getX() - enemy.getX(), bombardier.getZ() - enemy.getZ());
+                enemy.addVelocity(0.0, 0.35, 0.0);
 
                 if (server != null && myFaction != null) {
                     BattleStats.get(server).recordDamage(myFaction, damage);

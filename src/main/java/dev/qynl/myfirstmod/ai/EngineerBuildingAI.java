@@ -45,6 +45,7 @@ public final class EngineerBuildingAI {
         if (!hasItem(mob, Items.TORCH)) return;
 
         if (world.isAir(pos) && world.getBlockState(pos.down()).isSolidBlock(world, pos.down())) {
+            mob.swingHand(net.minecraft.util.Hand.MAIN_HAND);
             world.setBlockState(pos, Blocks.TORCH.getDefaultState(), Block.NOTIFY_ALL);
             world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_WOOD_PLACE, SoundCategory.BLOCKS, 0.8f, 1.0f);
             consumeItem(mob, Items.TORCH, unit);
@@ -67,6 +68,7 @@ public final class EngineerBuildingAI {
             BlockPos targetPos = basePos.up(dy);
             if (world.isAir(targetPos) || world.getBlockState(targetPos).isReplaceable()) {
                 if (world.getBlockState(targetPos.down()).isSolidBlock(world, targetPos.down()) || dy > 0) {
+                    engineer.swingHand(net.minecraft.util.Hand.MAIN_HAND);
                     world.setBlockState(targetPos, blockToPlace.getDefaultState(), Block.NOTIFY_ALL);
                     world.playSound(null, targetPos.getX(), targetPos.getY(), targetPos.getZ(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 0.8f, 1.0f);
                     world.spawnParticles(ParticleTypes.POOF, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 4, 0.2, 0.2, 0.2, 0.05);

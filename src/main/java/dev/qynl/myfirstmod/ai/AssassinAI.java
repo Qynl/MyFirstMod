@@ -3,7 +3,6 @@ package dev.qynl.myfirstmod.ai;
 import dev.qynl.myfirstmod.faction.FactionManager;
 import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
-import dev.qynl.myfirstmod.unit.UnitWorldData;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -15,6 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.Comparator;
 import java.util.List;
@@ -53,31 +53,43 @@ public final class AssassinAI {
 
         double distSq = assassin.squaredDistanceTo(target);
 
-        // Assassin stealth sprint when approaching
+        // Shadow Step Blink: if 6 to 14 blocks away, blink behind target!
+        if (distSq >= 36.0 && distSq <= 196.0 && assassin.age % 80 == 0) {
+            Vec3d behindTarget = target.getPos().add(target.getRotationVector().multiply(-1.8));
+            world.spawnParticles(ParticleTypes.PORTAL, assassin.getX(), assassin.getY() + 0.8, assassin.getZ(), 20, 0.3, 0.5, 0.3, 0.1);
+            assassin.requestTeleport(behindTarget.x, behindTarget.y, behindTarget.z);
+            world.spawnParticles(ParticleTypes.SMOKE, behindTarget.x, behindTarget.y + 0.5, behindTarget.z, 25, 0.3, 0.5, 0.3, 0.05);
+            world.playSound(null, behindTarget.x, behindTarget.y, behindTarget.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 1.0f, 1.4f);
+            assassin.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 60, 2, false, false));
+        }
+
+        // Stealth sprint when approaching
         if (distSq > 16.0) {
             assassin.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 40, 1, false, false));
             assassin.getNavigation().startMovingTo(target, 1.35);
         } else {
             // Close range strike
-            assassin.getLookControl().lookAt(target, 40.0f, 40.0f);
+            assassin.getLookControl().lookAt(target, 45.0f, 45.0f);
 
             if (assassin.age % 12 == 0) {
                 assassin.swingHand(Hand.MAIN_HAND);
 
-                float damage = unit.attackDamage * 1.5f; // Bonus assassin damage
+                float damage = unit.attackDamage * 1.5f;
 
                 // Check for backstab angle
                 double dot = assassin.getRotationVector().dotProduct(target.getRotationVector());
-                boolean isBackstab = dot > 0.4;
+                boolean isBackstab = dot > 0.3;
                 if (isBackstab) {
-                    damage *= 1.75f; // Huge critical backstab multiplier
-                    world.spawnParticles(ParticleTypes.CRIT, target.getX(), target.getBodyY(0.5), target.getZ(), 12, 0.3, 0.3, 0.3, 0.15);
-                    world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.0f, 0.8f);
+                    damage *= 1.85f; // Devastating backstab multiplier
+                    world.spawnParticles(ParticleTypes.CRIT, target.getX(), target.getBodyY(0.5), target.getZ(), 20, 0.3, 0.4, 0.3, 0.2);
+                    world.spawnParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getBodyY(0.6), target.getZ(), 4, 0.2, 0.2, 0.2, 0.05);
+                    world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1.2f, 0.8f);
                 }
 
                 boolean targetWasAlive = target.isAlive();
                 target.damage(world.getDamageSources().mobAttack(assassin), damage);
                 world.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, SoundCategory.NEUTRAL, 0.9f, 1.2f);
+                world.spawnParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getBodyY(0.5), target.getZ(), 1, 0, 0, 0, 0);
 
                 if (server != null) {
                     BattleStats stats = BattleStats.get(server);
@@ -86,6 +98,7 @@ public final class AssassinAI {
                         stats.recordKill(myFaction);
                         String vFaction = UnitSystem.getTagValue(target, "faction:");
                         if (vFaction != null) stats.recordDeath(vFaction);
+                        VeteranProgression.recordKillForUnit(world, assassin);
                     }
                 }
             }

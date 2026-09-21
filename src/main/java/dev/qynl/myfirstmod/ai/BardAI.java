@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Hand;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public final class BardAI {
                     e -> e.isAlive() && FactionManager.isAllied(server, myFaction, UnitSystem.getTagValue(e, "faction:")));
 
             if (!allies.isEmpty()) {
+                bard.swingHand(Hand.MAIN_HAND);
                 // Musical note particles
                 world.spawnParticles(ParticleTypes.NOTE, bard.getX(), bard.getY() + 1.2, bard.getZ(), 8, 0.4, 0.4, 0.4, 0.5);
 

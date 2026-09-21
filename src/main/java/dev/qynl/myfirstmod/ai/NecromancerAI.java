@@ -16,6 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public final class NecromancerAI {
                         e -> e.isAlive() && e.getCommandTags().contains("necromancer_minion") && myFaction.equals(UnitSystem.getTagValue(e, "faction:")));
 
                 if (existingMinions.size() < 3) {
+                    necromancer.swingHand(Hand.MAIN_HAND);
                     summonUndeadMinion(world, necromancer, myFaction, enemies.get(0));
                 }
             }
@@ -85,8 +87,13 @@ public final class NecromancerAI {
         world.spawnEntity(minion);
 
         // Visual summoning pentagram & portal burst
+        for (int i = 0; i < 16; i++) {
+            double angle = (2 * Math.PI * i) / 16;
+            double px = sx + Math.cos(angle) * 1.5;
+            double pz = sz + Math.sin(angle) * 1.5;
+            world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, px, sy + 0.1, pz, 2, 0.1, 0.1, 0.1, 0.02);
+        }
         world.spawnParticles(ParticleTypes.PORTAL, sx, sy + 0.8, sz, 30, 0.4, 0.6, 0.4, 0.15);
-        world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, sx, sy + 0.2, sz, 15, 0.3, 0.3, 0.3, 0.05);
         world.playSound(null, sx, sy, sz, SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.HOSTILE, 1.2f, 0.9f);
     }
 }

@@ -23,19 +23,22 @@ public final class PaladinAI {
 
         double distSq = paladin.squaredDistanceTo(target);
         if (distSq > 9.0) {
-            paladin.getNavigation().startMovingTo(target, 1.15);
+            paladin.getNavigation().startMovingTo(target, 1.2);
             return;
         }
 
-        paladin.getLookControl().lookAt(target, 30.0f, 30.0f);
+        paladin.getLookControl().lookAt(target, 45.0f, 45.0f);
 
         if (paladin.age % 14 == 0) {
             paladin.swingHand(Hand.MAIN_HAND);
 
             float damage = unit.attackDamage;
-            if (target.getType().isIn(EntityTypeTags.UNDEAD)) {
-                damage *= 1.6f; // Radiant smite bonus vs undead
-                world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, target.getX(), target.getBodyY(0.5), target.getZ(), 10, 0.3, 0.3, 0.3, 0.1);
+            boolean isUndead = target.getType().isIn(EntityTypeTags.UNDEAD);
+
+            if (isUndead) {
+                damage *= 1.75f; // Huge Radiant Smite bonus vs Undead
+                world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, target.getX(), target.getBodyY(0.5), target.getZ(), 20, 0.4, 0.6, 0.4, 0.15);
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getBodyY(0.5), target.getZ(), 15, 0.3, 0.4, 0.3, 0.1);
             }
 
             boolean targetWasAlive = target.isAlive();
@@ -50,7 +53,7 @@ public final class PaladinAI {
                         e -> e.isAlive() && FactionManager.isAllied(server, myFaction, UnitSystem.getTagValue(e, "faction:")));
 
                 for (LivingEntity ally : allies) {
-                    ally.heal(2.0f);
+                    ally.heal(2.5f);
                     world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, ally.getX(), ally.getY() + 0.5, ally.getZ(), 4, 0.2, 0.2, 0.2, 0.05);
                 }
 
@@ -63,8 +66,11 @@ public final class PaladinAI {
                 }
             }
 
-            world.spawnParticles(ParticleTypes.ENCHANTED_HIT, target.getX(), target.getBodyY(0.5), target.getZ(), 8, 0.3, 0.3, 0.3, 0.05);
-            world.playSound(null, paladin.getX(), paladin.getY(), paladin.getZ(), SoundEvents.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.NEUTRAL, 1.0f, 1.4f);
+            // Visual impact shockwave & audio
+            world.spawnParticles(ParticleTypes.ENCHANTED_HIT, target.getX(), target.getBodyY(0.5), target.getZ(), 10, 0.3, 0.3, 0.3, 0.08);
+            world.spawnParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getBodyY(0.5), target.getZ(), 1, 0, 0, 0, 0);
+            world.playSound(null, paladin.getX(), paladin.getY(), paladin.getZ(), SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.NEUTRAL, 0.9f, 1.4f);
+            world.playSound(null, paladin.getX(), paladin.getY(), paladin.getZ(), SoundEvents.ITEM_TRIDENT_THUNDER, SoundCategory.NEUTRAL, 0.7f, 1.6f);
         }
     }
 }

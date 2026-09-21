@@ -78,6 +78,7 @@ public final class SpecialEntityAI {
         // 3. Breeze Wind Blast & Shockwave
         if (mob instanceof BreezeEntity breeze && target != null && target.isAlive()) {
             if (mob.age % 35 == 0) {
+                breeze.swingHand(net.minecraft.util.Hand.MAIN_HAND);
                 double dx = target.getX() - breeze.getX();
                 double dz = target.getZ() - breeze.getZ();
                 world.playSound(null, breeze.getX(), breeze.getY(), breeze.getZ(), SoundEvents.ENTITY_BREEZE_SHOOT, SoundCategory.HOSTILE, 1.2f, 1.0f);
@@ -127,6 +128,7 @@ public final class SpecialEntityAI {
         // 7. Evoker Fang Spell Barrage
         if (mob instanceof EvokerEntity evoker && target != null && target.isAlive()) {
             if (mob.age % 70 == 0) {
+                evoker.swingHand(net.minecraft.util.Hand.MAIN_HAND);
                 world.playSound(null, evoker.getX(), evoker.getY(), evoker.getZ(), SoundEvents.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1.2f, 1.0f);
                 float yaw = (float) MathHelper.atan2(target.getZ() - evoker.getZ(), target.getX() - evoker.getX());
 
@@ -146,6 +148,7 @@ public final class SpecialEntityAI {
         // 8. Witch Tactical Battle Alchemist
         if (mob instanceof WitchEntity witch) {
             if (mob.age % 45 == 0 && myFaction != null) {
+                witch.swingHand(net.minecraft.util.Hand.MAIN_HAND);
                 List<LivingEntity> woundedAllies = world.getEntitiesByClass(LivingEntity.class, witch.getBoundingBox().expand(10.0),
                         e -> e.isAlive() && FactionManager.isAllied(server, myFaction, UnitSystem.getTagValue(e, "faction:")) && e.getHealth() < e.getMaxHealth() * 0.7f);
 
@@ -223,6 +226,7 @@ public final class SpecialEntityAI {
         if (mob instanceof PolarBearEntity bear && target != null && target.isAlive()) {
             if (mob.age % 40 == 0 && mob.squaredDistanceTo(target) < 16.0) {
                 bear.setWarning(true);
+                bear.swingHand(net.minecraft.util.Hand.MAIN_HAND);
                 world.playSound(null, bear.getX(), bear.getY(), bear.getZ(), SoundEvents.ENTITY_POLAR_BEAR_WARNING, SoundCategory.NEUTRAL, 1.4f, 0.8f);
                 world.spawnParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getBodyY(0.5), target.getZ(), 2, 0.3, 0.3, 0.3, 0.0);
 
@@ -236,6 +240,7 @@ public final class SpecialEntityAI {
         // 13. Spider Web Snare Trap
         if (mob instanceof SpiderEntity spider && target != null && target.isAlive()) {
             if (mob.age % 50 == 0 && mob.squaredDistanceTo(target) < 25.0) {
+                spider.swingHand(net.minecraft.util.Hand.MAIN_HAND);
                 world.playSound(null, spider.getX(), spider.getY(), spider.getZ(), SoundEvents.ENTITY_SPIDER_STEP, SoundCategory.HOSTILE, 1.0f, 1.2f);
                 target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 3, false, true));
                 world.spawnParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getBodyY(0.5), target.getZ(), 10, 0.3, 0.3, 0.3, 0.05);
@@ -246,6 +251,7 @@ public final class SpecialEntityAI {
         // 14. Piglin Brute Bloodlust Whirlwind
         if (mob instanceof PiglinBruteEntity brute && target != null && target.isAlive()) {
             if (mob.age % 30 == 0 && mob.squaredDistanceTo(target) < 12.0) {
+                brute.swingHand(net.minecraft.util.Hand.MAIN_HAND);
                 world.playSound(null, brute.getX(), brute.getY(), brute.getZ(), SoundEvents.ENTITY_PIGLIN_BRUTE_ANGRY, SoundCategory.HOSTILE, 1.2f, 1.0f);
                 world.spawnParticles(ParticleTypes.CRIT, target.getX(), target.getBodyY(0.6), target.getZ(), 8, 0.3, 0.3, 0.3, 0.1);
                 target.damage(world.getDamageSources().mobAttack(brute), unit.attackDamage * 1.35f);

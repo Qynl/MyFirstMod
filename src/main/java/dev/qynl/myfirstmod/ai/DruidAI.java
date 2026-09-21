@@ -14,6 +14,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 
 import java.util.List;
 
@@ -32,13 +33,14 @@ public final class DruidAI {
             List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, druid.getBoundingBox().expand(18.0),
                     e -> e != druid && e.isAlive() && FactionManager.isHostile(server, myFaction, UnitSystem.getTagValue(e, "faction:")));
 
-            for (LivingEntity enemy : enemies) {
-                enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 3, false, false));
-                enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 80, 1, false, false));
-                world.spawnParticles(ParticleTypes.COMPOSTER, enemy.getX(), enemy.getY() + 0.3, enemy.getZ(), 15, 0.4, 0.4, 0.4, 0.05);
-            }
-
             if (!enemies.isEmpty()) {
+                druid.swingHand(Hand.MAIN_HAND);
+                for (LivingEntity enemy : enemies) {
+                    enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 3, false, false));
+                    enemy.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 80, 1, false, false));
+                    world.spawnParticles(ParticleTypes.COMPOSTER, enemy.getX(), enemy.getY() + 0.3, enemy.getZ(), 15, 0.4, 0.4, 0.4, 0.05);
+                    world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, enemy.getX(), enemy.getY() + 0.6, enemy.getZ(), 8, 0.3, 0.4, 0.3, 0.05);
+                }
                 world.playSound(null, druid.getX(), druid.getY(), druid.getZ(), SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.NEUTRAL, 1.2f, 0.8f);
             }
         }
@@ -49,6 +51,7 @@ public final class DruidAI {
                     w -> w.isAlive() && w.getCommandTags().contains("nature_spirit") && myFaction.equals(UnitSystem.getTagValue(w, "faction:")));
 
             if (spirits.isEmpty()) {
+                druid.swingHand(Hand.MAIN_HAND);
                 WolfEntity wolf = EntityType.WOLF.create(world);
                 if (wolf != null) {
                     wolf.refreshPositionAndAngles(druid.getX() + 1.0, druid.getY(), druid.getZ() + 1.0, druid.getYaw(), 0.0f);

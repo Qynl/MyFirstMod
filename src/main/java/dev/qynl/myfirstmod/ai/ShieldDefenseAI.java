@@ -24,14 +24,15 @@ public final class ShieldDefenseAI {
 
         double distSq = mob.squaredDistanceTo(target);
 
-        // When enemy is close (< 5 blocks) and facing, raise shield
-        if (distSq < 25.0 && target.isAlive()) {
+        // When enemy is within 6 blocks and facing, actively raise shield in defensive stance
+        if (distSq < 36.0 && target.isAlive()) {
             Hand hand = hasOffhandShield ? Hand.OFF_HAND : Hand.MAIN_HAND;
             mob.setCurrentHand(hand);
 
-            if (mob.age % 30 == 0) {
-                world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.NEUTRAL, 0.7f, 1.1f);
-                world.spawnParticles(ParticleTypes.CRIT, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 4, 0.2, 0.2, 0.2, 0.05);
+            if (mob.age % 25 == 0) {
+                world.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.NEUTRAL, 0.8f, 1.15f);
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 5, 0.3, 0.3, 0.3, 0.05);
+                world.spawnParticles(ParticleTypes.CRIT, mob.getX(), mob.getBodyY(0.5), mob.getZ(), 3, 0.2, 0.2, 0.2, 0.02);
             }
         } else {
             if (mob.isUsingItem()) {
