@@ -107,6 +107,47 @@ public final class UnitCommands {
             );
 
             // /battle commands
+            var battleCustomDistance = CommandManager.argument("distance", DoubleArgumentType.doubleArg(10.0, 80.0))
+                    .executes(c -> startCustomBattle(c.getSource(),
+                            StringArgumentType.getString(c, "factionA"),
+                            StringArgumentType.getString(c, "unitA"),
+                            IntegerArgumentType.getInteger(c, "countA"),
+                            StringArgumentType.getString(c, "factionB"),
+                            StringArgumentType.getString(c, "unitB"),
+                            IntegerArgumentType.getInteger(c, "countB"),
+                            StringArgumentType.getString(c, "formation"),
+                            DoubleArgumentType.getDouble(c, "distance")));
+
+            var battleCustomFormation = CommandManager.argument("formation", StringArgumentType.word())
+                    .executes(c -> startCustomBattle(c.getSource(),
+                            StringArgumentType.getString(c, "factionA"),
+                            StringArgumentType.getString(c, "unitA"),
+                            IntegerArgumentType.getInteger(c, "countA"),
+                            StringArgumentType.getString(c, "factionB"),
+                            StringArgumentType.getString(c, "unitB"),
+                            IntegerArgumentType.getInteger(c, "countB"),
+                            StringArgumentType.getString(c, "formation"), 32.0))
+                    .then(battleCustomDistance);
+
+            var battleCustomCountB = CommandManager.argument("countB", IntegerArgumentType.integer(1, 100))
+                    .executes(c -> startCustomBattle(c.getSource(),
+                            StringArgumentType.getString(c, "factionA"),
+                            StringArgumentType.getString(c, "unitA"),
+                            IntegerArgumentType.getInteger(c, "countA"),
+                            StringArgumentType.getString(c, "factionB"),
+                            StringArgumentType.getString(c, "unitB"),
+                            IntegerArgumentType.getInteger(c, "countB"),
+                            "line", 32.0))
+                    .then(battleCustomFormation);
+
+            var battleCustom = CommandManager.literal("custom")
+                    .then(CommandManager.argument("factionA", StringArgumentType.word())
+                            .then(CommandManager.argument("unitA", StringArgumentType.word())
+                                    .then(CommandManager.argument("countA", IntegerArgumentType.integer(1, 100))
+                                            .then(CommandManager.argument("factionB", StringArgumentType.word())
+                                                    .then(CommandManager.argument("unitB", StringArgumentType.word())
+                                                            .then(battleCustomCountB))))));
+
             dispatcher.register(CommandManager.literal("battle")
                     .then(CommandManager.literal("start")
                             .then(CommandManager.argument("faction1", StringArgumentType.word())
@@ -114,40 +155,7 @@ public final class UnitCommands {
                                             .executes(c -> startBattle(c.getSource(), StringArgumentType.getString(c, "faction1"), StringArgumentType.getString(c, "faction2"), 8))
                                             .then(CommandManager.argument("size", IntegerArgumentType.integer(1, 100))
                                                     .executes(c -> startBattle(c.getSource(), StringArgumentType.getString(c, "faction1"), StringArgumentType.getString(c, "faction2"), IntegerArgumentType.getInteger(c, "size")))))))
-                    .then(CommandManager.literal("custom")
-                            .then(CommandManager.argument("factionA", StringArgumentType.word())
-                                    .then(CommandManager.argument("unitA", StringArgumentType.word())
-                                            .then(CommandManager.argument("countA", IntegerArgumentType.integer(1, 100))
-                                                    .then(CommandManager.argument("factionB", StringArgumentType.word())
-                                                            .then(CommandManager.argument("unitB", StringArgumentType.word())
-                                                                    .then(CommandManager.argument("countB", IntegerArgumentType.integer(1, 100))
-                                                                            .executes(c -> startCustomBattle(c.getSource(),
-                                                                                    StringArgumentType.getString(c, "factionA"),
-                                                                                    StringArgumentType.getString(c, "unitA"),
-                                                                                    IntegerArgumentType.getInteger(c, "countA"),
-                                                                                    StringArgumentType.getString(c, "factionB"),
-                                                                                    StringArgumentType.getString(c, "unitB"),
-                                                                                    IntegerArgumentType.getInteger(c, "countB"),
-                                                                                    "line", 32.0))
-                                                                            .then(CommandManager.argument("formation", StringArgumentType.word())
-                                                                                    .executes(c -> startCustomBattle(c.getSource(),
-                                                                                            StringArgumentType.getString(c, "factionA"),
-                                                                                            StringArgumentType.getString(c, "unitA"),
-                                                                                            IntegerArgumentType.getInteger(c, "countA"),
-                                                                                            StringArgumentType.getString(c, "factionB"),
-                                                                                            StringArgumentType.getString(c, "unitB"),
-                                                                                            IntegerArgumentType.getInteger(c, "countB"),
-                                                                                            StringArgumentType.getString(c, "formation"), 32.0))
-                                                                                    .then(CommandManager.argument("distance", DoubleArgumentType.doubleArg(10.0, 80.0))
-                                                                                            .executes(c -> startCustomBattle(c.getSource(),
-                                                                                                    StringArgumentType.getString(c, "factionA"),
-                                                                                                    StringArgumentType.getString(c, "unitA"),
-                                                                                                    IntegerArgumentType.getInteger(c, "countA"),
-                                                                                                    StringArgumentType.getString(c, "factionB"),
-                                                                                                    StringArgumentType.getString(c, "unitB"),
-                                                                                                    IntegerArgumentType.getInteger(c, "countB"),
-                                                                                                    StringArgumentType.getString(c, "formation"),
-                                                                                                    DoubleArgumentType.getDouble(c, "distance")))))))))))
+                    .then(battleCustom)
                     .then(CommandManager.literal("preset")
                             .then(CommandManager.argument("presetName", StringArgumentType.word())
                                     .executes(c -> startPresetBattle(c.getSource(), StringArgumentType.getString(c, "presetName")))))
