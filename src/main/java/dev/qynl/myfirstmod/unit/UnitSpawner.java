@@ -178,11 +178,20 @@ public final class UnitSpawner {
         int colorRgb = faction != null ? faction.getParsedColor() : 0x94A3B8;
 
         String factionTag = faction != null ? "[" + faction.name + "] " : "";
-        String roleTag = unit.commander ? " ★ " : " ";
+        String rankIcon = "🗡 ";
+        if (unit.commander) {
+            rankIcon = "👑 ";
+        } else if ("warlord".equalsIgnoreCase(unit.rank) || "general".equalsIgnoreCase(unit.rank)) {
+            rankIcon = "★ ";
+        } else if ("captain".equalsIgnoreCase(unit.rank) || "champion".equalsIgnoreCase(unit.rank)) {
+            rankIcon = "✦ ";
+        } else if ("veteran".equalsIgnoreCase(unit.rank)) {
+            rankIcon = "◆ ";
+        }
 
         Text customName = Text.literal(factionTag)
                 .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(colorRgb)).withBold(true))
-                .append(Text.literal(unit.name + roleTag).setStyle(Style.EMPTY.withColor(Formatting.WHITE).withBold(false)));
+                .append(Text.literal(rankIcon + unit.name).setStyle(Style.EMPTY.withColor(Formatting.WHITE).withBold(unit.commander)));
 
         living.setCustomName(customName);
         living.setCustomNameVisible(true);

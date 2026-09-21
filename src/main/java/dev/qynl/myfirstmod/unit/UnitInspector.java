@@ -55,7 +55,14 @@ public final class UnitInspector {
 
         player.sendMessage(Text.literal("Health: ").formatted(Formatting.GRAY)
                 .append(Text.literal(hpBar + " "))
-                .append(Text.literal(String.format("%.1f / %.1f HP", currentHp, maxHp)).formatted(Formatting.GREEN)), false);
+                .append(Text.literal(String.format("%.1f / %.1f HP", currentHp, maxHp)).formatted(Formatting.GREEN))
+                .append(Text.literal("  |  Scale: ").formatted(Formatting.GRAY))
+                .append(Text.literal(String.format("%.2fx", unitDef != null ? unitDef.scale : 1.0f)).formatted(Formatting.AQUA)), false);
+
+        if (unitDef != null && unitDef.mount != null && !unitDef.mount.isBlank() && !"none".equalsIgnoreCase(unitDef.mount)) {
+            player.sendMessage(Text.literal("Cavalry Mount: ").formatted(Formatting.GRAY)
+                    .append(Text.literal(unitDef.mount).formatted(Formatting.GOLD)), false);
+        }
 
         ItemStack mainHand = entity.getEquippedStack(EquipmentSlot.MAINHAND);
         ItemStack offHand = entity.getEquippedStack(EquipmentSlot.OFFHAND);

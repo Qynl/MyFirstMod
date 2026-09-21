@@ -2,21 +2,25 @@ package dev.qynl.myfirstmod.ai;
 
 import dev.qynl.myfirstmod.faction.FactionManager;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.BlazeEntity;
 import net.minecraft.entity.mob.BoggedEntity;
 import net.minecraft.entity.mob.BreezeEntity;
-import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.entity.mob.EvokerEntity;
 import net.minecraft.entity.mob.EvokerFangsEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.PiglinBruteEntity;
+import net.minecraft.entity.mob.PolarBearEntity;
 import net.minecraft.entity.mob.RavagerEntity;
+import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.mob.WitchEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.passive.AllayEntity;
+import net.minecraft.entity.passive.CamelEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.particle.ParticleTypes;
@@ -124,10 +128,6 @@ public final class SpecialEntityAI {
         if (mob instanceof EvokerEntity evoker && target != null && target.isAlive()) {
             if (mob.age % 70 == 0) {
                 world.playSound(null, evoker.getX(), evoker.getY(), evoker.getZ(), SoundEvents.ENTITY_EVOKER_CAST_SPELL, SoundCategory.HOSTILE, 1.2f, 1.0f);
-                double minX = Math.min(target.getX(), evoker.getX());
-                double maxX = Math.max(target.getX(), evoker.getX());
-                double minZ = Math.min(target.getZ(), evoker.getZ());
-                double maxZ = Math.max(target.getZ(), evoker.getZ());
                 float yaw = (float) MathHelper.atan2(target.getZ() - evoker.getZ(), target.getX() - evoker.getX());
 
                 for (int i = 0; i < 7; i++) {
@@ -146,7 +146,6 @@ public final class SpecialEntityAI {
         // 8. Witch Tactical Battle Alchemist
         if (mob instanceof WitchEntity witch) {
             if (mob.age % 45 == 0 && myFaction != null) {
-                // If wounded allies nearby, throw healing
                 List<LivingEntity> woundedAllies = world.getEntitiesByClass(LivingEntity.class, witch.getBoundingBox().expand(10.0),
                         e -> e.isAlive() && FactionManager.isAllied(server, myFaction, UnitSystem.getTagValue(e, "faction:")) && e.getHealth() < e.getMaxHealth() * 0.7f);
 
@@ -157,7 +156,6 @@ public final class SpecialEntityAI {
                     world.spawnParticles(ParticleTypes.HEART, ally.getX(), ally.getBodyY(0.5), ally.getZ(), 8, 0.3, 0.3, 0.3, 0.05);
                     world.playSound(null, ally.getX(), ally.getY(), ally.getZ(), SoundEvents.ENTITY_SPLASH_POTION_THROW, SoundCategory.NEUTRAL, 0.9f, 1.2f);
                 } else if (target != null && target.isAlive()) {
-                    // Curses target
                     target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100, 1));
                     target.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 100, 0));
                     world.spawnParticles(ParticleTypes.WITCH, target.getX(), target.getBodyY(0.5), target.getZ(), 10, 0.3, 0.3, 0.3, 0.05);
@@ -185,18 +183,18 @@ public final class SpecialEntityAI {
             return false;
         }
 
-        // 10. Wolf Pack Howl
+        // 10. Wolf Pack Howl & Frenzy
         if (mob instanceof WolfEntity wolf) {
-            if (mob.age % 100 == 0 && myFaction != null) {
-                List<WolfEntity> pack = world.getEntitiesByClass(WolfEntity.class, wolf.getBoundingBox().expand(12.0),
+            if (mob.age % 80 == 0 && myFaction != null) {
+                List<WolfEntity> pack = world.getEntitiesByClass(WolfEntity.class, wolf.getBoundingBox().expand(14.0),
                         w -> w.isAlive() && myFaction.equals(UnitSystem.getTagValue(w, "faction:")));
 
                 if (pack.size() >= 2) {
                     world.playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(), SoundEvents.ENTITY_WOLF_HOWL, SoundCategory.NEUTRAL, 1.2f, 1.0f);
                     for (WolfEntity member : pack) {
-                        member.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 160, 1));
-                        member.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 160, 0));
-                        world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, member.getX(), member.getBodyY(0.6), member.getZ(), 4, 0.2, 0.2, 0.2, 0.05);
+                        member.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 180, 1));
+                        member.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 180, pack.size() >= 4 ? 1 : 0));
+                        world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, member.getX(), member.getBodyY(0.6), member.getZ(), 5, 0.2, 0.2, 0.2, 0.05);
                     }
                 }
             }
@@ -219,6 +217,40 @@ public final class SpecialEntityAI {
                     enemy.takeKnockback(0.8, golem.getX() - enemy.getX(), golem.getZ() - enemy.getZ());
                 }
             }
+        }
+
+        // 12. Polar Bear / Grizzly Battle Bear Stomp & Fury
+        if (mob instanceof PolarBearEntity bear && target != null && target.isAlive()) {
+            if (mob.age % 40 == 0 && mob.squaredDistanceTo(target) < 16.0) {
+                bear.setWarning(true);
+                world.playSound(null, bear.getX(), bear.getY(), bear.getZ(), SoundEvents.ENTITY_POLAR_BEAR_WARNING, SoundCategory.NEUTRAL, 1.4f, 0.8f);
+                world.spawnParticles(ParticleTypes.SWEEP_ATTACK, target.getX(), target.getBodyY(0.5), target.getZ(), 2, 0.3, 0.3, 0.3, 0.0);
+
+                target.damage(world.getDamageSources().mobAttack(bear), unit.attackDamage * 1.4f);
+                target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 60, 1));
+                target.takeKnockback(1.2, bear.getX() - target.getX(), bear.getZ() - target.getZ());
+            }
+            return false;
+        }
+
+        // 13. Spider Web Snare Trap
+        if (mob instanceof SpiderEntity spider && target != null && target.isAlive()) {
+            if (mob.age % 50 == 0 && mob.squaredDistanceTo(target) < 25.0) {
+                world.playSound(null, spider.getX(), spider.getY(), spider.getZ(), SoundEvents.ENTITY_SPIDER_STEP, SoundCategory.HOSTILE, 1.0f, 1.2f);
+                target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 3, false, true));
+                world.spawnParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getBodyY(0.5), target.getZ(), 10, 0.3, 0.3, 0.3, 0.05);
+            }
+            return false;
+        }
+
+        // 14. Piglin Brute Bloodlust Whirlwind
+        if (mob instanceof PiglinBruteEntity brute && target != null && target.isAlive()) {
+            if (mob.age % 30 == 0 && mob.squaredDistanceTo(target) < 12.0) {
+                world.playSound(null, brute.getX(), brute.getY(), brute.getZ(), SoundEvents.ENTITY_PIGLIN_BRUTE_ANGRY, SoundCategory.HOSTILE, 1.2f, 1.0f);
+                world.spawnParticles(ParticleTypes.CRIT, target.getX(), target.getBodyY(0.6), target.getZ(), 8, 0.3, 0.3, 0.3, 0.1);
+                target.damage(world.getDamageSources().mobAttack(brute), unit.attackDamage * 1.35f);
+            }
+            return false;
         }
 
         return false;
