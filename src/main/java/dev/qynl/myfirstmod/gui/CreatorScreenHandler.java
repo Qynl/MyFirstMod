@@ -275,6 +275,18 @@ public class CreatorScreenHandler extends ScreenHandler {
                 String fb = fKeys.get(Math.abs(battleFactionBIdx) % fKeys.size());
                 BattleSandbox.startBattle(serverPlayer, fa, fb, 24);
             }
+            case 22 -> { // Start mega war (32 vs 32)
+                List<String> fKeys = new ArrayList<>(data.factions.keySet());
+                String fa = fKeys.get(Math.abs(battleFactionAIdx) % fKeys.size());
+                String fb = fKeys.get(Math.abs(battleFactionBIdx) % fKeys.size());
+                BattleSandbox.startBattle(serverPlayer, fa, fb, 32);
+            }
+            case 23 -> { // Start titan clash (48 vs 48)
+                List<String> fKeys = new ArrayList<>(data.factions.keySet());
+                String fa = fKeys.get(Math.abs(battleFactionAIdx) % fKeys.size());
+                String fb = fKeys.get(Math.abs(battleFactionBIdx) % fKeys.size());
+                BattleSandbox.startBattle(serverPlayer, fa, fb, 48);
+            }
             case 65 -> { // Cycle Faction A for battle
                 battleFactionAIdx++;
             }
@@ -548,8 +560,22 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
+            case 80 -> loadPresetToEquipped(data, player.getUuid(), "royal_cavalry");
+            case 81 -> loadPresetToEquipped(data, player.getUuid(), "war_wolf");
+            case 82 -> loadPresetToEquipped(data, player.getUuid(), "battle_bear");
+            case 83 -> loadPresetToEquipped(data, player.getUuid(), "iron_titan");
+            case 84 -> loadPresetToEquipped(data, player.getUuid(), "camel_dragoon");
+            case 85 -> loadPresetToEquipped(data, player.getUuid(), "holy_paladin");
         }
 
         return true;
+    }
+
+    private void loadPresetToEquipped(UnitWorldData data, UUID playerUuid, String templateId) {
+        UnitDefinition template = data.units.get(templateId);
+        if (template != null) {
+            data.setEquippedUnit(playerUuid, template.id);
+            loadUnitIntoSlots(template);
+        }
     }
 }

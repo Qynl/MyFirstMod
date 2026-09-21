@@ -137,22 +137,34 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             addDrawableChild(searchField);
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn Equipped"), b -> sendButton(1))
-                    .dimensions(rightX, y + 34, 162, 20).build());
+                    .dimensions(rightX, y + 34, 162, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🛡 Spawn Squad (5)"), b -> sendButton(2))
-                    .dimensions(rightX, y + 58, 162, 20).build());
+                    .dimensions(rightX, y + 54, 162, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("📥 Cavalry"), b -> sendButton(80))
+                    .dimensions(rightX, y + 74, 78, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("📥 War Wolf"), b -> sendButton(81))
+                    .dimensions(rightX + 84, y + 74, 78, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("📥 Battle Bear"), b -> sendButton(82))
+                    .dimensions(rightX, y + 94, 78, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("📥 Iron Titan"), b -> sendButton(83))
+                    .dimensions(rightX + 84, y + 94, 78, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("📥 Dragoon"), b -> sendButton(84))
+                    .dimensions(rightX, y + 114, 78, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("📥 Paladin"), b -> sendButton(85))
+                    .dimensions(rightX + 84, y + 114, 78, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Next Unit"), b -> sendButton(3))
-                    .dimensions(rightX, y + 82, 78, 20).build());
+                    .dimensions(rightX, y + 134, 78, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Prev Unit"), b -> sendButton(6))
-                    .dimensions(rightX + 84, y + 82, 78, 20).build());
-
-            addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate"), b -> sendButton(4))
-                    .dimensions(rightX, y + 106, 78, 20).build());
-
-            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Delete"), b -> sendButton(5))
-                    .dimensions(rightX + 84, y + 106, 78, 20).build());
+                    .dimensions(rightX + 84, y + 134, 78, 18).build());
 
         } else if (tab == 2) { // FACTIONS & DIPLOMACY
             addDrawableChild(ButtonWidget.builder(Text.literal("Kingdom ↔ Raiders: Toggle"), b -> sendButton(70))
@@ -169,25 +181,31 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
         } else if (tab == 3) { // BATTLE SANDBOX
             addDrawableChild(ButtonWidget.builder(Text.literal("Faction A: Cycle"), b -> sendButton(65))
-                    .dimensions(leftX, y + 34, 108, 20).build());
+                    .dimensions(leftX, y + 34, 108, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Faction B: Cycle"), b -> sendButton(66))
-                    .dimensions(leftX + 116, y + 34, 108, 20).build());
+                    .dimensions(leftX + 116, y + 34, 108, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ QUICK CLASH (8 vs 8) ⚔"), b -> sendButton(10))
-                    .dimensions(leftX, y + 58, 224, 20).build());
+                    .dimensions(leftX, y + 54, 224, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ LARGE BATTLE (16 vs 16) ⚔"), b -> sendButton(20))
-                    .dimensions(leftX, y + 80, 224, 20).build());
+                    .dimensions(leftX, y + 74, 224, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ EPIC WARFARE (24 vs 24) ⚔"), b -> sendButton(21))
-                    .dimensions(leftX, y + 102, 224, 20).build());
+                    .dimensions(leftX, y + 94, 224, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ MEGA WAR (32 vs 32) ⚔"), b -> sendButton(22))
+                    .dimensions(leftX, y + 114, 224, 18).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ TITAN CLASH (48 vs 48) ⚔"), b -> sendButton(23))
+                    .dimensions(leftX, y + 134, 224, 18).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🗑 CLEAR ALL BATTLE MOBS"), b -> sendButton(11))
-                    .dimensions(leftX, y + 124, 224, 20).build());
+                    .dimensions(rightX, y + 104, 162, 22).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Battle Stats"), b -> sendButton(12))
-                    .dimensions(rightX, y + 124, 162, 20).build());
+                    .dimensions(rightX, y + 130, 162, 22).build());
 
         } else if (tab == 4) { // SETTINGS & SIMULATION
             addDrawableChild(ButtonWidget.builder(Text.literal("Building AI: " + (buildingEnabled ? "ON [Active]" : "OFF [Disabled]")), b -> {
@@ -349,13 +367,13 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
             context.drawTextWithShadow(textRenderer, Text.literal("LIVE WAR SANDBOX").formatted(Formatting.BOLD, Formatting.GOLD), statsX, statsY, 0xffffd700);
             context.drawText(textRenderer, Text.literal("Side A / B: Select Factions").formatted(Formatting.AQUA), statsX, statsY + 16, 0xff38bdf8, false);
-            context.drawText(textRenderer, Text.literal("Deploy structured army lines").formatted(Formatting.GRAY), statsX, statsY + 30, 0xff94a3b8, false);
-            context.drawText(textRenderer, Text.literal("Frontline, Ranged, Medics, Mortars").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
+            context.drawText(textRenderer, Text.literal("5 Scale Sizes: 8v8 up to 48v48!").formatted(Formatting.GRAY), statsX, statsY + 30, 0xff94a3b8, false);
+            context.drawText(textRenderer, Text.literal("Terrain-Snapped Frontlines").formatted(Formatting.GRAY), statsX, statsY + 44, 0xff94a3b8, false);
 
-            context.fill(leftX, y + 148, x + backgroundWidth - 14, y + backgroundHeight - 12, COLOR_PANEL_MAIN);
-            context.drawTextWithShadow(textRenderer, Text.literal("AUTOMATED CASUALTY TRACKING & VICTORY SYSTEM").formatted(Formatting.GREEN, Formatting.BOLD), leftX + 8, y + 154, 0xff4ade80);
-            context.drawText(textRenderer, Text.literal("• Armies automatically adapt to terrain heightmaps on deployment.").formatted(Formatting.WHITE), leftX + 8, y + 168, 0xffcbd5e1, false);
-            context.drawText(textRenderer, Text.literal("• When all units of one faction fall, victory fireworks and horn sound!").formatted(Formatting.YELLOW), leftX + 8, y + 180, 0xfffde047, false);
+            context.fill(leftX, y + 152, x + backgroundWidth - 14, y + backgroundHeight - 10, COLOR_PANEL_MAIN);
+            context.drawTextWithShadow(textRenderer, Text.literal("AUTOMATED CASUALTY TRACKING & VICTORY SYSTEM").formatted(Formatting.GREEN, Formatting.BOLD), leftX + 8, y + 158, 0xff4ade80);
+            context.drawText(textRenderer, Text.literal("• Armies automatically adapt to terrain heightmaps on deployment.").formatted(Formatting.WHITE), leftX + 8, y + 172, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("• When all units of one faction fall, victory fireworks and horn sound!").formatted(Formatting.YELLOW), leftX + 8, y + 184, 0xfffde047, false);
 
         } else if (tab == 4) { // SETTINGS & SIMULATION
             int infoX = x + 218;
