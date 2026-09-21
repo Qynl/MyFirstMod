@@ -153,6 +153,7 @@ Every non-vanilla item in **Legions & Factions** features a **custom 3D voxel-sc
 - **Vengeance Rage**: Veteran and Captain units enter **Vengeance Fury** (+40% speed and damage) to avenge fallen officers!
 
 ### 4. 🌪️ 1.21 Special Mob AI Routines (`SpecialEntityAI`)
+- **Dynamic Weapon Swings**: Units alternate mainhand and offhand attacks when dual-wielding weapons, jump-strike airborne with critical particle bursts, and mounted cavalry perform high-speed charge knockbacks.
 - **Breeze**: Fires howling wind bursts (`GUST_EMITTER_LARGE`) knocking enemies 15+ blocks back and into the air.
 - **Bogged**: Fires lingering poison sniper arrows from long range with slime trail VFX.
 - **Evoker**: Casts piercing ground fangs in straight offensive lines towards hostile troop formations.
@@ -258,6 +259,7 @@ Surviving warriors gain battle experience and battlefield promotions!
 /battle start <faction1> <faction2> [size]    # Deploy armies in battlefield formation
 /battle custom <facA> <unitA|all> <cntA> <facB> <unitB|all> <cntB> [formation] [distance]
 /battle preset <titan_vs_swarm|cavalry_charge|pitched_battle|undead_siege|paladin_crusade|dragoon_skirmish>
+/battle spectate                              # Toggle flying Spectator Mode for battlefield viewing
 /battle clear                                 # Despawn all active battle mobs
 /battle stats                                 # View kills & deaths scoreboard
 /battle reset                                 # Reset statistics
