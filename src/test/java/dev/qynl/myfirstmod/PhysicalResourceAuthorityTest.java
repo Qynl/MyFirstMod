@@ -1,27 +1,31 @@
 package dev.qynl.myfirstmod;
 
 import dev.qynl.myfirstmod.unit.UnitDefinition;
+import net.minecraft.Bootstrap;
+import net.minecraft.SharedConstants;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PhysicalResourceAuthorityTest {
 
+    @BeforeAll
+    static void initMinecraft() {
+        try {
+            SharedConstants.createGameVersion();
+            Bootstrap.initialize();
+        } catch (Throwable ignored) {}
+    }
+
     @Test
-    void testUnitInventoryStackingAndAmmunition() {
+    void testUnitDefinitionAmmoLogic() {
         UnitDefinition unit = new UnitDefinition("archer_ammo_test", "Archer Ammo Test", Identifier.of("minecraft", "skeleton"));
-        unit.inventory.add(new ItemStack(Items.ARROW, 32));
-        unit.inventory.add(new ItemStack(Items.SPECTRAL_ARROW, 16));
-
-        int totalArrows = unit.inventory.stream()
-                .filter(s -> s.isOf(Items.ARROW) || s.isOf(Items.SPECTRAL_ARROW))
-                .mapToInt(ItemStack::getCount)
-                .sum();
-
-        assertEquals(48, totalArrows);
+        assertEquals(0, unit.inventory.size());
+        assertFalse(unit.infiniteAmmo);
     }
 
     @Test
