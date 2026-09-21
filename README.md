@@ -86,6 +86,46 @@ Design asymmetric, custom army battles between any faction or specific unit type
 
 ---
 
+## 🌟 Cinematic Visual FX & Tactical HUD Scanner Suite
+
+**Legions & Factions** introduces a complete, immersion-focused visual overhaul featuring **in-world 3D floating combat indicators, real-time tactical targeting HUDs, and cinematic spell FX**:
+
+```text
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ 👁️ TACTICAL TARGET SCANNER HUD (Top-Center Screen)                          │
+ ├────────────────────────────────────────────────────────────────────────────┤
+ │ • Crosshair Targeting: Aim at any unit to display their Live Combat Dossier│
+ │ • Real-Time Health Bars: Segmented HP bar with gradient green/amber/red    │
+ │ • Combat Attributes: Shows current Attack Damage, Armor, Speed & Role tags │
+ │ • Faction Accent Color: Matching Blue, Red, Green, Purple, or Cyan border  │
+ └────────────────────────────────────────────────────────────────────────────┘
+```
+
+```text
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ 💥 3D FLOATING COMBAT NUMBERS & STATUS TEXT                                │
+ ├────────────────────────────────────────────────────────────────────────────┤
+ │ • Damage Numbers: Pops up dynamic physical and critical damage text (-12.5)│
+ │ • Healing Indicators: Green floating heal tags with radiant hearts (+8 HP) │
+ │ • Combat Status Banners: "🛡️ BLOCKED!", "🌿 ROOTED!", "⚡ SMITE!",         │
+ │   "🔥 BLOODRAGE!", "🗡️ SHADOW STEP", "⭐ VETERAN PROMOTED!"                 │
+ │ • Smooth Ascent & Fade: Floating texts smoothly drift upward in 3D world   │
+ └────────────────────────────────────────────────────────────────────────────┘
+```
+
+```text
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ 🎆 VISUAL EFFECTS ENGINE (Particle Shockwaves, Auras & Orbital Beams)      │
+ ├────────────────────────────────────────────────────────────────────────────┤
+ │ • Orbital Drop Beams: 40-block vertical beacon pillars with spiral vortex  │
+ │ • Expanding Ground Shockwaves: Dual-particle blast rings on impact         │
+ │ • Arcane Summoning Circles: Rotating runic arrays for rituals & magic      │
+ │ • Directional Muzzle Cones: Fiery explosive smoke blasts for artillery     │
+ └────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## 🎮 The Commander's 3D Arsenal (13 Custom 3D Modeled Weapons & Tools)
 
 Every non-vanilla item in **Legions & Factions** features a **custom 3D voxel-sculpted model with authentic first-person, third-person, ground, and GUI display transforms**!
