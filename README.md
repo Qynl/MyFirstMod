@@ -243,25 +243,44 @@ Surviving warriors gain battle experience and battlefield promotions!
 
 ---
 
-## 🖥️ 5-Tab Interactive Creator Dashboard
+## 🖥️ 6-Tab Interactive Creator Dashboard & Live 3D Entity Preview
 
 ```text
-  ┌────────────────────────────────────────────────────────────────────────┐
-  │ [⚔ EDITOR]  [📋 UNITS]  [🛡 FACTIONS]  [💥 BATTLE]  [⚙ SETTINGS]       │
-  ├────────────────────────────────────────────────────────────────────────┤
-  │                                                                        │
-  │  [⮜ Next Unit]     [➕ Duplicate]         [💾 Save Slots]             │
-  │  [Entity: Next ⮞]  [Role: Cycle]          [⚔ Spawn Unit (1)]          │
-  │  [Faction: Cycle]  [Rank: Cycle]          [🛡 Spawn Squad (5)]         │
-  │  [Mount: Next ⮞]   [Aura: Cycle]          [🗑 Delete Unit]             │
-  │  [Death: Cycle]    [Scale: Cycle]                                      │
-  │  [Commander: Toggle ON/OFF]                                            │
-  │                                                                        │
-  │  Equipment Slots:  [ H ] [ C ] [ L ] [ F ]  |  [ Main ] [ Offhand ]    │
-  │  Unit Inventory:   [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9] │
-  │  Player Inventory: (Drag-and-drop any gear, weapons, food, potions)   │
-  └────────────────────────────────────────────────────────────────────────┘
+  ┌──────────────────────────────────────────────────────────────────────────────────┐
+  │ [⚔ EDITOR]  [✨ NEW TROOP]  [📋 UNITS]  [🛡 FACTIONS]  [💥 BATTLE]  [⚙ CONFIG]   │
+  ├──────────────────────────────────────────────────────────────────────────────────┤
+  │                                                                                  │
+  │  [⮜ Prev Unit]   [Next Unit ⮞]   [✨ + New]        ┌──────────────────────────┐ │
+  │                                                    │   LIVE 3D MODEL PREVIEW  │ │
+  │  Health:   [========== 45 HP ]                     │  (Interactive mouse rot, │ │
+  │  Damage:   [====== 8.5 DMG   ]                     │   armor & weapon synced, │ │
+  │  Armor:    [======== 14 pts  ]                     │   scale visualization)   │ │
+  │  Speed:    [==== 0.30 spd    ]                     └──────────────────────────┘ │
+  │  Scale:    [===== 1.00x      ]                     [⚔ Spawn 1x]  [🛡 Squad 5x]  │
+  │  Retreat:  [=== 20%          ]                     [➕ Duplicate] [🗑 Delete]    │
+  │                                                                                  │
+  │  [🦁 Entity]  [🎯 Role]  [🐎 Mount]  [🚩 Faction]  [★ Commander]  [💾 Save Gear] │
+  │                                                                                  │
+  │  Equipment Slots:  [ H ] [ C ] [ L ] [ F ]  |  [ Main ] [ Offhand ]              │
+  │  Unit Inventory:   [ 1 ] [ 2 ] [ 3 ] [ 4 ] [ 5 ] [ 6 ] [ 7 ] [ 8 ] [ 9]           │
+  │  Player Inventory: (Drag-and-drop any gear, weapons, food, potions, fireworks)   │
+  └──────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### ✨ Dedicated Troop Creation Studio (`[✨ New]` Tab)
+- **Custom Name & Identifier**: Enter custom troop names (e.g. *Frost Valkyrie*, *Goblin Sapper*, *Void Mage*) with automatic slugging and validation.
+- **Instant Archetype Templates**: Choose from 12 starter templates (*Warrior*, *Marksman*, *Cavalry*, *Mage*, *Fireworks Pyro*, *Bombardier*, *Medic*, *Titan*, *Beast*, *Assassin*, *Paladin*, *Druid*) with pre-configured weapons, armor, and combat AI profiles.
+- **Dynamic Species & Factions**: Select from 22 base mob types (Villager, Skeleton, Zombie, Golem, Wolf, Polar Bear, Breeze, Bogged, Evoker, Witch, Allay, Warden, Ravager, Camel, etc.) and 5 distinct factions.
+- **Live Server Sync**: Creates and registers the unit server-side, equips recommended archetype gear into the inventory slots, and syncs immediately to the client.
+
+---
+
+## 🌐 Live Web Preview & Tactical Battle Simulator (Port 3000)
+
+An interactive HTML5 Canvas & Web Audio simulation dashboard is included in `web-preview/`:
+- **Real-Time 2D/3D Canvas Battle Arena**: Simulates melee collisions, ranged ballistic trajectories, splash potion bursts, fireworks mortar strikes, and death animations.
+- **Visual Troop Customizer & JSON Generator**: Fine-tune stats and generate `UnitDefinition` JSON payloads ready for deployment.
+- **Epic Battle Matchups**: 1-click presets for *Titan vs 25 Swarm*, *12v12 Cavalry Blitz*, *30-Mob Undead Siege*, and *Holy Paladin Crusades*.
 
 ---
 
