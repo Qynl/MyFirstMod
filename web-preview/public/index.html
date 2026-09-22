@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tactical Battle Simulator & Troop Studio | Eldorian Armies</title>
+  <style>
+    :root {
+      --bg-dark: #090e17;
+      --panel-bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-gold: #f59e0b;
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --accent-purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background-color: var(--panel-bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      letter-spacing: 0.5px;
+    }
+
+    .brand .badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: #2563eb;
+      color: #fff;
+      border-color: #3b82f6;
+    }
+
+    /* Main Container */
+    main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Simulation Canvas Arena */
+    .arena-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: #060911;
+    }
+
+    #battle-canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .arena-overlay-stats {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .stat-pill {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-pill.team-a { border-left: 3px solid var(--accent-blue); }
+    .stat-pill.team-b { border-left: 3px solid var(--accent-red); }
+
+    .arena-controls {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 8px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    .ctrl-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .ctrl-btn:hover {
+      background: #334155;
+    }
+
+    .ctrl-btn.primary {
+      background: #2563eb;
+      border-color: #3b82f6;
+    }
+    .ctrl-btn.primary:hover {
+      background: #1d4ed8;
+    }
+
+    .ctrl-btn.danger {
+      background: #dc2626;
+      border-color: #ef4444;
+    }
+
+    /* Sidebar Panel */
+    .sidebar {
+      width: 380px;
+      background: var(--panel-bg);
+      border-left: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .sidebar-section h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slider-container input[type=range] {
+      flex: 1;
+      accent-color: var(--accent-gold);
+    }
+
+    .slider-val {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      min-width: 45px;
+      text-align: right;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .preset-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .preset-card:hover {
+      border-color: var(--accent-gold);
+      background: #27354a;
+      transform: translateY(-2px);
+    }
+
+    .preset-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .preset-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Live JSON Viewer */
+    pre.json-box {
+      background: #060911;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #38bdf8;
+      overflow-x: auto;
+      max-height: 180px;
+    }
+
+    /* Live Combat Feed */
+    .combat-feed {
+      max-height: 130px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.75rem;
+    }
+
+    .combat-log-entry {
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: rgba(30, 41, 59, 0.6);
+      border-left: 3px solid var(--accent-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>⚔ ELDORIAN ARMIES</h1>
+      <span class="badge">TACTICAL COMMAND & TROOP STUDIO</span>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchView('sim')">💥 Battle Sandbox</button>
+      <button class="tab-btn" onclick="switchView('studio')">✨ Troop Studio</button>
+      <button class="tab-btn" onclick="switchView('roster')">📋 Unit Roster</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Simulation View -->
+    <div class="arena-container">
+      <canvas id="battle-canvas"></canvas>
+
+      <div class="arena-overlay-stats">
+        <div class="stat-pill team-a">
+          <span>🔵 Team A (Kingdom):</span>
+          <strong id="stat-count-a">12</strong>
+        </div>
+        <div class="stat-pill team-b">
+          <span>🔴 Team B (Raiders):</span>
+          <strong id="stat-count-b">12</strong>
+        </div>
+        <div class="stat-pill">
+          <span>⚡ Simulation Speed:</span>
+          <strong id="stat-speed">1.0x</strong>
+        </div>
+      </div>
+
+      <div class="arena-controls">
+        <button class="ctrl-btn primary" id="btn-start" onclick="toggleBattle()">▶ Start Battle</button>
+        <button class="ctrl-btn" onclick="resetBattle()">🔄 Reset</button>
+        <button class="ctrl-btn" onclick="cycleSpeed()">⏩ Speed</button>
+        <button class="ctrl-btn danger" onclick="clearAllUnits()">🗑 Clear All</button>
+      </div>
+    </div>
+
+    <!-- Sidebar Controls -->
+    <aside class="sidebar" id="sidebar-sim">
+      <div class="sidebar-section">
+        <h2>⚔ Quick Epic Scenarios</h2>
+        <div class="preset-grid">
+          <div class="preset-card" onclick="loadPreset('titan_swarm')">
+            <div class="preset-title">👑 Titan vs 25 Swarm</div>
+            <div class="preset-sub">1 Iron Titan vs 25 Berserkers</div>
+          </div>
+          <div class="preset-card" onclick="loadPreset('cavalry_charge')">
+            <div class="preset-title">🐎 12v12 Cavalry Blitz</div>
+            <div class="preset-sub">Knights vs Dread Cavalry</div>
+          </div>
+          <div class="preset-card" onclick="loadPreset('undead_siege')">
+            <div class="preset-title">💀 30-Mob Undead Siege</div>
+            <div class="preset-sub">Allies vs Necromancer horde</div>
+          </div>
+          <div class="preset-card" onclick="loadPreset('paladin_crusade')">
+            <div class="preset-title">⚡ 8 Paladins vs 24 Snipers</div>
+            <div class="preset-sub">Smite Crusader formation</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>🔵 Side A (Kingdom Forces)</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Unit Type</label>
+            <select class="form-control" id="sim-unit-a" onchange="updateSimConfig()">
+              <option value="royal_knight">Royal Knight (Tank)</option>
+              <option value="royal_cavalry">Royal Cavalry (Horse)</option>
+              <option value="war_wolf">Savage War Wolf</option>
+              <option value="iron_titan">Colossal Iron Titan</option>
+              <option value="holy_paladin">Holy Paladin (Smite)</option>
+              <option value="royal_pyro">Fireworks Artillery</option>
+              <option value="field_medic">Field Medic (Heals)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Troop Count: <span id="label-count-a">12</span></label>
+            <div class="slider-container">
+              <input type="range" min="1" max="40" value="12" id="slider-count-a" oninput="document.getElementById('label-count-a').innerText = this.value; updateSimConfig();">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>🔴 Side B (Enemy Horde)</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Unit Type</label>
+            <select class="form-control" id="sim-unit-b" onchange="updateSimConfig()">
+              <option value="raider_berserker">Raider Berserker</option>
+              <option value="dread_cavalry">Dread Cavalry (Wither)</option>
+              <option value="undead_necromancer">Undead Necromancer</option>
+              <option value="siege_bombardier">Siege Bombardier (TNT)</option>
+              <option value="shadow_assassin">Shadow Assassin</option>
+              <option value="bogged_sniper">Bogged Poison Sniper</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Troop Count: <span id="label-count-b">12</span></label>
+            <div class="slider-container">
+              <input type="range" min="1" max="40" value="12" id="slider-count-b" oninput="document.getElementById('label-count-b').innerText = this.value; updateSimConfig();">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>📜 Live Combat Feed</h2>
+        <div class="combat-feed" id="combat-log">
+          <div class="combat-log-entry">⚔ Simulation ready. Choose armies and press Start Battle.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Troop Customizer Sidebar (Tab 2) -->
+    <aside class="sidebar" id="sidebar-studio" style="display: none;">
+      <div class="sidebar-section">
+        <h2>✨ Troop Creation Studio</h2>
+        <div class="form-group">
+          <label>Troop Name</label>
+          <input type="text" class="form-control" id="custom-name" value="Frost Valkyrie" oninput="updateCustomTroop()">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Archetype Preset</label>
+            <select class="form-control" id="custom-archetype" onchange="applyCustomArchetype()">
+              <option value="warrior">Shield Warrior</option>
+              <option value="archer">Longbow Sniper</option>
+              <option value="cavalry">Armored Cavalry</option>
+              <option value="mage">Arcane Mage</option>
+              <option value="pyro">Fireworks Artillery</option>
+              <option value="sapper">TNT Bombardier</option>
+              <option value="titan">Colossal Titan</option>
+              <option value="beast">Savage Beast</option>
+              <option value="paladin">Holy Paladin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Faction</label>
+            <select class="form-control" id="custom-faction" onchange="updateCustomTroop()">
+              <option value="kingdom">🔵 Kingdom</option>
+              <option value="raiders">🔴 Raiders</option>
+              <option value="villagers">🟢 Villagers</option>
+              <option value="undead">🟣 Undead</option>
+              <option value="arcane">🔷 Arcane</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>⚡ Combat Attributes</h2>
+        <div class="form-group">
+          <label>Health (HP)</label>
+          <div class="slider-container">
+            <input type="range" min="10" max="300" value="50" id="custom-hp" oninput="updateCustomTroop()">
+            <span class="slider-val" id="val-hp">50</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Attack Damage</label>
+          <div class="slider-container">
+            <input type="range" min="1" max="40" value="8" id="custom-dmg" oninput="updateCustomTroop()">
+            <span class="slider-val" id="val-dmg">8</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Armor Protection</label>
+          <div class="slider-container">
+            <input type="range" min="0" max="30" value="12" id="custom-arm" oninput="updateCustomTroop()">
+            <span class="slider-val" id="val-arm">12</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Movement Speed</label>
+          <div class="slider-container">
+            <input type="range" min="10" max="60" value="28" id="custom-spd" oninput="updateCustomTroop()">
+            <span class="slider-val" id="val-spd">0.28</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>📋 Generated Minecraft Mod JSON</h2>
+        <pre class="json-box" id="json-output"></pre>
+        <button class="ctrl-btn primary" style="width: 100%; margin-top: 8px;" onclick="spawnCustomUnitToArena()">⚔ Deploy into Battle Arena</button>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Canvas & Audio Context Initialization
+    const canvas = document.getElementById('battle-canvas');
+    const ctx = canvas.getContext('2d');
+    let audioCtx = null;
+
+    function playBeep(freq, duration, type = 'sine') {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Resize canvas
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Simulation State
+    let isRunning = false;
+    let simSpeed = 1.0;
+    let units = [];
+    let projectiles = [];
+    let particleEffects = [];
+
+    const UNIT_SPECS = {
+      royal_knight: { name: 'Royal Knight', team: 'A', hp: 45, dmg: 7.5, arm: 15, spd: 1.2, rng: 25, color: '#3b82f6', size: 9, role: 'melee' },
+      royal_cavalry: { name: 'Royal Cavalry', team: 'A', hp: 50, dmg: 9.0, arm: 14, spd: 2.2, rng: 25, color: '#60a5fa', size: 11, role: 'cavalry' },
+      war_wolf: { name: 'War Wolf', team: 'A', hp: 36, dmg: 8.0, arm: 8, spd: 2.0, rng: 20, color: '#f97316', size: 8, role: 'beast' },
+      iron_titan: { name: 'Colossal Iron Titan', team: 'A', hp: 160, dmg: 16.0, arm: 20, spd: 0.8, rng: 35, color: '#10b981', size: 18, role: 'titan' },
+      holy_paladin: { name: 'Holy Paladin', team: 'A', hp: 55, dmg: 8.5, arm: 16, spd: 1.1, rng: 25, color: '#facc15', size: 10, role: 'paladin' },
+      royal_pyro: { name: 'Fireworks Artillery', team: 'A', hp: 32, dmg: 10.0, arm: 6, spd: 1.0, rng: 180, color: '#ef4444', size: 8, role: 'artillery' },
+      field_medic: { name: 'Field Medic', team: 'A', hp: 30, dmg: 2.0, arm: 6, spd: 1.1, rng: 100, color: '#34d399', size: 8, role: 'medic' },
+
+      raider_berserker: { name: 'Raider Berserker', team: 'B', hp: 42, dmg: 8.5, arm: 10, spd: 1.5, rng: 25, color: '#ef4444', size: 9, role: 'melee' },
+      dread_cavalry: { name: 'Dread Cavalry', team: 'B', hp: 50, dmg: 10.0, arm: 12, spd: 2.2, rng: 25, color: '#a855f7', size: 11, role: 'cavalry' },
+      undead_necromancer: { name: 'Necromancer', team: 'B', hp: 45, dmg: 5.0, arm: 6, spd: 0.9, rng: 150, color: '#8b5cf6', size: 9, role: 'mage' },
+      siege_bombardier: { name: 'Siege Bombardier', team: 'B', hp: 35, dmg: 14.0, arm: 8, spd: 0.9, rng: 200, color: '#f97316', size: 9, role: 'sapper' },
+      shadow_assassin: { name: 'Shadow Assassin', team: 'B', hp: 30, dmg: 12.0, arm: 6, spd: 2.4, rng: 20, color: '#c084fc', size: 7, role: 'assassin' },
+      bogged_sniper: { name: 'Bogged Sniper', team: 'B', hp: 28, dmg: 6.0, arm: 4, spd: 1.0, rng: 190, color: '#84cc16', size: 8, role: 'ranged' }
+    };
+
+    function initArmies() {
+      units = [];
+      projectiles = [];
+      particleEffects = [];
+
+      const typeA = document.getElementById('sim-unit-a').value;
+      const countA = parseInt(document.getElementById('slider-count-a').value);
+
+      const typeB = document.getElementById('sim-unit-b').value;
+      const countB = parseInt(document.getElementById('slider-count-b').value);
+
+      const specA = UNIT_SPECS[typeA];
+      const specB = UNIT_SPECS[typeB];
+
+      const startXA = canvas.width * 0.2;
+      const startXB = canvas.width * 0.8;
+      const centerY = canvas.height * 0.5;
+
+      for (let i = 0; i < countA; i++) {
+        const offsetY = (i - countA / 2) * 26 + (Math.random() - 0.5) * 15;
+        units.push({
+          id: 'A_' + i,
+          ...specA,
+          maxHp: specA.hp,
+          x: startXA + (Math.random() - 0.5) * 30,
+          y: centerY + offsetY,
+          target: null,
+          cooldown: Math.random() * 20
+        });
+      }
+
+      for (let i = 0; i < countB; i++) {
+        const offsetY = (i - countB / 2) * 26 + (Math.random() - 0.5) * 15;
+        units.push({
+          id: 'B_' + i,
+          ...specB,
+          maxHp: specB.hp,
+          x: startXB + (Math.random() - 0.5) * 30,
+          y: centerY + offsetY,
+          target: null,
+          cooldown: Math.random() * 20
+        });
+      }
+
+      updateOverlay();
+    }
+
+    function toggleBattle() {
+      isRunning = !isRunning;
+      const btn = document.getElementById('btn-start');
+      btn.innerText = isRunning ? '⏸ Pause Battle' : '▶ Start Battle';
+      btn.className = isRunning ? 'ctrl-btn' : 'ctrl-btn primary';
+      if (isRunning) playBeep(520, 0.15, 'triangle');
+    }
+
+    function resetBattle() {
+      isRunning = false;
+      document.getElementById('btn-start').innerText = '▶ Start Battle';
+      document.getElementById('btn-start').className = 'ctrl-btn primary';
+      initArmies();
+      addLog('🔄 Armies deployed to starting battlefield lines.');
+    }
+
+    function cycleSpeed() {
+      simSpeed = simSpeed === 1.0 ? 2.0 : (simSpeed === 2.0 ? 4.0 : 1.0);
+      document.getElementById('stat-speed').innerText = simSpeed.toFixed(1) + 'x';
+    }
+
+    function clearAllUnits() {
+      units = [];
+      projectiles = [];
+      particleEffects = [];
+      isRunning = false;
+      document.getElementById('btn-start').innerText = '▶ Start Battle';
+      updateOverlay();
+      addLog('🗑 Cleared all units from the battlefield.');
+    }
+
+    function loadPreset(key) {
+      if (key === 'titan_swarm') {
+        document.getElementById('sim-unit-a').value = 'iron_titan';
+        document.getElementById('slider-count-a').value = '1';
+        document.getElementById('label-count-a').innerText = '1';
+        document.getElementById('sim-unit-b').value = 'raider_berserker';
+        document.getElementById('slider-count-b').value = '25';
+        document.getElementById('label-count-b').innerText = '25';
+      } else if (key === 'cavalry_charge') {
+        document.getElementById('sim-unit-a').value = 'royal_cavalry';
+        document.getElementById('slider-count-a').value = '12';
+        document.getElementById('label-count-a').innerText = '12';
+        document.getElementById('sim-unit-b').value = 'dread_cavalry';
+        document.getElementById('slider-count-b').value = '12';
+        document.getElementById('label-count-b').innerText = '12';
+      } else if (key === 'undead_siege') {
+        document.getElementById('sim-unit-a').value = 'holy_paladin';
+        document.getElementById('slider-count-a').value = '10';
+        document.getElementById('label-count-a').innerText = '10';
+        document.getElementById('sim-unit-b').value = 'undead_necromancer';
+        document.getElementById('slider-count-b').value = '25';
+        document.getElementById('label-count-b').innerText = '25';
+      } else if (key === 'paladin_crusade') {
+        document.getElementById('sim-unit-a').value = 'holy_paladin';
+        document.getElementById('slider-count-a').value = '8';
+        document.getElementById('label-count-a').innerText = '8';
+        document.getElementById('sim-unit-b').value = 'bogged_sniper';
+        document.getElementById('slider-count-b').value = '24';
+        document.getElementById('label-count-b').innerText = '24';
+      }
+      resetBattle();
+    }
+
+    function updateSimConfig() {
+      resetBattle();
+    }
+
+    function addLog(msg) {
+      const log = document.getElementById('combat-log');
+      const el = document.createElement('div');
+      el.className = 'combat-log-entry';
+      el.innerText = msg;
+      log.prepend(el);
+      while (log.children.length > 20) {
+        log.removeChild(log.lastChild);
+      }
+    }
+
+    function updateOverlay() {
+      const countA = units.filter(u => u.team === 'A' && u.hp > 0).length;
+      const countB = units.filter(u => u.team === 'B' && u.hp > 0).length;
+      document.getElementById('stat-count-a').innerText = countA;
+      document.getElementById('stat-count-b').innerText = countB;
+
+      if (isRunning && (countA === 0 || countB === 0)) {
+        isRunning = false;
+        document.getElementById('btn-start').innerText = '▶ Battle Finished';
+        const winner = countA > 0 ? '🔵 Kingdom Forces VICTORY!' : '🔴 Enemy Horde VICTORY!';
+        addLog('👑 ' + winner);
+        playBeep(660, 0.4, 'sine');
+      }
+    }
+
+    // Main Game Loop
+    function update(dt) {
+      if (!isRunning) return;
+
+      const delta = dt * simSpeed;
+
+      // Update Units
+      units.forEach(u => {
+        if (u.hp <= 0) return;
+
+        // Find nearest living enemy
+        let closest = null;
+        let minDist = Infinity;
+        units.forEach(other => {
+          if (other.team !== u.team && other.hp > 0) {
+            const dist = Math.hypot(other.x - u.x, other.y - u.y);
+            if (dist < minDist) {
+              minDist = dist;
+              closest = other;
+            }
+          }
+        });
+
+        u.target = closest;
+
+        if (closest) {
+          const angle = Math.atan2(closest.y - u.y, closest.x - u.x);
+          const dist = Math.hypot(closest.x - u.x, closest.y - u.y);
+
+          // Movement logic
+          if (dist > u.rng) {
+            u.x += Math.cos(angle) * u.spd * delta * 1.5;
+            u.y += Math.sin(angle) * u.spd * delta * 1.5;
+          }
+
+          // Attack logic
+          u.cooldown -= delta;
+          if (u.cooldown <= 0 && dist <= u.rng + 5) {
+            u.cooldown = 20; // attack rate
+
+            if (u.rng > 40) { // Ranged / Artillery
+              projectiles.push({
+                x: u.x,
+                y: u.y,
+                vx: Math.cos(angle) * 7,
+                vy: Math.sin(angle) * 7,
+                team: u.team,
+                dmg: u.dmg,
+                color: u.color,
+                life: 60,
+                type: u.role
+              });
+              playBeep(440, 0.05, 'sawtooth');
+            } else { // Melee Strike
+              const netDmg = Math.max(1, u.dmg - (closest.arm * 0.15));
+              closest.hp -= netDmg;
+              playBeep(220, 0.08, 'square');
+
+              // Particles
+              particleEffects.push({
+                x: closest.x,
+                y: closest.y,
+                vx: (Math.random() - 0.5) * 3,
+                vy: (Math.random() - 0.5) * 3,
+                life: 15,
+                color: '#facc15'
+              });
+
+              if (closest.hp <= 0) {
+                addLog(`💀 ${u.name} defeated ${closest.name}`);
+              }
+            }
+          }
+        }
+      });
+
+      // Update Projectiles
+      for (let i = projectiles.length - 1; i >= 0; i--) {
+        const p = projectiles[i];
+        p.x += p.vx * delta * 1.2;
+        p.y += p.vy * delta * 1.2;
+        p.life -= delta;
+
+        // Check collision
+        for (const u of units) {
+          if (u.team !== p.team && u.hp > 0) {
+            if (Math.hypot(u.x - p.x, u.y - p.y) < u.size + 4) {
+              const netDmg = Math.max(1, p.dmg - (u.arm * 0.1));
+              u.hp -= netDmg;
+              p.life = 0;
+
+              // Explosion particles
+              for (let k = 0; k < 6; k++) {
+                particleEffects.push({
+                  x: p.x,
+                  y: p.y,
+                  vx: (Math.random() - 0.5) * 4,
+                  vy: (Math.random() - 0.5) * 4,
+                  life: 20,
+                  color: p.color
+                });
+              }
+
+              if (u.hp <= 0) {
+                addLog(`💥 Projectile eliminated ${u.name}`);
+              }
+              break;
+            }
+          }
+        }
+
+        if (p.life <= 0) {
+          projectiles.splice(i, 1);
+        }
+      }
+
+      // Update Particles
+      for (let i = particleEffects.length - 1; i >= 0; i--) {
+        const pt = particleEffects[i];
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.life -= delta;
+        if (pt.life <= 0) {
+          particleEffects.splice(i, 1);
+        }
+      }
+
+      updateOverlay();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Grid Lines
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.2)';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      for (let x = 0; x < canvas.width; x += gridSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      // Draw Projectiles
+      projectiles.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw Particles
+      particleEffects.forEach(pt => {
+        ctx.fillStyle = pt.color;
+        ctx.globalAlpha = Math.max(0, pt.life / 20);
+        ctx.fillRect(pt.x, pt.y, 3, 3);
+      });
+      ctx.globalAlpha = 1.0;
+
+      // Draw Units
+      units.forEach(u => {
+        if (u.hp <= 0) return;
+
+        // Shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(u.x, u.y + u.size * 0.8, u.size * 0.9, u.size * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Unit Body
+        ctx.fillStyle = u.color;
+        ctx.beginPath();
+        ctx.arc(u.x, u.y, u.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Direction Indicator
+        if (u.target) {
+          const angle = Math.atan2(u.target.y - u.y, u.target.x - u.x);
+          ctx.beginPath();
+          ctx.moveTo(u.x, u.y);
+          ctx.lineTo(u.x + Math.cos(angle) * (u.size + 4), u.y + Math.sin(angle) * (u.size + 4));
+          ctx.strokeStyle = '#fff';
+          ctx.stroke();
+        }
+
+        // Health Bar
+        const barW = u.size * 2.5;
+        const barH = 3;
+        const barX = u.x - barW / 2;
+        const barY = u.y - u.size - 6;
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+        ctx.fillRect(barX, barY, barW, barH);
+        const hpPct = Math.max(0, u.hp / u.maxHp);
+        ctx.fillStyle = hpPct > 0.5 ? '#10b981' : (hpPct > 0.25 ? '#f59e0b' : '#ef4444');
+        ctx.fillRect(barX, barY, barW * hpPct, barH);
+      });
+
+      requestAnimationFrame(loop);
+    }
+
+    let lastTime = performance.now();
+    function loop(time) {
+      const dt = (time - lastTime) / 16.666;
+      lastTime = time;
+      update(dt);
+      draw();
+    }
+
+    // View Switching
+    function switchView(v) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.getElementById('sidebar-sim').style.display = v === 'sim' ? 'flex' : 'none';
+      document.getElementById('sidebar-studio').style.display = v === 'studio' ? 'flex' : 'none';
+
+      if (v === 'studio') {
+        updateCustomTroop();
+      }
+    }
+
+    // Troop Studio Helpers
+    function applyCustomArchetype() {
+      const arch = document.getElementById('custom-archetype').value;
+      if (arch === 'titan') {
+        document.getElementById('custom-hp').value = 150;
+        document.getElementById('custom-dmg').value = 16;
+        document.getElementById('custom-arm').value = 20;
+        document.getElementById('custom-spd').value = 18;
+      } else if (arch === 'archer') {
+        document.getElementById('custom-hp').value = 24;
+        document.getElementById('custom-dmg').value = 6;
+        document.getElementById('custom-arm').value = 6;
+        document.getElementById('custom-spd').value = 26;
+      } else if (arch === 'cavalry') {
+        document.getElementById('custom-hp').value = 55;
+        document.getElementById('custom-dmg').value = 9;
+        document.getElementById('custom-arm').value = 14;
+        document.getElementById('custom-spd').value = 32;
+      }
+      updateCustomTroop();
+    }
+
+    function updateCustomTroop() {
+      const name = document.getElementById('custom-name').value;
+      const hp = document.getElementById('custom-hp').value;
+      const dmg = document.getElementById('custom-dmg').value;
+      const arm = document.getElementById('custom-arm').value;
+      const spd = (document.getElementById('custom-spd').value / 100).toFixed(2);
+      const faction = document.getElementById('custom-faction').value;
+
+      document.getElementById('val-hp').innerText = hp;
+      document.getElementById('val-dmg').innerText = dmg;
+      document.getElementById('val-arm').innerText = arm;
+      document.getElementById('val-spd').innerText = spd;
+
+      const json = {
+        id: name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+        name: name,
+        faction: faction,
+        attributes: {
+          max_health: parseFloat(hp),
+          attack_damage: parseFloat(dmg),
+          armor: parseFloat(arm),
+          movement_speed: parseFloat(spd),
+          scale: 1.0
+        },
+        behavior: {
+          target_priority: "nearest",
+          retreat_health: 0.20,
+          can_block: true,
+          infinite_ammo: false
+        }
+      };
+
+      document.getElementById('json-output').innerText = JSON.stringify(json, null, 2);
+    }
+
+    function spawnCustomUnitToArena() {
+      const name = document.getElementById('custom-name').value;
+      const hp = parseFloat(document.getElementById('custom-hp').value);
+      const dmg = parseFloat(document.getElementById('custom-dmg').value);
+      const arm = parseFloat(document.getElementById('custom-arm').value);
+      const spd = parseFloat(document.getElementById('custom-spd').value) / 20;
+
+      units.push({
+        id: 'Custom_' + Date.now(),
+        name: name,
+        team: 'A',
+        hp: hp,
+        maxHp: hp,
+        dmg: dmg,
+        arm: arm,
+        spd: spd,
+        rng: 25,
+        color: '#06b6d4',
+        size: 11,
+        role: 'custom',
+        x: canvas.width * 0.5,
+        y: canvas.height * 0.5,
+        target: null,
+        cooldown: 0
+      });
+
+      addLog(`✨ Deployed Custom Unit: [${name}] into live battle!`);
+      playBeep(780, 0.2, 'triangle');
+    }
+
+    // Initial setup
+    initArmies();
+    requestAnimationFrame(loop);
+    updateCustomTroop();
+  </script>
+</body>
+</html>

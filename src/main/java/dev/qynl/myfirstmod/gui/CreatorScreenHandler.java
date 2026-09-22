@@ -4,6 +4,7 @@ import dev.qynl.myfirstmod.battle.BattleSandbox;
 import dev.qynl.myfirstmod.faction.Faction;
 import dev.qynl.myfirstmod.faction.FactionPerk;
 import dev.qynl.myfirstmod.faction.FactionRelation;
+import dev.qynl.myfirstmod.network.ModPackets;
 import dev.qynl.myfirstmod.unit.BattleStats;
 import dev.qynl.myfirstmod.unit.UnitDefinition;
 import dev.qynl.myfirstmod.unit.UnitSpawner;
@@ -122,6 +123,7 @@ public class CreatorScreenHandler extends ScreenHandler {
             if (unit == null) unit = data.units.get(data.firstUnit());
             if (unit != null) {
                 loadUnitIntoSlots(unit);
+                ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
             }
         }
     }
@@ -226,6 +228,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                 UnitDefinition unit = data.units.get(nextId);
                 if (unit != null) {
                     loadUnitIntoSlots(unit);
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 6 -> { // Cycle to prev unit
@@ -233,6 +236,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                 UnitDefinition unit = data.units.get(nextId);
                 if (unit != null) {
                     loadUnitIntoSlots(unit);
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 4 -> { // Duplicate currently equipped unit
@@ -241,6 +245,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                 if (copy != null) {
                     data.setEquippedUnit(player.getUuid(), copy.id);
                     loadUnitIntoSlots(copy);
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, copy);
                 }
             }
             case 5 -> { // Delete currently equipped unit
@@ -249,7 +254,11 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.deleteUnit(equippedId);
                     String next = data.firstUnit();
                     data.setEquippedUnit(player.getUuid(), next);
-                    loadUnitIntoSlots(data.units.get(next));
+                    UnitDefinition nextUnit = data.units.get(next);
+                    if (nextUnit != null) {
+                        loadUnitIntoSlots(nextUnit);
+                        ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, nextUnit);
+                    }
                 }
             }
             case 10 -> { // Start standard battle (8 vs 8)
@@ -299,7 +308,11 @@ public class CreatorScreenHandler extends ScreenHandler {
                 data.factions.clear();
                 data.initDefaultsIfEmpty();
                 data.markDirty();
-                loadUnitIntoSlots(data.units.get(data.firstUnit()));
+                UnitDefinition first = data.units.get(data.firstUnit());
+                if (first != null) {
+                    loadUnitIntoSlots(first);
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, first);
+                }
             }
             case 31 -> { // Toggle building AI
                 data.buildingEnabled = !data.buildingEnabled;
@@ -327,6 +340,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                 if (unit != null) {
                     unit.entityId = dev.qynl.myfirstmod.entity.DynamicEntityRegistry.cycleEntity(unit.entityId, -1);
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 50 -> { // Cycle Base Entity (Next)
@@ -335,6 +349,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                 if (unit != null) {
                     unit.entityId = dev.qynl.myfirstmod.entity.DynamicEntityRegistry.cycleEntity(unit.entityId, 1);
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 48 -> { // Prev Role
@@ -350,6 +365,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.role = ROLE_CYCLE[(currentIndex - 1 + ROLE_CYCLE.length) % ROLE_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 51 -> { // Cycle Role (Next)
@@ -365,6 +381,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.role = ROLE_CYCLE[(currentIndex + 1) % ROLE_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 47 -> { // Prev Faction
@@ -375,6 +392,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     int idx = fKeys.indexOf(unit.factionId);
                     unit.factionId = fKeys.get((idx - 1 + fKeys.size()) % fKeys.size());
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 52 -> { // Cycle Faction (Next)
@@ -385,6 +403,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     int idx = fKeys.indexOf(unit.factionId);
                     unit.factionId = fKeys.get((idx + 1) % fKeys.size());
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 46 -> { // Prev Rank
@@ -400,6 +419,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.rank = RANK_CYCLE[(currentIndex - 1 + RANK_CYCLE.length) % RANK_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 53 -> { // Cycle Rank (Next)
@@ -415,6 +435,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.rank = RANK_CYCLE[(currentIndex + 1) % RANK_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 54 -> { // Toggle Commander
@@ -423,6 +444,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                 if (unit != null) {
                     unit.commander = !unit.commander;
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 55 -> { // Cycle Mount (Next)
@@ -431,6 +453,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                 if (unit != null) {
                     unit.mount = dev.qynl.myfirstmod.entity.DynamicEntityRegistry.cycleMount(unit.mount, 1);
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 59 -> { // Prev Mount
@@ -439,6 +462,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                 if (unit != null) {
                     unit.mount = dev.qynl.myfirstmod.entity.DynamicEntityRegistry.cycleMount(unit.mount, -1);
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 45 -> { // Prev Aura
@@ -454,6 +478,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.particleAura = AURA_CYCLE[(currentIndex - 1 + AURA_CYCLE.length) % AURA_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 56 -> { // Cycle Aura (Next)
@@ -469,6 +494,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.particleAura = AURA_CYCLE[(currentIndex + 1) % AURA_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 44 -> { // Prev Death Action
@@ -484,6 +510,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.deathAction = DEATH_CYCLE[(currentIndex - 1 + DEATH_CYCLE.length) % DEATH_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 57 -> { // Cycle Death Action (Next)
@@ -499,6 +526,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.deathAction = DEATH_CYCLE[(currentIndex + 1) % DEATH_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 43 -> { // Prev Scale
@@ -514,6 +542,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.scale = SCALE_CYCLE[(currentIndex - 1 + SCALE_CYCLE.length) % SCALE_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 58 -> { // Cycle Scale (Next)
@@ -529,6 +558,7 @@ public class CreatorScreenHandler extends ScreenHandler {
                     }
                     unit.scale = SCALE_CYCLE[(currentIndex + 1) % SCALE_CYCLE.length];
                     data.markDirty();
+                    ModPackets.syncEquippedUnitToPlayer(serverPlayer, data, unit);
                 }
             }
             case 70 -> { // Cycle Kingdom ↔ Raiders Relation
@@ -561,22 +591,23 @@ public class CreatorScreenHandler extends ScreenHandler {
                     data.markDirty();
                 }
             }
-            case 80 -> loadPresetToEquipped(data, player.getUuid(), "royal_cavalry");
-            case 81 -> loadPresetToEquipped(data, player.getUuid(), "war_wolf");
-            case 82 -> loadPresetToEquipped(data, player.getUuid(), "battle_bear");
-            case 83 -> loadPresetToEquipped(data, player.getUuid(), "iron_titan");
-            case 84 -> loadPresetToEquipped(data, player.getUuid(), "camel_dragoon");
-            case 85 -> loadPresetToEquipped(data, player.getUuid(), "holy_paladin");
+            case 80 -> loadPresetToEquipped(data, serverPlayer, "royal_cavalry");
+            case 81 -> loadPresetToEquipped(data, serverPlayer, "war_wolf");
+            case 82 -> loadPresetToEquipped(data, serverPlayer, "battle_bear");
+            case 83 -> loadPresetToEquipped(data, serverPlayer, "iron_titan");
+            case 84 -> loadPresetToEquipped(data, serverPlayer, "camel_dragoon");
+            case 85 -> loadPresetToEquipped(data, serverPlayer, "holy_paladin");
         }
 
         return true;
     }
 
-    private void loadPresetToEquipped(UnitWorldData data, UUID playerUuid, String templateId) {
+    private void loadPresetToEquipped(UnitWorldData data, ServerPlayerEntity player, String templateId) {
         UnitDefinition template = data.units.get(templateId);
         if (template != null) {
-            data.setEquippedUnit(playerUuid, template.id);
+            data.setEquippedUnit(player.getUuid(), template.id);
             loadUnitIntoSlots(template);
+            ModPackets.syncEquippedUnitToPlayer(player, data, template);
         }
     }
 }

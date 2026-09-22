@@ -5,18 +5,25 @@ import dev.qynl.myfirstmod.network.ModPackets;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+
+import java.util.*;
 
 public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private int tab = 0;
-    private TextFieldWidget searchField;
 
-    // Tactical Military Command Palette Colors
+    // Tactical Military Palette
     private static final int COLOR_BG_BACKDROP = 0xd9060b14;
     private static final int COLOR_PANEL_MAIN = 0xff0f172a;
     private static final int COLOR_PANEL_INNER = 0xff090e1a;
@@ -27,7 +34,22 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private static final int COLOR_GREEN_ACCENT = 0xff10b981;
     private static final int COLOR_RED_ACCENT = 0xffef4444;
 
-    // Live Slider Values (Interactive Solo Editing)
+    // Synchronized Unit Profile State
+    private String currentUnitId = "royal_knight";
+    private String currentUnitName = "Royal Knight";
+    private String currentEntityId = "minecraft:villager";
+    private String currentFactionId = "kingdom";
+    private String currentRole = "melee";
+    private String currentRank = "captain";
+    private String currentMount = "";
+    private String currentAura = "none";
+    private String currentDeathAction = "none";
+    private boolean currentCommander = false;
+    private boolean currentInfiniteAmmo = false;
+    private int totalUnitCount = 1;
+    private int currentUnitIndex = 0;
+
+    // Real-Time Slider Values
     private double sliderHealth = 40.0;
     private double sliderDamage = 7.5;
     private double sliderArmor = 15.0;
@@ -35,7 +57,44 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private double sliderSpeed = 0.25;
     private double sliderRetreat = 0.20;
 
-    // Custom Battle Composition Controls
+    // --- NEW TROOP STUDIO STATE ---
+    private TextFieldWidget newTroopNameField;
+    private TextFieldWidget newTroopIdField;
+    private int newTroopArchetypeIdx = 0;
+    private int newTroopEntityIdx = 0;
+    private int newTroopFactionIdx = 0;
+
+    private static final String[] ARCHETYPE_KEYS = {
+            "warrior", "archer", "cavalry", "mage", "pyro",
+            "sapper", "medic", "titan", "beast", "assassin", "paladin", "druid"
+    };
+    private static final String[] ARCHETYPE_NAMES = {
+            "🛡 Frontline Warrior", "🏹 Long-range Marksman", "🐎 Armored Cavalry", "🧙 Arcane Mage",
+            "💥 Fireworks Pyro", "💣 Siege Sapper (TNT)", "🧪 Field Medic", "🗿 Colossal Titan",
+            "🐺 Savage Beast", "🗡 Shadow Assassin", "⚡ Holy Paladin", "🌿 Grove Druid"
+    };
+
+    private static final String[] ENTITY_CHOICES = {
+            "minecraft:villager", "minecraft:skeleton", "minecraft:zombie", "minecraft:pillager",
+            "minecraft:vindicator", "minecraft:piglin_brute", "minecraft:piglin", "minecraft:witch",
+            "minecraft:evoker", "minecraft:iron_golem", "minecraft:wolf", "minecraft:polar_bear",
+            "minecraft:breeze", "minecraft:bogged", "minecraft:allay", "minecraft:blaze",
+            "minecraft:wither_skeleton", "minecraft:stray", "minecraft:drowned", "minecraft:warden",
+            "minecraft:ravager", "minecraft:camel"
+    };
+    private static final String[] ENTITY_DISPLAY_NAMES = {
+            "Villager", "Skeleton", "Zombie", "Pillager",
+            "Vindicator", "Piglin Brute", "Piglin", "Witch",
+            "Evoker", "Iron Golem", "Wolf", "Polar Bear",
+            "Breeze", "Bogged", "Allay", "Blaze",
+            "Wither Skeleton", "Stray", "Drowned", "Warden",
+            "Ravager", "Camel"
+    };
+
+    // --- LIBRARY STATE ---
+    private TextFieldWidget searchField;
+
+    // --- CUSTOM BATTLE CONTROLS ---
     private static final String[] FACTION_OPTIONS = {"kingdom", "raiders", "villagers", "undead", "arcane"};
     private static final String[] FACTION_NAMES = {"🔵 Kingdom", "🔴 Raiders", "🟢 Villagers", "🟣 Undead", "🔷 Arcane"};
 
@@ -58,23 +117,26 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     private static final float[] DISTANCE_OPTIONS = {18.0f, 32.0f, 50.0f};
     private static final String[] DISTANCE_NAMES = {"Close (18m)", "Standard (32m)", "Long (50m)"};
 
-    private int battleFactionAIdx = 0; // Kingdom
-    private int battleUnitAIdx = 0;    // All
+    private int battleFactionAIdx = 0;
+    private int battleUnitAIdx = 0;
     private double battleCountA = 12.0;
 
-    private int battleFactionBIdx = 1; // Raiders
-    private int battleUnitBIdx = 0;    // All
+    private int battleFactionBIdx = 1;
+    private int battleUnitBIdx = 0;
     private double battleCountB = 12.0;
 
     private int battleFormationIdx = 0;
     private int battleDistanceIdx = 1;
 
-    // Simulation toggle states for UI display
+    // Simulation toggle states
     private boolean buildingEnabled = true;
     private boolean potionsEnabled = true;
     private boolean fireworksEnabled = true;
     private boolean shieldEnabled = true;
     private boolean friendlyFireAllowed = false;
+
+    // 3D Dummy Entity Cache
+    private final Map<String, LivingEntity> dummyEntityCache = new HashMap<>();
 
     public CreatorScreen(CreatorScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -88,156 +150,226 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         rebuildInterface();
     }
 
+    public void applySyncedUnit(ModPackets.SyncEquippedUnitPayload payload) {
+        this.currentUnitId = payload.unitId();
+        this.currentUnitName = payload.unitName();
+        this.currentEntityId = payload.entityId();
+        this.currentFactionId = payload.factionId();
+        this.currentRole = payload.role();
+        this.currentRank = payload.rank();
+        this.currentMount = payload.mount();
+        this.currentAura = payload.aura();
+        this.currentDeathAction = payload.deathAction();
+        this.currentCommander = payload.commander();
+        this.currentInfiniteAmmo = payload.infiniteAmmo();
+        this.totalUnitCount = payload.totalUnits();
+        this.currentUnitIndex = payload.currentIndex();
+
+        this.sliderHealth = payload.maxHealth();
+        this.sliderDamage = payload.attackDamage();
+        this.sliderArmor = payload.armor();
+        this.sliderScale = payload.scale();
+        this.sliderSpeed = payload.movementSpeed();
+        this.sliderRetreat = payload.retreatHealth();
+
+        if (tab == 0) {
+            rebuildInterface();
+        }
+    }
+
     private void rebuildInterface() {
         clearChildren();
 
-        int topY = y + 7;
-        int tabWidth = 78;
+        int topY = y + 6;
+        int tabWidth = 66;
 
         // Navigation Tab Bar with active highlighted styling
         addDrawableChild(ButtonWidget.builder(Text.literal(tab == 0 ? "⚔ [EDITOR]" : "⚔ Editor"), b -> { tab = 0; rebuildInterface(); })
-                .dimensions(x + 10 + (0 * (tabWidth + 4)), topY, tabWidth, 20).build());
+                .dimensions(x + 8 + (0 * (tabWidth + 3)), topY, tabWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 1 ? "📋 [UNITS]" : "📋 Units"), b -> { tab = 1; rebuildInterface(); })
-                .dimensions(x + 10 + (1 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 1 ? "✨ [NEW]" : "✨ New"), b -> { tab = 1; rebuildInterface(); })
+                .dimensions(x + 8 + (1 * (tabWidth + 3)), topY, tabWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 2 ? "🛡 [FACTIONS]" : "🛡 Factions"), b -> { tab = 2; rebuildInterface(); })
-                .dimensions(x + 10 + (2 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 2 ? "📋 [UNITS]" : "📋 Units"), b -> { tab = 2; rebuildInterface(); })
+                .dimensions(x + 8 + (2 * (tabWidth + 3)), topY, tabWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 3 ? "💥 [BATTLE]" : "💥 Battle"), b -> { tab = 3; rebuildInterface(); })
-                .dimensions(x + 10 + (3 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 3 ? "🛡 [DIPLO]" : "🛡 Diplo"), b -> { tab = 3; rebuildInterface(); })
+                .dimensions(x + 8 + (3 * (tabWidth + 3)), topY, tabWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 4 ? "⚙ [CONFIG]" : "⚙ Config"), b -> { tab = 4; rebuildInterface(); })
-                .dimensions(x + 10 + (4 * (tabWidth + 4)), topY, tabWidth, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 4 ? "💥 [BATTLE]" : "💥 Battle"), b -> { tab = 4; rebuildInterface(); })
+                .dimensions(x + 8 + (4 * (tabWidth + 3)), topY, tabWidth, 20).build());
 
-        int leftX = x + 14;
-        int rightX = x + 252;
+        addDrawableChild(ButtonWidget.builder(Text.literal(tab == 5 ? "⚙ [CONFIG]" : "⚙ Config"), b -> { tab = 5; rebuildInterface(); })
+                .dimensions(x + 8 + (5 * (tabWidth + 3)), topY, tabWidth, 20).build());
 
-        if (tab == 0) { // UNIT EDITOR WITH REAL-TIME SLIDERS
+        int leftX = x + 12;
+        int rightX = x + 248;
+
+        if (tab == 0) { // TAB 0: UNIT EDITOR WITH 3D PREVIEW & STAT SLIDERS
             // Unit Selectors
             addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Prev Unit"), b -> sendButton(6))
-                    .dimensions(leftX, y + 32, 108, 16).build());
+                    .dimensions(leftX, y + 30, 78, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("Next Unit ⮞"), b -> sendButton(3))
-                    .dimensions(leftX + 112, y + 32, 108, 16).build());
+                    .dimensions(leftX + 82, y + 30, 78, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("✨ + New"), b -> { tab = 1; rebuildInterface(); })
+                    .dimensions(leftX + 164, y + 30, 56, 16).build());
 
             // 1. Health Slider (5 to 300 HP)
-            addDrawableChild(new TacticalSliderWidget(leftX, y + 50, 108, 16, "Health", "HP", 5.0, 300.0, sliderHealth, val -> {
+            addDrawableChild(new TacticalSliderWidget(leftX, y + 48, 108, 16, "Health", "HP", 5.0, 300.0, sliderHealth, val -> {
                 sliderHealth = val;
                 syncSlidersToServer();
             }));
 
             // 2. Attack Damage Slider (1 to 50 DMG)
-            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 50, 108, 16, "Damage", "DMG", 1.0, 50.0, sliderDamage, val -> {
+            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 48, 108, 16, "Damage", "DMG", 1.0, 50.0, sliderDamage, val -> {
                 sliderDamage = val;
                 syncSlidersToServer();
             }));
 
             // 3. Armor Slider (0 to 30 Armor)
-            addDrawableChild(new TacticalSliderWidget(leftX, y + 68, 108, 16, "Armor", "pts", 0.0, 30.0, sliderArmor, val -> {
+            addDrawableChild(new TacticalSliderWidget(leftX, y + 66, 108, 16, "Armor", "pts", 0.0, 30.0, sliderArmor, val -> {
                 sliderArmor = val;
                 syncSlidersToServer();
             }));
 
             // 4. Visual Scale Slider (0.25x to 3.00x)
-            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 68, 108, 16, "Scale", "x", 0.25, 3.0, sliderScale, val -> {
+            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 66, 108, 16, "Scale", "x", 0.25, 3.0, sliderScale, val -> {
                 sliderScale = val;
                 syncSlidersToServer();
             }));
 
             // 5. Movement Speed Slider (0.10 to 0.60)
-            addDrawableChild(new TacticalSliderWidget(leftX, y + 86, 108, 16, "Speed", "spd", 0.10, 0.60, sliderSpeed, val -> {
+            addDrawableChild(new TacticalSliderWidget(leftX, y + 84, 108, 16, "Speed", "spd", 0.10, 0.60, sliderSpeed, val -> {
                 sliderSpeed = val;
                 syncSlidersToServer();
             }));
 
             // 6. Retreat Threshold Slider (0% to 75%)
-            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 86, 108, 16, "Retreat", "%", 0.0, 0.75, sliderRetreat, val -> {
+            addDrawableChild(new TacticalSliderWidget(leftX + 112, y + 84, 108, 16, "Retreat", "%", 0.0, 0.75, sliderRetreat, val -> {
                 sliderRetreat = val;
                 syncSlidersToServer();
             }));
 
-            // Quick Category Cyclers
+            // Category Cyclers
             addDrawableChild(ButtonWidget.builder(Text.literal("🦁 ⮜ Entity ⮞"), b -> sendButton(hasShiftDown() ? 49 : 50))
-                    .dimensions(leftX, y + 104, 108, 16).build());
+                    .dimensions(leftX, y + 102, 108, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🎯 ⮜ Role ⮞"), b -> sendButton(hasShiftDown() ? 48 : 51))
-                    .dimensions(leftX + 112, y + 104, 108, 16).build());
+                    .dimensions(leftX + 112, y + 102, 108, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🐎 ⮜ Mount ⮞"), b -> sendButton(hasShiftDown() ? 59 : 55))
-                    .dimensions(leftX, y + 122, 108, 16).build());
+                    .dimensions(leftX, y + 120, 108, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🚩 ⮜ Faction ⮞"), b -> sendButton(hasShiftDown() ? 47 : 52))
-                    .dimensions(leftX + 112, y + 122, 108, 16).build());
+                    .dimensions(leftX + 112, y + 120, 108, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("★ Commander Status: Toggle"), b -> sendButton(54))
-                    .dimensions(leftX, y + 140, 220, 16).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal(currentCommander ? "★ Commander: [YES]" : "☆ Commander: [NO]"), b -> sendButton(54))
+                    .dimensions(leftX, y + 138, 108, 16).build());
 
-            // Right Panel: Solo Faction Quick-Deployment Bar
-            addDrawableChild(ButtonWidget.builder(Text.literal("💾 Save Unit Slots"), b -> sendButton(0))
-                    .dimensions(rightX, y + 32, 162, 16).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("💾 Save Gear"), b -> sendButton(0))
+                    .dimensions(leftX + 112, y + 138, 108, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔵 Kingdom: 1x"), b -> spawnSoloFaction("kingdom", 1))
-                    .dimensions(rightX, y + 50, 78, 16).build());
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔵 Squad (5)"), b -> spawnSoloFaction("kingdom", 5))
-                    .dimensions(rightX + 84, y + 50, 78, 16).build());
+            // Right Panel Spawn & Management Bar
+            addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn 1x"), b -> sendButton(1))
+                    .dimensions(rightX + 90, y + 30, 80, 16).build());
 
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔴 Raiders: 1x"), b -> spawnSoloFaction("raiders", 1))
-                    .dimensions(rightX, y + 68, 78, 16).build());
-            addDrawableChild(ButtonWidget.builder(Text.literal("🔴 Squad (5)"), b -> spawnSoloFaction("raiders", 5))
-                    .dimensions(rightX + 84, y + 68, 78, 16).build());
-
-            addDrawableChild(ButtonWidget.builder(Text.literal("🟢 Village: 1x"), b -> spawnSoloFaction("villagers", 1))
-                    .dimensions(rightX, y + 86, 78, 16).build());
-            addDrawableChild(ButtonWidget.builder(Text.literal("🟢 Squad (5)"), b -> spawnSoloFaction("villagers", 5))
-                    .dimensions(rightX + 84, y + 86, 78, 16).build());
-
-            addDrawableChild(ButtonWidget.builder(Text.literal("🟣 Undead: 1x"), b -> spawnSoloFaction("undead", 1))
-                    .dimensions(rightX, y + 104, 78, 16).build());
-            addDrawableChild(ButtonWidget.builder(Text.literal("🟣 Squad (5)"), b -> spawnSoloFaction("undead", 5))
-                    .dimensions(rightX + 84, y + 104, 78, 16).build());
+            addDrawableChild(ButtonWidget.builder(Text.literal("🛡 Squad (5x)"), b -> sendButton(2))
+                    .dimensions(rightX + 90, y + 48, 80, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("➕ Duplicate"), b -> sendButton(4))
-                    .dimensions(rightX, y + 122, 78, 16).build());
-            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Delete"), b -> sendButton(5))
-                    .dimensions(rightX + 84, y + 122, 78, 16).build());
+                    .dimensions(rightX + 90, y + 66, 80, 16).build());
 
-        } else if (tab == 1) { // SAVED UNITS LIBRARY
-            searchField = new TextFieldWidget(textRenderer, leftX, y + 34, 224, 20, Text.literal("Search"));
+            addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Delete"), b -> sendButton(5))
+                    .dimensions(rightX + 90, y + 84, 80, 16).build());
+
+        } else if (tab == 1) { // TAB 1: DEDICATED NEW TROOP CREATOR STUDIO
+            int formX = leftX + 10;
+            int formW = backgroundWidth - 44;
+
+            newTroopNameField = new TextFieldWidget(textRenderer, formX, y + 46, formW / 2 - 6, 18, Text.literal("Troop Name"));
+            newTroopNameField.setPlaceholder(Text.literal("Troop Name (e.g. Frost Valkyrie)"));
+            newTroopNameField.setText("Custom Warrior");
+            addDrawableChild(newTroopNameField);
+
+            newTroopIdField = new TextFieldWidget(textRenderer, formX + formW / 2 + 6, y + 46, formW / 2 - 6, 18, Text.literal("Troop ID"));
+            newTroopIdField.setPlaceholder(Text.literal("Troop ID (e.g. frost_valkyrie)"));
+            newTroopIdField.setText("frost_valkyrie");
+            addDrawableChild(newTroopIdField);
+
+            // Archetype Template Selector
+            addDrawableChild(ButtonWidget.builder(Text.literal("Archetype: " + ARCHETYPE_NAMES[newTroopArchetypeIdx]), b -> {
+                newTroopArchetypeIdx = (newTroopArchetypeIdx + 1) % ARCHETYPE_KEYS.length;
+                rebuildInterface();
+            }).dimensions(formX, y + 74, formW, 18).build());
+
+            // Base Mob Selector
+            addDrawableChild(ButtonWidget.builder(Text.literal("Base Mob: " + ENTITY_DISPLAY_NAMES[newTroopEntityIdx]), b -> {
+                newTroopEntityIdx = (newTroopEntityIdx + 1) % ENTITY_CHOICES.length;
+                rebuildInterface();
+            }).dimensions(formX, y + 98, formW / 2 - 6, 18).build());
+
+            // Faction Selector
+            addDrawableChild(ButtonWidget.builder(Text.literal("Faction: " + FACTION_NAMES[newTroopFactionIdx]), b -> {
+                newTroopFactionIdx = (newTroopFactionIdx + 1) % FACTION_OPTIONS.length;
+                rebuildInterface();
+            }).dimensions(formX + formW / 2 + 6, y + 98, formW / 2 - 6, 18).build());
+
+            // Big Action Button: FORGE & RECRUIT NEW TROOP
+            addDrawableChild(ButtonWidget.builder(Text.literal("✨ FORGE & RECRUIT NEW TROOP ✨").formatted(Formatting.BOLD), b -> createCustomTroopAction())
+                    .dimensions(formX, y + 130, formW, 24).build());
+
+            // Preset Quick-Spawn Archetype Shortcuts
+            int chipW = (formW - 18) / 4;
+            addDrawableChild(ButtonWidget.builder(Text.literal("🛡 Warrior"), b -> quickCreateArchetype("warrior", "Custom Warrior", "minecraft:villager", "kingdom"))
+                    .dimensions(formX + 0 * (chipW + 6), y + 164, chipW, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("🏹 Archer"), b -> quickCreateArchetype("archer", "Custom Archer", "minecraft:skeleton", "kingdom"))
+                    .dimensions(formX + 1 * (chipW + 6), y + 164, chipW, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("🐎 Cavalry"), b -> quickCreateArchetype("cavalry", "Custom Cavalry", "minecraft:villager", "kingdom"))
+                    .dimensions(formX + 2 * (chipW + 6), y + 164, chipW, 16).build());
+
+            addDrawableChild(ButtonWidget.builder(Text.literal("🧙 Mage"), b -> quickCreateArchetype("mage", "Custom Mage", "minecraft:witch", "arcane"))
+                    .dimensions(formX + 3 * (chipW + 6), y + 164, chipW, 16).build());
+
+        } else if (tab == 2) { // TAB 2: SAVED UNITS LIBRARY
+            searchField = new TextFieldWidget(textRenderer, leftX, y + 32, 224, 18, Text.literal("Search"));
             searchField.setPlaceholder(Text.literal("Search units (knight, wolf, bear, dragoon, titan)..."));
             addDrawableChild(searchField);
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ Spawn Equipped"), b -> sendButton(1))
-                    .dimensions(rightX, y + 34, 162, 18).build());
+                    .dimensions(rightX, y + 32, 162, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🛡 Spawn Squad (5)"), b -> sendButton(2))
-                    .dimensions(rightX, y + 54, 162, 18).build());
+                    .dimensions(rightX, y + 50, 162, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("📥 Cavalry"), b -> sendButton(80))
-                    .dimensions(rightX, y + 74, 78, 18).build());
+                    .dimensions(rightX, y + 70, 78, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("📥 War Wolf"), b -> sendButton(81))
-                    .dimensions(rightX + 84, y + 74, 78, 18).build());
+                    .dimensions(rightX + 84, y + 70, 78, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("📥 Battle Bear"), b -> sendButton(82))
-                    .dimensions(rightX, y + 94, 78, 18).build());
+                    .dimensions(rightX, y + 88, 78, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("📥 Iron Titan"), b -> sendButton(83))
-                    .dimensions(rightX + 84, y + 94, 78, 18).build());
+                    .dimensions(rightX + 84, y + 88, 78, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("📥 Dragoon"), b -> sendButton(84))
-                    .dimensions(rightX, y + 114, 78, 18).build());
+                    .dimensions(rightX, y + 106, 78, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("📥 Paladin"), b -> sendButton(85))
-                    .dimensions(rightX + 84, y + 114, 78, 18).build());
+                    .dimensions(rightX + 84, y + 106, 78, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Next Unit"), b -> sendButton(3))
-                    .dimensions(rightX, y + 134, 78, 18).build());
+                    .dimensions(rightX, y + 126, 78, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("⮜ Prev Unit"), b -> sendButton(6))
-                    .dimensions(rightX + 84, y + 134, 78, 18).build());
+                    .dimensions(rightX + 84, y + 126, 78, 16).build());
 
-        } else if (tab == 2) { // FACTIONS & DIPLOMACY
+        } else if (tab == 3) { // TAB 3: FACTIONS & DIPLOMACY
             addDrawableChild(ButtonWidget.builder(Text.literal("Kingdom ↔ Raiders: Toggle"), b -> sendButton(70))
                     .dimensions(rightX, y + 34, 162, 20).build());
 
@@ -250,12 +382,12 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Restore Defaults"), b -> sendButton(30))
                     .dimensions(rightX, y + 110, 162, 20).build());
 
-        } else if (tab == 3) { // CUSTOM BATTLE SANDBOX & ARMY COMPOSITION BUILDER
+        } else if (tab == 4) { // TAB 4: CUSTOM BATTLE SANDBOX
             int colW = 196;
             int col1 = leftX;
             int col2 = leftX + colW + 12;
 
-            // --- SIDE A BUILDER ---
+            // Side A Builder
             addDrawableChild(ButtonWidget.builder(Text.literal("Side A: " + FACTION_NAMES[battleFactionAIdx]), b -> {
                 battleFactionAIdx = (battleFactionAIdx + 1) % FACTION_OPTIONS.length;
                 rebuildInterface();
@@ -270,7 +402,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                 battleCountA = val;
             }));
 
-            // --- SIDE B BUILDER ---
+            // Side B Builder
             addDrawableChild(ButtonWidget.builder(Text.literal("Side B: " + FACTION_NAMES[battleFactionBIdx]), b -> {
                 battleFactionBIdx = (battleFactionBIdx + 1) % FACTION_OPTIONS.length;
                 rebuildInterface();
@@ -285,7 +417,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                 battleCountB = val;
             }));
 
-            // --- MODIFIERS: FORMATION & DISTANCE ---
+            // Modifiers: Formation & Distance
             addDrawableChild(ButtonWidget.builder(Text.literal("Formation: " + FORMATION_NAMES[battleFormationIdx]), b -> {
                 battleFormationIdx = (battleFormationIdx + 1) % FORMATION_OPTIONS.length;
                 rebuildInterface();
@@ -296,11 +428,11 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                 rebuildInterface();
             }).dimensions(col2, y + 86, colW, 16).build());
 
-            // --- LAUNCH BUTTON ---
+            // Launch Button
             addDrawableChild(ButtonWidget.builder(Text.literal("⚔ LAUNCH CUSTOM WAR CLASH ⚔"), b -> launchCustomBattle())
-                    .dimensions(leftX, y + 104, backgroundWidth - 28, 18).build());
+                    .dimensions(leftX, y + 104, backgroundWidth - 24, 18).build());
 
-            // --- PRESET BUTTONS (4 Quick Epic Setups) ---
+            // Preset Buttons
             int presetW = 96;
             addDrawableChild(ButtonWidget.builder(Text.literal("👑 1 Titan vs 25"), b -> launchPreset("titan_vs_swarm"))
                     .dimensions(leftX + (0 * (presetW + 6)), y + 124, presetW, 16).build());
@@ -314,14 +446,14 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             addDrawableChild(ButtonWidget.builder(Text.literal("⚡ 8 vs 24 Smite"), b -> launchPreset("paladin_crusade"))
                     .dimensions(leftX + (3 * (presetW + 6)), y + 124, presetW, 16).build());
 
-            // --- UTILITY CONTROLS ---
+            // Utility Controls
             addDrawableChild(ButtonWidget.builder(Text.literal("🗑 Clear Battle Mobs"), b -> sendButton(11))
                     .dimensions(leftX, y + 142, 196, 16).build());
 
             addDrawableChild(ButtonWidget.builder(Text.literal("🔄 Reset Stats Scoreboard"), b -> sendButton(12))
                     .dimensions(leftX + 208, y + 142, 196, 16).build());
 
-        } else if (tab == 4) { // SETTINGS & SIMULATION
+        } else if (tab == 5) { // TAB 5: SIMULATION CONFIG
             addDrawableChild(ButtonWidget.builder(Text.literal("Building AI: " + (buildingEnabled ? "ON [Active]" : "OFF [Disabled]")), b -> {
                 buildingEnabled = !buildingEnabled;
                 sendButton(31);
@@ -357,6 +489,29 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         }
     }
 
+    private void createCustomTroopAction() {
+        String name = newTroopNameField != null ? newTroopNameField.getText() : "Custom Troop";
+        String id = newTroopIdField != null ? newTroopIdField.getText() : "custom_troop";
+        String template = ARCHETYPE_KEYS[newTroopArchetypeIdx];
+        String entityId = ENTITY_CHOICES[newTroopEntityIdx];
+        String factionId = FACTION_OPTIONS[newTroopFactionIdx];
+
+        ClientPlayNetworking.send(new ModPackets.CreateCustomTroopPayload(
+                id, name, entityId, factionId, "melee", template
+        ));
+        tab = 0; // Switch to editor to see the new unit immediately
+        rebuildInterface();
+    }
+
+    private void quickCreateArchetype(String template, String name, String entityId, String factionId) {
+        String id = template + "_" + System.currentTimeMillis() % 10000;
+        ClientPlayNetworking.send(new ModPackets.CreateCustomTroopPayload(
+                id, name, entityId, factionId, "melee", template
+        ));
+        tab = 0;
+        rebuildInterface();
+    }
+
     private void launchCustomBattle() {
         String fA = FACTION_OPTIONS[battleFactionAIdx];
         String uA = UNIT_OPTIONS[battleUnitAIdx];
@@ -377,13 +532,13 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
     private void launchPreset(String preset) {
         if ("titan_vs_swarm".equals(preset)) {
-            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("villagers", "village_titan", 1, "raiders", "raider_berserker", 25, "ambush", 24.0f));
+            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("villagers", "iron_titan", 1, "raiders", "raider_berserker", 25, "ambush", 24.0f));
         } else if ("cavalry_charge".equals(preset)) {
-            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("kingdom", "royal_cavalry", 12, "undead", "undead_cavalry", 12, "line", 40.0f));
+            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("kingdom", "royal_cavalry", 12, "undead", "dread_cavalry", 12, "line", 40.0f));
         } else if ("undead_siege".equals(preset)) {
             ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("villagers", "all", 10, "undead", "all", 30, "ambush", 28.0f));
         } else if ("paladin_crusade".equals(preset)) {
-            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("kingdom", "paladin_crusader", 8, "undead", "undead_archer", 24, "line", 30.0f));
+            ClientPlayNetworking.send(new ModPackets.StartCustomBattlePayload("kingdom", "holy_paladin", 8, "undead", "bogged_sniper", 24, "line", 30.0f));
         }
         close();
     }
@@ -399,14 +554,28 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
         ));
     }
 
-    private void spawnSoloFaction(String factionId, int count) {
-        ClientPlayNetworking.send(new ModPackets.SpawnFactionUnitPayload(factionId, count));
-    }
-
     private void sendButton(int id) {
         if (client != null && client.interactionManager != null) {
             client.interactionManager.clickButton(handler.syncId, id);
         }
+    }
+
+    private LivingEntity getOrCreateDummyEntity(String entityIdStr) {
+        if (client == null || client.world == null) return null;
+        return dummyEntityCache.computeIfAbsent(entityIdStr, id -> {
+            try {
+                Identifier idObj = Identifier.tryParse(id);
+                if (idObj == null) idObj = Identifier.of("minecraft", "villager");
+                var entityType = Registries.ENTITY_TYPE.get(idObj);
+                if (entityType != null) {
+                    var ent = entityType.create(client.world);
+                    if (ent instanceof LivingEntity living) {
+                        return living;
+                    }
+                }
+            } catch (Throwable ignored) {}
+            return null;
+        });
     }
 
     @Override
@@ -416,14 +585,14 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
         // Main Dialog Console Panel
         context.fill(x, y, x + backgroundWidth, y + backgroundHeight, COLOR_PANEL_MAIN);
-        context.fill(x + 8, y + 28, x + backgroundWidth - 8, y + backgroundHeight - 8, COLOR_PANEL_INNER);
+        context.fill(x + 6, y + 26, x + backgroundWidth - 6, y + backgroundHeight - 6, COLOR_PANEL_INNER);
 
         // Header separator line
-        context.fill(x + 8, y + 28, x + backgroundWidth - 8, y + 29, COLOR_CARD_BORDER);
+        context.fill(x + 6, y + 26, x + backgroundWidth - 6, y + 27, COLOR_CARD_BORDER);
 
         // Tab selection highlight under active tab
-        int tabWidth = 78;
-        context.fill(x + 10 + (tab * (tabWidth + 4)), y + 26, x + 10 + (tab * (tabWidth + 4)) + tabWidth, y + 28, COLOR_GOLD_ACCENT);
+        int tabWidth = 66;
+        context.fill(x + 8 + (tab * (tabWidth + 3)), y + 24, x + 8 + (tab * (tabWidth + 3)) + tabWidth, y + 26, COLOR_GOLD_ACCENT);
     }
 
     @Override
@@ -450,21 +619,42 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
 
     private void drawSlotLabels(DrawContext context) {
         int eqX = x + 255;
-        int eqY = y + 144;
+        int eqY = y + 128;
         context.drawText(textRenderer, Text.literal("H   C   L   F   M   O").formatted(Formatting.DARK_GRAY), eqX + 3, eqY, 0xff8294ad, false);
-        context.drawText(textRenderer, Text.literal("Unit Equipment & Inventory").formatted(Formatting.AQUA), eqX, y + 130, 0xff9ecbff, false);
+        context.drawText(textRenderer, Text.literal("Equipment & Satchel").formatted(Formatting.AQUA), eqX, y + 116, 0xff9ecbff, false);
     }
 
     private void drawTabContent(DrawContext context, int mouseX, int mouseY) {
-        int leftX = x + 14;
-        int leftY = y + 162;
+        int leftX = x + 12;
 
-        if (tab == 0) { // UNIT EDITOR CONTENT & STAT HUD
-            context.fill(leftX, leftY - 4, leftX + 220, y + backgroundHeight - 12, COLOR_CARD_BG);
-            context.fill(leftX, leftY - 4, leftX + 3, y + backgroundHeight - 12, COLOR_GOLD_ACCENT);
+        if (tab == 0) { // TAB 0: LIVE 3D PREVIEW & COMBAT PROFILE
+            // Draw 3D Entity Preview Box
+            int prevX = x + 250;
+            int prevY = y + 30;
+            int prevW = 82;
+            int prevH = 74;
 
-            // Live Stat Bars & Rating Dashboard
-            context.drawText(textRenderer, Text.literal("⚔ UNIT COMBAT PROFILE").formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, leftY, COLOR_GOLD_ACCENT, false);
+            context.fill(prevX, prevY, prevX + prevW, prevY + prevH, COLOR_CARD_BG);
+            context.drawBorder(prevX, prevY, prevW, prevH, COLOR_CARD_BORDER);
+
+            LivingEntity dummy = getOrCreateDummyEntity(currentEntityId);
+            if (dummy != null) {
+                // Synchronize equipment slots to preview model
+                for (int i = 0; i < 6; i++) {
+                    ItemStack stack = handler.equipmentInventory.getStack(i);
+                    dummy.equipStack(CreatorScreenHandler.EQUIPMENT_SLOTS[i], stack);
+                }
+                int entitySize = (int) (28 * Math.max(0.6f, Math.min(1.8f, (float) sliderScale)));
+                InventoryScreen.drawEntity(context, prevX + 2, prevY + 2, prevX + prevW - 2, prevY + prevH - 2, entitySize, 0.0625f, (float) mouseX, (float) mouseY, dummy);
+            }
+
+            // Unit Identity Header above stats
+            int leftY = y + 158;
+            context.fill(leftX, leftY - 4, leftX + 224, y + backgroundHeight - 8, COLOR_CARD_BG);
+            context.fill(leftX, leftY - 4, leftX + 3, y + backgroundHeight - 8, COLOR_GOLD_ACCENT);
+
+            String titleStr = "⚔ " + currentUnitName + " [" + (currentUnitIndex + 1) + "/" + Math.max(1, totalUnitCount) + "]";
+            context.drawText(textRenderer, Text.literal(titleStr).formatted(Formatting.GOLD, Formatting.BOLD), leftX + 8, leftY, COLOR_GOLD_ACCENT, false);
 
             drawStatBar(context, leftX + 8, leftY + 12, "❤ HP", (float) sliderHealth, 300.0f, 0xffef4444);
             drawStatBar(context, leftX + 8, leftY + 24, "🗡 DMG", (float) sliderDamage, 50.0f, 0xfff97316);
@@ -472,35 +662,42 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             drawStatBar(context, leftX + 8, leftY + 48, "⚡ SPD", (float) (sliderSpeed * 100), 60.0f, 0xffeab308);
             drawStatBar(context, leftX + 8, leftY + 60, "📏 SCL", (float) sliderScale, 3.0f, 0xffa855f7);
 
-            context.drawText(textRenderer, Text.literal("• Live Synchronized Solo Sandbox Profile").formatted(Formatting.DARK_GRAY), leftX + 8, leftY + 74, 0xff94a3b8, false);
+            String infoBadge = "• " + currentFactionId.toUpperCase() + " | " + currentRole.toUpperCase() + (currentCommander ? " | ★ CMD" : "");
+            context.drawText(textRenderer, Text.literal(infoBadge).formatted(Formatting.DARK_GRAY), leftX + 8, leftY + 74, 0xff94a3b8, false);
 
-        } else if (tab == 1) { // SAVED UNITS LIBRARY
-            int cardY = y + 58;
+        } else if (tab == 1) { // TAB 1: NEW TROOP CREATOR STUDIO
+            int formX = leftX + 10;
+            context.drawTextWithShadow(textRenderer, Text.literal("TROOP CREATION STUDIO").formatted(Formatting.BOLD, Formatting.GOLD), formX, y + 32, 0xffffd700);
+            context.drawText(textRenderer, Text.literal("Type a custom name and select starting archetype, mob type, and faction:").formatted(Formatting.GRAY), formX, y + 118, 0xffcbd5e1, false);
+            context.drawText(textRenderer, Text.literal("Quick Starter Presets (Instant Forge):").formatted(Formatting.AQUA), formX, y + 152, 0xff38bdf8, false);
+
+        } else if (tab == 2) { // TAB 2: UNITS LIBRARY
+            int cardY = y + 54;
             String q = searchField == null ? "" : searchField.getText().toLowerCase();
             int cardsDrawn = 0;
 
             String[][] allUnits = {
-                    {"Royal Knight", "VILLAGER • MELEE TANK • 40 HP • 7.5 DMG", "0xff3b82f6", "royal knight villager melee tank"},
-                    {"Royal Heavy Cavalry", "HORSE MOUNT • ARMORED LANCE • 45 HP", "0xff3b82f6", "royal cavalry horse mount"},
-                    {"Savage War Wolf", "WOLF • BERSERKER BEAST • 36 HP • 8.0 DMG", "0xfff97316", "war wolf beast berserker animal canine naturalist"},
-                    {"Armored Battle Bear", "POLAR BEAR • 1.25x TANK JUGGERNAUT • 85 HP", "0xff38bdf8", "battle bear polar grizzly bear naturalist tank"},
-                    {"Desert Camel Dragoon", "CAMEL MOUNT • CROSSBOW RANGED • 48 HP", "0xffeab308", "desert camel dragoon mount ranged marksman"},
-                    {"Royal Archer", "SKELETON • RANGED SNIPER • 24 HP • 5.0 DMG", "0xff38bdf8", "royal archer skeleton ranged"},
-                    {"Field Medic", "VILLAGER • HEALER • 28 HP • POTIONS", "0xff10b981", "field medic villager healer support potion"},
-                    {"Holy Paladin Crusader", "PALADIN • SMITE & ABSORPTION • 55 HP", "0xfffacc15", "holy paladin crusader mace sunforge"},
-                    {"Colossal Iron Titan", "IRON GOLEM • 1.35x SCALE • 150 HP • 16 DMG", "0xff10b981", "colossal iron titan golem tank warlord"},
-                    {"Grove Druid", "VILLAGER • ROOT SNARE & NATURE • 32 HP", "0xff22c55e", "grove druid nature roots wolf"},
-                    {"Royal Pyrotechnic", "PILLAGER • FIREWORKS ARTILLERY • 30 HP", "0xffef4444", "royal pyro pillager fireworks artillery explosive"},
-                    {"Siege Bombardier", "PIGLIN • TNT MORTAR SAPPER • 35 HP", "0xfff97316", "siege bombardier piglin mortar tnt"},
-                    {"Raider Berserker", "PIGLIN BRUTE • BLOODRAGE • 40 HP", "0xffef4444", "raider berserker piglin brute fury"},
-                    {"Undead Necromancer", "EVOKER • DARK SUMMONER • 45 HP", "0xff8b5cf6", "undead necromancer evoker summoner"},
-                    {"Shadowfang Assassin", "STRAY • BLINK BACKSTAB • 28 HP", "0xffa855f7", "shadow assassin stray dagger blink"},
-                    {"Dread Skeleton Cavalry", "SKELETON HORSE • WITHER • 48 HP", "0xff6b21a8", "dread cavalry wither skeleton horse"},
-                    {"Mossy Bogged Sniper", "BOGGED • POISON SNIPER • 26 HP", "0xff84cc16", "bogged poison sniper archer"},
-                    {"Tempest Breeze", "BREEZE • WIND GUST AOE • 40 HP", "0xff06b6d4", "tempest breeze wind knockback"},
-                    {"Celestial Pixie Medic", "ALLAY • FLYING HEALER • 25 HP", "0xff38bdf8", "celestial pixie medic allay flying fairy"},
-                    {"Arcane Bard", "VILLAGER • WAR LUTE BUFFS • 30 HP", "0xff06b6d4", "arcane bard lute music buff"},
-                    {"Combat Engineer", "VILLAGER • BARRICADE BUILDER • 32 HP", "0xff0ea5e9", "combat engineer villager builder barricade"}
+                    {"Royal Knight", "VILLAGER • MELEE TANK • 40 HP • 7.5 DMG", "0xff3b82f6", "royal knight villager melee tank", "royal_knight"},
+                    {"Royal Heavy Cavalry", "HORSE MOUNT • ARMORED LANCE • 45 HP", "0xff3b82f6", "royal cavalry horse mount", "royal_cavalry"},
+                    {"Savage War Wolf", "WOLF • BERSERKER BEAST • 36 HP • 8.0 DMG", "0xfff97316", "war wolf beast berserker animal canine naturalist", "war_wolf"},
+                    {"Armored Battle Bear", "POLAR BEAR • 1.25x TANK JUGGERNAUT • 85 HP", "0xff38bdf8", "battle bear polar grizzly bear naturalist tank", "battle_bear"},
+                    {"Desert Camel Dragoon", "CAMEL MOUNT • CROSSBOW RANGED • 48 HP", "0xffeab308", "desert camel dragoon mount ranged marksman", "camel_dragoon"},
+                    {"Royal Archer", "SKELETON • RANGED SNIPER • 24 HP • 5.0 DMG", "0xff38bdf8", "royal archer skeleton ranged", "royal_archer"},
+                    {"Field Medic", "VILLAGER • HEALER • 28 HP • POTIONS", "0xff10b981", "field medic villager healer support potion", "field_medic"},
+                    {"Holy Paladin Crusader", "PALADIN • SMITE & ABSORPTION • 55 HP", "0xfffacc15", "holy paladin crusader mace sunforge", "holy_paladin"},
+                    {"Colossal Iron Titan", "IRON GOLEM • 1.35x SCALE • 150 HP • 16 DMG", "0xff10b981", "colossal iron titan golem tank warlord", "iron_titan"},
+                    {"Grove Druid", "VILLAGER • ROOT SNARE & NATURE • 32 HP", "0xff22c55e", "grove druid nature roots wolf", "nature_druid"},
+                    {"Royal Pyrotechnic", "PILLAGER • FIREWORKS ARTILLERY • 30 HP", "0xffef4444", "royal pyro pillager fireworks artillery explosive", "royal_pyro"},
+                    {"Siege Bombardier", "PIGLIN • TNT MORTAR SAPPER • 35 HP", "0xfff97316", "siege bombardier piglin mortar tnt", "siege_bombardier"},
+                    {"Raider Berserker", "PIGLIN BRUTE • BLOODRAGE • 40 HP", "0xffef4444", "raider berserker piglin brute fury", "raider_berserker"},
+                    {"Undead Necromancer", "EVOKER • DARK SUMMONER • 45 HP", "0xff8b5cf6", "undead necromancer evoker summoner", "undead_necromancer"},
+                    {"Shadowfang Assassin", "STRAY • BLINK BACKSTAB • 28 HP", "0xffa855f7", "shadow assassin stray dagger blink", "shadow_assassin"},
+                    {"Dread Skeleton Cavalry", "SKELETON HORSE • WITHER • 48 HP", "0xff6b21a8", "dread cavalry wither skeleton horse", "dread_cavalry"},
+                    {"Mossy Bogged Sniper", "BOGGED • POISON SNIPER • 26 HP", "0xff84cc16", "bogged poison sniper archer", "poison_bogged"},
+                    {"Tempest Breeze", "BREEZE • WIND GUST AOE • 40 HP", "0xff06b6d4", "tempest breeze wind knockback", "tempest_breeze"},
+                    {"Celestial Pixie Medic", "ALLAY • FLYING HEALER • 25 HP", "0xff38bdf8", "celestial pixie medic allay flying fairy", "fairy_medic"},
+                    {"Arcane Bard", "VILLAGER • WAR LUTE BUFFS • 30 HP", "0xff06b6d4", "arcane bard lute music buff", "arcane_bard"},
+                    {"Combat Engineer", "VILLAGER • BARRICADE BUILDER • 32 HP", "0xff0ea5e9", "combat engineer villager builder barricade", "combat_engineer"}
             };
 
             for (String[] u : allUnits) {
@@ -513,7 +710,7 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
                 }
             }
 
-        } else if (tab == 2) { // FACTIONS & DIPLOMACY
+        } else if (tab == 3) { // TAB 3: DIPLOMACY
             drawFactionCard(context, leftX, y + 34, "Kingdom of Eldoria", "Blue (#3B82F6) • 6 Units • Hostile: Raiders, Undead", 0xff3b82f6);
             drawFactionCard(context, leftX, y + 72, "Iron Raiders", "Red (#EF4444) • 3 Units • Hostile: Kingdom, Village", 0xffef4444);
             drawFactionCard(context, leftX, y + 110, "Village Alliance", "Green (#10B981) • 3 Units • Allied: Kingdom", 0xff10b981);
@@ -524,10 +721,10 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             context.drawText(textRenderer, Text.literal("• Pyrotechnics (+50% Fireworks AoE) • Holy Might (+50% Heals)").formatted(Formatting.WHITE), leftX, infoY + 26, 0xffe2e8f0, false);
             context.drawText(textRenderer, Text.literal("• Zero friendly fire damage between allied or same-faction forces.").formatted(Formatting.GREEN), leftX, infoY + 38, 0xff4ade80, false);
 
-        } else if (tab == 3) { // CUSTOM BATTLE SANDBOX BANNER
+        } else if (tab == 4) { // TAB 4: BATTLE MATCHUP BANNER
             int bannerY = y + 164;
-            context.fill(leftX, bannerY, leftX + backgroundWidth - 28, y + backgroundHeight - 10, COLOR_CARD_BG);
-            context.fill(leftX, bannerY, leftX + 4, y + backgroundHeight - 10, COLOR_GOLD_ACCENT);
+            context.fill(leftX, bannerY, leftX + backgroundWidth - 24, y + backgroundHeight - 8, COLOR_CARD_BG);
+            context.fill(leftX, bannerY, leftX + 4, y + backgroundHeight - 8, COLOR_GOLD_ACCENT);
 
             int countA = (int) Math.round(battleCountA);
             int countB = (int) Math.round(battleCountB);
@@ -538,20 +735,19 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
             context.drawText(textRenderer, Text.literal("Side A: " + summaryA).formatted(Formatting.AQUA), leftX + 8, bannerY + 16, 0xff38bdf8, false);
             context.drawText(textRenderer, Text.literal("Side B: " + summaryB).formatted(Formatting.RED), leftX + 8, bannerY + 28, 0xfff87171, false);
 
-            // Tactical Power Balance Meter
             int meterX = leftX + 8;
             int meterY = bannerY + 40;
-            int meterWidth = backgroundWidth - 44;
+            int meterWidth = backgroundWidth - 40;
             float ratio = (float) countA / Math.max(1, countA + countB);
             int splitW = (int) (meterWidth * ratio);
 
-            context.fill(meterX, meterY, meterX + splitW, meterY + 6, 0xff3b82f6); // Side A Blue
-            context.fill(meterX + splitW, meterY, meterX + meterWidth, meterY + 6, 0xffef4444); // Side B Red
-            context.fill(meterX + splitW - 1, meterY - 1, meterX + splitW + 1, meterY + 7, 0xffffffff); // Center Marker
+            context.fill(meterX, meterY, meterX + splitW, meterY + 6, 0xff3b82f6);
+            context.fill(meterX + splitW, meterY, meterX + meterWidth, meterY + 6, 0xffef4444);
+            context.fill(meterX + splitW - 1, meterY - 1, meterX + splitW + 1, meterY + 7, 0xffffffff);
 
             context.drawText(textRenderer, Text.literal("Power Ratio: " + (int)(ratio * 100) + "% vs " + (100 - (int)(ratio * 100)) + "%").formatted(Formatting.DARK_GRAY), meterX, meterY + 10, 0xff94a3b8, false);
 
-        } else if (tab == 4) { // SETTINGS & SIMULATION
+        } else if (tab == 5) { // TAB 5: CONFIG
             int infoX = x + 218;
             int infoY = y + 68;
             context.drawTextWithShadow(textRenderer, Text.literal("WORLD CONFIG & AUTHORITY").formatted(Formatting.BOLD, Formatting.GOLD), infoX, infoY, 0xffffd700);
@@ -596,6 +792,12 @@ public final class CreatorScreen extends HandledScreen<CreatorScreenHandler> {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (searchField != null && searchField.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
+        if (newTroopNameField != null && newTroopNameField.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
+        if (newTroopIdField != null && newTroopIdField.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
         if (keyCode == 256) { // ESC key
