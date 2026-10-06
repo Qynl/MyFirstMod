@@ -73,6 +73,7 @@ public final class KineticsHud {
                 st.abilityEnabled(KineticsNetworking.ABILITY_DASH),
                 cooldownFraction(st.dashCooldownDisplay(), KineticsConfig.get().dashCooldownTicks),
                 st.dashFlashTicks > 0, false);
+        drawKeyBadge(context, client, KineticsKeybinds.dashKey, x, y);
 
         drawAbilityIcon(context, ICON_JUMP, x + ICON_STEP, y,
                 st.abilityEnabled(KineticsNetworking.ABILITY_DOUBLE_JUMP),
@@ -89,6 +90,7 @@ public final class KineticsHud {
         drawAbilityIcon(context, ICON_GLIDE, x + ICON_STEP * 4, y,
                 st.abilityEnabled(KineticsNetworking.ABILITY_GLIDE),
                 0.0F, st.gliding, false);
+        drawKeyBadge(context, client, KineticsKeybinds.glideKey, x + ICON_STEP * 4, y);
 
         drawAbilityIcon(context, ICON_SLIDE, x + ICON_STEP * 5, y,
                 st.abilityEnabled(KineticsNetworking.ABILITY_SLIDE),
@@ -158,6 +160,17 @@ public final class KineticsHud {
         }
 
         RenderSystem.disableBlend();
+    }
+
+    /** Draws the bound key (e.g. "V") in the bottom-right corner of an icon. */
+    private static void drawKeyBadge(DrawContext context, MinecraftClient client,
+                                     net.minecraft.client.option.KeyBinding key, int x, int y) {
+        if (key == null) return;
+        String label = key.getBoundKeyLocalizedText().getString();
+        if (label.isEmpty() || label.length() > 3) return;
+        int w = client.textRenderer.getWidth(label);
+        context.drawTextWithShadow(client.textRenderer, label,
+                x + ICON_SIZE - w - 1, y + ICON_SIZE - 8, 0xFFB8E8E0);
     }
 
     private static float cooldownFraction(int remaining, int total) {
