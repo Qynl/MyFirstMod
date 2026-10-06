@@ -60,12 +60,11 @@ jobs:
             "https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.16.10/${INSTALLER}/server/jar"
           cd smoke
           echo "eula=true" > eula.txt
-          cat > server.properties <<'PROPS'
-online-mode=false
-enable-rcon=true
-rcon.password=smoke
-rcon.port=25575
-PROPS
+          printf '%s\n' \
+            "online-mode=false" \
+            "enable-rcon=true" \
+            "rcon.password=smoke" \
+            "rcon.port=25575" > server.properties
           java -Xmx2G -jar server.jar nogui > server.log 2>&1 &
           PID=$!
           ok=0
