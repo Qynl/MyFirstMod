@@ -3,6 +3,7 @@ import dev.qynl.myfirstmod.kinetics.KineticsSounds;
 
 import dev.qynl.myfirstmod.MyFirstMod;
 import dev.qynl.myfirstmod.item.ModItems;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -121,6 +122,15 @@ public final class KineticsManager {
 
             // ---- flow ------------------------------------------------------
             tickFlow(player, state, cfg);
+
+            // ---- grapple sanity --------------------------------------------
+            if (state.grappleEntityId >= 0) {
+                Entity hook = world.getEntityById(state.grappleEntityId);
+                if (!(hook instanceof NullhookEntity)) {
+                    state.grappleEntityId = -1;
+                    state.markDirty();
+                }
+            }
 
             // ---- fall damage grace ----------------------------------------
             if (state.hasFallGrace(tick)

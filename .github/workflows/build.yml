@@ -44,7 +44,49 @@ jobs:
             exit 1
           fi
 
+      - name: Smoke test (dedicated server boot)
+        timeout-minutes: 10
+        run: |
+          set -e
+          mkdir -p smoke/mods
+          JAR=$(ls build/libs | grep -v 'sources' | head -1)
+          echo "Testing $JAR"
+          cp "build/libs/$JAR" smoke/mods/mod.jar
+          curl -sSfL -o smoke/mods/fabric-api.jar \
+            "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.116.17+1.21.1/fabric-api-0.116.17+1.21.1.jar"
+          INSTALLER=$(curl -sSfL "https://meta.fabricmc.net/v2/versions/installer" | jq -r '.[0].version')
+          echo "Installer: $INSTALLER"
+          curl -sSfL -o smoke/server.jar \
+            "https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.16.10/${INSTALLER}/server/jar"
+          cd smoke
+          echo "eula=true" > eula.txt
+          echo "online-mode=false" > server.properties
+          java -Xmx2G -jar server.jar nogui > server.log 2>&1 &
+          PID=$!
+          ok=0
+          for i in $(seq 1 90); do
+            if grep -q "Done (" server.log 2>/dev/null; then ok=1; break; fi
+            if ! kill -0 $PID 2>/dev/null; then break; fi
+            sleep 2
+          done
+          kill $PID 2>/dev/null || true
+          sleep 2
+          echo "--- server.log tail ---"
+          tail -n 40 server.log || true
+          if [ "$ok" -ne 1 ]; then
+            echo "::error::Dedicated server never reached the 'Done' state (crashed or timed out)"
+            exit 1
+          fi
+          # Surface mod-related errors (datapacks, mixins, registrations)
+          if grep -E "Failed to parse|Failed to load|Couldn't parse|Couldn't load|Mixin apply failed|error loading" server.log | grep -Ei "myfirstmod|qynl" > /tmp/moderrors.txt; then
+            cat /tmp/moderrors.txt
+            while IFS= read -r line; do echo "::error::${line:0:240}"; done < /tmp/moderrors.txt
+            exit 1
+          fi
+          echo "Smoke test passed: server booted with the mod loaded"
+
       - name: Upload JAR
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: MyFirstMod
