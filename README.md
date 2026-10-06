@@ -169,6 +169,12 @@ You can also run it manually from:
 
 The generated JAR is uploaded as the **MyFirstMod** artifact when the build succeeds.
 
+CI also runs a **dedicated-server smoke test** on every build: the fresh JAR is
+dropped into a real Fabric 1.21.1 server alongside Fabric API, the server must
+boot to `Done` with zero mod-related datapack/mixin/registration errors, and
+the `/kinetics` command tree plus the Nullhook entity are exercised live over
+RCON (`tools/rcon.py`).
+
 ### Source layout
 
 ```text

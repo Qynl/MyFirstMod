@@ -15,13 +15,15 @@ import net.minecraft.world.World;
  */
 public final class KineticsWorldUtil {
     /** How close (in blocks) the player must hug a wall to interact with it. */
-    public static final double WALL_PROXIMITY = 0.16;
+    public static final double WALL_PROXIMITY = 0.22;
 
     private KineticsWorldUtil() {}
 
     /**
      * Finds the direction from the player toward the nearest wall they are
-     * pressing against, or {@code null} if no wall is in reach.
+     * pressing against, or {@code null} if no wall is in reach. Both the foot
+     * and upper-body block layers are checked so walls that only reach the
+     * torso still count.
      *
      * @return a horizontal direction pointing from the player <b>toward</b> the wall
      */
@@ -33,26 +35,30 @@ public final class KineticsWorldUtil {
         double bestGap = Double.MAX_VALUE;
 
         for (Direction dir : Direction.Type.HORIZONTAL) {
-            BlockPos pos = base.offset(dir);
-            if (world.getBlockState(pos).getCollisionShape(world, pos).isEmpty()) {
-                continue;
+            double gap = Double.MAX_VALUE;
+            for (int layer = 0; layer <= 1; layer++) {
+                BlockPos pos = base.up(layer).offset(dir);
+                if (world.getBlockState(pos).getCollisionShape(world, pos).isEmpty()) {
+                    continue;
+                }
+                Box wallBox = new Box(pos);
+                // Expand the player box slightly along the wall axis and check overlap.
+                Box reach = playerBox.expand(
+                        Math.abs(dir.getOffsetX()) * WALL_PROXIMITY,
+                        0.0,
+                        Math.abs(dir.getOffsetZ()) * WALL_PROXIMITY);
+                if (!reach.intersects(wallBox)) {
+                    continue;
+                }
+                double candidate = switch (dir) {
+                    case NORTH -> playerBox.minZ - wallBox.maxZ;
+                    case SOUTH -> wallBox.minZ - playerBox.maxZ;
+                    case WEST -> playerBox.minX - wallBox.maxX;
+                    case EAST -> wallBox.minX - playerBox.maxX;
+                    default -> Double.MAX_VALUE;
+                };
+                gap = Math.min(gap, candidate);
             }
-            Box wallBox = new Box(pos);
-            // Expand the player box slightly along the wall axis and check overlap.
-            Box reach = playerBox.expand(
-                    Math.abs(dir.getOffsetX()) * WALL_PROXIMITY,
-                    0.0,
-                    Math.abs(dir.getOffsetZ()) * WALL_PROXIMITY);
-            if (!reach.intersects(wallBox)) {
-                continue;
-            }
-            double gap = switch (dir) {
-                case NORTH -> playerBox.minZ - wallBox.maxZ;
-                case SOUTH -> wallBox.minZ - playerBox.maxZ;
-                case WEST -> playerBox.minX - wallBox.maxX;
-                case EAST -> wallBox.minX - playerBox.maxX;
-                default -> Double.MAX_VALUE;
-            };
             if (gap >= -WALL_PROXIMITY && gap < bestGap) {
                 bestGap = gap;
                 best = dir;

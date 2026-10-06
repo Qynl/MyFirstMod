@@ -40,7 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class KineticsManager {
     private static final Map<UUID, KineticsState> STATES = new ConcurrentHashMap<>();
-    private static final java.util.Set<UUID> ONLINE = ConcurrentHashMap.newKeySet();
     private static final Identifier FLOW_MODIFIER_ID = Identifier.of(MyFirstMod.MOD_ID, "flow_speed");
 
     private KineticsManager() {}
@@ -56,14 +55,12 @@ public final class KineticsManager {
     }
 
     public static void onPlayerJoin(ServerPlayerEntity player) {
-        ONLINE.add(player.getUuid());
         KineticsState state = getState(player);
         state.energy = KineticsConfig.get().maxEnergy;
         state.markDirty();
     }
 
     public static void onPlayerLeave(UUID id) {
-        ONLINE.remove(id);
         STATES.remove(id);
     }
 
@@ -445,6 +442,7 @@ public final class KineticsManager {
                 state.wallRunUntil = tick + cfg.wallRunMaxTicks;
                 grantFallGrace(state, tick, cfg);
                 state.markDirty();
+                KineticsAdvancements.grantRoot(player);
                 player.getServerWorld().playSound(null, player.getBlockPos(),
                         KineticsSounds.event(SoundEvents.ENTITY_BREEZE_SLIDE), SoundCategory.PLAYERS, 0.6F, 1.2F);
                 return true;
@@ -463,6 +461,7 @@ public final class KineticsManager {
                 state.glideUntil = tick + 120; // renewable: the client re-requests while held
                 grantFallGrace(state, tick, cfg);
                 state.markDirty();
+                KineticsAdvancements.grantRoot(player);
                 player.getServerWorld().playSound(null, player.getBlockPos(),
                         KineticsSounds.event(SoundEvents.ENTITY_PHANTOM_FLAP), SoundCategory.PLAYERS, 0.5F, 0.85F);
                 return true;
@@ -488,6 +487,7 @@ public final class KineticsManager {
                 grantFallGrace(state, tick, cfg);
                 addFlow(player, state, cfg);
                 state.markDirty();
+                KineticsAdvancements.grantRoot(player);
 
                 ServerWorld world = player.getServerWorld();
                 world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_BREEZE_SLIDE),
