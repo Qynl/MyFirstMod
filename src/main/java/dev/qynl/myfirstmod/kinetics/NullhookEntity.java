@@ -1,4 +1,5 @@
 package dev.qynl.myfirstmod.kinetics;
+import dev.qynl.myfirstmod.kinetics.KineticsSounds;
 
 import dev.qynl.myfirstmod.boss.ModEntities;
 import net.minecraft.entity.Entity;
@@ -230,9 +231,9 @@ public class NullhookEntity extends Entity {
         this.anchoredTicks = 0;
 
         ServerWorld world = (ServerWorld) this.getWorld();
-        world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_CHAIN_PLACE,
+        world.playSound(null, this.getBlockPos(), KineticsSounds.event(SoundEvents.BLOCK_CHAIN_PLACE),
                 SoundCategory.PLAYERS, 1.0F, 0.7F);
-        world.playSound(null, this.getBlockPos(), SoundEvents.ENTITY_ARROW_HIT,
+        world.playSound(null, this.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_ARROW_HIT),
                 SoundCategory.PLAYERS, 0.5F, 0.6F);
         world.spawnParticles(ParticleTypes.GLOW, pos.x, pos.y, pos.z, 10, 0.15, 0.15, 0.15, 0.02);
         world.spawnParticles(ParticleTypes.SCULK_SOUL, pos.x, pos.y, pos.z, 6, 0.1, 0.1, 0.1, 0.01);
@@ -249,7 +250,7 @@ public class NullhookEntity extends Entity {
         player.setVelocity(v.x, v.y + 0.18, v.z);
         player.velocityModified = true;
         KineticsManager.handleGrappleEnd(player);
-        world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_BREEZE_LAND,
+        world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_BREEZE_LAND),
                 SoundCategory.PLAYERS, 0.6F, 1.3F);
         startRetracting();
     }

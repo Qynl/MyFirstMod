@@ -1,4 +1,5 @@
 package dev.qynl.myfirstmod.item;
+import dev.qynl.myfirstmod.kinetics.KineticsSounds;
 
 import dev.qynl.myfirstmod.kinetics.KineticsConfig;
 import dev.qynl.myfirstmod.kinetics.KineticsManager;
@@ -71,7 +72,7 @@ public class NullhookItem extends Item {
         if (!dev.qynl.myfirstmod.kinetics.KineticsWorldUtil.canUseKinetics(player)) return false;
         if (player.getAbilities().flying) return false;
         if (state.energy < cfg.grappleEnergy) {
-            world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
+            world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.BLOCK_NOTE_BLOCK_PLING),
                     SoundCategory.PLAYERS, 0.5F, 0.55F);
             return false;
         }
@@ -83,7 +84,7 @@ public class NullhookItem extends Item {
         NullhookEntity hook = new NullhookEntity(world, player);
         world.spawnEntity(hook);
 
-        world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_TRIDENT_THROW,
+        world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ITEM_TRIDENT_THROW),
                 SoundCategory.PLAYERS, 0.7F, 1.5F);
         return true;
     }

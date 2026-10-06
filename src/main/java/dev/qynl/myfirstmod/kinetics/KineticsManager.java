@@ -1,4 +1,5 @@
 package dev.qynl.myfirstmod.kinetics;
+import dev.qynl.myfirstmod.kinetics.KineticsSounds;
 
 import dev.qynl.myfirstmod.MyFirstMod;
 import dev.qynl.myfirstmod.item.ModItems;
@@ -164,7 +165,7 @@ public final class KineticsManager {
         if (tick % 8 == 0) {
             if (wall != null) {
                 player.getServerWorld().playSound(
-                        null, player.getBlockPos(), SoundEvents.ENTITY_BREEZE_SLIDE,
+                        null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_BREEZE_SLIDE),
                         SoundCategory.PLAYERS, 0.35F, 1.1F + player.getRandom().nextFloat() * 0.2F);
                 Vec3d at = player.getPos().add(
                         wall.getOffsetX() * 0.45, 0.4 + player.getRandom().nextDouble() * 0.4,
@@ -189,7 +190,7 @@ public final class KineticsManager {
             KineticsAdvancements.grant(player, "drifter");
         }
         if (tick % 12 == 0) {
-            world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_PHANTOM_FLAP,
+            world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_PHANTOM_FLAP),
                     SoundCategory.PLAYERS, 0.25F, 0.9F);
         }
     }
@@ -286,7 +287,7 @@ public final class KineticsManager {
         double cost = cost(state, base, cfg);
         if (state.energy < cost) {
             player.getServerWorld().playSound(
-                    null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
+                    null, player.getBlockPos(), KineticsSounds.event(SoundEvents.BLOCK_NOTE_BLOCK_PLING),
                     SoundCategory.PLAYERS, 0.5F, 0.55F);
             return false;
         }
@@ -317,9 +318,9 @@ public final class KineticsManager {
         state.markDirty();
 
         ServerWorld world = player.getServerWorld();
-        world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_ENDERMAN_TELEPORT,
+        world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_ENDERMAN_TELEPORT),
                 SoundCategory.PLAYERS, 0.7F, 1.35F);
-        world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_BREEZE_JUMP,
+        world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_BREEZE_JUMP),
                 SoundCategory.PLAYERS, 0.5F, 0.7F);
         Vec3d pos = player.getPos();
         world.spawnParticles(ParticleTypes.REVERSE_PORTAL, pos.x, pos.y + 1.0, pos.z, 26, 0.35, 0.5, 0.35, 0.16);
@@ -352,7 +353,7 @@ public final class KineticsManager {
                 addFlow(player, state, cfg);
                 state.markDirty();
                 player.getServerWorld().playSound(null, player.getBlockPos(),
-                        SoundEvents.ENTITY_BREEZE_LAND, SoundCategory.PLAYERS, 0.6F, 1.4F);
+                        KineticsSounds.event(SoundEvents.ENTITY_BREEZE_LAND), SoundCategory.PLAYERS, 0.6F, 1.4F);
                 return true;
             }
             return false;
@@ -377,7 +378,7 @@ public final class KineticsManager {
                 state.markDirty();
 
                 ServerWorld world = player.getServerWorld();
-                world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_BREEZE_JUMP,
+                world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_BREEZE_JUMP),
                         SoundCategory.PLAYERS, 0.8F, 1.45F);
                 BlockPos at = player.getBlockPos().offset(wall);
                 world.spawnParticles(ParticleTypes.SOUL,
@@ -406,7 +407,7 @@ public final class KineticsManager {
         state.markDirty();
 
         ServerWorld world = player.getServerWorld();
-        world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_GOAT_LONG_JUMP,
+        world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_GOAT_LONG_JUMP),
                 SoundCategory.PLAYERS, 0.9F, 1.15F);
         Vec3d pos = player.getPos();
         world.spawnParticles(ParticleTypes.SCULK_SOUL, pos.x, pos.y + 0.2, pos.z, 16, 0.35, 0.05, 0.35, 0.02);
@@ -437,7 +438,7 @@ public final class KineticsManager {
                 grantFallGrace(state, tick, cfg);
                 state.markDirty();
                 player.getServerWorld().playSound(null, player.getBlockPos(),
-                        SoundEvents.ENTITY_BREEZE_SLIDE, SoundCategory.PLAYERS, 0.6F, 1.2F);
+                        KineticsSounds.event(SoundEvents.ENTITY_BREEZE_SLIDE), SoundCategory.PLAYERS, 0.6F, 1.2F);
                 return true;
             }
             case WINDOW_WALLRUN_STOP -> {
@@ -455,7 +456,7 @@ public final class KineticsManager {
                 grantFallGrace(state, tick, cfg);
                 state.markDirty();
                 player.getServerWorld().playSound(null, player.getBlockPos(),
-                        SoundEvents.ENTITY_PHANTOM_FLAP, SoundCategory.PLAYERS, 0.5F, 0.85F);
+                        KineticsSounds.event(SoundEvents.ENTITY_PHANTOM_FLAP), SoundCategory.PLAYERS, 0.5F, 0.85F);
                 return true;
             }
             case WINDOW_GLIDE_STOP -> {
@@ -481,7 +482,7 @@ public final class KineticsManager {
                 state.markDirty();
 
                 ServerWorld world = player.getServerWorld();
-                world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_BREEZE_SLIDE,
+                world.playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.ENTITY_BREEZE_SLIDE),
                         SoundCategory.PLAYERS, 0.9F, 0.75F);
                 Vec3d pos = player.getPos();
                 world.spawnParticles(ParticleTypes.CLOUD, pos.x, pos.y + 0.1, pos.z, 10, 0.3, 0.05, 0.3, 0.04);
@@ -512,7 +513,7 @@ public final class KineticsManager {
         state.flowTimer = cfg.flowWindowTicks;
         state.markDirty();
 
-        player.getServerWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
+        player.getServerWorld().playSound(null, player.getBlockPos(), KineticsSounds.event(SoundEvents.BLOCK_NOTE_BLOCK_PLING),
                 SoundCategory.PLAYERS, 0.45F, 0.9F + state.flowStacks * 0.12F);
         if (state.flowStacks >= cfg.flowMaxStacks) {
             KineticsAdvancements.grant(player, "flow_state");
