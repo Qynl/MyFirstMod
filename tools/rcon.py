@@ -78,6 +78,10 @@ def main():
     check("info-no-player", "kinetics info", "kinetics")
     check("bad-ability", "kinetics toggle warp_drive", "Unknown ability")
 
+    # Exercise custom entity registration and server-side tick logic.
+    check("summon-nullhook", "summon myfirstmod:nullhook 0 -60 0", "Summoned")
+    rcon.command("kill @e[type=myfirstmod:nullhook]")
+
     # Command feedback for a non-player must not crash the server.
     rcon.command("kinetics energy 50")
     rcon.command("stop")

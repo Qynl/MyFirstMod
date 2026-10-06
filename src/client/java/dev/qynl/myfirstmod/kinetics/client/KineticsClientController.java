@@ -193,7 +193,7 @@ public final class KineticsClientController {
             double horizSpeed = Math.sqrt(v.x * v.x + v.z * v.z);
 
             boolean wants = !player.isOnGround() && wall != null && holdingTowardWall
-                    && horizSpeed >= cfg.wallRunMinSpeed && st.energy > cfg.wallRunEnergyPerTick * 4;
+                    && horizSpeed >= cfg.wallRunMinSpeed && st.energy > cfg.wallRunEnergyPerTick * 10;
 
             if (wants && !st.wallRunning && wallRunRequestCooldown <= 0) {
                 st.wallRunning = true; // optimistic; server confirms or denies via sync
@@ -212,8 +212,11 @@ public final class KineticsClientController {
                                 KineticsNetworking.WINDOW_WALLRUN_STOP));
                     }
                 } else if (!wants) {
-                    // On ground or too slow — the server closes it too.
+                    // Stopped wanting the wall run (grounded, slow, released
+                    // forward) — close the window explicitly.
                     st.wallRunning = false;
+                    ClientPlayNetworking.send(new KineticsNetworking.WindowPayload(
+                            KineticsNetworking.WINDOW_WALLRUN_STOP));
                 } else {
                     wallRunNoWallTicks = 0;
                     st.wallRunTicksLeft--;
@@ -242,7 +245,7 @@ public final class KineticsClientController {
         boolean glideHeld = KineticsKeybinds.glideKey != null && KineticsKeybinds.glideKey.isPressed();
         if (kineticsOk && st.abilityEnabled(KineticsNetworking.ABILITY_GLIDE)) {
             boolean wants = glideHeld && !player.isOnGround() && player.getVelocity().y < -0.1
-                    && st.energy > cfg.glideEnergyPerTick * 4;
+                    && st.energy > cfg.glideEnergyPerTick * 10;
 
             if (wants) {
                 st.glideTicksHeld++;
