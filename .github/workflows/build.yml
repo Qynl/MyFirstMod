@@ -27,6 +27,16 @@ jobs:
       - name: Build
         run: gradle build
 
+      - name: Boot smoke test (dedicated server)
+        run: |
+          mkdir -p run
+          echo "eula=true" > run/eula.txt
+          ( sleep 60; echo "stop"; sleep 600 ) | timeout 900 gradle runServer --console=plain > server.log 2>&1 || true
+          echo "--- last 40 lines of server log ---"
+          tail -40 server.log
+          grep -q "myfirstmod" server.log
+          grep -q "Done (" server.log
+
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:

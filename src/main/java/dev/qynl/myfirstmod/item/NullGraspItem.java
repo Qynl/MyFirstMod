@@ -28,7 +28,7 @@ import net.minecraft.world.World;
  */
 public class NullGraspItem extends Item {
     private static final int THROW_COOLDOWN_TICKS = 14;
-    private static final int GRAB_COOLDOWN_TICKS = 10;
+    private static final int GRAB_COOLDOWN_TICKS = 12;
     private static final int DROP_COOLDOWN_TICKS = 6;
     private static final int WHIFF_COOLDOWN_TICKS = 5;
 
