@@ -5,6 +5,7 @@
   "infiniburn": "minecraft:infiniburn_overworld",
   "respawn_anchor_works": false,
   "has_skylight": false,
+  "has_ceiling": false,
   "bed_works": false,
   "effects": "minecraft:the_end",
   "min_y": -64,
