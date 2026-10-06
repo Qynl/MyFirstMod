@@ -108,6 +108,30 @@ public final class KineticsManager {
                 }
             }
 
+            // ---- kinetic landing burst -------------------------------------
+            boolean windowsActive = state.isWallRunning(tick) || state.isGliding(tick)
+                    || state.isSliding(tick) || state.grappleEntityId >= 0
+                    || state.hasFallGrace(tick);
+            if (player.isOnGround() && !state.wasOnGround
+                    && (state.hadKineticWindow || windowsActive)) {
+                Vec3d v = player.getVelocity();
+                double speed = Math.sqrt(v.x * v.x + v.z * v.z);
+                if (speed > 0.45) {
+                    int count = Math.min(40, (int) (speed * 24));
+                    Vec3d pos = player.getPos();
+                    world.spawnParticles(ParticleTypes.CLOUD,
+                            pos.x, pos.y + 0.1, pos.z, count, 0.4, 0.06, 0.4, 0.06);
+                    world.spawnParticles(ParticleTypes.CRIT,
+                            pos.x, pos.y + 0.15, pos.z, count / 2, 0.35, 0.12, 0.35, 0.08);
+                    world.playSound(null, player.getBlockPos(),
+                            KineticsSounds.event(SoundEvents.ENTITY_BREEZE_LAND),
+                            SoundCategory.PLAYERS,
+                            Math.min(0.8F, 0.35F + (float) speed * 0.25F), 0.9F);
+                }
+            }
+            state.wasOnGround = player.isOnGround();
+            state.hadKineticWindow = windowsActive;
+
             // ---- window maintenance ---------------------------------------
             tickWallRun(player, state, tick, cfg);
             tickGlide(player, state, world, tick, cfg);

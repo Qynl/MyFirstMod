@@ -39,6 +39,10 @@ public final class KineticsState {
     public int totalGlideTicks = 0;
     public boolean grappleAdvancementDone = false;
 
+    // Landing effect bookkeeping
+    public boolean wasOnGround = true;
+    public boolean hadKineticWindow = false;
+
     // Networking
     public boolean dirty = true;
     public long lastSyncTick = -1;
