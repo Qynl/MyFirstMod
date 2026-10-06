@@ -106,6 +106,14 @@ public final class KineticsNetworking {
         }
     }
 
+    // Window ids used by the WindowPayload packet.
+    public static final int WINDOW_WALLRUN_START = 0;
+    public static final int WINDOW_WALLRUN_STOP = 1;
+    public static final int WINDOW_GLIDE_START = 2;
+    public static final int WINDOW_GLIDE_STOP = 3;
+    public static final int WINDOW_SLIDE_START = 4;
+    public static final int WINDOW_SLIDE_STOP = 5;
+
     // Flag bits for the state payload.
     public static final int FLAG_WALL_RUNNING = 1;
     public static final int FLAG_GLIDING = 2;

@@ -18,6 +18,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
+import static dev.qynl.myfirstmod.kinetics.KineticsNetworking.WINDOW_GLIDE_START;
+import static dev.qynl.myfirstmod.kinetics.KineticsNetworking.WINDOW_GLIDE_STOP;
+import static dev.qynl.myfirstmod.kinetics.KineticsNetworking.WINDOW_SLIDE_START;
+import static dev.qynl.myfirstmod.kinetics.KineticsNetworking.WINDOW_SLIDE_STOP;
+import static dev.qynl.myfirstmod.kinetics.KineticsNetworking.WINDOW_WALLRUN_START;
+import static dev.qynl.myfirstmod.kinetics.KineticsNetworking.WINDOW_WALLRUN_STOP;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,14 +41,6 @@ public final class KineticsManager {
     private static final Map<UUID, KineticsState> STATES = new ConcurrentHashMap<>();
     private static final java.util.Set<UUID> ONLINE = ConcurrentHashMap.newKeySet();
     private static final Identifier FLOW_MODIFIER_ID = Identifier.of(MyFirstMod.MOD_ID, "flow_speed");
-
-    // Window ids used by the WindowPayload packet.
-    public static final int WINDOW_WALLRUN_START = 0;
-    public static final int WINDOW_WALLRUN_STOP = 1;
-    public static final int WINDOW_GLIDE_START = 2;
-    public static final int WINDOW_GLIDE_STOP = 3;
-    public static final int WINDOW_SLIDE_START = 4;
-    public static final int WINDOW_SLIDE_STOP = 5;
 
     private KineticsManager() {}
 

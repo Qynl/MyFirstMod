@@ -56,7 +56,7 @@ public final class KineticsHud {
 
     private static void render(DrawContext context, RenderTickCounter tickCounter) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.options.hudHidden || client.options.debugEnabled) return;
+        if (client.player == null || client.options.hudHidden) return;
         if (!KineticsClientState.hudVisible || !KineticsConfig.get().hudEnabled) return;
         if (client.player.isSpectator()) return;
 

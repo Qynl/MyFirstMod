@@ -73,8 +73,8 @@ public class NullhookEntityRenderer extends EntityRenderer<NullhookEntity> {
             if (len > 0.4F) {
                 Vec3d dir = rel.multiply(1.0 / len);
                 drawLine(lines, entry,
-                        dir.x * 0.15F, dir.y * 0.15F, dir.z * 0.15F,
-                        (float) rel.x * 0.55F, (float) rel.y * 0.55F, (float) rel.z * 0.55F,
+                        (float) (dir.x * 0.15), (float) (dir.y * 0.15), (float) (dir.z * 0.15),
+                        (float) (rel.x * 0.55), (float) (rel.y * 0.55), (float) (rel.z * 0.55),
                         r, g, b, 0.5F);
             }
         }
@@ -86,9 +86,9 @@ public class NullhookEntityRenderer extends EntityRenderer<NullhookEntity> {
         float sin = MathHelper.sin(spin);
 
         for (int[] edge : OCTAHEDRON_EDGES) {
-            float[] a = rotate(OCTAHEDRON_VERTICES[edge[0]], cos, sin, size);
-            float[] b = rotate(OCTAHEDRON_VERTICES[edge[1]], cos, sin, size);
-            drawLine(lines, entry, a[0], a[1], a[2], b[0], b[1], b[2], r, g, b, 1.0F);
+            float[] from = rotate(OCTAHEDRON_VERTICES[edge[0]], cos, sin, size);
+            float[] to = rotate(OCTAHEDRON_VERTICES[edge[1]], cos, sin, size);
+            drawLine(lines, entry, from[0], from[1], from[2], to[0], to[1], to[2], r, g, b, 1.0F);
         }
     }
 
@@ -105,7 +105,7 @@ public class NullhookEntityRenderer extends EntityRenderer<NullhookEntity> {
         float dx = x2 - x1;
         float dy = y2 - y1;
         float dz = z2 - z1;
-        float len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        float len = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (len < 1.0E-5F) len = 1.0F;
         float nx = dx / len;
         float ny = dy / len;
