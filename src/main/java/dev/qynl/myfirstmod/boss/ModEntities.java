@@ -1,6 +1,7 @@
 package dev.qynl.myfirstmod.boss;
 
 import dev.qynl.myfirstmod.MyFirstMod;
+import dev.qynl.myfirstmod.kinetics.NullhookEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
@@ -18,6 +19,16 @@ public final class ModEntities {
                     .maxTrackingRange(64)
                     .trackingTickInterval(1)
                     .build("myfirstmod:null_warden")
+    );
+
+    public static final EntityType<NullhookEntity> NULLHOOK = Registry.register(
+            Registries.ENTITY_TYPE,
+            Identifier.of(MyFirstMod.MOD_ID, "nullhook"),
+            EntityType.Builder.create(NullhookEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.35f, 0.35f)
+                    .maxTrackingRange(64)
+                    .trackingTickInterval(1)
+                    .build("myfirstmod:nullhook")
     );
 
     public static void register() {}

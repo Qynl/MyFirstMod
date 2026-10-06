@@ -1,0 +1,14 @@
+{
+  "parent": "myfirstmod:kinetics/root",
+  "display": {
+    "icon": {"item": "minecraft:polished_blackstone_bricks"},
+    "title": {"translate": "advancements.myfirstmod.kinetics.wall_dancer.title"},
+    "description": {"translate": "advancements.myfirstmod.kinetics.wall_dancer.description"},
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "unlocked": {"trigger": "minecraft:impossible"}
+  }
+}

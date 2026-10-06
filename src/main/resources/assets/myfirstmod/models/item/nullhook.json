@@ -1,0 +1,27 @@
+{
+  "textures": {
+    "rope": "minecraft:item/string",
+    "shaft": "minecraft:block/chain",
+    "core": "minecraft:block/sculk",
+    "eye": "minecraft:block/amethyst_block",
+    "edge": "minecraft:block/crying_obsidian"
+  },
+  "elements": [
+    {"from":[7.3,12,7.3],"to":[8.7,16,8.7],"faces":{"north":{"texture":"#rope"},"south":{"texture":"#rope"},"east":{"texture":"#rope"},"west":{"texture":"#rope"},"up":{"texture":"#rope"},"down":{"texture":"#edge"}}},
+    {"from":[7,10.6,7],"to":[9,12.4,9],"faces":{"north":{"texture":"#core"},"south":{"texture":"#core"},"east":{"texture":"#core"},"west":{"texture":"#core"},"up":{"texture":"#eye"},"down":{"texture":"#core"}}},
+    {"from":[7.05,6,7.05],"to":[8.95,10.8,8.95],"faces":{"north":{"texture":"#shaft"},"south":{"texture":"#shaft"},"east":{"texture":"#shaft"},"west":{"texture":"#shaft"},"up":{"texture":"#core"},"down":{"texture":"#shaft"}}},
+    {"from":[5.6,4.6,7.05],"to":[8.95,6.4,8.95],"rotation":{"origin":[8,5.5,8],"axis":"z","angle":22.5},"faces":{"north":{"texture":"#shaft"},"south":{"texture":"#shaft"},"east":{"texture":"#shaft"},"west":{"texture":"#shaft"},"up":{"texture":"#shaft"},"down":{"texture":"#shaft"}}},
+    {"from":[4.4,5.6,7.05],"to":[6.4,7.4,8.95],"rotation":{"origin":[6,7,8],"axis":"z","angle":-22.5},"faces":{"north":{"texture":"#edge"},"south":{"texture":"#edge"},"east":{"texture":"#edge"},"west":{"texture":"#edge"},"up":{"texture":"#edge"},"down":{"texture":"#edge"}}},
+    {"from":[7.5,8.6,6.5],"to":[8.5,9.8,7.5],"faces":{"north":{"texture":"#eye"},"south":{"texture":"#eye"},"east":{"texture":"#eye"},"west":{"texture":"#eye"},"up":{"texture":"#eye"},"down":{"texture":"#eye"}}},
+    {"from":[7.5,8.6,8.5],"to":[8.5,9.8,9.5],"faces":{"north":{"texture":"#eye"},"south":{"texture":"#eye"},"east":{"texture":"#eye"},"west":{"texture":"#eye"},"up":{"texture":"#eye"},"down":{"texture":"#eye"}}}
+  ],
+  "display": {
+    "thirdperson_righthand":{"rotation":[0,90,-30],"translation":[0,1.5,0],"scale":[0.85,0.85,0.85]},
+    "thirdperson_lefthand":{"rotation":[0,-90,30],"translation":[0,1.5,0],"scale":[0.85,0.85,0.85]},
+    "firstperson_righthand":{"rotation":[0,-70,35],"translation":[0,3,0],"scale":[0.8,0.8,0.8]},
+    "firstperson_lefthand":{"rotation":[0,70,-35],"translation":[0,3,0],"scale":[0.8,0.8,0.8]},
+    "gui":{"rotation":[25,-40,10],"translation":[0,1,0],"scale":[1.0,1.0,1.0]},
+    "ground":{"rotation":[0,0,0],"translation":[0,1,0],"scale":[0.6,0.6,0.6]},
+    "fixed":{"rotation":[0,0,0],"translation":[0,1,0],"scale":[0.8,0.8,0.8]}
+  }
+}

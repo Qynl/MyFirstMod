@@ -1,5 +1,31 @@
 {
   "item.myfirstmod.null_relic": "Heart of the Null",
   "item.myfirstmod.nullblade": "Nullblade",
-  "block.myfirstmod.void_portal": "Void Gate"
+  "item.myfirstmod.nullhook": "Nullhook",
+  "item.myfirstmod.nullhook.tooltip.1": "A wrist-mounted void grapple.",
+  "item.myfirstmod.nullhook.tooltip.2": "Right-click to fire · right-click again to release",
+  "item.myfirstmod.nullhook.tooltip.3": "Sneak while hooked to let go",
+  "block.myfirstmod.void_portal": "Void Gate",
+
+  "category.myfirstmod.kinetics": "Null Kinetics",
+  "key.myfirstmod.void_dash": "Void Dash",
+  "key.myfirstmod.null_drift": "Null Drift (hold)",
+  "key.myfirstmod.hud_toggle": "Toggle Kinetics HUD",
+
+  "hud.myfirstmod.flow": "NULL FLOW ×%s",
+
+  "advancements.myfirstmod.kinetics.root.title": "Null Kinetics",
+  "advancements.myfirstmod.kinetics.root.description": "Move like the Warden.",
+  "advancements.myfirstmod.kinetics.void_dash.title": "Void Dash",
+  "advancements.myfirstmod.kinetics.void_dash.description": "Blink forward with residual null energy.",
+  "advancements.myfirstmod.kinetics.airwalker.title": "Airwalker",
+  "advancements.myfirstmod.kinetics.airwalker.description": "Jump five times without touching the ground.",
+  "advancements.myfirstmod.kinetics.wall_dancer.title": "Wall Dancer",
+  "advancements.myfirstmod.kinetics.wall_dancer.description": "Perform three wall jumps in a single flight.",
+  "advancements.myfirstmod.kinetics.drifter.title": "Null Drift",
+  "advancements.myfirstmod.kinetics.drifter.description": "Glide for ten seconds on null currents.",
+  "advancements.myfirstmod.kinetics.hooked.title": "Hooked",
+  "advancements.myfirstmod.kinetics.hooked.description": "Anchor the Nullhook at least twenty blocks away.",
+  "advancements.myfirstmod.kinetics.flow_state.title": "Flow State",
+  "advancements.myfirstmod.kinetics.flow_state.description": "Chain abilities to reach maximum Flow."
 }

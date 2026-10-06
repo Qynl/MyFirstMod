@@ -1,0 +1,14 @@
+{
+  "parent": "myfirstmod:kinetics/root",
+  "display": {
+    "icon": {"item": "minecraft:feather"},
+    "title": {"translate": "advancements.myfirstmod.kinetics.drifter.title"},
+    "description": {"translate": "advancements.myfirstmod.kinetics.drifter.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "unlocked": {"trigger": "minecraft:impossible"}
+  }
+}

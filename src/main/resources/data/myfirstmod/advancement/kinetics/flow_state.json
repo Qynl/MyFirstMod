@@ -1,0 +1,14 @@
+{
+  "parent": "myfirstmod:kinetics/root",
+  "display": {
+    "icon": {"item": "minecraft:amethyst_shard"},
+    "title": {"translate": "advancements.myfirstmod.kinetics.flow_state.title"},
+    "description": {"translate": "advancements.myfirstmod.kinetics.flow_state.description"},
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "unlocked": {"trigger": "minecraft:impossible"}
+  }
+}

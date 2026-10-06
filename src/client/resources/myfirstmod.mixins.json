@@ -3,7 +3,7 @@
     "package": "dev.qynl.myfirstmod.mixin",
     "compatibilityLevel": "JAVA_21",
     "client": [
-        "TitleScreenMixin"
+        "GameRendererMixin"
     ],
     "injectors": {
         "defaultRequire": 1
