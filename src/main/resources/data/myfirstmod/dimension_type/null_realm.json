@@ -2,7 +2,7 @@
   "ultrawarm": false,
   "natural": false,
   "ambient_light": 0.05,
-  "infiniburn": "minecraft:infiniburn_overworld",
+  "infiniburn": "#minecraft:infiniburn_overworld",
   "respawn_anchor_works": false,
   "has_skylight": false,
   "has_ceiling": false,
