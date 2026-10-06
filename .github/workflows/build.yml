@@ -46,6 +46,10 @@ jobs:
           ok=1
           grep -q "myfirstmod" server.log || ok=0
           grep -q "Done (" server.log || ok=0
+          modIssues=$(grep -iE "(error|failed|exception).*myfirstmod" server.log | grep -v "No data fixer" || true)
+          if [ -n "$modIssues" ]; then
+            printf '::warning title=Mod-related log lines::%s\n' "$(printf '%s' "$modIssues" | tail -c 2000 | tr '"' "'" | sed ':a;N;$!ba;s/\n/%0A/g')"
+          fi
           if [ "$ok" != "1" ]; then
             diag=$( { grep -A 40 "Registry loading errors" server.log; echo "===== generic errors ====="; grep -iE "error|exception|caused by" server.log | grep -v "^\s*at " | head -30; } | tr -d '\r' | tr '"' "'" | tail -c 2800 | sed ':a;N;$!ba;s/\n/%0A/g' )
             printf '::error title=Server smoke test failed::%s\n' "$diag"
