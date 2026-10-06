@@ -28,14 +28,28 @@ jobs:
         run: gradle build
 
       - name: Boot smoke test (dedicated server)
+        timeout-minutes: 20
         run: |
           mkdir -p run
           echo "eula=true" > run/eula.txt
-          ( sleep 60; echo "stop"; sleep 600 ) | timeout 900 gradle runServer --console=plain > server.log 2>&1 || true
-          echo "--- last 40 lines of server log ---"
-          tail -40 server.log
-          grep -q "myfirstmod" server.log
-          grep -q "Done (" server.log
+          {
+            echo "level-type=minecraft\:flat"
+            echo "view-distance=4"
+            echo "simulation-distance=4"
+            echo "online-mode=false"
+            echo "sync-chunk-writes=false"
+            echo "spawn-protection=0"
+          } > run/server.properties
+          ( sleep 45; echo "stop" ) | timeout 720 gradle runServer --console=plain > server.log 2>&1 || true
+          echo "--- last 60 lines of server log ---"
+          tail -60 server.log
+          ok=1
+          grep -q "myfirstmod" server.log || ok=0
+          grep -q "Done (" server.log || ok=0
+          if [ "$ok" != "1" ]; then
+            printf '::error title=Server smoke test failed::%s\n' "$(tail -c 2800 server.log | tr -d '\r' | tr '"' "'" | sed ':a;N;$!ba;s/\n/%0A/g')"
+            exit 1
+          fi
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4
