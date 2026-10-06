@@ -84,8 +84,8 @@ public final class KineticsConfig {
     // Null Drift (glide)
     // ------------------------------------------------------------------
     public double glideFallSpeed = 0.42;
-    public double glideForwardAccel = 0.028;
-    public double glideMaxHorizontalSpeed = 0.95;
+    public double glideForwardAccel = 0.024;
+    public double glideMaxHorizontalSpeed = 0.8;
     public double glideEnergyPerTick = 0.30;
 
     // ------------------------------------------------------------------
