@@ -71,7 +71,7 @@ public class NullhookItem extends Item {
         if (!dev.qynl.myfirstmod.kinetics.KineticsWorldUtil.canUseKinetics(player)) return false;
         if (player.getAbilities().flying) return false;
         if (state.energy < cfg.grappleEnergy) {
-            world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING,
+            world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
                     SoundCategory.PLAYERS, 0.5F, 0.55F);
             return false;
         }

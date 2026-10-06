@@ -246,7 +246,7 @@ public final class KineticsManager {
         EntityAttributeModifier existing = attr.getModifier(FLOW_MODIFIER_ID);
         if (existing == null || Math.abs(existing.value() - target) > 1.0E-6) {
             attr.removeModifier(FLOW_MODIFIER_ID);
-            attr.addModifier(new EntityAttributeModifier(
+            attr.addTemporaryModifier(new EntityAttributeModifier(
                     FLOW_MODIFIER_ID, target, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         }
         state.flowModifierApplied = true;
@@ -286,7 +286,7 @@ public final class KineticsManager {
         double cost = cost(state, base, cfg);
         if (state.energy < cost) {
             player.getServerWorld().playSound(
-                    null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING,
+                    null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
                     SoundCategory.PLAYERS, 0.5F, 0.55F);
             return false;
         }
@@ -512,7 +512,7 @@ public final class KineticsManager {
         state.flowTimer = cfg.flowWindowTicks;
         state.markDirty();
 
-        player.getServerWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING,
+        player.getServerWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
                 SoundCategory.PLAYERS, 0.45F, 0.9F + state.flowStacks * 0.12F);
         if (state.flowStacks >= cfg.flowMaxStacks) {
             KineticsAdvancements.grant(player, "flow_state");

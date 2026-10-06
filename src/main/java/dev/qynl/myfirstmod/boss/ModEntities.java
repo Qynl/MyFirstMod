@@ -7,6 +7,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 public final class ModEntities {
     private ModEntities() {}
@@ -24,7 +25,11 @@ public final class ModEntities {
     public static final EntityType<NullhookEntity> NULLHOOK = Registry.register(
             Registries.ENTITY_TYPE,
             Identifier.of(MyFirstMod.MOD_ID, "nullhook"),
-            EntityType.Builder.create(NullhookEntity::new, SpawnGroup.MISC)
+            // Explicit lambda (instead of a constructor reference) so generic
+            // inference resolves to EntityType<NullhookEntity> despite the
+            // entity having two constructors.
+            EntityType.Builder.create((EntityType<NullhookEntity> type, World world) ->
+                            new NullhookEntity(type, world), SpawnGroup.MISC)
                     .dimensions(0.35f, 0.35f)
                     .maxTrackingRange(64)
                     .trackingTickInterval(1)

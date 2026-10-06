@@ -34,8 +34,12 @@ jobs:
             echo '```' >> "$GITHUB_STEP_SUMMARY"
             grep -B2 -A6 "error:" /tmp/build.log | head -120 >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
-            grep -E "error:" /tmp/build.log | head -40 | while IFS= read -r line; do
+            grep -E "error:" /tmp/build.log | head -25 | while IFS= read -r line; do
               echo "::error::${line:0:240}"
+            done
+            # Attach follow-up detail lines (bounds/locations) to each error.
+            grep -A3 "error:" /tmp/build.log | head -100 | while IFS= read -r line; do
+              if [ -n "$line" ]; then echo "::error::${line:0:240}"; fi
             done
             exit 1
           fi
