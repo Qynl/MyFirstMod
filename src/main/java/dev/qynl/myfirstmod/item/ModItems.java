@@ -21,5 +21,11 @@ public final class ModItems {
             new NullbladeItem(new Item.Settings().maxCount(1).maxDamage(2031))
     );
 
+    public static final Item NULLHOOK = Registry.register(
+            Registries.ITEM,
+            Identifier.of(MyFirstMod.MOD_ID, "nullhook"),
+            new NullhookItem(new Item.Settings().maxCount(1))
+    );
+
     public static void register() {}
 }

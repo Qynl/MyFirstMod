@@ -2,9 +2,10 @@
   "ultrawarm": false,
   "natural": false,
   "ambient_light": 0.05,
-  "infiniburn": "minecraft:infiniburn_overworld",
+  "infiniburn": "#minecraft:infiniburn_overworld",
   "respawn_anchor_works": false,
   "has_skylight": false,
+  "has_ceiling": false,
   "bed_works": false,
   "effects": "minecraft:the_end",
   "min_y": -64,
@@ -16,9 +17,7 @@
   "monster_spawn_block_light_limit": 0,
   "monster_spawn_light_level": {
     "type": "minecraft:uniform",
-    "value": {
-      "min_inclusive": 0,
-      "max_inclusive": 7
-    }
+    "min_inclusive": 0,
+    "max_inclusive": 7
   }
 }

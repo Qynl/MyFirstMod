@@ -1,0 +1,14 @@
+{
+  "parent": "myfirstmod:kinetics/root",
+  "display": {
+    "icon": {"id": "minecraft:fishing_rod"},
+    "title": {"translate": "advancements.myfirstmod.kinetics.hooked.title"},
+    "description": {"translate": "advancements.myfirstmod.kinetics.hooked.description"},
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "unlocked": {"trigger": "minecraft:impossible"}
+  }
+}

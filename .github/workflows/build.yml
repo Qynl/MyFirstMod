@@ -2,7 +2,7 @@ name: Build Mod
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "arena/**"]
   workflow_dispatch:
 
 jobs:
@@ -25,9 +25,94 @@ jobs:
           gradle-version: "9.5.1"
 
       - name: Build
-        run: gradle build
+        run: |
+          set +e
+          gradle build 2>&1 | tee /tmp/build.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            echo "## Build failed" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -B2 -A6 "error:" /tmp/build.log | head -120 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            grep -E "error:" /tmp/build.log | head -25 | while IFS= read -r line; do
+              echo "::error::${line:0:240}"
+            done
+            # Attach follow-up detail lines (bounds/locations) to each error.
+            grep -A3 "error:" /tmp/build.log | head -100 | while IFS= read -r line; do
+              if [ -n "$line" ]; then echo "::error::${line:0:240}"; fi
+            done
+            exit 1
+          fi
+
+      - name: Smoke test (dedicated server boot)
+        timeout-minutes: 10
+        run: |
+          set -e
+          mkdir -p smoke/mods
+          JAR=$(ls build/libs | grep -v 'sources' | head -1)
+          echo "Testing $JAR"
+          cp "build/libs/$JAR" smoke/mods/mod.jar
+          curl -sSfL -o smoke/mods/fabric-api.jar \
+            "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.116.17+1.21.1/fabric-api-0.116.17+1.21.1.jar"
+          INSTALLER=$(curl -sSfL "https://meta.fabricmc.net/v2/versions/installer" | jq -r '.[0].version')
+          echo "Installer: $INSTALLER"
+          curl -sSfL -o smoke/server.jar \
+            "https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.16.10/${INSTALLER}/server/jar"
+          cd smoke
+          echo "eula=true" > eula.txt
+          printf '%s\n' \
+            "online-mode=false" \
+            "enable-rcon=true" \
+            "rcon.password=smoke" \
+            "rcon.port=25575" > server.properties
+          java -Xmx2G -jar server.jar nogui > server.log 2>&1 &
+          PID=$!
+          ok=0
+          for i in $(seq 1 90); do
+            if grep -q "Done (" server.log 2>/dev/null; then ok=1; break; fi
+            if ! kill -0 $PID 2>/dev/null; then break; fi
+            sleep 2
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "::error::Dedicated server never reached the 'Done' state (crashed or timed out)"
+            grep -E "Exception|Error|Caused by|at dev\.qynl|FAILED|Crash report" server.log | head -25 | \
+              while IFS= read -r line; do echo "::error::${line:0:240}"; done
+            kill $PID 2>/dev/null || true
+            exit 1
+          fi
+          # Exercise the mod's commands over RCON and stop the server cleanly.
+          python3 ../tools/rcon.py 127.0.0.1 25575 smoke
+          for i in $(seq 1 30); do
+            if ! kill -0 $PID 2>/dev/null; then break; fi
+            sleep 2
+          done
+          kill $PID 2>/dev/null || true
+          sleep 2
+          echo "--- server.log tail ---"
+          tail -n 40 server.log || true
+          # The mod must have generated its config file on boot.
+          if [ ! -f config/myfirstmod-kinetics.json ]; then
+            echo "::error::KineticsConfig did not generate config/myfirstmod-kinetics.json"
+            exit 1
+          fi
+          echo "Config file generated:" && head -n 8 config/myfirstmod-kinetics.json
+          # Surface mod-related errors (datapacks, mixins, registrations)
+          if grep -E "Failed to parse|Failed to load|Couldn't parse|Couldn't load|Mixin apply failed|error loading" server.log | grep -Ei "myfirstmod|qynl" > /tmp/moderrors.txt; then
+            cat /tmp/moderrors.txt
+            while IFS= read -r line; do echo "::error::${line:0:240}"; done < /tmp/moderrors.txt
+            exit 1
+          fi
+          echo "Smoke test passed: server booted with the mod loaded"
+
+      - name: Upload server log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-server-log
+          path: smoke/server.log
 
       - name: Upload JAR
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: MyFirstMod

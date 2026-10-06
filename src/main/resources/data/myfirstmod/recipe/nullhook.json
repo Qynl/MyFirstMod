@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C",
+    "S",
+    "E"
+  ],
+  "key": {
+    "C": {"item": "minecraft:chain"},
+    "S": {"item": "minecraft:string"},
+    "E": {"item": "minecraft:echo_shard"}
+  },
+  "result": {
+    "id": "myfirstmod:nullhook",
+    "count": 1
+  }
+}
