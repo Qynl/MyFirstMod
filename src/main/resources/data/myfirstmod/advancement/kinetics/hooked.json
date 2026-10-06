@@ -1,7 +1,7 @@
 {
   "parent": "myfirstmod:kinetics/root",
   "display": {
-    "icon": {"item": "minecraft:fishing_rod"},
+    "icon": {"id": "minecraft:fishing_rod"},
     "title": {"translate": "advancements.myfirstmod.kinetics.hooked.title"},
     "description": {"translate": "advancements.myfirstmod.kinetics.hooked.description"},
     "frame": "goal",

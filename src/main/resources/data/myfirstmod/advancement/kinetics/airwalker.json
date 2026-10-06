@@ -1,7 +1,7 @@
 {
   "parent": "myfirstmod:kinetics/root",
   "display": {
-    "icon": {"item": "minecraft:phantom_membrane"},
+    "icon": {"id": "minecraft:phantom_membrane"},
     "title": {"translate": "advancements.myfirstmod.kinetics.airwalker.title"},
     "description": {"translate": "advancements.myfirstmod.kinetics.airwalker.description"},
     "frame": "challenge",

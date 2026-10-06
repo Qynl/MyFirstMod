@@ -1,6 +1,6 @@
 {
   "display": {
-    "icon": {"item": "myfirstmod:nullhook"},
+    "icon": {"id": "myfirstmod:nullhook"},
     "title": {"translate": "advancements.myfirstmod.kinetics.root.title"},
     "description": {"translate": "advancements.myfirstmod.kinetics.root.description"},
     "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
