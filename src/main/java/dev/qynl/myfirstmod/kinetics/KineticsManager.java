@@ -1,5 +1,4 @@
 package dev.qynl.myfirstmod.kinetics;
-import dev.qynl.myfirstmod.kinetics.KineticsSounds;
 
 import dev.qynl.myfirstmod.MyFirstMod;
 import dev.qynl.myfirstmod.item.ModItems;
@@ -347,8 +346,9 @@ public final class KineticsManager {
         long tick = now(player);
 
         // Slide hop: jump pressed mid-slide pops a low, momentum-keeping hop.
+        // (Not gated by slideCooldown — that spaces consecutive slides, not hops.)
         if (state.isSliding(tick)) {
-            if (state.slideCooldown <= 0 && trySpend(player, state, cfg.slideEnergy * 0.5, cfg)) {
+            if (trySpend(player, state, cfg.slideEnergy * 0.5, cfg)) {
                 Vec3d v = player.getVelocity();
                 player.setVelocity(v.x, 0.34, v.z);
                 player.velocityModified = true;
@@ -543,12 +543,6 @@ public final class KineticsManager {
     public static void setEnergy(ServerPlayerEntity player, double value) {
         KineticsState state = getState(player);
         state.energy = Math.max(0.0, Math.min(KineticsConfig.get().maxEnergy, value));
-        state.markDirty();
-    }
-
-    public static void clearGrapple(ServerPlayerEntity player) {
-        KineticsState state = getState(player);
-        state.grappleEntityId = -1;
         state.markDirty();
     }
 
