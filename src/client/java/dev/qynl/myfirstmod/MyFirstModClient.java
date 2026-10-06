@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 
 public class MyFirstModClient implements ClientModInitializer {
     @Override
@@ -24,5 +25,6 @@ public class MyFirstModClient implements ClientModInitializer {
         NullWardenTexture.GLOW_TEXTURE = NullWardenTexture.registerGlow();
 
         EntityRendererRegistry.register(ModEntities.NULL_WARDEN, NullWardenRenderer::new);
+        EntityRendererRegistry.register(ModEntities.RIFT_ANCHOR, FlyingItemEntityRenderer::new);
     }
 }

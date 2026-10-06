@@ -2,7 +2,7 @@ name: Build Mod
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "arena/e0119b17-myfirstmod"]
   workflow_dispatch:
 
 jobs:

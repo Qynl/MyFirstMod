@@ -67,6 +67,35 @@ The **Nullblade** is the primary boss reward.
 
 It is a custom Netherite-based weapon with a charged area ability, cooldown, knockback, and a visual Null-themed particle effect.
 
+## 🧰 The Null Arsenal
+
+Two echo-shard void-tech tools, craftable in survival the moment you loot your first Ancient City — so the sculk tech line has a payoff *before* the boss, not just after. Both live in their own **Null Arsenal** creative tab.
+
+### 🪝 Riftline
+
+A void grapple woven from echo shards (3 echo shards, 2 string, 1 iron ingot).
+
+- **Use** — hurl a rift anchor. When it bites into a block, the void reels you toward it with real momentum.
+- **Chain casts** — recast mid-flight and the new pull blends with your current velocity, so you can swing through caves and cities like a pendulum.
+- **Get over here** — strike a creature instead of a block and the pull reverses, dragging the victim to your feet.
+- **Sneak** cuts the line and keeps whatever momentum you earned.
+- Every latched zip grants a short fall-damage grace window, so bold swings are rewarded instead of punished.
+- A particle tether is drawn along the line while you fly, with chain sounds rattling as you go.
+
+### 🫳 Grasp of the Null
+
+A sculk-veined telekinesis gauntlet (3 echo shards, 3 iron ingots, 1 diamond).
+
+- **Use** — seize the creature you are looking at (up to 14 blocks away). It hangs in front of you, trailing sculk energy.
+- **Sneak-use** — rip a **block** out of the world instead and hold that.
+- **Use again** — hurl whatever you are holding. Impact damage scales with flight speed, splashes to nearby creatures, and knocks the pins over. Yes, this means creeper bowling.
+- Thrown **blocks** obey anvil rules mid-flight and *place themselves* where they land — instant bridges, long-range building, improvised artillery.
+- Thrown **creepers** arrive primed. Plan accordingly.
+- **Sneak-use while holding** sets the victim down gently, if mercy is your thing.
+- TNT and falling blocks can be grabbed too; players and bosses cannot.
+
+Both tools are multiplayer-safe: held creatures are released cleanly on death, disconnect, dimension change, or when the gauntlet leaves your hands.
+
 ## 🛠️ Development
 
 ### Requirements

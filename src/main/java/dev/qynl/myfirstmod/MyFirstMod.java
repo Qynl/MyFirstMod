@@ -1,5 +1,7 @@
 package dev.qynl.myfirstmod;
 
+import dev.qynl.myfirstmod.arsenal.GraspManager;
+import dev.qynl.myfirstmod.arsenal.RiftlineManager;
 import dev.qynl.myfirstmod.block.ModBlocks;
 import dev.qynl.myfirstmod.boss.ModEntities;
 import dev.qynl.myfirstmod.item.ModItems;
@@ -8,6 +10,7 @@ import dev.qynl.myfirstmod.portal.VoidPortalManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -33,5 +36,12 @@ public class MyFirstMod implements ModInitializer {
 
         ServerTickEvents.END_SERVER_TICK.register(VoidPortalManager::tick);
         ServerTickEvents.END_SERVER_TICK.register(NullbladeItem::tick);
+        ServerTickEvents.END_SERVER_TICK.register(RiftlineManager::tick);
+        ServerTickEvents.END_SERVER_TICK.register(GraspManager::tick);
+
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            RiftlineManager.clear(handler.player.getUuid());
+            GraspManager.clear(handler.player);
+        });
     }
 }

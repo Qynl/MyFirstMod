@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "IEI",
+    "EDE",
+    " I "
+  ],
+  "key": {
+    "E": {"item": "minecraft:echo_shard"},
+    "I": {"item": "minecraft:iron_ingot"},
+    "D": {"item": "minecraft:diamond"}
+  },
+  "result": {
+    "id": "myfirstmod:null_grasp",
+    "count": 1
+  }
+}

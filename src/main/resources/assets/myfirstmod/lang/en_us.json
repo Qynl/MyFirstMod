@@ -1,5 +1,16 @@
 {
   "item.myfirstmod.null_relic": "Heart of the Null",
   "item.myfirstmod.nullblade": "Nullblade",
+  "item.myfirstmod.riftline": "Riftline",
+  "item.myfirstmod.riftline.tip0": "Hurl a rift anchor — the void reels you in",
+  "item.myfirstmod.riftline.tip1": "Recast mid-flight to chain swings",
+  "item.myfirstmod.riftline.tip2": "Strike a creature to drag it to you instead",
+  "item.myfirstmod.riftline.tip3": "Sneak to cut the line",
+  "item.myfirstmod.null_grasp": "Grasp of the Null",
+  "item.myfirstmod.null_grasp.tip0": "Seize a creature from afar — sneak to seize a block",
+  "item.myfirstmod.null_grasp.tip1": "Use again to hurl it; speed is damage",
+  "item.myfirstmod.null_grasp.tip2": "Sneak-use to set it down gently",
+  "item.myfirstmod.null_grasp.tip3": "Creepers arrive primed. Plan accordingly",
+  "itemGroup.myfirstmod.arsenal": "The Null Arsenal",
   "block.myfirstmod.void_portal": "Void Gate"
 }
