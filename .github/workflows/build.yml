@@ -75,6 +75,8 @@ jobs:
           tail -n 40 server.log || true
           if [ "$ok" -ne 1 ]; then
             echo "::error::Dedicated server never reached the 'Done' state (crashed or timed out)"
+            grep -E "Exception|Error|Caused by|at dev\.qynl|FAILED|crash报告|Crash report" server.log | head -25 | \
+              while IFS= read -r line; do echo "::error::${line:0:240}"; done
             exit 1
           fi
           # Surface mod-related errors (datapacks, mixins, registrations)
@@ -84,6 +86,13 @@ jobs:
             exit 1
           fi
           echo "Smoke test passed: server booted with the mod loaded"
+
+      - name: Upload server log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-server-log
+          path: smoke/server.log
 
       - name: Upload JAR
         if: success()
