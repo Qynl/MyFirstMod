@@ -34,9 +34,13 @@ public class MyFirstMod implements ModInitializer {
         ModItems.register();
         ModEntities.register();
 
-        // Creative tab entries for the kinetics gear.
+        // Creative tab entries for the kinetics gear and boss rewards.
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS)
                 .register(entries -> entries.add(ModItems.NULLHOOK));
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT)
+                .register(entries -> entries.add(ModItems.NULLBLADE));
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
+                .register(entries -> entries.add(ModItems.NULL_RELIC));
 
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
             if (world.isClient || hand != net.minecraft.util.Hand.MAIN_HAND) return ActionResult.PASS;

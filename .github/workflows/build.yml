@@ -60,7 +60,12 @@ jobs:
             "https://meta.fabricmc.net/v2/versions/loader/1.21.1/0.16.10/${INSTALLER}/server/jar"
           cd smoke
           echo "eula=true" > eula.txt
-          echo "online-mode=false" > server.properties
+          cat > server.properties <<'PROPS'
+online-mode=false
+enable-rcon=true
+rcon.password=smoke
+rcon.port=25575
+PROPS
           java -Xmx2G -jar server.jar nogui > server.log 2>&1 &
           PID=$!
           ok=0
@@ -69,16 +74,23 @@ jobs:
             if ! kill -0 $PID 2>/dev/null; then break; fi
             sleep 2
           done
+          if [ "$ok" -ne 1 ]; then
+            echo "::error::Dedicated server never reached the 'Done' state (crashed or timed out)"
+            grep -E "Exception|Error|Caused by|at dev\.qynl|FAILED|Crash report" server.log | head -25 | \
+              while IFS= read -r line; do echo "::error::${line:0:240}"; done
+            kill $PID 2>/dev/null || true
+            exit 1
+          fi
+          # Exercise the mod's commands over RCON and stop the server cleanly.
+          python3 ../tools/rcon.py 127.0.0.1 25575 smoke
+          for i in $(seq 1 30); do
+            if ! kill -0 $PID 2>/dev/null; then break; fi
+            sleep 2
+          done
           kill $PID 2>/dev/null || true
           sleep 2
           echo "--- server.log tail ---"
           tail -n 40 server.log || true
-          if [ "$ok" -ne 1 ]; then
-            echo "::error::Dedicated server never reached the 'Done' state (crashed or timed out)"
-            grep -E "Exception|Error|Caused by|at dev\.qynl|FAILED|crash报告|Crash report" server.log | head -25 | \
-              while IFS= read -r line; do echo "::error::${line:0:240}"; done
-            exit 1
-          fi
           # Surface mod-related errors (datapacks, mixins, registrations)
           if grep -E "Failed to parse|Failed to load|Couldn't parse|Couldn't load|Mixin apply failed|error loading" server.log | grep -Ei "myfirstmod|qynl" > /tmp/moderrors.txt; then
             cat /tmp/moderrors.txt
