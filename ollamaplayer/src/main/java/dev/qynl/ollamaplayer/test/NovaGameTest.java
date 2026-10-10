@@ -42,7 +42,6 @@ public class NovaGameTest implements FabricGameTest {
             if (ticks.get() < 0) return; // finished already
             int t = ticks.incrementAndGet();
             companion.tick(null);
-            if (t % 100 == 0) System.out.println("NOVA_DEBUG t=" + t + " " + companion.debugState());
 
             boolean logGone = world.getBlockState(logAbs).isAir();
             boolean holdingLog = false;
