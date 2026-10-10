@@ -128,6 +128,30 @@ public class NovaGameTest implements FabricGameTest {
                 () -> "Companion did not mine the iron ore with its stone pickaxe.");
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 4000)
+    public void fullLoopIronPickaxeFromOre(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        BlockPos[] ores = {new BlockPos(6, 1, 5), new BlockPos(8, 1, 3), new BlockPos(9, 1, 8)};
+        for (BlockPos o : ores) ctx.setBlockState(o, Blocks.IRON_ORE.getDefaultState());
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaLoop");
+        body.getInventory().insertStack(new ItemStack(Items.STONE_PICKAXE, 1));
+        body.getInventory().insertStack(new ItemStack(Items.COAL, 3));
+        body.getInventory().insertStack(new ItemStack(Items.COBBLESTONE, 8));
+        body.getInventory().insertStack(new ItemStack(Items.OAK_PLANKS, 8));
+        body.getInventory().insertStack(new ItemStack(Items.STICK, 2));
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+
+        String reply = companion.craftGoal("iron_pickaxe", 1);
+        System.out.println("NOVA_REPLY " + reply);
+        if (reply.startsWith("I can't")) ctx.throwGameTestException(reply);
+
+        run(ctx, companion, 3800, () -> count(body, Items.IRON_PICKAXE) >= 1,
+                () -> "Companion did not finish the iron pickaxe loop. status=" + companion.statusLine()
+                        + " inv=" + body.getInventory().size());
+    }
+
     private static void floor(TestContext ctx) {
         for (int x = 0; x <= 10; x++) {
             for (int z = 0; z <= 10; z++) {
