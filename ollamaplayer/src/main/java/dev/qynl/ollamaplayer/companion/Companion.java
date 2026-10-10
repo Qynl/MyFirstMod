@@ -4,6 +4,9 @@ import com.mojang.authlib.GameProfile;
 import dev.qynl.ollamaplayer.craft.Planner;
 import dev.qynl.ollamaplayer.craft.Recipes;
 import net.minecraft.block.Block;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EquipmentSlot;
@@ -85,6 +88,7 @@ public final class Companion {
     private String planGoal;
     private boolean planMining;
     private int shieldTimer;
+    private boolean huntingLogged;
     private int equipTimer;
 
     public Companion(NovaBody player, Consumer<String> say) {
@@ -168,6 +172,19 @@ public final class Companion {
             return;
         }
 
+        if (enemy == null && plan.isEmpty() && !planMining && needsFood() && !hasFood()) {
+            LivingEntity animal = nearestAnimal(world, 24);
+            if (animal != null) {
+                if (!huntingLogged) {
+                    say.accept("I'm hungry. Going hunting.");
+                    huntingLogged = true;
+                }
+                fight(animal, world);
+                return;
+            }
+        }
+        if (!needsFood()) huntingLogged = false;
+
         if (!plan.isEmpty() || planMining) {
             if (runPlan(world)) return;
         }
@@ -207,6 +224,9 @@ public final class Companion {
             }
             case "gear" -> {
                 return craftGoal("gear", 1);
+            }
+            case "shelter" -> {
+                return buildShelter();
             }
             case "eat" -> {
                 if (!eatFood()) return "I've got nothing to eat right now.";
@@ -886,6 +906,82 @@ public final class Companion {
             sb.append("off-hand ").append(Registries.ITEM.getId(player.getOffHandStack().getItem()).getPath());
         }
         return sb.length() == 0 ? "no armor" : sb.toString();
+    }
+
+    // ------------------------------------------------------------------ survival extras
+
+    private boolean needsFood() {
+        return player.getHungerManager().getFoodLevel() <= 16;
+    }
+
+    private boolean hasFood() {
+        PlayerInventory inv = player.getInventory();
+        for (int i = 0; i < inv.size(); i++) {
+            if (inv.getStack(i).get(DataComponentTypes.FOOD) != null) return true;
+        }
+        return false;
+    }
+
+    @Nullable
+    private LivingEntity nearestAnimal(ServerWorld world, double range) {
+        Box box = player.getBoundingBox().expand(range);
+        LivingEntity best = null;
+        double bestDist = Double.MAX_VALUE;
+        for (AnimalEntity a : world.getEntitiesByClass(AnimalEntity.class, box, LivingEntity::isAlive)) {
+            double d = player.squaredDistanceTo(a);
+            if (d < bestDist) {
+                bestDist = d;
+                best = a;
+            }
+        }
+        return best;
+    }
+
+    /** Walls the body into a 3x3 hut (two walls high, flat roof) using blocks from the inventory. */
+    private String buildShelter() {
+        ServerWorld world = player.getServerWorld();
+        BlockPos base = player.getBlockPos();
+        List<BlockPos> spots = new ArrayList<>();
+        for (int y = 0; y <= 2; y++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    boolean interior = dx == 0 && dz == 0 && y <= 1;
+                    if (interior) continue;
+                    BlockPos p = base.add(dx, y, dz);
+                    if (world.getBlockState(p).isAir() || world.getBlockState(p).isReplaceable()) spots.add(p);
+                }
+            }
+        }
+        PlayerInventory inv = player.getInventory();
+        int available = 0;
+        for (int i = 0; i < inv.size(); i++) {
+            ItemStack s = inv.getStack(i);
+            if (s.getItem() instanceof BlockItem bi && bi.getBlock().getDefaultState().isFullCube(world, base)) {
+                available += s.getCount();
+            }
+        }
+        if (available < spots.size()) {
+            return "I need about " + (spots.size() - available) + " more blocks for a shelter.";
+        }
+        int placed = 0;
+        for (BlockPos p : spots) {
+            Block block = null;
+            for (int i = 0; i < inv.size() && block == null; i++) {
+                ItemStack s = inv.getStack(i);
+                if (s.getItem() instanceof BlockItem bi && bi.getBlock().getDefaultState().isFullCube(world, p)) {
+                    block = bi.getBlock();
+                    s.decrement(1);
+                }
+            }
+            if (block == null) break;
+            world.setBlockState(p, block.getDefaultState());
+            placed++;
+        }
+        cancelPlan();
+        nav.clear();
+        setMode(Mode.STAY);
+        player.swingHand(Hand.MAIN_HAND);
+        return "Shelter built with " + placed + " blocks. I'll hold here. Tell me to follow when you want me out.";
     }
 
     // ------------------------------------------------------------------ helpers

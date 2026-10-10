@@ -30,6 +30,9 @@ public final class Heuristics {
         if (t.contains("gear") || t.contains("armor") || t.contains("armour") || t.contains("kit")) {
             return new Reply("Let's get geared up.", "gear", null, 0);
         }
+        if (t.contains("shelter") || t.contains("house") || t.contains("hide") || t.contains("hut")) {
+            return new Reply("Building a shelter.", "shelter", null, 0);
+        }
         if (CRAFT_VERB.matcher(t).find()) {
             String target = craftTarget(t);
             if (target != null) return new Reply("Making " + target.replace('_', ' ') + ".", "craft", target, explicitCount(t));

@@ -151,6 +151,7 @@ public final class Brain {
                 + "diamond_ore, sand, dirt) and how many in 'count'.\n"
                 + "- craft: make an item, e.g. target 'stone_pickaxe', 'furnace', 'iron_helmet', 'torch'. Gathers what is missing, places a crafting table or furnace if needed, and smelts ores.\n"
                 + "- gear: work toward a full iron kit (iron pickaxe, sword, shield, helmet, chestplate, leggings, boots).\n"
+                + "- shelter: wall yourself into a small hut from blocks in your inventory and hold there.\n"
                 + "- eat: eat food from your inventory.\n"
                 + "- status: report what you are doing.\n"
                 + "Reply ONLY with JSON: {\"say\": \"<chat line, empty to stay silent>\", \"action\": \"<allowed action>\", "

@@ -7,7 +7,7 @@ import java.util.Set;
 
 /** A decoded decision: what to say and which single action to take. */
 public record Reply(String say, String action, String target, int count) {
-    public static final Set<String> ACTIONS = Set.of("none", "follow", "stay", "mine", "craft", "gear", "eat", "status");
+    public static final Set<String> ACTIONS = Set.of("none", "follow", "stay", "mine", "craft", "gear", "shelter", "eat", "status");
 
     public static Reply none(String say) {
         return new Reply(say, "none", null, 0);
