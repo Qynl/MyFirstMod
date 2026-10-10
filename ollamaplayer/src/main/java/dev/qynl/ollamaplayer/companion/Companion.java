@@ -607,12 +607,7 @@ public final class Companion {
                     p -> Math.hypot(p.getX() + 0.5 - ip.x, p.getZ() + 0.5 - ip.z)));
             replanTimer = 10;
         }
-        Navigator.Result res = nav.tick(player, 0.13);
-        if (chaseTicks % 40 == 1) {
-            System.out.println("NOVA_DEBUG chase drop=" + target.getPos() + " body=" + player.getPos()
-                    + " res=" + res + " hasPath=" + nav.hasPath() + " chaseTicks=" + chaseTicks);
-        }
-        if (res != Navigator.Result.MOVING) {
+        if (nav.tick(player, 0.13) != Navigator.Result.MOVING) {
             return false;
         }
         return true;
@@ -839,7 +834,8 @@ public final class Companion {
                 if (dx == 0 && dz == 0) continue;
                 BlockPos p = origin.add(dx, 0, dz);
                 BlockPos below = p.down();
-                if (world.getBlockState(p).isAir() && world.getBlockState(below).isSolidBlock(world, below)) {
+                if (world.getBlockState(p).isAir() && world.getBlockState(below).isSolidBlock(world, below)
+                        && !hasDropAt(world, p)) {
                     world.setBlockState(p, block.getDefaultState());
                     consume(itemPath, 1);
                     player.swingHand(Hand.MAIN_HAND);
@@ -848,6 +844,11 @@ public final class Companion {
             }
         }
         abort("There is no room to place the " + itemPath.replace('_', ' ') + " here.");
+    }
+
+    /** True if an item entity lies in this block cell (placing a block there would trap the item). */
+    private static boolean hasDropAt(ServerWorld world, BlockPos p) {
+        return !world.getEntitiesByClass(ItemEntity.class, new Box(p), ItemEntity::isAlive).isEmpty();
     }
 
     private void give(ItemStack stack) {
@@ -1045,6 +1046,7 @@ public final class Companion {
                 }
             }
             if (block == null) break;
+            if (hasDropAt(world, p)) continue; // never entomb a dropped item inside a wall
             world.setBlockState(p, block.getDefaultState());
             placed++;
         }
