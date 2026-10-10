@@ -494,6 +494,7 @@ public final class Companion {
                 || enemy instanceof net.minecraft.entity.mob.WitchEntity
                 || enemy instanceof net.minecraft.entity.mob.BlazeEntity;
         double d = player.distanceTo(enemy);
+        System.out.println("NOVA_DEBUG shoot ranged=" + ranged + " d=" + d + " arrows=" + countInv("arrow") + " see=" + player.canSee(enemy) + " hit=" + world.raycast(new net.minecraft.world.RaycastContext(player.getEyePos(), enemy.getEyePos(), net.minecraft.world.RaycastContext.ShapeType.COLLIDER, net.minecraft.world.RaycastContext.FluidHandling.NONE, player)).getBlockPos() + " me=" + player.getPos() + " tgt=" + enemy.getPos());
         if (!ranged || d > 15.0 || countInv("bow") < 1 || countInv("arrow") < 1 || !player.canSee(enemy)) {
             return false;
         }
