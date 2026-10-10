@@ -58,7 +58,6 @@ public final class Navigator {
         }
         lastPos = pos;
         if (stuckTicks > 35) {
-            System.out.println("NOVA_DEBUG stuck at " + pos + " " + body.getName().getString() + " index=" + index + " next=" + (index < path.size() ? path.get(index) : null));
             clear();
             return Result.FAILED;
         }
@@ -72,7 +71,7 @@ public final class Navigator {
             boolean airBelow = body.getWorld().getBlockState(below).isAir();
             boolean bridge = hd < 2.2 && Math.abs(dy) < 0.9;
             // Pillar: we are rising under the node and have reached the top of the jump.
-            boolean pillar = hd < 1.0 && dy > 0.9 && pos.y >= n.getY() - 0.1;
+            boolean pillar = hd < 1.0 && pos.y >= n.getY() - 0.1;
             if (airBelow && Pathfinder.passable(body.getWorld(), n) && (bridge || pillar)) {
                 if (!bridger.place(below)) {
                     clear();
