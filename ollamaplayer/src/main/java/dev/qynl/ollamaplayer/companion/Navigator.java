@@ -62,6 +62,9 @@ public final class Navigator {
             return Result.FAILED;
         }
 
+        if (body.getName().getString().equals("NovaPillar") && index < path.size()) {
+            System.out.println("NOVA_DEBUG nav idx=" + index + " n=" + path.get(index) + " pos=" + pos + " ground=" + body.isOnGround() + " len=" + path.size());
+        }
         // Fill a bridge or pillar cell before the body is allowed to step past it.
         if (index < path.size() && bridger != null) {
             BlockPos n = path.get(index);
