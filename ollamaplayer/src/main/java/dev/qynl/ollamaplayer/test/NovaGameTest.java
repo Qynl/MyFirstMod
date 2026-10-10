@@ -91,6 +91,43 @@ public class NovaGameTest implements FabricGameTest {
                 () -> "Companion did not put on the iron helmet.");
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 1200)
+    public void smeltsIronWithPlacedFurnace(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaSmelt");
+        body.getInventory().insertStack(new ItemStack(Items.RAW_IRON, 2));
+        body.getInventory().insertStack(new ItemStack(Items.COAL, 2));
+        body.getInventory().insertStack(new ItemStack(Items.COBBLESTONE, 8));
+        body.getInventory().insertStack(new ItemStack(Items.OAK_PLANKS, 4));
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+
+        String reply = companion.craftGoal("iron_ingot", 2);
+        System.out.println("NOVA_REPLY " + reply);
+        if (reply.startsWith("I can't")) ctx.throwGameTestException(reply);
+
+        run(ctx, companion, 900, () -> count(body, Items.IRON_INGOT) >= 2,
+                () -> "Companion did not smelt two iron ingots with a placed furnace.");
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 900)
+    public void minesIronOreWithStonePickaxe(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        BlockPos oreRel = new BlockPos(6, 1, 5);
+        ctx.setBlockState(oreRel, Blocks.IRON_ORE.getDefaultState());
+        BlockPos oreAbs = BlockPos.ofFloored(ctx.getAbsolute(Vec3d.ofCenter(oreRel)));
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaOre");
+        body.getInventory().insertStack(new ItemStack(Items.STONE_PICKAXE, 1));
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+        companion.startMining("iron_ore", 1);
+
+        run(ctx, companion, 800, () -> world.getBlockState(oreAbs).isAir() && count(body, Items.RAW_IRON) >= 1,
+                () -> "Companion did not mine the iron ore with its stone pickaxe.");
+    }
+
     private static void floor(TestContext ctx) {
         for (int x = 0; x <= 10; x++) {
             for (int z = 0; z <= 10; z++) {
