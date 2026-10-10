@@ -1,7 +1,6 @@
 package dev.qynl.ollamaplayer.companion;
 
 import com.mojang.authlib.GameProfile;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
@@ -41,7 +40,7 @@ public final class Companion {
 
     private static final String[] RARE = {"diamond", "emerald", "ancient_debris", "gold_ore", "iron_ore", "lapis", "redstone_ore", "coal_ore"};
 
-    private final FakePlayer player;
+    private final NovaBody player;
     private final Consumer<String> say;
     private final Navigator nav = new Navigator();
 
@@ -52,7 +51,6 @@ public final class Companion {
     private boolean wasFighting;
     private boolean sawEnemy;
     private float lastHealth = 20f;
-    private int lastAge = -1;
 
     private String mineTarget;
     private int mineWanted;
@@ -63,20 +61,20 @@ public final class Companion {
     private int swingTimer;
     private final Set<Long> badBlocks = new HashSet<>();
 
-    public Companion(FakePlayer player, Consumer<String> say) {
+    public Companion(NovaBody player, Consumer<String> say) {
         this.player = player;
         this.say = say;
     }
 
     /** Creates a fresh fake player with a unique profile (avoids FakePlayer's instance cache). */
-    public static FakePlayer createPlayer(ServerWorld world, Vec3d pos, String name) {
-        FakePlayer p = FakePlayer.get(world, new GameProfile(UUID.randomUUID(), name));
+    public static NovaBody createPlayer(ServerWorld world, Vec3d pos, String name) {
+        NovaBody p = new NovaBody(world, new GameProfile(UUID.randomUUID(), name));
         p.refreshPositionAndAngles(pos.x, pos.y, pos.z, 0f, 0f);
         world.spawnEntity(p);
         return p;
     }
 
-    public FakePlayer player() {
+    public NovaBody player() {
         return player;
     }
 
@@ -91,17 +89,9 @@ public final class Companion {
 
     // ------------------------------------------------------------------ tick
 
-    /**
-     * One server tick: decide, then make sure the body physically advances this tick.
-     * Some setups do not tick fake players from the world; if the world did not advance
-     * the body's age since our last call, we tick it ourselves so velocities and gravity apply.
-     */
+    /** One server tick of decisions. The body's physics run in NovaBody#tick. */
     public void tick(@Nullable ServerPlayerEntity owner) {
         think(owner);
-        if (player.age == lastAge) {
-            player.tick();
-        }
-        lastAge = player.age;
     }
 
     private void think(@Nullable ServerPlayerEntity owner) {

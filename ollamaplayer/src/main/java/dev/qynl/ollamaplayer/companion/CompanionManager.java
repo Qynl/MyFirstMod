@@ -2,7 +2,6 @@ package dev.qynl.ollamaplayer.companion;
 
 import dev.qynl.ollamaplayer.brain.Brain;
 import dev.qynl.ollamaplayer.config.ModConfig;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -91,7 +90,7 @@ public final class CompanionManager {
                 speak("Back. That was rough.");
             }
         } else {
-            FakePlayer body = companion.player();
+            NovaBody body = companion.player();
             if (body.getHealth() <= 0.0F || body.isRemoved()) {
                 handleDeath(body);
             } else {
@@ -118,7 +117,7 @@ public final class CompanionManager {
         return companion.statusLine() + " Model: " + brain.llm().status();
     }
 
-    private void handleDeath(FakePlayer body) {
+    private void handleDeath(NovaBody body) {
         BlockPos where = body.getBlockPos();
         speak("I died at " + where.toShortString() + "! My stuff should be on the ground there.");
         removeCompanion();
@@ -126,10 +125,10 @@ public final class CompanionManager {
     }
 
     private void relocate(ServerPlayerEntity owner) {
-        FakePlayer old = companion.player();
+        NovaBody old = companion.player();
         Companion.Mode mode = companion.mode();
         ServerWorld world = owner.getServerWorld();
-        FakePlayer fresh = Companion.createPlayer(world, owner.getPos().add(2, 0, 0), name());
+        NovaBody fresh = Companion.createPlayer(world, owner.getPos().add(2, 0, 0), name());
         for (int i = 0; i < old.getInventory().size(); i++) {
             fresh.getInventory().setStack(i, old.getInventory().getStack(i).copy());
         }

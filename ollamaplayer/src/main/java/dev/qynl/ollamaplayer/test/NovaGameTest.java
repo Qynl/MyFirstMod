@@ -3,7 +3,6 @@ package dev.qynl.ollamaplayer.test;
 import dev.qynl.ollamaplayer.companion.Companion;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -34,7 +33,7 @@ public class NovaGameTest implements FabricGameTest {
         BlockPos logAbs = BlockPos.ofFloored(ctx.getAbsolute(Vec3d.ofCenter(logRel)));
 
         Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
-        FakePlayer body = Companion.createPlayer(world, start, "NovaTest");
+        dev.qynl.ollamaplayer.companion.NovaBody body = Companion.createPlayer(world, start, "NovaTest");
         Companion companion = new Companion(body, msg -> { });
         companion.startMining("log", 1);
 
