@@ -6,6 +6,10 @@ on:
     paths: ["ollamaplayer/**", ".github/workflows/ollamaplayer-build.yml"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,13 +31,44 @@ jobs:
         with:
           gradle-version: "9.5.1"
 
-      - name: Build
-        run: gradle build --no-daemon
+      - name: Build and game test
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle build runGametest --no-daemon --continue 2>&1 | tee build.log
+          status=${PIPESTATUS[0]}
+          echo "$status" > gradle.exit
+          exit "$status"
 
-      - name: "Game test: headless Minecraft, companion mines a log"
-        run: gradle runGametest --no-daemon
+      - name: Publish build log as check run
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          log = open("build.log", errors="replace").read() if os.path.exists("build.log") else "no log produced"
+          ok = os.path.exists("gradle.exit") and open("gradle.exit").read().strip() == "0"
+          payload = {
+              "name": "ollamaplayer-build-log",
+              "head_sha": os.environ["SHA"],
+              "status": "completed",
+              "conclusion": "success" if ok else "failure",
+              "output": {
+                  "title": "Gradle build + gametest: " + ("PASS" if ok else "FAIL"),
+                  "summary": "Tail of the Gradle log.",
+                  "text": log[-60000:],
+              },
+          }
+          r = subprocess.run(["gh", "api", f"repos/{os.environ['REPO']}/check-runs", "--input", "-"],
+                             input=json.dumps(payload).encode())
+          print("check-run post exit", r.returncode)
+          PY
 
       - name: Upload JAR
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ollamaplayer
