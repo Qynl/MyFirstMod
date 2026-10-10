@@ -235,7 +235,9 @@ public class NovaGameTest implements FabricGameTest {
         world.spawnEntity(skeleton);
 
         run(ctx, companion, 240, () -> count(body, Items.ARROW) < 5,
-                () -> "Companion did not shoot at the skeleton. arrows=" + count(body, Items.ARROW));
+                () -> "Companion did not shoot at the skeleton. arrows=" + count(body, Items.ARROW)
+                        + " skeletonAlive=" + skeleton.isAlive() + " skel=" + skeleton.getPos() + " body=" + body.getPos()
+                        + " enemyNear=" + companion.statusLine());
     }
 
     private static void floor(TestContext ctx) {
