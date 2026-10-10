@@ -916,6 +916,7 @@ public final class Companion {
                     BlockPos below = p.down();
                     if (!world.getBlockState(p).isAir() || !world.getBlockState(below).isSolidBlock(world, below)) continue;
                     if (hasDropAt(world, p) || touchesStation(world, p)) continue;
+                    System.out.println("NOVA_DEBUG place " + itemPath + " at " + p + " drops=" + nearbyDrops(world));
                     world.setBlockState(p, block.getDefaultState());
                     consume(itemPath, 1);
                     player.swingHand(Hand.MAIN_HAND);
@@ -948,6 +949,9 @@ public final class Companion {
     }
 
     private void consume(String key, int n) {
+        if (key.equals("raw_iron") || key.equals("iron_ingot") || key.equals("#logs")) {
+            System.out.println("NOVA_DEBUG consume " + key + " n=" + n + " have=" + countInv(key));
+        }
         PlayerInventory inv = player.getInventory();
         int left = n;
         for (int i = 0; i < inv.size() && left > 0; i++) {
@@ -1045,6 +1049,7 @@ public final class Companion {
         for (int i = 0; i < 36; i++) {
             ItemStack s = inv.getStack(i);
             if (s.isEmpty() || !JUNK.contains(Registries.ITEM.getId(s.getItem()).getPath())) continue;
+            System.out.println("NOVA_DEBUG junk " + s.getItem() + " x" + s.getCount());
             ItemEntity dropped = player.dropItem(s.copy(), false);
             if (dropped != null) ignoredDrops.add(dropped.getUuid());
             inv.setStack(i, ItemStack.EMPTY);
@@ -1208,7 +1213,9 @@ public final class Companion {
         Box box = player.getBoundingBox().expand(3.0);
         for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
             ItemStack s = e.getStack().copy();
+            int before = countInv(Registries.ITEM.getId(s.getItem()).getPath());
             player.getInventory().insertStack(s);
+            System.out.println("NOVA_DEBUG pickup " + e.getStack().getItem() + " x" + e.getStack().getCount() + " invBefore=" + before + " left=" + s.getCount());
             if (s.isEmpty()) e.discard();
             else e.setStack(s);
         }
