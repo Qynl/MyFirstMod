@@ -94,6 +94,7 @@ public final class Companion {
     private int shieldTimer;
     private boolean huntingLogged;
     private int cookCooldown;
+    private int dropGrace;
     private int equipTimer;
 
     public Companion(NovaBody player, Consumer<String> say) {
@@ -709,6 +710,7 @@ public final class Companion {
                     walkToStation(world, Blocks.CRAFTING_TABLE, "crafting table");
                     return true;
                 }
+                if (waitForDrops(world)) return true;
                 plan.poll();
                 doCraft(s);
                 return true;
@@ -718,12 +720,27 @@ public final class Companion {
                     walkToStation(world, Blocks.FURNACE, "furnace");
                     return true;
                 }
+                if (waitForDrops(world)) return true;
                 plan.poll();
                 doSmelt(s.key(), s.count());
                 return true;
             }
         }
         return true;
+    }
+
+    /** Gives a freshly dropped stack a few ticks to be picked up before a step needs it. */
+    private boolean waitForDrops(ServerWorld world) {
+        if (dropGrace >= 20) return false;
+        Box box = player.getBoundingBox().expand(3.0);
+        for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
+            if (!ignoredDrops.contains(e.getUuid())) {
+                dropGrace++;
+                return true;
+            }
+        }
+        dropGrace = 0;
+        return false;
     }
 
     private void abort(String reason) {
