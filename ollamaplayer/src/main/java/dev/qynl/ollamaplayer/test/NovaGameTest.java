@@ -217,6 +217,26 @@ public class NovaGameTest implements FabricGameTest {
                         + " raw=" + count(body, Items.BEEF));
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 600)
+    public void bridgesAcrossAGap(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        // A two-block gap across the whole floor: the only way over is to lay blocks.
+        for (int z = 0; z <= 16; z++) {
+            ctx.setBlockState(new BlockPos(5, 0, z), Blocks.AIR.getDefaultState());
+            ctx.setBlockState(new BlockPos(6, 0, z), Blocks.AIR.getDefaultState());
+        }
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaBridge");
+        body.getInventory().insertStack(new ItemStack(Items.COBBLESTONE, 8));
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+        Vec3d goal = ctx.getAbsolute(new Vec3d(9.5, 1, 5.5));
+        companion.walkTo(BlockPos.ofFloored(goal));
+
+        run(ctx, companion, 500, () -> Math.hypot(body.getX() - goal.x, body.getZ() - goal.z) < 1.5,
+                () -> "Companion did not bridge the gap. pos=" + body.getPos());
+    }
+
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
     public void routesRequestsToActions(TestContext ctx) {

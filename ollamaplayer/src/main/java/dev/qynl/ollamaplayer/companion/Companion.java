@@ -64,6 +64,10 @@ public final class Companion {
     private final Consumer<String> say;
     private final Navigator nav = new Navigator();
 
+    {
+        nav.setBridger(this::bridgeAt);
+    }
+
     private Mode mode = Mode.FOLLOW;
     private int replanTimer;
     private int eatCooldown;
@@ -1288,13 +1292,30 @@ public final class Companion {
     // ------------------------------------------------------------------ helpers
 
     private boolean planTo(ServerWorld world, Pathfinder.Goal goal) {
-        List<BlockPos> path = Pathfinder.find(world, player.getBlockPos(), goal);
+        boolean canBridge = countInv("cobblestone") + countInv("dirt") > 0;
+        List<BlockPos> path = Pathfinder.find(world, player.getBlockPos(), goal, canBridge);
         if (path == null) {
             nav.clear();
             return false;
         }
         nav.setPath(path);
         return true;
+    }
+
+    /** Fills an air cell on the route with a block from the bag. Called by the navigator. */
+    private boolean bridgeAt(BlockPos at) {
+        ServerWorld world = player.getServerWorld();
+        if (countInv("cobblestone") >= 1) {
+            consume("cobblestone", 1);
+            world.setBlockState(at, Blocks.COBBLESTONE.getDefaultState());
+            return true;
+        }
+        if (countInv("dirt") >= 1) {
+            consume("dirt", 1);
+            world.setBlockState(at, Blocks.DIRT.getDefaultState());
+            return true;
+        }
+        return false;
     }
 
     private void teleportNear(ServerPlayerEntity owner) {

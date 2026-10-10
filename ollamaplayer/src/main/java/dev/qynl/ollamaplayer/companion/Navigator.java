@@ -13,6 +13,17 @@ import java.util.List;
 public final class Navigator {
     public enum Result { NONE, MOVING, ARRIVED, FAILED }
 
+    /** Places a floor block at the given air cell; returns false if that is not possible. */
+    public interface Bridger {
+        boolean place(BlockPos at);
+    }
+
+    private Bridger bridger;
+
+    public void setBridger(Bridger b) {
+        this.bridger = b;
+    }
+
     private List<BlockPos> path;
     private int index;
     private int stuckTicks;
@@ -75,6 +86,15 @@ public final class Navigator {
             body.setVelocity(0, v.y, 0);
             body.velocityModified = true;
             return Result.MOVING;
+        }
+
+        // A waypoint over air at our height is a bridge cell: fill its floor before stepping onto it.
+        if (hd < 2.2 && Math.abs(dy) < 0.9 && body.getWorld().getBlockState(n.down()).isAir()
+                && Pathfinder.passable(body.getWorld(), n)) {
+            if (bridger == null || !bridger.place(n.down())) {
+                clear();
+                return Result.FAILED;
+            }
         }
 
         float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));

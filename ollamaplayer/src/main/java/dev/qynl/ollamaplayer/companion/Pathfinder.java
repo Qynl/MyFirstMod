@@ -36,6 +36,14 @@ public final class Pathfinder {
 
     /** Returns the list of feet positions from start to goal (inclusive), or null if none was found. */
     public static List<BlockPos> find(World world, BlockPos start, Goal goal) {
+        return find(world, start, goal, false);
+    }
+
+    /**
+     * Same as {@link #find(World, BlockPos, Goal)}; with {@code bridge} set, the path may cross
+     * single-block air gaps at floor level by placing a block there (see {@link Navigator}).
+     */
+    public static List<BlockPos> find(World world, BlockPos start, Goal goal, boolean bridge) {
         if (goal.reached().test(start)) return List.of(start);
 
         PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingDouble(n -> n.f));
@@ -53,7 +61,7 @@ public final class Pathfinder {
             if (goal.reached().test(cur.pos)) return reconstruct(cur);
 
             for (int[] d : DIRS) {
-                BlockPos next = step(world, cur.pos, d[0], d[1]);
+                BlockPos next = step(world, cur.pos, d[0], d[1], bridge);
                 if (next == null) continue;
                 if (Math.abs(next.getX() - start.getX()) > MAX_RANGE || Math.abs(next.getZ() - start.getZ()) > MAX_RANGE) continue;
                 long key = next.asLong();
@@ -75,6 +83,8 @@ public final class Pathfinder {
         double horizontal = (from.getX() != to.getX() && from.getZ() != to.getZ()) ? 1.42 : 1.0;
         // Swimming is allowed but slow and wet: prefer dry land when there is a choice.
         if (inWater(world, to)) horizontal += 2.0;
+        // Placing a bridge block costs a little extra, so detours around real ground stay preferred.
+        if (dy == 0 && !solid(world, to.down())) horizontal += 1.5;
         if (dy > 0) return horizontal + 1.5;
         if (dy < 0) return horizontal + 0.6 * -dy;
         return horizontal;
@@ -85,7 +95,7 @@ public final class Pathfinder {
     }
 
     /** One horizontal move from p in direction (dx,dz), including step-up and drop-down options. */
-    private static BlockPos step(World world, BlockPos p, int dx, int dz) {
+    private static BlockPos step(World world, BlockPos p, int dx, int dz, boolean bridge) {
         int x = p.getX() + dx;
         int z = p.getZ() + dz;
         int y = p.getY();
@@ -104,6 +114,12 @@ public final class Pathfinder {
         // Step up one block: need head room above us and the cell above the target floor free.
         BlockPos up = flat.up();
         if (passable(world, p.up(2)) && standable(world, up)) return up;
+
+        // Bridge a one-block air gap at our own height: the navigator places the floor block first.
+        if (bridge && solid(world, p.down()) && passable(world, flat) && passable(world, flat.up())
+                && world.getBlockState(flat.down()).isAir()) {
+            return flat;
+        }
 
         // Drop down (up to 3): the way ahead must be open at our height, then fall column is clear.
         if (!passable(world, flat) || !passable(world, flat.up())) return null;
