@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public final class Pathfinder {
                 if (Math.abs(next.getX() - start.getX()) > MAX_RANGE || Math.abs(next.getZ() - start.getZ()) > MAX_RANGE) continue;
                 long key = next.asLong();
                 if (closed.contains(key)) continue;
-                double cost = cur.g + moveCost(cur.pos, next);
+                double cost = cur.g + moveCost(world, cur.pos, next);
                 Node old = best.get(key);
                 if (old == null || cost < old.g) {
                     Node n = new Node(next, cost, cost + goal.estimate().applyAsDouble(next), cur);
@@ -69,12 +70,18 @@ public final class Pathfinder {
         return null;
     }
 
-    private static double moveCost(BlockPos from, BlockPos to) {
+    private static double moveCost(World world, BlockPos from, BlockPos to) {
         int dy = to.getY() - from.getY();
         double horizontal = (from.getX() != to.getX() && from.getZ() != to.getZ()) ? 1.42 : 1.0;
+        // Swimming is allowed but slow and wet: prefer dry land when there is a choice.
+        if (inWater(world, to)) horizontal += 2.0;
         if (dy > 0) return horizontal + 1.5;
         if (dy < 0) return horizontal + 0.6 * -dy;
         return horizontal;
+    }
+
+    static boolean inWater(World world, BlockPos p) {
+        return world.getBlockState(p).getFluidState().isIn(FluidTags.WATER);
     }
 
     /** One horizontal move from p in direction (dx,dz), including step-up and drop-down options. */
@@ -110,7 +117,8 @@ public final class Pathfinder {
 
     static boolean passable(World world, BlockPos p) {
         BlockState s = world.getBlockState(p);
-        if (!s.getFluidState().isEmpty()) return false;
+        // Water can be swum through; lava and anything else fluid-like cannot.
+        if (!s.getFluidState().isEmpty() && !s.getFluidState().isIn(FluidTags.WATER)) return false;
         if (HAZARDS.contains(s.getBlock())) return false;
         return s.getCollisionShape(world, p).isEmpty();
     }
