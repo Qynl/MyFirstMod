@@ -299,6 +299,19 @@ public class NovaGameTest implements FabricGameTest {
         }, () -> "Companion never moved its sword into the hotbar.");
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 400)
+    public void stashesBulkBlocksWhenFull(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaStash");
+        for (int i = 0; i < 36; i++) body.getInventory().setStack(i, new ItemStack(Items.DIORITE, 64));
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+
+        run(ctx, companion, 300, () -> count(body, Items.DIORITE) < 36 * 64,
+                () -> "Companion did not stash bulk blocks. diorite=" + count(body, Items.DIORITE));
+    }
+
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
     public void routesRequestsToActions(TestContext ctx) {

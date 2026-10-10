@@ -180,6 +180,7 @@ public final class Companion {
         sawEnemy = enemy != null;
 
         torchIfDark(world);
+        if (enemy == null && mode != Mode.STAY) stashIfFull(world);
         if (enemy == null && ++hotbarTimer >= 40) {
             hotbarTimer = 0;
             organizeHotbar();
@@ -499,6 +500,95 @@ public final class Companion {
     }
 
     private int hotbarTimer;
+    private int stashCooldown;
+
+    private static final Set<String> KEEP_BLOCKS = Set.of("crafting_table", "furnace", "chest", "torch");
+
+    /**
+     * When the bag is nearly full, bulk blocks go into a chest placed nearby. The table, furnace,
+     * torches and a reserve of cobblestone and dirt for bridges stay in the bag.
+     */
+    private void stashIfFull(ServerWorld world) {
+        if (stashCooldown > 0) {
+            stashCooldown--;
+            return;
+        }
+        PlayerInventory inv = player.getInventory();
+        int used = 0;
+        for (int i = 0; i < 36; i++) {
+            if (!inv.getStack(i).isEmpty()) used++;
+        }
+        if (used < 30) return;
+        stashCooldown = 200;
+
+        int bulk = 0;
+        for (int i = 0; i < 36; i++) bulk += stashable(inv.getStack(i));
+        if (bulk == 0) return;
+
+        BlockPos spot = findChestSpot(world);
+        if (spot == null) return;
+        world.setBlockState(spot, Blocks.CHEST.getDefaultState());
+        if (!(world.getBlockEntity(spot) instanceof net.minecraft.inventory.Inventory chest)) {
+            world.removeBlock(spot, false);
+            return;
+        }
+        int moved = 0;
+        for (int i = 0; i < 36; i++) {
+            ItemStack s = inv.getStack(i);
+            int extra = stashable(s);
+            if (extra <= 0) continue;
+            ItemStack rest = s.copyWithCount(extra);
+            insertIntoChest(chest, rest);
+            int stored = extra - rest.getCount();
+            s.decrement(stored);
+            moved += stored;
+        }
+        chest.markDirty();
+        if (moved > 0) {
+            say.accept("Stashed " + moved + " blocks in a chest at " + spot.toShortString() + ".");
+        }
+    }
+
+    /** How many items of this stack can go into the chest; 0 for anything the plans may still need. */
+    private static int stashable(ItemStack s) {
+        if (s.isEmpty() || !(s.getItem() instanceof BlockItem)) return 0;
+        String id = Registries.ITEM.getId(s.getItem()).getPath();
+        if (KEEP_BLOCKS.contains(id)) return 0;
+        int keep = (id.equals("cobblestone") || id.equals("dirt")) ? 32 : 0;
+        return Math.max(0, s.getCount() - keep);
+    }
+
+    private static void insertIntoChest(net.minecraft.inventory.Inventory chest, ItemStack rest) {
+        for (int j = 0; j < chest.size() && !rest.isEmpty(); j++) {
+            ItemStack cur = chest.getStack(j);
+            if (cur.isEmpty()) {
+                chest.setStack(j, rest.copy());
+                rest.setCount(0);
+            } else if (ItemStack.areItemsAndComponentsEqual(cur, rest)) {
+                int add = Math.min(cur.getMaxCount() - cur.getCount(), rest.getCount());
+                cur.increment(add);
+                rest.decrement(add);
+            }
+        }
+    }
+
+    @Nullable
+    private BlockPos findChestSpot(ServerWorld world) {
+        BlockPos origin = player.getBlockPos();
+        for (int ring = 2; ring <= 3; ring++) {
+            for (int dx = -ring; dx <= ring; dx++) {
+                for (int dz = -ring; dz <= ring; dz++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+                    BlockPos p = origin.add(dx, 0, dz);
+                    BlockPos below = p.down();
+                    if (!world.getBlockState(p).isAir() || !world.getBlockState(below).isSolidBlock(world, below)) continue;
+                    if (hasDropAt(world, p) || touchesStation(world, p)) continue;
+                    return p;
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Equipping only looks at the hotbar, so the best sword, pickaxe and food are moved there,
