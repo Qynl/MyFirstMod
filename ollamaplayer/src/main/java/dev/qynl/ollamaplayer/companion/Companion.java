@@ -532,8 +532,9 @@ public final class Companion {
         for (int h = 0; h < 9; h++) {
             ItemStack s = inv.getStack(h);
             if (!s.isEmpty() && match.test(s)) hotbarBest = Math.max(hotbarBest, score.applyAsInt(s));
-            // The least useful hotbar stack is the victim: empty first, then anything that isn't a tool or food.
-            int junk = s.isEmpty() ? -1 : (match.test(s) ? 100 : 50);
+            // Victim order: empty slots, then plain junk (blocks), then other gear. Never the stack we are promoting for.
+            boolean useful = !s.isEmpty() && (s.isDamageable() || s.get(DataComponentTypes.FOOD) != null);
+            int junk = s.isEmpty() ? -1 : match.test(s) ? 100 : useful ? 75 : 50;
             if (junk < victimScore) {
                 victimScore = junk;
                 victim = h;
