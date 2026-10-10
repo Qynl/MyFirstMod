@@ -31,9 +31,9 @@ public class NovaGameTest implements FabricGameTest {
         }
         BlockPos logRel = new BlockPos(7, 1, 5);
         ctx.setBlockState(logRel, Blocks.OAK_LOG.getDefaultState());
-        BlockPos logAbs = ctx.getAbsolute(logRel);
+        BlockPos logAbs = BlockPos.ofFloored(ctx.getAbsolute(Vec3d.ofCenter(logRel)));
 
-        Vec3d start = Vec3d.ofBottomCenter(ctx.getAbsolute(new BlockPos(2, 1, 5)));
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
         FakePlayer body = Companion.createPlayer(world, start, "NovaTest");
         Companion companion = new Companion(body, msg -> { });
         companion.startMining("log", 1);
