@@ -7,6 +7,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,9 @@ public class OllamaPlayerMod implements ModInitializer {
 
         ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) ->
                 CompanionManager.INSTANCE.onPlayerChat(sender, message.getContent().getString()));
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
+                CompanionManager.INSTANCE.onPlayerJoin(handler.getPlayer()));
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 NovaCommands.register(dispatcher));

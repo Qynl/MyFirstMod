@@ -28,7 +28,8 @@ public final class Brain {
     private final CompanionManager manager;
     private final OllamaClient llm = new OllamaClient();
     private final Deque<String> history = new ArrayDeque<>();
-    private final ConcurrentLinkedQueue<Reply> replies = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Queued> replies = new ConcurrentLinkedQueue<>();
+    private record Queued(boolean idle, Reply reply) {}
     private final Random random = new Random();
     private final JsonObject responseFormat = buildResponseFormat();
 
@@ -69,9 +70,9 @@ public final class Brain {
 
     /** Server thread. Applies finished replies and fires idle chatter. */
     public void tick(@Nullable Companion c, @Nullable ServerPlayerEntity owner) {
-        Reply r;
-        while ((r = replies.poll()) != null) {
-            apply(r, c);
+        Queued q;
+        while ((q = replies.poll()) != null) {
+            apply(q, c);
         }
 
         if (pendingText != null && !inFlight) {
@@ -91,14 +92,16 @@ public final class Brain {
         request("idle", "", "");
     }
 
-    private void apply(Reply r, @Nullable Companion c) {
+    private void apply(Queued q, @Nullable Companion c) {
+        Reply r = q.reply();
         if (r.say() != null && !r.say().isBlank()) {
             manager.speak(r.say());
         }
-        if (c != null && !"none".equals(r.action())) {
-            String note = c.command(r.action(), r.target(), r.count());
-            if (note != null) manager.speak(note);
-        }
+        if (c == null || "none".equals(r.action())) return;
+        // Idle thoughts may chat and may pick up mining while following, but never override an explicit order.
+        if (q.idle() && (c.mode() != Companion.Mode.FOLLOW || !"mine".equals(r.action()))) return;
+        String note = c.command(r.action(), r.target(), r.count());
+        if (note != null) manager.speak(note);
     }
 
     private void request(String trigger, String who, String text) {
@@ -107,7 +110,7 @@ public final class Brain {
 
         if (!cfg.useLlm || !llm.isReady()) {
             llm.discoverAsync();
-            if (player) replies.add(Heuristics.reply(text));
+            if (player) replies.add(new Queued(false, Heuristics.reply(text)));
             return;
         }
         if (inFlight) {
@@ -122,16 +125,17 @@ public final class Brain {
         List<JsonObject> messages = buildMessages(trigger, who, text);
         llm.chat(messages, responseFormat).whenComplete((content, err) -> {
             inFlight = false;
+            boolean idle = !player;
             if (err != null) {
                 OllamaPlayerMod.LOGGER.info("Brain request failed: {}", err.getMessage());
-                if (player) replies.add(Heuristics.reply(text));
+                if (player) replies.add(new Queued(false, Heuristics.reply(text)));
                 return;
             }
             Reply reply = Reply.parse(content);
             if (player && reply.say().isBlank() && "none".equals(reply.action())) {
                 reply = Heuristics.reply(text);
             }
-            replies.add(reply);
+            replies.add(new Queued(idle, reply));
         });
     }
 

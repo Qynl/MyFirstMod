@@ -73,6 +73,13 @@ public final class CompanionManager {
         brain.onChat(sender, text);
     }
 
+    /** Called when any player joins: if it's the owner coming back, Nova greets them. */
+    public void onPlayerJoin(ServerPlayerEntity player) {
+        if (companion != null && player.getUuid().equals(ownerId)) {
+            speak("Welcome back, " + player.getName().getString() + "!");
+        }
+    }
+
     /** Called on the server thread every tick. */
     public void tick() {
         if (server == null) return;
