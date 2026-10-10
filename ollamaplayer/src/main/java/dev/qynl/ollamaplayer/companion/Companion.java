@@ -166,6 +166,14 @@ public final class Companion {
         }
 
         LivingEntity enemy = nearestEnemy(world, 16);
+        // Defend the owner: whatever just hit them, unless it is another player, becomes the target.
+        if (owner != null) {
+            LivingEntity hitter = owner.getAttacker();
+            if (hitter != null && hitter.isAlive() && !(hitter instanceof ServerPlayerEntity)
+                    && hitter.squaredDistanceTo(owner) < 144.0 && owner.age - owner.getLastAttackedTime() < 100) {
+                if (enemy == null || enemy.squaredDistanceTo(owner) > 16.0) enemy = hitter;
+            }
+        }
         if (enemy != null && !sawEnemy && player.distanceTo(enemy) < 10) {
             say.accept("Heads up, " + Registries.ENTITY_TYPE.getId(enemy.getType()).getPath().replace('_', ' ') + "!");
         }
