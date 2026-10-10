@@ -109,12 +109,11 @@ public final class Pathfinder {
         return horizontal;
     }
 
+    /** Lava in the cross-shaped neighbourhood at foot or floor level. Kept cheap: this runs for every expansion. */
     static boolean nearLava(World world, BlockPos p) {
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                for (int dy = -1; dy <= 0; dy++) {
-                    if (world.getBlockState(p.add(dx, dy, dz)).getFluidState().isIn(FluidTags.LAVA)) return true;
-                }
+        for (int[] d : new int[][] {{0, 0}, {1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+            for (int dy = -1; dy <= 0; dy++) {
+                if (world.getBlockState(p.add(d[0], dy, d[1])).getFluidState().isIn(FluidTags.LAVA)) return true;
             }
         }
         return false;
