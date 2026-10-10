@@ -39,7 +39,7 @@ public final class NovaBody extends FakePlayer {
     }
 
     @Override
-    public boolean isInvulnerableTo(ServerWorld world, DamageSource source) {
+    public boolean isInvulnerableTo(DamageSource source) {
         return false;
     }
 }
