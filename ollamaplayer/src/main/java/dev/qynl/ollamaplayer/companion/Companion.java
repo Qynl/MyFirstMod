@@ -452,6 +452,7 @@ public final class Companion {
         lastEnemyPos = enemy.getPos();
         double d = player.distanceTo(enemy);
         faceTo(enemy.getEyePos());
+        if (d >= 4.0 && tryShoot(enemy, world)) return;
         if (d > 2.6) {
             Vec3d ep = enemy.getPos();
             if (replanTimer == 0 || !nav.hasPath()) {
@@ -476,6 +477,37 @@ public final class Companion {
                 player.swingHand(Hand.MAIN_HAND);
             }
         }
+    }
+
+    private int shotCooldown;
+
+    /** Fires an arrow at ranged mobs when Nova carries a bow and arrows. Returns true if it shot this tick. */
+    private boolean tryShoot(LivingEntity enemy, ServerWorld world) {
+        if (shotCooldown > 0) {
+            shotCooldown--;
+            return false;
+        }
+        boolean ranged = enemy instanceof net.minecraft.entity.mob.SkeletonEntity
+                || enemy instanceof net.minecraft.entity.mob.PillagerEntity
+                || enemy instanceof net.minecraft.entity.mob.WitchEntity
+                || enemy instanceof net.minecraft.entity.mob.BlazeEntity;
+        double d = player.distanceTo(enemy);
+        if (!ranged || d > 15.0 || countInv("bow") < 1 || countInv("arrow") < 1 || !player.canSee(enemy)) {
+            return false;
+        }
+        Vec3d from = player.getEyePos();
+        Vec3d to = enemy.getEyePos();
+        // Aim a little high to compensate for arrow drop over distance.
+        double dx = to.x - from.x, dy = to.y - from.y + d * 0.06, dz = to.z - from.z;
+        net.minecraft.entity.projectile.ArrowEntity arrow = new net.minecraft.entity.projectile.ArrowEntity(
+                world, player, new ItemStack(Items.ARROW), null);
+        arrow.setVelocity(dx, dy, dz, 2.8F, 0.0F);
+        arrow.pickupType = net.minecraft.entity.projectile.PersistentProjectileEntity.PickupPermission.DISALLOWED;
+        world.spawnEntity(arrow);
+        consume("arrow", 1);
+        player.swingHand(Hand.MAIN_HAND);
+        shotCooldown = 25;
+        return true;
     }
 
     private void mine(ServerWorld world) {
