@@ -149,7 +149,7 @@ public class NovaGameTest implements FabricGameTest {
 
         run(ctx, companion, 3800, () -> count(body, Items.IRON_PICKAXE) >= 1,
                 () -> "Companion did not finish the iron pickaxe loop. status=" + companion.statusLine()
-                        + " | " + companion.describe(null).replace('\n', ' '));
+                        + " | " + companion.describe(null).replace('\n', ' ') + " | " + companion.debugDrops());
     }
 
     private static void floor(TestContext ctx) {

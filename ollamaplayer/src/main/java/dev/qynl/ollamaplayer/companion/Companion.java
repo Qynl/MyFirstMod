@@ -613,6 +613,12 @@ public final class Companion {
         return true;
     }
 
+    /** Diagnostics: nearby drops, ignored drop count, and the body's position. */
+    public String debugDrops() {
+        return nearbyDrops(player.getServerWorld()) + " ignored=" + ignoredDrops.size()
+                + " body=" + String.format(Locale.ROOT, "%.2f,%.2f,%.2f", player.getX(), player.getY(), player.getZ());
+    }
+
     /** Counts item drops near the body, for diagnostics. */
     public String nearbyDrops(ServerWorld world) {
         Box box = player.getBoundingBox().expand(8.0, 3.0, 8.0);
@@ -807,7 +813,7 @@ public final class Companion {
         String raw = Recipes.smeltInput(ingot);
         if (countInv(raw) < n || countInv("coal") < n) {
             abort("I need " + n + " " + raw.replace('_', ' ') + " and " + n + " coal to smelt (have "
-                    + countInv(raw) + " and " + countInv("coal") + ").");
+                    + countInv(raw) + " and " + countInv("coal") + "). Drops: " + debugDrops());
             return;
         }
         consume(raw, n);
