@@ -235,7 +235,14 @@ public class NovaGameTest implements FabricGameTest {
         skeleton.setAiDisabled(true);
         world.spawnEntity(skeleton);
 
-        run(ctx, companion, 240, () -> count(body, Items.ARROW) < 5,
+        // Gametests run on peaceful, where hostile mobs are removed at once. Turn it up for this test only.
+        net.minecraft.world.Difficulty before = world.getDifficulty();
+        world.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL, true);
+        run(ctx, companion, 240, () -> {
+            if (count(body, Items.ARROW) >= 5) return false;
+            world.getServer().setDifficulty(before, true);
+            return true;
+        },
                 () -> "Companion did not shoot at the pillager. arrows=" + count(body, Items.ARROW)
                         + " skeletonAlive=" + skeleton.isAlive() + " skel=" + skeleton.getPos() + " body=" + body.getPos()
                         + " enemyNear=" + companion.statusLine());
