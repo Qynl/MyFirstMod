@@ -58,6 +58,7 @@ public final class Navigator {
         }
         lastPos = pos;
         if (stuckTicks > 35) {
+            System.out.println("NOVA_DEBUG stuck at " + pos + " index=" + index + " next=" + (index < path.size() ? path.get(index) : null));
             clear();
             return Result.FAILED;
         }
