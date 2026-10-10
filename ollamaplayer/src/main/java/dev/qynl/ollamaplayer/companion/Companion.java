@@ -135,6 +135,10 @@ public final class Companion {
             nav.clear();
         }
 
+        if (mode != Mode.STAY && collectDrops(world)) {
+            return;
+        }
+
         switch (mode) {
             case FOLLOW -> follow(owner, world);
             case STAY -> {
@@ -181,10 +185,11 @@ public final class Companion {
     /** Developer diagnostics; not shown to players. */
     public String debugState() {
         Vec3d v = player.getVelocity();
+        String drops = nearbyDrops(player.getServerWorld());
         return String.format(Locale.ROOT,
-                "mode=%s pos=(%.2f,%.2f,%.2f) vel=(%.3f,%.3f,%.3f) onGround=%s hasPath=%s mineBlock=%s progress=%.3f mined=%d/%d failures=%d",
+                "mode=%s pos=(%.2f,%.2f,%.2f) vel=(%.3f,%.3f,%.3f) onGround=%s hasPath=%s mineBlock=%s progress=%.3f mined=%d/%d failures=%d drops=[%s] inv=[%s]",
                 mode, player.getX(), player.getY(), player.getZ(), v.x, v.y, v.z, player.isOnGround(),
-                nav.hasPath(), mineBlock, mineProgress, mined, mineWanted, mineFailures);
+                nav.hasPath(), mineBlock, mineProgress, mined, mineWanted, mineFailures, drops, inventorySummary());
     }
 
     public String statusLine() {
@@ -338,6 +343,48 @@ public final class Companion {
             }
             if (mined >= mineWanted) finishMining();
         }
+    }
+
+    /** Walks to the nearest item drop within reach so it lands in the inventory. Returns true while busy. */
+    private boolean collectDrops(ServerWorld world) {
+        Box box = player.getBoundingBox().expand(8.0, 3.0, 8.0);
+        ItemEntity target = null;
+        double best = Double.MAX_VALUE;
+        for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
+            double d = player.squaredDistanceTo(e);
+            if (d < best) {
+                best = d;
+                target = e;
+            }
+        }
+        if (target == null) return false;
+        if (best < 2.25 && mineBlock == null) {
+            // Already on top of it: pickUpItems() takes it on this tick.
+            return false;
+        }
+        if (replanTimer == 0 || !nav.hasPath()) {
+            Vec3d ip = target.getPos();
+            planTo(world, new Pathfinder.Goal(
+                    p -> Math.hypot(p.getX() + 0.5 - ip.x, p.getZ() + 0.5 - ip.z) <= 0.7 && Math.abs(p.getY() - ip.y) <= 1.5,
+                    p -> Math.hypot(p.getX() + 0.5 - ip.x, p.getZ() + 0.5 - ip.z)));
+            replanTimer = 10;
+        }
+        if (nav.tick(player, 0.13) != Navigator.Result.MOVING) {
+            return false;
+        }
+        return true;
+    }
+
+    /** Counts item drops near the body, for diagnostics. */
+    public String nearbyDrops(ServerWorld world) {
+        Box box = player.getBoundingBox().expand(8.0, 3.0, 8.0);
+        StringBuilder sb = new StringBuilder();
+        for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
+            if (sb.length() > 0) sb.append("; ");
+            sb.append(e.getStack().getCount()).append("x").append(e.getStack().getItem())
+              .append(" at ").append(String.format(Locale.ROOT, "%.1f,%.1f,%.1f", e.getX(), e.getY(), e.getZ()));
+        }
+        return sb.length() == 0 ? "none" : sb.toString();
     }
 
     private void finishMining() {
