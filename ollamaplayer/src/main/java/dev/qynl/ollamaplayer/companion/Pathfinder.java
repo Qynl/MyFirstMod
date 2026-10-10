@@ -83,11 +83,24 @@ public final class Pathfinder {
         double horizontal = (from.getX() != to.getX() && from.getZ() != to.getZ()) ? 1.42 : 1.0;
         // Swimming is allowed but slow and wet: prefer dry land when there is a choice.
         if (inWater(world, to)) horizontal += 2.0;
+        // Keep a margin from lava: a cost, not a wall, so a route past it is still possible.
+        if (nearLava(world, to)) horizontal += 3.0;
         // Placing a bridge block costs a little extra, so detours around real ground stay preferred.
         if (dy == 0 && !solid(world, to.down())) horizontal += 1.5;
         if (dy > 0) return horizontal + 1.5;
         if (dy < 0) return horizontal + 0.6 * -dy;
         return horizontal;
+    }
+
+    static boolean nearLava(World world, BlockPos p) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                for (int dy = -1; dy <= 0; dy++) {
+                    if (world.getBlockState(p.add(dx, dy, dz)).getFluidState().isIn(FluidTags.LAVA)) return true;
+                }
+            }
+        }
+        return false;
     }
 
     static boolean inWater(World world, BlockPos p) {

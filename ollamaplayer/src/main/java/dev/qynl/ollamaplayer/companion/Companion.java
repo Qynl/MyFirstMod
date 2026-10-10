@@ -1415,6 +1415,8 @@ public final class Companion {
             ItemStack s = inv.getStack(i);
             if (s.isEmpty() || !s.isSuitableFor(st)) continue;
             float speed = s.getMiningSpeedMultiplier(st);
+            // A tool about to break is the last choice, not the first: it would vanish mid-job.
+            if (s.isDamageable() && s.getMaxDamage() - s.getDamage() <= 3) speed *= 0.01f;
             if (best < 0 || speed > bestSpeed) {
                 best = i;
                 bestSpeed = speed;
