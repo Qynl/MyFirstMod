@@ -651,3 +651,22 @@ curl -s http://127.0.0.1:11434/api/chat -d '{
 [ ] chats with memory of what happened, in a consistent personality       (P4–P5)
 [ ] acts sensibly when nobody is watching                                 (P5)
 ```
+
+---
+
+## 18. Implementation status (as built, v1)
+
+Written after the first working build. The plan above is the target; this section is what the code does today.
+
+| Phase | Status | What is actually in the mod |
+|---|---|---|
+| P0 Spikes | Done in spirit | Fake player movement, mining and placing work in gametests. Model auto-selection reads `/api/tags` and picks the largest installed model under `ollamaMaxModelBytes`. |
+| P1 Body & senses | Mostly done | `NovaBody` (FakePlayer subclass with gravity, hunger, damage, buoyancy), lifecycle, death and respawn, cross-dimension relocation. Persistence of bag, armor, place, mode and owner across restarts (`CompanionStore`). Not yet: ten-minute unattended soak test, and reflexes beyond swimming and fleeing lava. |
+| P2 Navigation | Partly done | A* over walkable blocks with step-up and drop-down, swimming at a cost, single-block air gap bridging with cobblestone or dirt, stuck detection and re-plan. Not yet: hazard-cost maps, async search, ladders, doors, pillar-up, 200-block journeys. |
+| P3 Skills & crafting | Partly done | Recipe table and backward planner covering tools, armor, smelting, cooking, furnace and table placement. Re-plans when materials go missing. Mining, fighting, eating, cooking, shooting (bow), torches in caves, dropping junk, give. Not yet: chests, farming, fishing, sleep. |
+| P4 Brain | Done | Ollama chat with JSON-schema output, rolling chat history, persona from config, keyword fallback when Ollama is off or slow, graceful parse fallback for free text. Not yet: streaming, tool-calling with multiple actions per turn, a circuit breaker. |
+| P5 Memory & autonomy | Not started | No journal or landmarks. Only the bag and place persist. |
+| P6 UX & config | Partly done | `/nova` commands with `help`, config file, README. Not yet: undo/edit log, protected areas, in-game config screen. |
+| P7 Hardening | Partly done | Exceptions in the companion or brain tick are logged and the server keeps running. Companion is removed after 20 consecutive tick failures. Not yet: multi-companion, dedicated-server soak, profiling. |
+
+Test coverage lives in `ollamaplayer/src/main/java/dev/qynl/ollamaplayer/test/NovaGameTest.java`. Each gametest runs headless in CI. Things the gametests cannot cover well (the bow, creeper retreat, real caves and nights) need a session in `gradle runClient`.
