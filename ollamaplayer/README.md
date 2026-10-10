@@ -56,7 +56,8 @@ If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/
 - `companion/NovaBody.java` - the body. Fabric's `FakePlayer` disables ticking and is invulnerable; this subclass adds gravity, collision movement, hunger and damage.
 - `companion/Companion.java` - behaviour: follow, fight, mine, eat, pick up drops, describe status.
 - `companion/Pathfinder.java`, `Navigator.java` - A* over walkable blocks (step-up, drops up to 3 blocks), path following with jumps and stuck detection.
-- `companion/CompanionManager.java` - one companion, respawn after death, cross-dimension relocation.
+- `companion/CompanionManager.java` - one companion, respawn after death, cross-dimension relocation, save and restore.
+- `companion/CompanionStore.java` - saves Nova's bag, armor, place and owner to `ollamaplayer-companion.nbt` in the world folder.
 - `brain/` - Ollama chat, reply parsing, heuristics fallback.
 - `ollama/OllamaClient.java` - model discovery (`/api/tags`) and chat (`/api/chat`).
 - `craft/Recipes.java`, `craft/Planner.java` - the recipe table and a backward planner. Asking for an item expands it into steps: gather raw materials, smelt, craft at a table, place stations.
