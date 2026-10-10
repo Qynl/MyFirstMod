@@ -545,8 +545,76 @@ public final class Companion {
         }
         chest.markDirty();
         if (moved > 0) {
+            stashPos = spot;
             say.accept("Stashed " + moved + " blocks in a chest at " + spot.toShortString() + ".");
         }
+    }
+
+    /** The one chest Nova placed itself. Village chests are never touched. */
+    @Nullable
+    private BlockPos stashPos;
+
+    private static int chestCount(net.minecraft.inventory.Inventory chest, String key) {
+        int n = 0;
+        for (int j = 0; j < chest.size(); j++) {
+            ItemStack st = chest.getStack(j);
+            if (Recipes.matches(st, key)) n += st.getCount();
+        }
+        return n;
+    }
+
+    /**
+     * Moves up to {@code count} of {@code key} from the stash into the bag. Only works when the body is
+     * within a few blocks of the chest. Returns how many were moved.
+     */
+    public int takeFromStash(String key, int count) {
+        if (stashPos == null || player.getBlockPos().getSquaredDistance(stashPos) > 9.0) return 0;
+        if (!(player.getWorld().getBlockEntity(stashPos) instanceof net.minecraft.inventory.Inventory chest)) {
+            stashPos = null;
+            return 0;
+        }
+        PlayerInventory inv = player.getInventory();
+        int need = count;
+        for (int j = 0; j < chest.size() && need > 0; j++) {
+            ItemStack st = chest.getStack(j);
+            if (!Recipes.matches(st, key)) continue;
+            ItemStack moved = st.split(Math.min(need, st.getCount()));
+            need -= moved.getCount();
+            inv.insertStack(moved);
+            if (!moved.isEmpty()) {
+                // The bag was too full for all of it: put the rest back.
+                if (chest.getStack(j).isEmpty()) chest.setStack(j, moved);
+                else chest.getStack(j).increment(moved.getCount());
+                need += moved.getCount();
+            }
+        }
+        chest.markDirty();
+        return count - need;
+    }
+
+    /** 1 = walking to the stash, 2 = fetched everything, 0 = nothing in the stash, mine instead. */
+    private int tryFetch(ServerWorld world, Planner.Step s) {
+        if (stashPos == null || !world.getBlockState(stashPos).isOf(Blocks.CHEST)) return 0;
+        if (!(world.getBlockEntity(stashPos) instanceof net.minecraft.inventory.Inventory chest)
+                || chestCount(chest, s.key()) < s.count()) {
+            return 0;
+        }
+        if (player.getBlockPos().getSquaredDistance(stashPos) > 9.0) {
+            BlockPos st = stashPos;
+            if (replanTimer == 0 || !nav.hasPath()) {
+                replanTimer = 15;
+                if (!planTo(world, new Pathfinder.Goal(
+                        p -> p.getSquaredDistance(st) <= 6.0,
+                        p -> p.getSquaredDistance(st)))) {
+                    return 0;
+                }
+            }
+            return nav.tick(player, 0.14) == Navigator.Result.FAILED ? 0 : 1;
+        }
+        nav.clear();
+        int got = takeFromStash(s.key(), s.count());
+        if (got > 0) say.accept("Fetched " + got + " " + s.key().replace('_', ' ') + " from my chest.");
+        return got >= s.count() ? 2 : 0;
     }
 
     /** How many items of this stack can go into the chest; 0 for anything the plans may still need. */
@@ -972,7 +1040,10 @@ public final class Companion {
                 return true;
             }
             case MINE -> {
+                int fetched = tryFetch(world, s);
+                if (fetched == 1) return true;
                 plan.poll();
+                if (fetched == 2) return true;
                 beginMine(s.key(), s.count());
                 planMining = true;
                 return false;

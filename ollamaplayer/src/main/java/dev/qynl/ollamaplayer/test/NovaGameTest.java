@@ -310,6 +310,13 @@ public class NovaGameTest implements FabricGameTest {
 
         run(ctx, companion, 300, () -> count(body, Items.DIORITE) < 36 * 64,
                 () -> "Companion did not stash bulk blocks. diorite=" + count(body, Items.DIORITE));
+        // Once stashed, the same blocks can be taken back out when the body is next to the chest.
+        int before = count(body, Items.DIORITE);
+        body.getInventory().setStack(0, ItemStack.EMPTY);
+        int moved = companion.takeFromStash("diorite", 1);
+        if (moved == 0 && before >= 36 * 64 - 64) {
+            ctx.throwGameTestException("Companion could not take diorite back from its chest.");
+        }
     }
 
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
