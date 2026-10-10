@@ -1,7 +1,7 @@
 # Ollama Player (Nova)
 
 A Fabric 1.21.1 mod that adds **Nova**, a server-side companion driven by a local [Ollama](https://ollama.com) model.
-Nova follows you, talks in chat, mines blocks, fights hostile mobs, eats and cooks when hungry, picks up drops, crafts and smelts from a recipe planner, gears up, builds a shelter, places torches in caves, backs away from creepers, swims out of water, and respawns after death.
+Nova follows you, talks in chat, mines blocks, fights hostile mobs, eats and cooks when hungry, picks up drops, crafts and smelts from a recipe planner, gears up, builds a shelter, places torches in caves, backs away from creepers, swims out of water, bridges one-block gaps with cobblestone or dirt from its bag, shoots skeletons, pillagers, witches and blazes with a carried bow, and respawns after death.
 If it dies, it walks back to where it fell to collect its drops (junk is dumped first to make room), then returns to you empty-handed.
 
 Requires Fabric Loader 0.16.10+ and Fabric API 0.116.17+1.21.1. No other mods.
@@ -62,8 +62,10 @@ If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/
 
 ## Known limits
 
-- Pathfinding is local (range 36 blocks). It can swim through water (slowly) but does not climb ladders, bridge gaps, or open doors.
+- Pathfinding is local (range 36 blocks). It swims through water (slowly), bridges single air gaps at floor level when it carries cobblestone or dirt, but does not climb ladders, pillar up, or open doors.
 - Nova is one companion per server.
 - Shelters use cobblestone-like blocks from the bag; they are not sealed against every mob spawn rule.
 - Gametests run on a flat stone floor; real terrain (caves, lava lakes, nights) is only covered by playing with `gradle runClient`.
+- The bow is not covered by a gametest: the test world is peaceful, which removes hostile mobs, and switching difficulty disturbs the other parallel tests. Check it in `gradle runClient`.
+- Creeper handling is simple: Nova backs away from a creeper within about 2.5 blocks, which helps more than trading hits but does not outrun it.
 - Lost drops are a known issue in dense multi-companion test setups; the full loop test passes with five ores.
