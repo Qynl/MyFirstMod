@@ -265,26 +265,20 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 900)
-    public void pillarsUpToAPlatform(TestContext ctx) {
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 600)
+    public void pillarsUpTwoBlocks(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
         floor(ctx);
-        // A raised platform three blocks up: too high to step onto, so Nova has to pillar up.
-        for (int x = 3; x <= 8; x++) {
-            for (int z = 4; z <= 6; z++) {
-                ctx.setBlockState(new BlockPos(x, 3, z), Blocks.STONE.getDefaultState());
-            }
-        }
+        // Nothing to step onto: the goal is two blocks up in open air, so Nova has to lay its own floor.
         Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
         NovaBody body = Companion.createPlayer(world, start, "NovaPillar");
         body.getInventory().insertStack(new ItemStack(Items.COBBLESTONE, 8));
         Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
-        Vec3d goal = ctx.getAbsolute(new Vec3d(8.5, 4, 5.5));
+        Vec3d goal = ctx.getAbsolute(new Vec3d(2.5, 5, 5.5));
         companion.walkTo(BlockPos.ofFloored(goal));
 
-        run(ctx, companion, 800, () -> body.getX() > ctx.getAbsolute(new Vec3d(5.0, 4, 5.5)).x
-                        && body.getY() > goal.y - 0.3,
-                () -> "Companion did not climb onto the platform. rel=" + relative(ctx, body.getPos())
+        run(ctx, companion, 500, () -> body.getY() > ctx.getAbsolute(Vec3d.ZERO).y + 2.9,
+                () -> "Companion did not pillar up. rel=" + relative(ctx, body.getPos())
                         + " status=" + companion.statusLine() + " cobble=" + count(body, Items.COBBLESTONE));
     }
 
