@@ -52,6 +52,7 @@ public final class Companion {
     private boolean wasFighting;
     private boolean sawEnemy;
     private float lastHealth = 20f;
+    private int lastAge = -1;
 
     private String mineTarget;
     private int mineWanted;
@@ -90,7 +91,20 @@ public final class Companion {
 
     // ------------------------------------------------------------------ tick
 
+    /**
+     * One server tick: decide, then make sure the body physically advances this tick.
+     * Some setups do not tick fake players from the world; if the world did not advance
+     * the body's age since our last call, we tick it ourselves so velocities and gravity apply.
+     */
     public void tick(@Nullable ServerPlayerEntity owner) {
+        think(owner);
+        if (player.age == lastAge) {
+            player.tick();
+        }
+        lastAge = player.age;
+    }
+
+    private void think(@Nullable ServerPlayerEntity owner) {
         ServerWorld world = player.getServerWorld();
         if (replanTimer > 0) replanTimer--;
         if (eatCooldown > 0) eatCooldown--;
