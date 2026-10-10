@@ -73,6 +73,7 @@ public final class Pathfinder {
                     best.put(key, n);
                     open.add(n);
                 }
+            }
 
             if (bridge) {
                 // Pillar straight up: jump, and place a block under our own feet at the top of the jump.
