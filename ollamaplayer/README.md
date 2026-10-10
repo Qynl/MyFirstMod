@@ -46,7 +46,7 @@ Config lives in `config/ollamaplayer.json` (created on first start):
 - `numCtx`, `timeoutSeconds` - Ollama context size and request timeout
 - `companionName` - default `Nova`
 - `chatterMinSeconds` / `chatterMaxSeconds` - idle remarks, default 120 to 300 s
-- `persona` - the system prompt for the model
+- `persona` - the system prompt for the model. An existing config keeps its saved persona; delete the `persona` line to get the current default.
 
 Ollama calls run on a background thread and use JSON-schema structured output, so replies always parse into `{say, action, target, count}`.
 If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/Heuristics.java`), so the mod keeps working offline.
