@@ -97,6 +97,8 @@ public final class Companion {
     private boolean huntingLogged;
     private int cookCooldown;
     private int dropGrace;
+    private final Set<java.util.UUID> claimed = new HashSet<>();
+    private Vec3d lastEnemyPos;
     private BlockPos recoverAt;
     private int recoverTimer;
     private int equipTimer;
@@ -176,6 +178,8 @@ public final class Companion {
         if (wasFighting) {
             wasFighting = false;
             nav.clear();
+            if (lastEnemyPos != null) claimDropsNear(world, lastEnemyPos, 5.0);
+            lastEnemyPos = null;
         }
 
         if (mode != Mode.STAY && collectDrops(world)) {
@@ -314,6 +318,7 @@ public final class Companion {
     public void recoverAt(BlockPos where) {
         recoverAt = where;
         recoverTimer = 600;
+        claimDropsNear(player.getServerWorld(), where.toCenterPos(), 6.0);
         say.accept("I'll go back for my stuff at " + where.toShortString() + ".");
     }
 
@@ -431,6 +436,7 @@ public final class Companion {
 
     private void fight(LivingEntity enemy, ServerWorld world) {
         equipWeapon();
+        lastEnemyPos = enemy.getPos();
         double d = player.distanceTo(enemy);
         faceTo(enemy.getEyePos());
         if (d > 2.6) {
@@ -522,10 +528,7 @@ public final class Companion {
             boolean wasDig = digging;
             BlockPos brokeAt = mineBlock;
             world.breakBlock(mineBlock, true, player);
-            if (!wasDig) {
-                System.out.println("NOVA_DEBUG broke " + id + " at " + brokeAt + " drops now: " + nearbyDrops(world)
-                        + " raw=" + countInv("raw_iron") + " mined=" + mined);
-            }
+            claimDropsNear(world, brokeAt.toCenterPos(), 2.0);
             if (!wasDig) mined++;
             digging = false;
             mineBlock = null;
@@ -621,7 +624,7 @@ public final class Companion {
         ItemEntity target = null;
         double best = Double.MAX_VALUE;
         for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
-            if (ignoredDrops.contains(e.getUuid())) continue;
+            if (ignoredDrops.contains(e.getUuid()) || !claimed.contains(e.getUuid())) continue;
             double d = player.squaredDistanceTo(e);
             if (d < best) {
                 best = d;
@@ -651,15 +654,19 @@ public final class Companion {
                     p -> Math.hypot(p.getX() + 0.5 - ip.x, p.getZ() + 0.5 - ip.z)));
             replanTimer = 10;
         }
-        Navigator.Result res = nav.tick(player, 0.13);
-        if (chaseTicks <= 3 || chaseTicks % 25 == 0) {
-            System.out.println("NOVA_DEBUG chase t=" + chaseTicks + " drop=" + target.getPos() + " body=" + player.getPos()
-                    + " res=" + res + " hasPath=" + nav.hasPath() + " mode=" + mode + " mineBlock=" + mineBlock);
-        }
-        if (res != Navigator.Result.MOVING) {
+        if (nav.tick(player, 0.13) != Navigator.Result.MOVING) {
             return false;
         }
         return true;
+    }
+
+    /** Marks item drops near a point as ours, so only drops this companion caused are fetched from afar. */
+    private void claimDropsNear(ServerWorld world, Vec3d center, double radius) {
+        Box box = new Box(center.x - radius, center.y - radius, center.z - radius,
+                center.x + radius, center.y + radius, center.z + radius);
+        for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
+            claimed.add(e.getUuid());
+        }
     }
 
     /** Diagnostics: nearby drops, ignored drop count, and the body's position. */
@@ -806,10 +813,9 @@ public final class Companion {
     /** Gives a freshly dropped stack a few ticks to be picked up before a step needs it. */
     private boolean waitForDrops(ServerWorld world) {
         if (dropGrace >= 60) return false;
-        if (dropGrace % 15 == 0) System.out.println("NOVA_DEBUG waitDrops g=" + dropGrace + " body=" + player.getPos() + " " + nearbyDrops(world));
         Box box = player.getBoundingBox().expand(8.0, 4.0, 8.0);
         for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
-            if (!ignoredDrops.contains(e.getUuid())) {
+            if (!ignoredDrops.contains(e.getUuid()) && claimed.contains(e.getUuid())) {
                 dropGrace++;
                 return true;
             }
