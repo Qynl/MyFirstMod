@@ -73,6 +73,21 @@ public final class Pathfinder {
                     best.put(key, n);
                     open.add(n);
                 }
+
+            if (bridge) {
+                // Pillar straight up: jump, and place a block under our own feet at the top of the jump.
+                BlockPos up = cur.pos.up();
+                long key = up.asLong();
+                if (!closed.contains(key) && solid(world, cur.pos.down()) && passable(world, up)
+                        && passable(world, up.up()) && !standable(world, up)) {
+                    double cost = cur.g + 3.0;
+                    Node old = best.get(key);
+                    if (old == null || cost < old.g) {
+                        Node n = new Node(up, cost, cost + goal.estimate().applyAsDouble(up), cur);
+                        best.put(key, n);
+                        open.add(n);
+                    }
+                }
             }
         }
         return null;

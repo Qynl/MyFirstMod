@@ -62,6 +62,24 @@ public final class Navigator {
             return Result.FAILED;
         }
 
+        // Fill a bridge or pillar cell before the body is allowed to step past it.
+        if (index < path.size() && bridger != null) {
+            BlockPos n = path.get(index);
+            double hd = Math.hypot(n.getX() + 0.5 - pos.x, n.getZ() + 0.5 - pos.z);
+            double dy = n.getY() - pos.y;
+            BlockPos below = n.down();
+            boolean airBelow = body.getWorld().getBlockState(below).isAir();
+            boolean bridge = hd < 2.2 && Math.abs(dy) < 0.9;
+            // Pillar: we are rising under the node and have reached the top of the jump.
+            boolean pillar = hd < 1.0 && dy > 0.9 && pos.y >= n.getY() - 0.1;
+            if (airBelow && Pathfinder.passable(body.getWorld(), n) && (bridge || pillar)) {
+                if (!bridger.place(below)) {
+                    clear();
+                    return Result.FAILED;
+                }
+            }
+        }
+
         while (index < path.size()) {
             BlockPos n = path.get(index);
             double hd = Math.hypot(n.getX() + 0.5 - pos.x, n.getZ() + 0.5 - pos.z);
@@ -86,15 +104,6 @@ public final class Navigator {
             body.setVelocity(0, v.y, 0);
             body.velocityModified = true;
             return Result.MOVING;
-        }
-
-        // A waypoint over air at our height is a bridge cell: fill its floor before stepping onto it.
-        if (hd < 2.2 && Math.abs(dy) < 0.9 && body.getWorld().getBlockState(n.down()).isAir()
-                && Pathfinder.passable(body.getWorld(), n)) {
-            if (bridger == null || !bridger.place(n.down())) {
-                clear();
-                return Result.FAILED;
-            }
         }
 
         float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
