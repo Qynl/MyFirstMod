@@ -149,6 +149,8 @@ public final class Brain {
                 + "- stay: stop and guard this spot.\n"
                 + "- mine: collect blocks. Put a keyword in 'target' (log, stone, cobblestone, coal_ore, iron_ore, "
                 + "diamond_ore, sand, dirt) and how many in 'count'.\n"
+                + "- craft: make an item, e.g. target 'stone_pickaxe', 'furnace', 'iron_helmet', 'torch'. Gathers what is missing, places a crafting table or furnace if needed, and smelts ores.\n"
+                + "- gear: work toward a full iron kit (iron pickaxe, sword, shield, helmet, chestplate, leggings, boots).\n"
                 + "- eat: eat food from your inventory.\n"
                 + "- status: report what you are doing.\n"
                 + "Reply ONLY with JSON: {\"say\": \"<chat line, empty to stay silent>\", \"action\": \"<allowed action>\", "

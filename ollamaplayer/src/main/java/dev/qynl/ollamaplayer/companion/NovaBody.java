@@ -23,6 +23,7 @@ public final class NovaBody extends FakePlayer {
     @Override
     public void tick() {
         // Vanilla player ticking is disabled for fake players, so we advance the body ourselves.
+        baseTick(); // air, fire, lava and fluid effects
         Vec3d v = getVelocity();
         double vy = v.y;
         if (!isOnGround() || vy > 0) vy -= GRAVITY;

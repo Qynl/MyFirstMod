@@ -119,6 +119,7 @@ public final class CompanionManager {
 
     private void handleDeath(NovaBody body) {
         BlockPos where = body.getBlockPos();
+        body.getInventory().dropAll();
         speak("I died at " + where.toShortString() + "! My stuff should be on the ground there.");
         removeCompanion();
         respawnTimer = 100; // back at the owner after 5 seconds, empty-handed

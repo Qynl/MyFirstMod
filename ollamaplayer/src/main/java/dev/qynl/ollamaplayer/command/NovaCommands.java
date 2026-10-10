@@ -34,6 +34,14 @@ public final class NovaCommands {
                 .then(literal("follow").executes(ctx -> act(ctx.getSource(), "follow", null, 0)))
                 .then(literal("stay").executes(ctx -> act(ctx.getSource(), "stay", null, 0)))
                 .then(literal("eat").executes(ctx -> act(ctx.getSource(), "eat", null, 0)))
+                .then(literal("gear").executes(ctx -> act(ctx.getSource(), "gear", null, 0)))
+                .then(literal("craft")
+                        .then(argument("what", StringArgumentType.word())
+                                .executes(ctx -> act(ctx.getSource(), "craft", StringArgumentType.getString(ctx, "what"), 1))
+                                .then(argument("count", IntegerArgumentType.integer(1, 64))
+                                        .executes(ctx -> act(ctx.getSource(), "craft",
+                                                StringArgumentType.getString(ctx, "what"),
+                                                IntegerArgumentType.getInteger(ctx, "count"))))))
                 .then(literal("mine")
                         .then(argument("what", StringArgumentType.word())
                                 .executes(ctx -> act(ctx.getSource(), "mine", StringArgumentType.getString(ctx, "what"), 8))

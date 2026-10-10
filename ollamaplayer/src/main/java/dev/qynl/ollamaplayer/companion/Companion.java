@@ -1,7 +1,17 @@
 package dev.qynl.ollamaplayer.companion;
 
 import com.mojang.authlib.GameProfile;
+import dev.qynl.ollamaplayer.craft.Planner;
+import dev.qynl.ollamaplayer.craft.Recipes;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.item.PickaxeItem;
+import net.minecraft.util.Identifier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.ItemEntity;
@@ -10,6 +20,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShieldItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -20,7 +31,9 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -60,6 +73,19 @@ public final class Companion {
     private int mineFailures;
     private int swingTimer;
     private final Set<Long> badBlocks = new HashSet<>();
+    private int explorations;
+    private int digs;
+    private boolean digging;
+    private final java.util.Random random = new java.util.Random();
+    private boolean exploring;
+    private int exploreFails;
+    private BlockPos exploreGoal;
+
+    private final Deque<Planner.Step> plan = new ArrayDeque<>();
+    private String planGoal;
+    private boolean planMining;
+    private int shieldTimer;
+    private int equipTimer;
 
     public Companion(NovaBody player, Consumer<String> say) {
         this.player = player;
@@ -121,6 +147,9 @@ public final class Companion {
 
         if (enemy != null) {
             wasFighting = true;
+            if (hp <= 10 && eatCooldown == 0 && eatFood()) {
+                return;
+            }
             if (hp <= 7 && owner != null) {
                 // Too hurt to trade hits: retreat toward the owner.
                 planTo(world, ownerGoal(owner));
@@ -139,6 +168,12 @@ public final class Companion {
             return;
         }
 
+        if (!plan.isEmpty() || planMining) {
+            if (runPlan(world)) return;
+        }
+
+        if (++equipTimer % 20 == 0) equipBest();
+
         switch (mode) {
             case FOLLOW -> follow(owner, world);
             case STAY -> {
@@ -154,11 +189,24 @@ public final class Companion {
     /** Executes a high-level action. Returns an optional line to say in chat. */
     public String command(String action, @Nullable String target, int count) {
         switch (action) {
-            case "follow" -> setMode(Mode.FOLLOW);
-            case "stay" -> setMode(Mode.STAY);
+            case "follow" -> {
+                cancelPlan();
+                setMode(Mode.FOLLOW);
+            }
+            case "stay" -> {
+                cancelPlan();
+                setMode(Mode.STAY);
+            }
             case "mine" -> {
                 if (target == null || target.isBlank()) return "Mine what, exactly?";
                 startMining(target, count);
+            }
+            case "craft" -> {
+                if (target == null || target.isBlank()) return "Craft what, exactly?";
+                return craftGoal(Recipes.normalize(target), count);
+            }
+            case "gear" -> {
+                return craftGoal("gear", 1);
             }
             case "eat" -> {
                 if (!eatFood()) return "I've got nothing to eat right now.";
@@ -172,14 +220,52 @@ public final class Companion {
     }
 
     public void startMining(String target, int count) {
-        mineTarget = normalizeTarget(target);
+        cancelPlan();
+        beginMine(normalizeTarget(target), count);
+    }
+
+    private void beginMine(String keyword, int count) {
+        mineTarget = keyword;
         mineWanted = Math.max(1, Math.min(64, count <= 0 ? 8 : count));
         mined = 0;
         mineFailures = 0;
         mineBlock = null;
         mineProgress = 0;
+        explorations = 0;
+        exploring = false;
+        digs = 0;
+        digging = false;
         badBlocks.clear();
         setMode(Mode.MINE);
+    }
+
+    private void cancelPlan() {
+        plan.clear();
+        planMining = false;
+        planGoal = null;
+    }
+
+    /** Plans and starts crafting (or gearing up) toward the target. Returns a chat line for the outcome. */
+    public String craftGoal(String target, int count) {
+        List<String> targets = target.equals("gear") ? Recipes.gearGoal() : List.of(target);
+        int n = target.equals("gear") ? 1 : Math.max(1, Math.min(64, count <= 0 ? 1 : count));
+        ServerWorld world = player.getServerWorld();
+        boolean table = findNearby(world, Blocks.CRAFTING_TABLE, 4) != null;
+        boolean furnace = findNearby(world, Blocks.FURNACE, 4) != null;
+        Planner.Result res = Planner.plan(targets, n, this::countInv, table, furnace, pickTier());
+        if (res.failed()) {
+            return "I can't make that: " + res.reason() + ".";
+        }
+        if (res.steps().isEmpty()) {
+            return "I already have that.";
+        }
+        cancelPlan();
+        setMode(Mode.FOLLOW);
+        plan.addAll(res.steps());
+        planGoal = target.equals("gear") ? "a full iron kit" : n + " " + target.replace('_', ' ');
+        int crafts = 0;
+        for (Planner.Step st : res.steps()) if (st.kind() == Planner.Kind.CRAFT) crafts++;
+        return "On it: " + planGoal + " (" + res.steps().size() + " steps, " + crafts + " crafts).";
     }
 
     /** Developer diagnostics; not shown to players. */
@@ -198,6 +284,7 @@ public final class Companion {
             case STAY -> "guarding this spot";
             case MINE -> "mining " + mineTarget + " (" + mined + "/" + mineWanted + ")";
         };
+        if (planGoal != null) what = "working on " + planGoal + (planMining ? ", mining " + mineTarget : "");
         return String.format(Locale.ROOT, "Health %.0f/20, food %d/20, %s.",
                 player.getHealth(), player.getHungerManager().getFoodLevel(), what);
     }
@@ -212,6 +299,7 @@ public final class Companion {
         ItemStack held = player.getMainHandStack();
         sb.append("- Holding: ").append(held.isEmpty() ? "nothing" : held.getName().getString()).append(".\n");
         sb.append("- Inventory: ").append(inventorySummary()).append(".\n");
+        sb.append("- Wearing: ").append(wornSummary()).append(".\n");
         LivingEntity enemy = nearestEnemy(world, 16);
         sb.append("- Hostile mobs nearby: ").append(enemy == null ? "none"
                 : Registries.ENTITY_TYPE.getId(enemy.getType()).getPath() + " about "
@@ -282,7 +370,14 @@ public final class Companion {
         } else {
             nav.clear();
             stopHorizontal();
-            if (player.getAttackCooldownProgress(0.5F) >= 1.0F) {
+            boolean ready = player.getAttackCooldownProgress(0.5F) >= 1.0F;
+            boolean shield = player.getOffHandStack().getItem() instanceof ShieldItem;
+            if (shield && !ready && d <= 3.5) {
+                if (!player.isBlocking()) player.setCurrentHand(Hand.OFF_HAND);
+            } else if (player.isBlocking()) {
+                player.clearActiveItem();
+            }
+            if (ready) {
                 player.attack(enemy);
                 player.swingHand(Hand.MAIN_HAND);
             }
@@ -290,12 +385,30 @@ public final class Companion {
     }
 
     private void mine(ServerWorld world) {
-        if (mineBlock == null || !isTarget(world.getBlockState(mineBlock))) {
+        if (exploring && walkExplore(world)) return;
+
+        if (mineBlock != null && digging && world.getBlockState(mineBlock).isAir()) {
+            digging = false;
             mineBlock = null;
             mineProgress = 0;
+        }
+        if (mineBlock == null || (!digging && !isTarget(world.getBlockState(mineBlock)))) {
+            mineBlock = null;
+            mineProgress = 0;
+            digging = false;
             if (!findTarget(world)) {
-                finishMining();
-                return;
+                if (explorations < 6) {
+                    if (startExplore(world)) return;
+                    if (!player.isOnGround()) return;
+                }
+                if (canDigDown(world)) {
+                    mineBlock = player.getBlockPos().down();
+                    digging = true;
+                    digs++;
+                } else {
+                    finishMining();
+                    return;
+                }
             }
         }
 
@@ -331,10 +444,13 @@ public final class Companion {
         if (++swingTimer % 6 == 0) player.swingHand(Hand.MAIN_HAND);
         if (mineProgress >= 1.0F) {
             String id = blockId(st);
+            boolean wasDig = digging;
             world.breakBlock(mineBlock, true, player);
-            mined++;
+            if (!wasDig) mined++;
+            digging = false;
             mineBlock = null;
             mineProgress = 0;
+            if (wasDig) return;
             for (String rare : RARE) {
                 if (id.contains(rare)) {
                     say.accept("Found " + id.replace('_', ' ') + "!");
@@ -343,6 +459,80 @@ public final class Companion {
             }
             if (mined >= mineWanted) finishMining();
         }
+    }
+
+    private static boolean isDeepOre(String t) {
+        return t.equals("diamond_ore") || t.equals("gold_ore") || t.equals("redstone_ore") || t.equals("emerald_ore");
+    }
+
+    /** Digging straight down one block at a time: the body falls into the hole, so there is no fall damage. */
+    private boolean canDigDown(ServerWorld world) {
+        if (mineTarget == null || !isDeepOre(mineTarget) || digs >= 60) return false;
+        if (player.getBlockY() <= -54 || !player.isOnGround()) return false;
+        BlockPos below = player.getBlockPos().down();
+        BlockState bs = world.getBlockState(below);
+        if (bs.isAir() || !bs.getFluidState().isEmpty() || bs.getHardness(world, below) < 0) return false;
+        return !nearLiquid(world, player.getBlockPos().down(2)) && !nearLiquid(world, below);
+    }
+
+    private static boolean nearLiquid(ServerWorld world, BlockPos c) {
+        for (BlockPos p : BlockPos.iterate(c.add(-1, -1, -1), c.add(1, 1, 1))) {
+            if (!world.getFluidState(p).isEmpty()) return true;
+        }
+        return false;
+    }
+
+    private boolean startExplore(ServerWorld world) {
+        if (!player.isOnGround()) return false;
+        BlockPos c = player.getBlockPos();
+        for (int attempt = 0; attempt < 3; attempt++) {
+            explorations++;
+            double ang = random.nextDouble() * Math.PI * 2;
+            int dist = 22 + random.nextInt(10);
+            exploreGoal = new BlockPos(c.getX() + (int) (Math.cos(ang) * dist), c.getY(),
+                    c.getZ() + (int) (Math.sin(ang) * dist));
+            if (planTo(world, exploreGoal())) {
+                exploring = true;
+                replanTimer = 40;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Pathfinder.Goal exploreGoal() {
+        final int gx = exploreGoal.getX();
+        final int gy = exploreGoal.getY();
+        final int gz = exploreGoal.getZ();
+        return new Pathfinder.Goal(
+                p -> Math.abs(p.getX() - gx) <= 2 && Math.abs(p.getZ() - gz) <= 2 && Math.abs(p.getY() - gy) <= 4,
+                p -> Math.hypot(p.getX() - gx, p.getZ() - gz));
+    }
+
+    /** Walks toward the exploration point. Returns true while still walking. */
+    private boolean walkExplore(ServerWorld world) {
+        if (exploreGoal == null) {
+            exploring = false;
+            return false;
+        }
+        double dx = player.getX() - (exploreGoal.getX() + 0.5);
+        double dz = player.getZ() - (exploreGoal.getZ() + 0.5);
+        if (Math.hypot(dx, dz) <= 3.0) {
+            exploring = false;
+            return false;
+        }
+        if (replanTimer == 0 || !nav.hasPath()) {
+            replanTimer = 40;
+            if (!planTo(world, exploreGoal())) {
+                exploring = false;
+                return false;
+            }
+        }
+        if (nav.tick(player, 0.14) == Navigator.Result.FAILED) {
+            exploring = false;
+            return false;
+        }
+        return true;
     }
 
     /** Walks to the nearest item drop within reach so it lands in the inventory. Returns true while busy. */
@@ -405,7 +595,7 @@ public final class Companion {
     private boolean findTarget(ServerWorld world) {
         BlockPos c = player.getBlockPos();
         List<BlockPos> hits = new ArrayList<>();
-        for (BlockPos p : BlockPos.iterate(c.add(-16, -6, -16), c.add(16, 6, 16))) {
+        for (BlockPos p : BlockPos.iterate(c.add(-24, -10, -24), c.add(24, 10, 24))) {
             if (badBlocks.contains(p.asLong())) continue;
             if (isTarget(world.getBlockState(p))) hits.add(p.toImmutable());
         }
@@ -423,6 +613,279 @@ public final class Companion {
             badBlocks.add(b.asLong());
         }
         return false;
+    }
+
+    // ------------------------------------------------------------------ planned work
+
+    /** Runs the head of the plan. Returns true if this tick was used (walking, placing, crafting). */
+    private boolean runPlan(ServerWorld world) {
+        if (planMining) {
+            if (mode == Mode.MINE) return false;
+            planMining = false;
+            if (mined < mineWanted) {
+                abort("I couldn't find enough " + mineTarget.replace('_', ' ') + " nearby.");
+                return true;
+            }
+        }
+        if (plan.isEmpty()) {
+            if (planGoal != null) {
+                say.accept("Got everything for " + planGoal + ".");
+                planGoal = null;
+            }
+            return false;
+        }
+        Planner.Step s = plan.peek();
+        switch (s.kind()) {
+            case FAIL -> {
+                abort("I can't do that: " + s.key() + ".");
+                return true;
+            }
+            case MINE -> {
+                plan.poll();
+                beginMine(s.key(), s.count());
+                planMining = true;
+                return false;
+            }
+            case PLACE_TABLE -> {
+                plan.poll();
+                placeStation(world, Blocks.CRAFTING_TABLE, "crafting_table");
+                return true;
+            }
+            case PLACE_FURNACE -> {
+                plan.poll();
+                placeStation(world, Blocks.FURNACE, "furnace");
+                return true;
+            }
+            case CRAFT -> {
+                Recipes.Recipe r = Recipes.recipe(s.key());
+                if (r != null && r.table() && findNearby(world, Blocks.CRAFTING_TABLE, 4) == null) {
+                    walkToStation(world, Blocks.CRAFTING_TABLE, "crafting table");
+                    return true;
+                }
+                plan.poll();
+                doCraft(s);
+                return true;
+            }
+            case SMELT -> {
+                if (findNearby(world, Blocks.FURNACE, 4) == null) {
+                    walkToStation(world, Blocks.FURNACE, "furnace");
+                    return true;
+                }
+                plan.poll();
+                doSmelt(s.key(), s.count());
+                return true;
+            }
+        }
+        return true;
+    }
+
+    private void abort(String reason) {
+        cancelPlan();
+        if (mode == Mode.MINE) setMode(Mode.FOLLOW);
+        say.accept(reason);
+    }
+
+    private void walkToStation(ServerWorld world, Block block, String label) {
+        BlockPos st = findNearby(world, block, 24);
+        if (st == null) {
+            abort("I need a " + label + " nearby, and I can't find one.");
+            return;
+        }
+        if (replanTimer == 0 || !nav.hasPath()) {
+            replanTimer = 15;
+            if (!planTo(world, new Pathfinder.Goal(
+                    p -> p.getSquaredDistance(st) <= 6.0,
+                    p -> p.getSquaredDistance(st)))) {
+                abort("I can't get to the " + label + ".");
+                return;
+            }
+        }
+        if (nav.tick(player, 0.14) == Navigator.Result.FAILED) {
+            abort("I can't get to the " + label + ".");
+        }
+    }
+
+    private void doCraft(Planner.Step s) {
+        Recipes.Recipe r = Recipes.recipe(s.key());
+        if (r == null) {
+            abort("I don't know how to make " + s.key() + ".");
+            return;
+        }
+        int crafts = s.count();
+        for (Recipes.Ing ing : r.ings()) {
+            if (countInv(ing.key()) < crafts * ing.count()) {
+                abort("I'm short on " + ing.key().replace('#', ' ') + " for " + r.output().replace('_', ' ') + ".");
+                return;
+            }
+        }
+        String outPath = r.output();
+        if (Recipes.PLANKS.equals(outPath)) {
+            outPath = "oak_planks";
+            PlayerInventory inv = player.getInventory();
+            for (int i = 0; i < inv.size(); i++) {
+                ItemStack st = inv.getStack(i);
+                if (Recipes.matches(st, Recipes.LOGS)) {
+                    outPath = Recipes.planksFor(Registries.ITEM.getId(st.getItem()).getPath());
+                    break;
+                }
+            }
+        }
+        for (Recipes.Ing ing : r.ings()) consume(ing.key(), crafts * ing.count());
+        int total = crafts * r.outCount();
+        give(new ItemStack(itemOf(outPath), total));
+        player.swingHand(Hand.MAIN_HAND);
+        if (!outPath.endsWith("planks") && !outPath.equals("stick")) {
+            say.accept("Made " + total + " " + outPath.replace('_', ' ') + ".");
+        }
+    }
+
+    private void doSmelt(String ingot, int n) {
+        String raw = Recipes.smeltInput(ingot);
+        if (countInv(raw) < n || countInv("coal") < n) {
+            abort("I need " + n + " " + raw.replace('_', ' ') + " and " + n + " coal to smelt.");
+            return;
+        }
+        consume(raw, n);
+        consume("coal", n);
+        give(new ItemStack(itemOf(ingot), n));
+        player.swingHand(Hand.MAIN_HAND);
+        say.accept("Smelted " + n + " " + ingot.replace('_', ' ') + ".");
+    }
+
+    private void placeStation(ServerWorld world, Block block, String itemPath) {
+        if (countInv(itemPath) < 1) {
+            abort("I have no " + itemPath.replace('_', ' ') + " to place.");
+            return;
+        }
+        BlockPos origin = player.getBlockPos();
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                BlockPos p = origin.add(dx, 0, dz);
+                BlockPos below = p.down();
+                if (world.getBlockState(p).isAir() && world.getBlockState(below).isSolidBlock(world, below)) {
+                    world.setBlockState(p, block.getDefaultState());
+                    consume(itemPath, 1);
+                    player.swingHand(Hand.MAIN_HAND);
+                    return;
+                }
+            }
+        }
+        abort("There is no room to place the " + itemPath.replace('_', ' ') + " here.");
+    }
+
+    private void give(ItemStack stack) {
+        ItemStack left = stack.copy();
+        player.getInventory().insertStack(left);
+        if (!left.isEmpty()) player.dropItem(left, false);
+    }
+
+    private void consume(String key, int n) {
+        PlayerInventory inv = player.getInventory();
+        int left = n;
+        for (int i = 0; i < inv.size() && left > 0; i++) {
+            ItemStack st = inv.getStack(i);
+            if (!Recipes.matches(st, key)) continue;
+            int take = Math.min(left, st.getCount());
+            st.decrement(take);
+            left -= take;
+        }
+    }
+
+    private int countInv(String key) {
+        PlayerInventory inv = player.getInventory();
+        int total = 0;
+        for (int i = 0; i < inv.size(); i++) {
+            ItemStack st = inv.getStack(i);
+            if (Recipes.matches(st, key)) total += st.getCount();
+        }
+        return total;
+    }
+
+    private int pickTier() {
+        PlayerInventory inv = player.getInventory();
+        int best = 0;
+        for (int i = 0; i < inv.size(); i++) {
+            ItemStack st = inv.getStack(i);
+            if (st.getItem() instanceof PickaxeItem) best = Math.max(best, Recipes.toolTier(st));
+        }
+        return best;
+    }
+
+    @Nullable
+    private BlockPos findNearby(ServerWorld world, Block block, int radius) {
+        BlockPos c = player.getBlockPos();
+        BlockPos best = null;
+        double bestD = Double.MAX_VALUE;
+        for (BlockPos p : BlockPos.iterate(c.add(-radius, -radius, -radius), c.add(radius, radius, radius))) {
+            if (!world.getBlockState(p).isOf(block)) continue;
+            double d = p.getSquaredDistance(c);
+            if (d < bestD) {
+                bestD = d;
+                best = p.toImmutable();
+            }
+        }
+        return best;
+    }
+
+    private static Item itemOf(String path) {
+        return Registries.ITEM.get(Identifier.of("minecraft", path));
+    }
+
+    /** Puts on better armor from the inventory, moves a shield to the off hand, and keeps the best sword in reach. */
+    private void equipBest() {
+        PlayerInventory inv = player.getInventory();
+        EquipmentSlot[] slots = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+        for (EquipmentSlot slot : slots) {
+            ItemStack cur = player.getEquippedStack(slot);
+            int curTier = cur.isEmpty() ? -1 : armorTier(cur);
+            int bestIdx = -1;
+            for (int i = 0; i < inv.size(); i++) {
+                ItemStack s = inv.getStack(i);
+                if (s.getItem() instanceof ArmorItem a && a.getSlotType() == slot) {
+                    int t = armorTier(s);
+                    if (t > curTier) {
+                        curTier = t;
+                        bestIdx = i;
+                    }
+                }
+            }
+            if (bestIdx >= 0) {
+                ItemStack cand = inv.getStack(bestIdx).copy();
+                player.equipStack(slot, cand);
+                inv.setStack(bestIdx, cur.isEmpty() ? ItemStack.EMPTY : cur.copy());
+                say.accept("Wearing " + cand.getName().getString() + ".");
+            }
+        }
+        if (player.getOffHandStack().isEmpty()) {
+            for (int i = 0; i < inv.size(); i++) {
+                ItemStack s = inv.getStack(i);
+                if (s.getItem() instanceof ShieldItem) {
+                    player.equipStack(EquipmentSlot.OFFHAND, s.copy());
+                    inv.setStack(i, ItemStack.EMPTY);
+                    break;
+                }
+            }
+        }
+    }
+
+    private static int armorTier(ItemStack s) {
+        return Recipes.materialTier(Registries.ITEM.getId(s.getItem()).getPath());
+    }
+
+    private String wornSummary() {
+        StringBuilder sb = new StringBuilder();
+        for (EquipmentSlot slot : new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+            ItemStack s = player.getEquippedStack(slot);
+            if (s.isEmpty()) continue;
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(Registries.ITEM.getId(s.getItem()).getPath());
+        }
+        if (!player.getOffHandStack().isEmpty()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append("off-hand ").append(Registries.ITEM.getId(player.getOffHandStack().getItem()).getPath());
+        }
+        return sb.length() == 0 ? "no armor" : sb.toString();
     }
 
     // ------------------------------------------------------------------ helpers
@@ -495,25 +958,35 @@ public final class Companion {
     private void equipWeapon() {
         PlayerInventory inv = player.getInventory();
         int pick = -1;
+        int bestScore = -1;
         for (int i = 0; i < 9; i++) {
             ItemStack s = inv.getStack(i);
-            if (s.getItem() instanceof SwordItem) {
+            int score;
+            if (s.getItem() instanceof SwordItem) score = 10 + Recipes.toolTier(s);
+            else if (s.getItem() instanceof AxeItem) score = Recipes.toolTier(s);
+            else continue;
+            if (score > bestScore) {
+                bestScore = score;
                 pick = i;
-                break;
             }
-            if (pick < 0 && s.getItem() instanceof AxeItem) pick = i;
         }
         if (pick >= 0) inv.selectedSlot = pick;
     }
 
     private void equipTool(BlockState st) {
         PlayerInventory inv = player.getInventory();
+        int best = -1;
+        float bestSpeed = 0f;
         for (int i = 0; i < 9; i++) {
-            if (inv.getStack(i).isSuitableFor(st)) {
-                inv.selectedSlot = i;
-                return;
+            ItemStack s = inv.getStack(i);
+            if (s.isEmpty() || !s.isSuitableFor(st)) continue;
+            float speed = s.getMiningSpeedMultiplier(st);
+            if (best < 0 || speed > bestSpeed) {
+                best = i;
+                bestSpeed = speed;
             }
         }
+        if (best >= 0) inv.selectedSlot = best;
     }
 
     @Nullable
