@@ -1,7 +1,7 @@
 # Ollama Player (Nova)
 
 A Fabric 1.21.1 mod that adds **Nova**, a server-side companion driven by a local [Ollama](https://ollama.com) model.
-Nova follows you, talks in chat, mines blocks, fights hostile mobs (and whatever hits you, but never another player), eats and cooks when hungry, picks up drops, stashes bulk blocks in a chest when its bag is nearly full, keeps its best sword and pickaxe in the hotbar, crafts and smelts from a recipe planner, gears up, builds a shelter, places torches in caves, backs away from creepers, swims out of water, bridges one-block gaps and pillars straight up with cobblestone or dirt from its bag, shoots skeletons, pillagers, witches and blazes with a carried bow, and respawns after death.
+Nova follows you, talks in chat, mines blocks, fights hostile mobs (and whatever hits you, but never another player), eats and cooks when hungry, picks up drops, stashes bulk blocks in its own chest when its bag is nearly full and fetches them back for plans, keeps its best sword and pickaxe in the hotbar, crafts and smelts from a recipe planner, gears up, builds a shelter, places torches in caves, backs away from creepers, swims out of water, bridges one-block gaps and pillars straight up with cobblestone or dirt from its bag, shoots skeletons, pillagers, witches and blazes with a carried bow, and respawns after death.
 Nova's bag, armor, position, mode and owner are saved in the world folder (`ollamaplayer-companion.nbt`) every 30 seconds and when the server stops, so she comes back with her stuff after a restart. `/nova despawn` and death clear the save.
 If it dies, it walks back to where it fell to collect its drops (junk is dumped first to make room), then returns to you empty-handed.
 
@@ -66,7 +66,7 @@ If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/
 ## Known limits
 
 - Pathfinding is local (range 36 blocks). It swims through water (slowly), bridges single air gaps at floor level and pillars straight up one block at a time when it carries cobblestone or dirt. It does not climb ladders or open doors, and it can still get stuck at the edge of a ledge it has pillared onto.
-- Nova stashes bulk blocks in chests but never takes them back out yet.
+- Nova stashes bulk blocks in one chest it placed itself and takes items back out for plans when it is nearby. It does not use village chests or other containers, and it does not empty the stash on its own.
 - Nova is one companion per server. Her chat memory is not saved; only her body and bag are.
 - Shelters use cobblestone-like blocks from the bag; they are not sealed against every mob spawn rule.
 - Gametests run on a flat stone floor; real terrain (caves, lava lakes, nights) is only covered by playing with `gradle runClient`.
