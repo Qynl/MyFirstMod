@@ -33,6 +33,9 @@ public final class Heuristics {
         if (t.contains("gear") || t.contains("armor") || t.contains("armour") || t.contains("kit")) {
             return new Reply("Let's get geared up.", "gear", null, 0);
         }
+        if (t.contains("give") && (t.contains("me") || t.contains("all") || t.contains("everything") || t.contains("your stuff"))) {
+            return new Reply("Here you go.", "give", null, 0);
+        }
         if (t.contains("shelter") || t.contains("house") || t.contains("hide") || t.contains("hut")) {
             return new Reply("Building a shelter.", "shelter", null, 0);
         }

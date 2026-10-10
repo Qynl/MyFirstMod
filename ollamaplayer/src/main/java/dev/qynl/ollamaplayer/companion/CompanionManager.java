@@ -1,5 +1,6 @@
 package dev.qynl.ollamaplayer.companion;
 
+import dev.qynl.ollamaplayer.OllamaPlayerMod;
 import dev.qynl.ollamaplayer.brain.Brain;
 import dev.qynl.ollamaplayer.config.ModConfig;
 import net.minecraft.server.MinecraftServer;
@@ -25,6 +26,7 @@ public final class CompanionManager {
     private UUID ownerId;
     private int respawnTimer = -1;
     private BlockPos lastDeath;
+    private int errorStreak;
     private ServerWorld lastDeathWorld;
     private final Brain brain = new Brain(this);
 
@@ -103,10 +105,29 @@ public final class CompanionManager {
                 if (owner != null && owner.getServerWorld() != body.getServerWorld()) {
                     relocate(owner);
                 }
-                if (companion != null) companion.tick(owner);
+                if (companion != null) {
+                    try {
+                        companion.tick(owner);
+                        errorStreak = 0;
+                    } catch (RuntimeException e) {
+                        // Never let a bug in the companion take the whole server down.
+                        errorStreak++;
+                        OllamaPlayerMod.LOGGER.error("Companion tick failed ({} in a row)", errorStreak, e);
+                        if (errorStreak >= 20) {
+                            speak("Something in my head broke. I'm going back to my owner.");
+                            removeCompanion();
+                            respawnTimer = 60;
+                            errorStreak = 0;
+                        }
+                    }
+                }
             }
         }
-        brain.tick(companion, owner);
+        try {
+            brain.tick(companion, owner);
+        } catch (RuntimeException e) {
+            OllamaPlayerMod.LOGGER.error("Brain tick failed", e);
+        }
     }
 
     /** Used by the brain and the body to talk as Nova. */

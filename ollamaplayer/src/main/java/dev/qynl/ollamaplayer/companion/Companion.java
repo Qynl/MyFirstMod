@@ -136,6 +136,7 @@ public final class Companion {
 
     /** One server tick of decisions. The body's physics run in NovaBody#tick. */
     public void tick(@Nullable ServerPlayerEntity owner) {
+        if (owner != null) lastOwner = owner;
         think(owner);
     }
 
@@ -164,8 +165,11 @@ public final class Companion {
         }
         sawEnemy = enemy != null;
 
+        torchIfDark(world);
+
         if (enemy != null) {
             wasFighting = true;
+            if (avoidCreeper(enemy)) return;
             if (hp <= 10 && eatCooldown == 0 && eatFood()) {
                 return;
             }
@@ -276,6 +280,9 @@ public final class Companion {
             }
             case "shelter" -> {
                 return buildShelter();
+            }
+            case "give" -> {
+                return giveToOwner();
             }
             case "diamond_gear" -> {
                 return craftGoal("diamond_gear", 1);
@@ -1097,6 +1104,62 @@ public final class Companion {
     }
 
     // ------------------------------------------------------------------ survival extras
+
+    private int torchCooldown;
+    private ServerPlayerEntity lastOwner;
+
+    /** Drops every item in the bag at the owner's feet, keeping worn armor and the tools in hand. */
+    public String giveToOwner() {
+        ServerPlayerEntity owner = lastOwner;
+        if (owner == null || owner.isRemoved() || owner.getWorld() != player.getWorld()) {
+            return "Your owner isn't close enough to take anything.";
+        }
+        PlayerInventory inv = player.getInventory();
+        int moved = 0;
+        for (int i = 0; i < 36; i++) {
+            ItemStack s = inv.getStack(i);
+            if (s.isEmpty()) continue;
+            ItemEntity dropped = owner.dropItem(s.copy(), false);
+            if (dropped != null) {
+                dropped.setOwner(owner.getUuid());
+                ignoredDrops.add(dropped.getUuid());
+            }
+            moved += s.getCount();
+            inv.setStack(i, ItemStack.EMPTY);
+        }
+        return moved == 0 ? "I'm not carrying anything." : "Here, " + owner.getName().getString() + ". " + moved + " items.";
+    }
+
+    /** Places a torch at the body's feet when it is underground and has torches; keeps caves from filling with mobs. */
+    private void torchIfDark(ServerWorld world) {
+        if (torchCooldown > 0) {
+            torchCooldown--;
+            return;
+        }
+        BlockPos feet = player.getBlockPos();
+        if (feet.getY() > 50 || !world.getBlockState(feet).isAir()) return;
+        BlockPos below = feet.down();
+        if (!world.getBlockState(below).isSolidBlock(world, below)) return;
+        if (countInv("torch") < 1) return;
+        if (!world.getBlockState(feet.up()).isAir()) return;
+        world.setBlockState(feet, Blocks.TORCH.getDefaultState());
+        consume("torch", 1);
+        torchCooldown = 40;
+    }
+
+    /** Backs away from a creeper that is about to blow, instead of trading hits with it. */
+    private boolean avoidCreeper(LivingEntity enemy) {
+        if (!(enemy instanceof net.minecraft.entity.mob.CreeperEntity) || player.squaredDistanceTo(enemy) > 6.25) {
+            return false;
+        }
+        double dx = player.getX() - enemy.getX();
+        double dz = player.getZ() - enemy.getZ();
+        double len = Math.max(0.001, Math.hypot(dx, dz));
+        player.setVelocity(dx / len * 0.2, player.getVelocity().y, dz / len * 0.2);
+        player.velocityModified = true;
+        faceTo(enemy.getEyePos());
+        return true;
+    }
 
     private boolean needsFood() {
         return player.getHungerManager().getFoodLevel() <= 16;
