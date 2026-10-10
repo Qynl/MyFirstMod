@@ -30,6 +30,9 @@ jobs:
       - name: Build
         run: gradle build --no-daemon
 
+      - name: Game test (headless Minecraft: companion mines a log)
+        run: gradle runGametest --no-daemon
+
       - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:

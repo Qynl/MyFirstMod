@@ -407,7 +407,7 @@ public final class Companion {
     }
 
     private void pickUpItems(ServerWorld world) {
-        Box box = player.getBoundingBox().expand(1.5);
+        Box box = player.getBoundingBox().expand(3.0);
         for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
             ItemStack s = e.getStack().copy();
             player.getInventory().insertStack(s);

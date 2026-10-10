@@ -8,7 +8,8 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["dev.qynl.ollamaplayer.OllamaPlayerMod"]
+    "main": ["dev.qynl.ollamaplayer.OllamaPlayerMod"],
+    "fabric-gametest": ["dev.qynl.ollamaplayer.test.NovaGameTest"]
   },
   "depends": {
     "fabricloader": ">=0.16.10",
