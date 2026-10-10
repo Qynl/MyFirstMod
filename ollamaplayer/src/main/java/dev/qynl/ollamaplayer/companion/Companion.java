@@ -526,10 +526,14 @@ public final class Companion {
         if (bulk == 0) return;
 
         BlockPos spot = findChestSpot(world);
-        if (spot == null) return;
+        if (spot == null) {
+            say.accept("My bag is nearly full and there is no room for a chest.");
+            return;
+        }
         world.setBlockState(spot, Blocks.CHEST.getDefaultState());
         if (!(world.getBlockEntity(spot) instanceof net.minecraft.inventory.Inventory chest)) {
             world.removeBlock(spot, false);
+            say.accept("My chest would not open here.");
             return;
         }
         int moved = 0;
