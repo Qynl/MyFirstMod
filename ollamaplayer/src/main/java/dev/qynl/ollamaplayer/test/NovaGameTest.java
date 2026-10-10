@@ -308,19 +308,17 @@ public class NovaGameTest implements FabricGameTest {
         for (int i = 0; i < 36; i++) body.getInventory().setStack(i, new ItemStack(Items.DIORITE, 64));
         Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
 
-        run(ctx, companion, 300, () -> count(body, Items.DIORITE) < 36 * 64,
-                () -> "Companion did not stash bulk blocks. diorite=" + count(body, Items.DIORITE));
-        // Once stashed, the same blocks can be taken back out when the body is next to the chest.
-        BlockPos chest = companion.stashPos();
-        if (chest == null) {
-            ctx.throwGameTestException("No stash chest was recorded.");
-        }
-        body.refreshPositionAndAngles(chest.getX() + 0.5, chest.getY(), chest.getZ() + 1.5, 0, 0);
-        body.getInventory().setStack(0, ItemStack.EMPTY);
-        int moved = companion.takeFromStash("diorite", 1);
-        if (moved == 0) {
-            ctx.throwGameTestException("Companion could not take diorite back from its chest.");
-        }
+        // run() is asynchronous, so the take happens inside the done check, on the tick the stash is recorded,
+        // while the body is still next to the chest.
+        AtomicInteger taken = new AtomicInteger(-1);
+        run(ctx, companion, 300, () -> {
+            if (companion.stashPos() == null) return false;
+            if (taken.get() < 0) taken.set(companion.takeFromStash("diorite", 1));
+            if (taken.get() == 0) {
+                ctx.throwGameTestException("Companion could not take diorite back from its chest.");
+            }
+            return true;
+        }, () -> "Companion did not stash bulk blocks. diorite=" + count(body, Items.DIORITE));
     }
 
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
