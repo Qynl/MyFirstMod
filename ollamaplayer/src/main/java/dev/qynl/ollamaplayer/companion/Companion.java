@@ -204,7 +204,8 @@ public final class Companion {
                 recoverAt = null;
                 nav.clear();
             } else {
-                if (replanTimer == 0 || !nav.hasPath()) {
+                // A fixed target only needs planning once: replanning mid-jump would start from the wrong cell.
+                if (!nav.hasPath() || (replanTimer == 0 && player.isOnGround())) {
                     BlockPos target = recoverAt;
                     planTo(world, new Pathfinder.Goal(
                             p -> p.getSquaredDistance(target) <= 4.0,
