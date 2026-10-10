@@ -492,6 +492,7 @@ public final class Companion {
                 || enemy instanceof net.minecraft.entity.mob.WitchEntity
                 || enemy instanceof net.minecraft.entity.mob.BlazeEntity;
         double d = player.distanceTo(enemy);
+        System.out.println("NOVA_DEBUG shoot ranged=" + ranged + " d=" + d + " bow=" + countInv("bow") + " arrows=" + countInv("arrow") + " see=" + player.canSee(enemy));
         if (!ranged || d > 15.0 || countInv("bow") < 1 || countInv("arrow") < 1 || !player.canSee(enemy)) {
             return false;
         }
