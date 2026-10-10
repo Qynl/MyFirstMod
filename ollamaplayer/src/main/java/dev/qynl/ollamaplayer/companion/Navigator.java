@@ -62,9 +62,6 @@ public final class Navigator {
             return Result.FAILED;
         }
 
-        if (body.getName().getString().equals("NovaPillar") && index < path.size()) {
-            System.out.println("NOVA_DEBUG nav idx=" + index + " n=" + path.get(index) + " pos=" + pos + " ground=" + body.isOnGround() + " vel=" + body.getVelocity());
-        }
         // Fill a bridge or pillar cell before the body is allowed to step past it.
         if (index < path.size() && bridger != null) {
             BlockPos n = path.get(index);
@@ -74,7 +71,7 @@ public final class Navigator {
             boolean airBelow = body.getWorld().getBlockState(below).isAir();
             boolean bridge = hd < 2.2 && Math.abs(dy) < 0.9;
             // Pillar: we are rising under the node and have reached the top of the jump.
-            boolean pillar = hd < 1.0 && pos.y >= n.getY() - 0.1;
+            boolean pillar = hd < 1.0 && pos.y >= n.getY() - 0.02;
             if (airBelow && Pathfinder.passable(body.getWorld(), n) && (bridge || pillar)) {
                 if (!bridger.place(below)) {
                     clear();
@@ -120,7 +117,8 @@ public final class Navigator {
         }
         double vy = body.getVelocity().y;
         if (body.isOnGround() && (dy > 0.5 || stuckTicks > 8)) {
-            vy = 0.42; // jump up a block (or hop an obstacle when stuck)
+            // A full block up is a stronger jump: it must clear the top of the cell a pillar fills.
+            vy = dy > 0.9 ? 0.5 : 0.42;
         }
         body.setVelocity(vx, vy, vz);
         body.velocityModified = true;
