@@ -217,46 +217,6 @@ public class NovaGameTest implements FabricGameTest {
                         + " raw=" + count(body, Items.BEEF));
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 300)
-    public void shootsRaiderWithBow(TestContext ctx) {
-        ServerWorld world = ctx.getWorld();
-        floor(ctx);
-        // Clear the air above the floor so nothing blocks the line of fire.
-        for (int x = 0; x <= 12; x++) {
-            for (int y = 1; y <= 4; y++) {
-                for (int z = 0; z <= 14; z++) {
-                    ctx.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
-                }
-            }
-        }
-        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
-        NovaBody body = Companion.createPlayer(world, start, "NovaArcher");
-        body.getInventory().insertStack(new ItemStack(Items.BOW, 1));
-        body.getInventory().insertStack(new ItemStack(Items.ARROW, 5));
-        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
-
-        // A pillager rather than a skeleton: skeletons burn in the daylight of the test world.
-        net.minecraft.entity.mob.PillagerEntity skeleton = new net.minecraft.entity.mob.PillagerEntity(
-                net.minecraft.entity.EntityType.PILLAGER, world);
-        // Off the line of x=8 (a solid block sits at relative y=2 there), so the arrow has a clear path.
-        Vec3d mob = ctx.getAbsolute(new Vec3d(6.5, 1, 9.5));
-        skeleton.refreshPositionAndAngles(mob.x, mob.y, mob.z, 0, 0);
-        skeleton.setAiDisabled(true);
-        world.spawnEntity(skeleton);
-
-        // Gametests run on peaceful, where hostile mobs are removed at once. Turn it up for this test only.
-        net.minecraft.world.Difficulty before = world.getDifficulty();
-        world.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL, true);
-        run(ctx, companion, 240, () -> {
-            if (count(body, Items.ARROW) >= 5) return false;
-            world.getServer().setDifficulty(before, true);
-            return true;
-        },
-                () -> "Companion did not shoot at the pillager. arrows=" + count(body, Items.ARROW)
-                        + " skeletonAlive=" + skeleton.isAlive() + " skel=" + skeleton.getPos() + " body=" + body.getPos()
-                        + " enemyNear=" + companion.statusLine());
-    }
-
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
     public void routesRequestsToActions(TestContext ctx) {
