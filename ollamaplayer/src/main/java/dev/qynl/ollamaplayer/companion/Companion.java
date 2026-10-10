@@ -1295,6 +1295,7 @@ public final class Companion {
     private boolean planTo(ServerWorld world, Pathfinder.Goal goal) {
         boolean canBridge = countInv("cobblestone") + countInv("dirt") > 0;
         List<BlockPos> path = Pathfinder.find(world, player.getBlockPos(), goal, canBridge);
+        if (player.getGameProfile().getName().equals("NovaPillar")) System.out.println("NOVA_DEBUG plan from=" + player.getBlockPos() + " path=" + (path == null ? "null" : path.toString().replaceAll("BlockPos\\{x=(-?[0-9]+), y=(-?[0-9]+), z=(-?[0-9]+)\\}", "$1,$2,$3")));
         if (path == null) {
             nav.clear();
             return false;
