@@ -29,6 +29,7 @@ In a world, as operator:
 | `/nova shelter` | wall itself into a 3x3 hut from blocks in the bag and hold still |
 | `/nova give` | hand everything in its bag to you |
 | `/nova eat` | eat the best food in the inventory (cooked food first) |
+| `/nova help` | list these commands in chat |
 | `/nova say <text>` | talk to Nova without going through chat |
 
 You can also just chat with Nova: messages to Nova are sent to the model, which replies with a short line and an action. The actions are `none, follow, stay, mine, craft, gear, shelter, give, eat, status`.

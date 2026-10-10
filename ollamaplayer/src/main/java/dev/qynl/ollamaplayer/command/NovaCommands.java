@@ -51,6 +51,17 @@ public final class NovaCommands {
                                         .executes(ctx -> act(ctx.getSource(), "mine",
                                                 StringArgumentType.getString(ctx, "what"),
                                                 IntegerArgumentType.getInteger(ctx, "count"))))))
+                .then(literal("help").executes(ctx -> {
+                    feedback(ctx.getSource(), String.join("\n",
+                            "Nova commands (operator):",
+                            "  /nova spawn | despawn | status | help",
+                            "  /nova follow | stay | eat | gear | shelter | give",
+                            "  /nova craft <item> [count]   e.g. /nova craft iron_pickaxe",
+                            "  /nova mine <what> [count]    e.g. /nova mine iron 5",
+                            "  /nova say <text>             talk without chatting",
+                            "Or just say \"Nova, ...\" in chat."));
+                    return 1;
+                }))
                 .then(literal("say")
                         .then(argument("text", StringArgumentType.greedyString())
                                 .executes(ctx -> {
