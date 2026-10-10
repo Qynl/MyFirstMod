@@ -789,7 +789,8 @@ public final class Companion {
     private void doSmelt(String ingot, int n) {
         String raw = Recipes.smeltInput(ingot);
         if (countInv(raw) < n || countInv("coal") < n) {
-            abort("I need " + n + " " + raw.replace('_', ' ') + " and " + n + " coal to smelt.");
+            abort("I need " + n + " " + raw.replace('_', ' ') + " and " + n + " coal to smelt (have "
+                    + countInv(raw) + " and " + countInv("coal") + ").");
             return;
         }
         consume(raw, n);
