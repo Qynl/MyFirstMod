@@ -621,8 +621,6 @@ public final class Companion {
             BlockPos c = e.getBlockPos();
             cells.append(" cell[").append(blockId(w.getBlockState(c))).append('/')
                  .append(blockId(w.getBlockState(c.down()))).append('/').append(blockId(w.getBlockState(c.up()))).append(']');
-            cells.append(" path=").append(Pathfinder.find(w, player.getBlockPos(), new Pathfinder.Goal(
-                    p -> p.equals(c), p -> p.getSquaredDistance(c)))!=null);
         }
         return cells + " " + nearbyDrops(player.getServerWorld()) + " ignored=" + ignoredDrops.size()
                 + " body=" + String.format(Locale.ROOT, "%.2f,%.2f,%.2f", player.getX(), player.getY(), player.getZ());
@@ -832,19 +830,24 @@ public final class Companion {
         say.accept("Smelted " + n + " " + ingot.replace('_', ' ') + ".");
     }
 
+    /**
+     * Places a station two blocks away from the body, never orthogonally touching another station,
+     * so stations cannot wall the body in.
+     */
     private void placeStation(ServerWorld world, Block block, String itemPath) {
         if (countInv(itemPath) < 1) {
             abort("I have no " + itemPath.replace('_', ' ') + " to place.");
             return;
         }
         BlockPos origin = player.getBlockPos();
-        for (int dx = -2; dx <= 2; dx++) {
-            for (int dz = -2; dz <= 2; dz++) {
-                if (dx == 0 && dz == 0) continue;
-                BlockPos p = origin.add(dx, 0, dz);
-                BlockPos below = p.down();
-                if (world.getBlockState(p).isAir() && world.getBlockState(below).isSolidBlock(world, below)
-                        && !hasDropAt(world, p)) {
+        for (int ring = 2; ring <= 3; ring++) {
+            for (int dx = -ring; dx <= ring; dx++) {
+                for (int dz = -ring; dz <= ring; dz++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+                    BlockPos p = origin.add(dx, 0, dz);
+                    BlockPos below = p.down();
+                    if (!world.getBlockState(p).isAir() || !world.getBlockState(below).isSolidBlock(world, below)) continue;
+                    if (hasDropAt(world, p) || touchesStation(world, p)) continue;
                     world.setBlockState(p, block.getDefaultState());
                     consume(itemPath, 1);
                     player.swingHand(Hand.MAIN_HAND);
@@ -853,6 +856,16 @@ public final class Companion {
             }
         }
         abort("There is no room to place the " + itemPath.replace('_', ' ') + " here.");
+    }
+
+    private static boolean touchesStation(ServerWorld world, BlockPos p) {
+        for (net.minecraft.util.math.Direction d : net.minecraft.util.math.Direction.Type.HORIZONTAL) {
+            BlockPos n = p.offset(d);
+            if (world.getBlockState(n).isOf(Blocks.CRAFTING_TABLE) || world.getBlockState(n).isOf(Blocks.FURNACE)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** True if an item entity lies in this block cell (placing a block there would trap the item). */
