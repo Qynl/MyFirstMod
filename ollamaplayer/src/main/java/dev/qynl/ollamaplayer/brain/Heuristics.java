@@ -27,6 +27,9 @@ public final class Heuristics {
         String t = raw.toLowerCase(Locale.ROOT);
 
         if (EAT.matcher(t).find() || t.contains("hungry")) return new Reply("Om nom.", "eat", null, 0);
+        if (t.contains("diamond") && (t.contains("gear") || t.contains("armor") || t.contains("kit"))) {
+            return new Reply("Going for a diamond kit.", "craft", "diamond_gear", 1);
+        }
         if (t.contains("gear") || t.contains("armor") || t.contains("armour") || t.contains("kit")) {
             return new Reply("Let's get geared up.", "gear", null, 0);
         }

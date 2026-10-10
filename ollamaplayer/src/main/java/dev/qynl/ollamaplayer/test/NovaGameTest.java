@@ -152,6 +152,33 @@ public class NovaGameTest implements FabricGameTest {
                         + " | " + companion.describe(null).replace('\n', ' ') + " | " + companion.debugDrops());
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 200)
+    public void buildsShelterAroundItself(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(5, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaHut");
+        body.getInventory().insertStack(new ItemStack(Items.COBBLESTONE, 40));
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+        BlockPos base = body.getBlockPos();
+
+        String reply = companion.command("shelter", null, 0);
+        System.out.println("NOVA_REPLY " + reply);
+
+        boolean walls = true;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                walls &= world.getBlockState(base.add(dx, 0, dz)).isOf(Blocks.COBBLESTONE);
+                walls &= world.getBlockState(base.add(dx, 1, dz)).isOf(Blocks.COBBLESTONE);
+            }
+            walls &= world.getBlockState(base.add(dx, 2, 0)).isOf(Blocks.COBBLESTONE);
+        }
+        if (!walls) ctx.throwGameTestException("Shelter walls are missing. reply=" + reply);
+        if (companion.mode() != Companion.Mode.STAY) ctx.throwGameTestException("Companion should hold still in the shelter.");
+        ctx.complete();
+    }
+
     private static void floor(TestContext ctx) {
         for (int x = 0; x <= 10; x++) {
             for (int z = 0; z <= 10; z++) {

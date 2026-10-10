@@ -136,7 +136,8 @@ public final class Recipes {
             case "axe" -> "iron_axe";
             case "sword" -> "iron_sword";
             case "shovel" -> "iron_shovel";
-            case "armor", "armour", "gear", "kit" -> "gear";
+            case "armor", "armour", "gear", "kit", "iron_gear", "iron_kit" -> "gear";
+            case "diamond_kit", "diamond_armor", "diamond_armour" -> "diamond_gear";
             case "iron", "iron_ore" -> "iron_ingot";
             case "gold", "gold_ore" -> "gold_ingot";
             case "copper", "copper_ore" -> "copper_ingot";
@@ -161,6 +162,18 @@ public final class Recipes {
         out.add("iron_chestplate");
         out.add("iron_leggings");
         out.add("iron_boots");
+        return out;
+    }
+
+    /** The diamond kit: pickaxe, sword, and full armor set. */
+    public static List<String> diamondGoal() {
+        List<String> out = new ArrayList<>();
+        out.add("diamond_pickaxe");
+        out.add("diamond_sword");
+        out.add("diamond_helmet");
+        out.add("diamond_chestplate");
+        out.add("diamond_leggings");
+        out.add("diamond_boots");
         return out;
     }
 

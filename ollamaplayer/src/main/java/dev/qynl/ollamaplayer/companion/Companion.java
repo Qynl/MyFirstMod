@@ -54,6 +54,8 @@ import java.util.function.Consumer;
 public final class Companion {
     public enum Mode { FOLLOW, STAY, MINE }
 
+    private static final Set<String> JUNK = Set.of("dirt", "gravel", "andesite", "diorite", "granite", "tuff",
+            "netherrack", "rotten_flesh", "cobbled_deepslate", "sand");
     private static final String[] RARE = {"diamond", "emerald", "ancient_debris", "gold_ore", "iron_ore", "lapis", "redstone_ore", "coal_ore"};
 
     private final NovaBody player;
@@ -95,6 +97,8 @@ public final class Companion {
     private boolean huntingLogged;
     private int cookCooldown;
     private int dropGrace;
+    private BlockPos recoverAt;
+    private int recoverTimer;
     private int equipTimer;
 
     public Companion(NovaBody player, Consumer<String> say) {
@@ -178,6 +182,25 @@ public final class Companion {
             return;
         }
 
+        if (recoverAt != null && enemy == null) {
+            if (--recoverTimer <= 0 || player.getPos().squaredDistanceTo(recoverAt.toCenterPos()) < 9.0) {
+                recoverAt = null;
+                nav.clear();
+            } else {
+                if (replanTimer == 0 || !nav.hasPath()) {
+                    BlockPos target = recoverAt;
+                    planTo(world, new Pathfinder.Goal(
+                            p -> p.getSquaredDistance(target) <= 4.0,
+                            p -> p.getSquaredDistance(target)));
+                    replanTimer = 20;
+                }
+                if (nav.tick(player, 0.14) == Navigator.Result.FAILED) {
+                    recoverAt = null;
+                }
+                return;
+            }
+        }
+
         if (enemy == null && plan.isEmpty() && !planMining && needsFood() && cookCooldown == 0) {
             // Hungry with raw meat and coal in the bag: cook it in a furnace before hunting more.
             String meat = firstRawMeat();
@@ -205,7 +228,10 @@ public final class Companion {
             if (runPlan(world)) return;
         }
 
-        if (++equipTimer % 20 == 0) equipBest();
+        if (++equipTimer % 20 == 0) {
+            equipBest();
+            dropJunk();
+        }
 
         switch (mode) {
             case FOLLOW -> follow(owner, world);
@@ -244,6 +270,9 @@ public final class Companion {
             case "shelter" -> {
                 return buildShelter();
             }
+            case "diamond_gear" -> {
+                return craftGoal("diamond_gear", 1);
+            }
             case "eat" -> {
                 if (!eatFood()) return "I've got nothing to eat right now.";
             }
@@ -281,11 +310,20 @@ public final class Companion {
         planGoal = null;
     }
 
+    /** After a death, walk back to where the stuff was dropped. */
+    public void recoverAt(BlockPos where) {
+        recoverAt = where;
+        recoverTimer = 600;
+        say.accept("I'll go back for my stuff at " + where.toShortString() + ".");
+    }
+
     /** Plans and starts crafting (or gearing up) toward the target. Returns a chat line for the outcome. */
     public String craftGoal(String target, int count) {
-        List<String> targets = target.equals("gear") ? Recipes.gearGoal() : List.of(target);
+        boolean gear = target.equals("gear") || target.equals("diamond_gear");
+        List<String> targets = target.equals("gear") ? Recipes.gearGoal()
+                : target.equals("diamond_gear") ? Recipes.diamondGoal() : List.of(target);
         if (mode == Mode.MINE && plan.isEmpty()) setMode(Mode.FOLLOW);
-        int n = target.equals("gear") ? 1 : Math.max(1, Math.min(64, count <= 0 ? 1 : count));
+        int n = gear ? 1 : Math.max(1, Math.min(64, count <= 0 ? 1 : count));
         ServerWorld world = player.getServerWorld();
         boolean table = findNearby(world, Blocks.CRAFTING_TABLE, 4) != null;
         boolean furnace = findNearby(world, Blocks.FURNACE, 4) != null;
@@ -298,7 +336,8 @@ public final class Companion {
         }
         cancelPlan();
         plan.addAll(res.steps());
-        planGoal = target.equals("gear") ? "a full iron kit" : n + " " + target.replace('_', ' ');
+        planGoal = target.equals("gear") ? "a full iron kit" : target.equals("diamond_gear") ? "a full diamond kit"
+                : n + " " + target.replace('_', ' ');
         int crafts = 0;
         for (Planner.Step st : res.steps()) if (st.kind() == Planner.Kind.CRAFT) crafts++;
         return "On it: " + planGoal + " (" + res.steps().size() + " steps, " + crafts + " crafts).";
@@ -965,6 +1004,22 @@ public final class Companion {
                     break;
                 }
             }
+        }
+    }
+
+    /** Keeps two slots free by dropping filler blocks. The dropped stacks are ignored so they are not picked up again. */
+    private void dropJunk() {
+        PlayerInventory inv = player.getInventory();
+        int empty = 0;
+        for (int i = 0; i < 36; i++) if (inv.getStack(i).isEmpty()) empty++;
+        if (empty >= 2) return;
+        for (int i = 0; i < 36; i++) {
+            ItemStack s = inv.getStack(i);
+            if (s.isEmpty() || !JUNK.contains(Registries.ITEM.getId(s.getItem()).getPath())) continue;
+            ItemEntity dropped = player.dropItem(s.copy(), false);
+            if (dropped != null) ignoredDrops.add(dropped.getUuid());
+            inv.setStack(i, ItemStack.EMPTY);
+            return;
         }
     }
 

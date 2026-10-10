@@ -24,6 +24,8 @@ public final class CompanionManager {
     private Companion companion;
     private UUID ownerId;
     private int respawnTimer = -1;
+    private BlockPos lastDeath;
+    private ServerWorld lastDeathWorld;
     private final Brain brain = new Brain(this);
 
     private CompanionManager() {}
@@ -88,6 +90,10 @@ public final class CompanionManager {
             if (respawnTimer > 0 && --respawnTimer == 0 && owner != null) {
                 spawn(owner);
                 speak("Back. That was rough.");
+                if (lastDeath != null && lastDeathWorld == owner.getServerWorld() && companion != null) {
+                    companion.recoverAt(lastDeath);
+                }
+                lastDeath = null;
             }
         } else {
             NovaBody body = companion.player();
@@ -119,6 +125,8 @@ public final class CompanionManager {
 
     private void handleDeath(NovaBody body) {
         BlockPos where = body.getBlockPos();
+        lastDeath = where;
+        lastDeathWorld = body.getServerWorld();
         body.getInventory().dropAll();
         speak("I died at " + where.toShortString() + "! My stuff should be on the ground there.");
         removeCompanion();
