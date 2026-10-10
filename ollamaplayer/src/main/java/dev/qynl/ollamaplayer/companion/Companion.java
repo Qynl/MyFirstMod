@@ -615,7 +615,16 @@ public final class Companion {
 
     /** Diagnostics: nearby drops, ignored drop count, and the body's position. */
     public String debugDrops() {
-        return nearbyDrops(player.getServerWorld()) + " ignored=" + ignoredDrops.size()
+        ServerWorld w = player.getServerWorld();
+        StringBuilder cells = new StringBuilder();
+        for (ItemEntity e : w.getEntitiesByClass(ItemEntity.class, player.getBoundingBox().expand(8, 3, 8), ItemEntity::isAlive)) {
+            BlockPos c = e.getBlockPos();
+            cells.append(" cell[").append(blockId(w.getBlockState(c))).append('/')
+                 .append(blockId(w.getBlockState(c.down()))).append('/').append(blockId(w.getBlockState(c.up()))).append(']');
+            cells.append(" path=").append(Pathfinder.find(w, player.getBlockPos(), new Pathfinder.Goal(
+                    p -> p.equals(c), p -> p.getSquaredDistance(c)))!=null);
+        }
+        return cells + " " + nearbyDrops(player.getServerWorld()) + " ignored=" + ignoredDrops.size()
                 + " body=" + String.format(Locale.ROOT, "%.2f,%.2f,%.2f", player.getX(), player.getY(), player.getZ());
     }
 
