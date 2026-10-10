@@ -666,7 +666,19 @@ public final class Companion {
             cells.append(" cell[").append(blockId(w.getBlockState(c))).append('/')
                  .append(blockId(w.getBlockState(c.down()))).append('/').append(blockId(w.getBlockState(c.up()))).append(']');
         }
-        return cells + " " + nearbyDrops(player.getServerWorld()) + " ignored=" + ignoredDrops.size()
+        StringBuilder map = new StringBuilder();
+        BlockPos b = player.getBlockPos();
+        for (int y = 1; y >= -1; y--) {
+            map.append(" y").append(y).append(':');
+            for (int z = -3; z <= 3; z++) {
+                for (int x = -3; x <= 3; x++) {
+                    String id = blockId(w.getBlockState(b.add(x, y, z)));
+                    map.append(id.length() > 3 ? id.substring(0, 3) : id).append(' ');
+                }
+                map.append('|');
+            }
+        }
+        return map + " " + cells + " " + nearbyDrops(player.getServerWorld()) + " ignored=" + ignoredDrops.size()
                 + " body=" + String.format(Locale.ROOT, "%.2f,%.2f,%.2f", player.getX(), player.getY(), player.getZ());
     }
 
