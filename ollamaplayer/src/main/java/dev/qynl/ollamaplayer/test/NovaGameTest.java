@@ -221,6 +221,14 @@ public class NovaGameTest implements FabricGameTest {
     public void shootsRaiderWithBow(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
         floor(ctx);
+        // Clear the air above the floor so nothing blocks the line of fire.
+        for (int x = 0; x <= 12; x++) {
+            for (int y = 1; y <= 4; y++) {
+                for (int z = 0; z <= 14; z++) {
+                    ctx.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
+                }
+            }
+        }
         Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
         NovaBody body = Companion.createPlayer(world, start, "NovaArcher");
         body.getInventory().insertStack(new ItemStack(Items.BOW, 1));
