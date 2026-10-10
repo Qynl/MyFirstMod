@@ -32,11 +32,13 @@ You can also just chat with Nova: messages to Nova are sent to the model, which 
 
 Config lives in `config/ollamaplayer.json` (created on first start):
 
-- `ollamaUrl` - default `http://localhost:11434`
-- `model` - `auto` picks the largest installed model whose size is at most `maxModelGb` (default 14 GB). Set a name to force one.
-- `maxModelGb` - default 14
-- `nameTag` - default `Nova`
+- `ollamaHost` - default `http://127.0.0.1:11434`
+- `model` - `auto` picks the largest installed model whose size is at most `ollamaMaxModelBytes` (default 14 GB). Set a model name to force one.
+- `useLlm` - `false` disables Ollama and uses only the keyword heuristics
+- `numCtx`, `timeoutSeconds` - Ollama context size and request timeout
+- `companionName` - default `Nova`
 - `chatterMinSeconds` / `chatterMaxSeconds` - idle remarks, default 120 to 300 s
+- `persona` - the system prompt for the model
 
 Ollama calls run on a background thread and use JSON-schema structured output, so replies always parse into `{say, action, target, count}`.
 If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/Heuristics.java`), so the mod keeps working offline.
