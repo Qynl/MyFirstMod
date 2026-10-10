@@ -180,6 +180,43 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 600)
+    public void swimsOutOfWaterPool(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        for (int x = 1; x <= 3; x++) {
+            for (int z = 4; z <= 6; z++) {
+                ctx.setBlockState(new BlockPos(x, 1, z), Blocks.WATER.getDefaultState());
+            }
+        }
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaSwim");
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+        BlockPos dry = BlockPos.ofFloored(ctx.getAbsolute(Vec3d.ofCenter(new BlockPos(6, 1, 5))));
+        companion.walkTo(dry);
+
+        run(ctx, companion, 500, () -> body.getPos().squaredDistanceTo(Vec3d.ofCenter(dry)) < 4.0,
+                () -> "Companion did not swim out of the pool. pos=" + body.getPos());
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 1500)
+    public void cooksRawBeefInsteadOfEatingItRaw(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaCook");
+        body.getInventory().insertStack(new ItemStack(Items.BEEF, 1));
+        body.getInventory().insertStack(new ItemStack(Items.COAL, 2));
+        body.getInventory().insertStack(new ItemStack(Items.COBBLESTONE, 8));
+        body.getInventory().insertStack(new ItemStack(Items.OAK_PLANKS, 4));
+        body.getHungerManager().setFoodLevel(8);
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+
+        run(ctx, companion, 1200, () -> count(body, Items.COOKED_BEEF) >= 1,
+                () -> "Companion did not cook its beef. food=" + body.getHungerManager().getFoodLevel()
+                        + " raw=" + count(body, Items.BEEF));
+    }
+
     private static void floor(TestContext ctx) {
         for (int x = 0; x <= 16; x++) {
             for (int z = 0; z <= 16; z++) {

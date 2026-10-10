@@ -1302,12 +1302,18 @@ public final class Companion {
         }
     }
 
+    /** Eats the best food in the bag: cooked food first, raw meat only when close to starving. */
     private boolean eatFood() {
         PlayerInventory inv = player.getInventory();
-        for (int i = 0; i < inv.size(); i++) {
-            ItemStack s = inv.getStack(i);
-            FoodComponent food = s.get(DataComponentTypes.FOOD);
-            if (food != null) {
+        boolean starving = player.getHungerManager().getFoodLevel() <= 6;
+        for (int pass = 0; pass < 2; pass++) {
+            for (int i = 0; i < inv.size(); i++) {
+                ItemStack s = inv.getStack(i);
+                FoodComponent food = s.get(DataComponentTypes.FOOD);
+                if (food == null) continue;
+                boolean raw = RAW_FOOD.contains(Registries.ITEM.getId(s.getItem()).getPath());
+                if (pass == 0 && raw) continue;
+                if (pass == 1 && !(raw && starving)) continue;
                 player.getHungerManager().add(food.nutrition(), food.saturation());
                 s.decrement(1);
                 eatCooldown = 30;
@@ -1316,6 +1322,16 @@ public final class Companion {
             }
         }
         return false;
+    }
+
+    private static final Set<String> RAW_FOOD = Set.of(
+            "beef", "porkchop", "chicken", "mutton", "rabbit", "cod", "salmon", "rotten_flesh");
+
+    /** Sends the body to a block position on its own (used by tests and by the brain's move actions). */
+    public void walkTo(BlockPos target) {
+        recoverAt = target;
+        recoverTimer = 400;
+        nav.clear();
     }
 
     private void equipWeapon() {
