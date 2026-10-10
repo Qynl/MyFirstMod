@@ -79,7 +79,8 @@ public final class Pathfinder {
                 // Pillar straight up: jump, and place a block under our own feet at the top of the jump.
                 BlockPos up = cur.pos.up();
                 long key = up.asLong();
-                if (!closed.contains(key) && solid(world, cur.pos.down()) && passable(world, up)
+                // No floor check here: in a chain of pillars the floor is the block the navigator placed one step earlier.
+                if (!closed.contains(key) && passable(world, up)
                         && passable(world, up.up()) && !standable(world, up)) {
                     double cost = cur.g + 3.0;
                     Node old = best.get(key);
