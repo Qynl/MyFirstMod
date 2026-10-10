@@ -32,13 +32,48 @@ public final class CompanionManager {
 
     private CompanionManager() {}
 
+    private int saveTimer;
+
     public void onServerStarted(MinecraftServer s) {
         server = s;
+        restoreSaved();
     }
 
     public void onServerStopping() {
+        if (companion != null) CompanionStore.save(server, companion, ownerId);
         removeCompanion();
         server = null;
+    }
+
+    /** Brings Nova back after a restart, with the bag and place she had when the server stopped. */
+    private void restoreSaved() {
+        net.minecraft.nbt.NbtCompound root = CompanionStore.read(server);
+        if (root == null || companion != null) return;
+        try {
+            ServerWorld world = server.getWorld(net.minecraft.registry.RegistryKey.of(
+                    net.minecraft.registry.RegistryKeys.WORLD, net.minecraft.util.Identifier.of(root.getString("world"))));
+            if (world == null) world = server.getOverworld();
+            Vec3d pos = new Vec3d(root.getDouble("x"), root.getDouble("y"), root.getDouble("z"));
+            NovaBody body = Companion.createPlayer(world, pos, root.getString("name"));
+            CompanionStore.restoreItems(server, root, body);
+            body.setHealth(Math.max(1.0F, root.getFloat("health")));
+            body.getHungerManager().setFoodLevel(root.getInt("food"));
+            companion = new Companion(body, this::speak);
+            companion.setMode(parseMode(root.getString("mode")));
+            if (root.containsUuid("owner")) ownerId = root.getUuid("owner");
+            speak("I'm back. Who wants to go mining?");
+        } catch (RuntimeException e) {
+            OllamaPlayerMod.LOGGER.warn("Could not restore Nova; she will need /nova spawn", e);
+            companion = null;
+        }
+    }
+
+    private static Companion.Mode parseMode(String name) {
+        try {
+            return Companion.Mode.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return Companion.Mode.FOLLOW;
+        }
     }
 
     @Nullable
@@ -60,6 +95,7 @@ public final class CompanionManager {
         removeCompanion();
         ownerId = owner.getUuid();
         respawnTimer = -1;
+        saveTimer = 0;
         ServerWorld world = owner.getServerWorld();
         Vec3d pos = owner.getPos().add(2, 0, 0);
         companion = new Companion(Companion.createPlayer(world, pos, name()), this::speak);
@@ -70,6 +106,7 @@ public final class CompanionManager {
         if (companion == null) return;
         speak("Heading out. Later!");
         removeCompanion();
+        if (server != null) CompanionStore.delete(server);
     }
 
     public void onPlayerChat(ServerPlayerEntity sender, String text) {
@@ -99,6 +136,10 @@ public final class CompanionManager {
             }
         } else {
             NovaBody body = companion.player();
+            if (++saveTimer >= 600) {
+                saveTimer = 0;
+                CompanionStore.save(server, companion, ownerId);
+            }
             if (body.getHealth() <= 0.0F || body.isRemoved()) {
                 handleDeath(body);
             } else {
@@ -151,6 +192,7 @@ public final class CompanionManager {
         body.getInventory().dropAll();
         speak("I died at " + where.toShortString() + "! My stuff should be on the ground there.");
         removeCompanion();
+        CompanionStore.delete(server);
         respawnTimer = 100; // back at the owner after 5 seconds, empty-handed
     }
 
