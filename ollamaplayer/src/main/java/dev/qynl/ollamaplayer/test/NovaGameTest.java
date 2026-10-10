@@ -282,6 +282,23 @@ public class NovaGameTest implements FabricGameTest {
                         + " status=" + companion.statusLine() + " cobble=" + count(body, Items.COBBLESTONE));
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 200)
+    public void movesSwordIntoHotbar(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaHotbar");
+        body.getInventory().setStack(25, new ItemStack(Items.DIAMOND_SWORD));
+        Companion companion = new Companion(body, msg -> { });
+
+        run(ctx, companion, 150, () -> {
+            for (int h = 0; h < 9; h++) {
+                if (body.getInventory().getStack(h).isOf(Items.DIAMOND_SWORD)) return true;
+            }
+            return false;
+        }, () -> "Companion never moved its sword into the hotbar.");
+    }
+
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
     public void routesRequestsToActions(TestContext ctx) {

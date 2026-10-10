@@ -180,6 +180,10 @@ public final class Companion {
         sawEnemy = enemy != null;
 
         torchIfDark(world);
+        if (enemy == null && ++hotbarTimer >= 40) {
+            hotbarTimer = 0;
+            organizeHotbar();
+        }
 
         if (enemy != null) {
             wasFighting = true;
@@ -492,6 +496,53 @@ public final class Companion {
                 player.swingHand(Hand.MAIN_HAND);
             }
         }
+    }
+
+    private int hotbarTimer;
+
+    /**
+     * Equipping only looks at the hotbar, so the best sword, pickaxe and food are moved there,
+     * displacing whatever is least useful in the first nine slots.
+     */
+    private void organizeHotbar() {
+        PlayerInventory inv = player.getInventory();
+        promote(inv, s -> s.getItem() instanceof SwordItem, s -> 10 + Recipes.toolTier(s));
+        promote(inv, s -> s.getItem() instanceof PickaxeItem, s -> Recipes.toolTier(s));
+        promote(inv, s -> s.get(DataComponentTypes.FOOD) != null, s -> s.get(DataComponentTypes.FOOD).nutrition());
+    }
+
+    /** Moves the best matching stack from the main bag into the hotbar, if it beats what is there. */
+    private static void promote(PlayerInventory inv, java.util.function.Predicate<ItemStack> match,
+                                java.util.function.ToIntFunction<ItemStack> score) {
+        int bestIdx = -1;
+        int bestScore = Integer.MIN_VALUE;
+        for (int i = 9; i < 36; i++) {
+            ItemStack s = inv.getStack(i);
+            if (s.isEmpty() || !match.test(s)) continue;
+            int sc = score.applyAsInt(s);
+            if (sc > bestScore) {
+                bestScore = sc;
+                bestIdx = i;
+            }
+        }
+        if (bestIdx < 0) return;
+        int hotbarBest = Integer.MIN_VALUE;
+        int victim = -1;
+        int victimScore = Integer.MAX_VALUE;
+        for (int h = 0; h < 9; h++) {
+            ItemStack s = inv.getStack(h);
+            if (!s.isEmpty() && match.test(s)) hotbarBest = Math.max(hotbarBest, score.applyAsInt(s));
+            // The least useful hotbar stack is the victim: empty first, then anything that isn't a tool or food.
+            int junk = s.isEmpty() ? -1 : (match.test(s) ? 100 : 50);
+            if (junk < victimScore) {
+                victimScore = junk;
+                victim = h;
+            }
+        }
+        if (bestScore <= hotbarBest || victim < 0) return;
+        ItemStack moving = inv.getStack(bestIdx);
+        inv.setStack(bestIdx, inv.getStack(victim));
+        inv.setStack(victim, moving);
     }
 
     private int shotCooldown;
