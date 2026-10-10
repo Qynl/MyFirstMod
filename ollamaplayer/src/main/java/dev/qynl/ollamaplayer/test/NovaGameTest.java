@@ -257,6 +257,41 @@ public class NovaGameTest implements FabricGameTest {
                         + " enemyNear=" + companion.statusLine());
     }
 
+    /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void routesRequestsToActions(TestContext ctx) {
+        String[][] cases = {
+                {"make an iron pickaxe", "craft", "iron_pickaxe"},
+                {"build a shelter", "shelter", null},
+                {"gear up", "gear", null},
+                {"give me everything", "give", null},
+                {"get me 8 cobblestone", "mine", "cobblestone"},
+                {"give me 5 iron", "mine", "iron_ore"},
+                {"follow me", "follow", null},
+                {"stay here", "stay", null},
+                {"what are you doing", "status", null},
+        };
+        for (String[] c : cases) {
+            dev.qynl.ollamaplayer.brain.Reply r = dev.qynl.ollamaplayer.brain.Heuristics.reply(c[0]);
+            if (!c[1].equals(r.action()) || (c[2] != null && !c[2].equals(r.target()))) {
+                ctx.throwGameTestException("'" + c[0] + "' routed to " + r.action() + "/" + r.target() + ", expected " + c[1] + "/" + c[2]);
+            }
+        }
+        dev.qynl.ollamaplayer.brain.Reply ok = dev.qynl.ollamaplayer.brain.Reply.parse(
+                "{\\"say\\":\\"On it\\",\\"action\\":\\"craft\\",\\"target\\":\\"iron_pickaxe\\",\\"count\\":1}");
+        if (!"craft".equals(ok.action()) || !"iron_pickaxe".equals(ok.target()) || ok.count() != 1) {
+            ctx.throwGameTestException("valid JSON reply parsed wrong: " + ok);
+        }
+        dev.qynl.ollamaplayer.brain.Reply bogus = dev.qynl.ollamaplayer.brain.Reply.parse(
+                "{\\"say\\":\\"hi\\",\\"action\\":\\"fly\\"}");
+        if (!"none".equals(bogus.action())) ctx.throwGameTestException("unknown action was not rejected: " + bogus);
+        dev.qynl.ollamaplayer.brain.Reply plain = dev.qynl.ollamaplayer.brain.Reply.parse("Sure thing, friend.");
+        if (!"none".equals(plain.action()) || !plain.say().startsWith("Sure")) {
+            ctx.throwGameTestException("plain-text reply was not kept as speech: " + plain);
+        }
+        ctx.complete();
+    }
+
     private static void floor(TestContext ctx) {
         for (int x = 0; x <= 16; x++) {
             for (int z = 0; z <= 16; z++) {

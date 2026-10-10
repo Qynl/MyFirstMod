@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  */
 public final class Heuristics {
     private static final Pattern NUMBER = Pattern.compile("(\\d{1,2})");
-    private static final Pattern MINE_VERB = Pattern.compile("\\b(mine|get|collect|chop|gather|dig|fetch|bring|find)\\b");
+    private static final Pattern MINE_VERB = Pattern.compile("\\b(mine|get|collect|chop|gather|dig|fetch|bring|find|give)\\b");
     private static final Pattern CRAFT_VERB = Pattern.compile("\\b(craft|make|build|smelt|cook|forge|create)\\b");
     private static final Pattern EAT = Pattern.compile("\\beat\\b");
 
@@ -33,7 +33,9 @@ public final class Heuristics {
         if (t.contains("gear") || t.contains("armor") || t.contains("armour") || t.contains("kit")) {
             return new Reply("Let's get geared up.", "gear", null, 0);
         }
-        if (t.contains("give") && (t.contains("me") || t.contains("all") || t.contains("everything") || t.contains("your stuff"))) {
+        // "give me everything" hands over the bag; "give me 5 iron" is a request to mine and bring iron.
+        if (t.contains("give") && findTarget(t) == null
+                && (t.contains("me") || t.contains("all") || t.contains("everything") || t.contains("your stuff"))) {
             return new Reply("Here you go.", "give", null, 0);
         }
         if (t.contains("shelter") || t.contains("house") || t.contains("hide") || t.contains("hut")) {
@@ -57,7 +59,7 @@ public final class Heuristics {
                 return new Reply("Alright, going for " + count + " " + target.replace('_', ' ') + ".", "mine", target, count);
             }
         }
-        return Reply.none("My brain is offline right now. I understand: follow, stay, eat, status, and mine <logs|stone|iron|coal>.");
+        return Reply.none("My brain is offline right now. I understand: follow, stay, eat, status, give, gear up, build a shelter, craft <item>, and mine <logs|stone|iron|coal>.");
     }
 
     private static String findTarget(String t) {
