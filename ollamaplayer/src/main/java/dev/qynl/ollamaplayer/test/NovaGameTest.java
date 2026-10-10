@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NovaGameTest implements FabricGameTest {
 
-    @GameTest(templateName = EMPTY_STRUCTURE, timeoutTicks = 1500)
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 1500)
     public void companionMinesLogAndKeepsIt(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
         for (int x = 0; x <= 10; x++) {
