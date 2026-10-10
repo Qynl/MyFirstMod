@@ -218,7 +218,7 @@ public class NovaGameTest implements FabricGameTest {
     }
 
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 300)
-    public void shootsSkeletonWithBow(TestContext ctx) {
+    public void shootsRaiderWithBow(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
         floor(ctx);
         Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
@@ -227,15 +227,16 @@ public class NovaGameTest implements FabricGameTest {
         body.getInventory().insertStack(new ItemStack(Items.ARROW, 5));
         Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
 
-        net.minecraft.entity.mob.SkeletonEntity skeleton = new net.minecraft.entity.mob.SkeletonEntity(
-                net.minecraft.entity.EntityType.SKELETON, world);
+        // A pillager rather than a skeleton: skeletons burn in the daylight of the test world.
+        net.minecraft.entity.mob.PillagerEntity skeleton = new net.minecraft.entity.mob.PillagerEntity(
+                net.minecraft.entity.EntityType.PILLAGER, world);
         skeleton.refreshPositionAndAngles(ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).x,
                 ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).y, ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).z, 0, 0);
         skeleton.setAiDisabled(true);
         world.spawnEntity(skeleton);
 
         run(ctx, companion, 240, () -> count(body, Items.ARROW) < 5,
-                () -> "Companion did not shoot at the skeleton. arrows=" + count(body, Items.ARROW)
+                () -> "Companion did not shoot at the pillager. arrows=" + count(body, Items.ARROW)
                         + " skeletonAlive=" + skeleton.isAlive() + " skel=" + skeleton.getPos() + " body=" + body.getPos()
                         + " enemyNear=" + companion.statusLine());
     }
