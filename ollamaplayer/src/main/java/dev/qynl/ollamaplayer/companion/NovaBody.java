@@ -28,6 +28,10 @@ public final class NovaBody extends FakePlayer {
         double vy = v.y;
         if (!isOnGround() || vy > 0) vy -= GRAVITY;
         vy *= DRAG_Y;
+        if (isTouchingWater() || isInLava()) {
+            // Swim upward: buoyancy, capped so the body bobs at the surface instead of rocketing out.
+            vy = Math.min(0.15, Math.max(vy, -0.1) + 0.12);
+        }
 
         move(MovementType.SELF, new Vec3d(v.x, vy, v.z));
         // Collision may have stopped us. Keep the horizontal intent, clear vertical once grounded.

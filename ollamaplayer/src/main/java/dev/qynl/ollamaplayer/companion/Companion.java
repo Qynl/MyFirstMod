@@ -84,11 +84,16 @@ public final class Companion {
     private int exploreFails;
     private BlockPos exploreGoal;
 
+    private final Set<java.util.UUID> ignoredDrops = new HashSet<>();
+    private java.util.UUID chasedDrop;
+    private int chaseTicks;
+
     private final Deque<Planner.Step> plan = new ArrayDeque<>();
     private String planGoal;
     private boolean planMining;
     private int shieldTimer;
     private boolean huntingLogged;
+    private int cookCooldown;
     private int equipTimer;
 
     public Companion(NovaBody player, Consumer<String> say) {
@@ -171,6 +176,16 @@ public final class Companion {
         if (mode != Mode.STAY && collectDrops(world)) {
             return;
         }
+
+        if (enemy == null && plan.isEmpty() && !planMining && needsFood() && cookCooldown == 0) {
+            // Hungry with raw meat and coal in the bag: cook it in a furnace before hunting more.
+            String meat = firstRawMeat();
+            if (meat != null && countInv("coal") > 0) {
+                craftGoal("cooked_" + meat, 1);
+                cookCooldown = 100;
+            }
+        }
+        if (cookCooldown > 0) cookCooldown--;
 
         if (enemy == null && plan.isEmpty() && !planMining && needsFood() && !hasFood()) {
             LivingEntity animal = nearestAnimal(world, 24);
@@ -268,6 +283,7 @@ public final class Companion {
     /** Plans and starts crafting (or gearing up) toward the target. Returns a chat line for the outcome. */
     public String craftGoal(String target, int count) {
         List<String> targets = target.equals("gear") ? Recipes.gearGoal() : List.of(target);
+        if (mode == Mode.MINE && plan.isEmpty()) setMode(Mode.FOLLOW);
         int n = target.equals("gear") ? 1 : Math.max(1, Math.min(64, count <= 0 ? 1 : count));
         ServerWorld world = player.getServerWorld();
         boolean table = findNearby(world, Blocks.CRAFTING_TABLE, 4) != null;
@@ -280,7 +296,6 @@ public final class Companion {
             return "I already have that.";
         }
         cancelPlan();
-        setMode(Mode.FOLLOW);
         plan.addAll(res.steps());
         planGoal = target.equals("gear") ? "a full iron kit" : n + " " + target.replace('_', ' ');
         int crafts = 0;
@@ -561,6 +576,7 @@ public final class Companion {
         ItemEntity target = null;
         double best = Double.MAX_VALUE;
         for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
+            if (ignoredDrops.contains(e.getUuid())) continue;
             double d = player.squaredDistanceTo(e);
             if (d < best) {
                 best = d;
@@ -568,6 +584,17 @@ public final class Companion {
             }
         }
         if (target == null) return false;
+        if (target.getUuid().equals(chasedDrop)) {
+            if (++chaseTicks > 200) {
+                ignoredDrops.add(target.getUuid()); // probably cannot be picked up (full inventory)
+                chasedDrop = null;
+                chaseTicks = 0;
+                return false;
+            }
+        } else {
+            chasedDrop = target.getUuid();
+            chaseTicks = 0;
+        }
         if (best < 2.25 && mineBlock == null) {
             // Already on top of it: pickUpItems() takes it on this tick.
             return false;
@@ -912,6 +939,21 @@ public final class Companion {
 
     private boolean needsFood() {
         return player.getHungerManager().getFoodLevel() <= 16;
+    }
+
+    private boolean hasRawFood() {
+        return firstRawMeat() != null;
+    }
+
+    /** Raw meat id in the inventory, or null. */
+    @Nullable
+    private String firstRawMeat() {
+        PlayerInventory inv = player.getInventory();
+        for (int i = 0; i < inv.size(); i++) {
+            String id = Registries.ITEM.getId(inv.getStack(i).getItem()).getPath();
+            if (id.equals("beef") || id.equals("porkchop") || id.equals("chicken") || id.equals("mutton")) return id;
+        }
+        return null;
     }
 
     private boolean hasFood() {

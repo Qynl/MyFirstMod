@@ -68,6 +68,10 @@ public final class Recipes {
         SMELT.put("iron_ingot", new String[] {"raw_iron"});
         SMELT.put("gold_ingot", new String[] {"raw_gold"});
         SMELT.put("copper_ingot", new String[] {"raw_copper"});
+        SMELT.put("cooked_beef", new String[] {"beef"});
+        SMELT.put("cooked_porkchop", new String[] {"porkchop"});
+        SMELT.put("cooked_chicken", new String[] {"chicken"});
+        SMELT.put("cooked_mutton", new String[] {"mutton"});
     }
 
     private Recipes() {}
