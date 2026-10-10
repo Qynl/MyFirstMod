@@ -132,7 +132,8 @@ public class NovaGameTest implements FabricGameTest {
     public void fullLoopIronPickaxeFromOre(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
         floor(ctx);
-        BlockPos[] ores = {new BlockPos(6, 1, 5), new BlockPos(8, 1, 3), new BlockPos(9, 1, 8)};
+        BlockPos[] ores = {new BlockPos(6, 1, 5), new BlockPos(8, 1, 3), new BlockPos(9, 1, 8),
+                new BlockPos(5, 1, 9), new BlockPos(4, 1, 2)};
         for (BlockPos o : ores) ctx.setBlockState(o, Blocks.IRON_ORE.getDefaultState());
         Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
         NovaBody body = Companion.createPlayer(world, start, "NovaLoop");
