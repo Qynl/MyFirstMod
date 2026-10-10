@@ -234,7 +234,8 @@ public class NovaGameTest implements FabricGameTest {
         companion.walkTo(BlockPos.ofFloored(goal));
 
         run(ctx, companion, 500, () -> Math.hypot(body.getX() - goal.x, body.getZ() - goal.z) < 1.5,
-                () -> "Companion did not bridge the gap. pos=" + body.getPos());
+                () -> "Companion did not bridge the gap. rel=" + relative(ctx, body.getPos()) + " goal=" + relative(ctx, goal)
+                        + " status=" + companion.statusLine() + " inv=" + count(body, Items.COBBLESTONE));
     }
 
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
@@ -270,6 +271,11 @@ public class NovaGameTest implements FabricGameTest {
             ctx.throwGameTestException("plain-text reply was not kept as speech: " + plain);
         }
         ctx.complete();
+    }
+
+    private static String relative(TestContext ctx, Vec3d abs) {
+        Vec3d o = ctx.getAbsolute(Vec3d.ZERO);
+        return String.format(java.util.Locale.ROOT, "(%.2f, %.2f, %.2f)", abs.x - o.x, abs.y - o.y, abs.z - o.z);
     }
 
     private static void floor(TestContext ctx) {
