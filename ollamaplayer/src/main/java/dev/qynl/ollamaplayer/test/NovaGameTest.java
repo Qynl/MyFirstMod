@@ -217,6 +217,27 @@ public class NovaGameTest implements FabricGameTest {
                         + " raw=" + count(body, Items.BEEF));
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 300)
+    public void shootsSkeletonWithBow(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaArcher");
+        body.getInventory().insertStack(new ItemStack(Items.BOW, 1));
+        body.getInventory().insertStack(new ItemStack(Items.ARROW, 5));
+        Companion companion = new Companion(body, msg -> System.out.println("NOVA_SAY " + msg));
+
+        net.minecraft.entity.mob.SkeletonEntity skeleton = new net.minecraft.entity.mob.SkeletonEntity(
+                net.minecraft.entity.EntityType.SKELETON, world);
+        skeleton.refreshPositionAndAngles(ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).x,
+                ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).y, ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).z, 0, 0);
+        skeleton.setAiDisabled(true);
+        world.spawnEntity(skeleton);
+
+        run(ctx, companion, 240, () -> count(body, Items.ARROW) < 5,
+                () -> "Companion did not shoot at the skeleton. arrows=" + count(body, Items.ARROW));
+    }
+
     private static void floor(TestContext ctx) {
         for (int x = 0; x <= 16; x++) {
             for (int z = 0; z <= 16; z++) {
