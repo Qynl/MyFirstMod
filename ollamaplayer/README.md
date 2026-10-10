@@ -1,7 +1,8 @@
 # Ollama Player (Nova)
 
 A Fabric 1.21.1 mod that adds **Nova**, a server-side companion driven by a local [Ollama](https://ollama.com) model.
-Nova follows you, talks in chat, mines blocks, fights hostile mobs, eats when hungry, picks up drops, and respawns after death.
+Nova follows you, talks in chat, mines blocks, fights hostile mobs, eats and cooks when hungry, picks up drops, crafts and smelts from a recipe planner, gears up, builds a shelter, places torches in caves, backs away from creepers, swims out of water, and respawns after death.
+If it dies, it walks back to where it fell to collect its drops (junk is dumped first to make room), then returns to you empty-handed.
 
 Requires Fabric Loader 0.16.10+ and Fabric API 0.116.17+1.21.1. No other mods.
 
@@ -20,20 +21,25 @@ In a world, as operator:
 |---|---|
 | `/nova spawn` | spawn Nova next to you |
 | `/nova despawn` | remove Nova |
-| `/nova status` | show mode, health, inventory |
+| `/nova status` | show mode, health, inventory, and the current plan |
 | `/nova follow` / `/nova stay` | follow you / hold position |
 | `/nova mine <what> [count]` | mine blocks matching a keyword, e.g. `/nova mine log 8` |
-| `/nova eat` | eat the best food in the inventory |
+| `/nova craft <what> [count]` | craft or smelt anything: plans the missing steps, gathers materials, uses or places a table/furnace, e.g. `/nova craft iron_pickaxe` |
+| `/nova gear` | wear the best armor and wield the best sword/axe/pickaxe/shield it carries |
+| `/nova shelter` | wall itself into a 3x3 hut from blocks in the bag and hold still |
+| `/nova give` | hand everything in its bag to you |
+| `/nova eat` | eat the best food in the inventory (cooked food first) |
 | `/nova say <text>` | talk to Nova without going through chat |
 
-You can also just chat with Nova: messages to Nova are sent to the model, which replies with a short line and an action.
+You can also just chat with Nova: messages to Nova are sent to the model, which replies with a short line and an action. The actions are `none, follow, stay, mine, craft, gear, shelter, give, eat, status`.
+For example: "Nova, get me 8 cobblestone", "make a crafting table", "gear up", "build a shelter".
 
 ## Ollama
 
 Config lives in `config/ollamaplayer.json` (created on first start):
 
 - `ollamaHost` - default `http://127.0.0.1:11434`
-- `model` - `auto` picks the largest installed model whose size is at most `ollamaMaxModelBytes` (default 14 GB). Set a model name to force one.
+- `model` - `auto` picks the largest installed model whose size is at most `ollamaMaxModelBytes` (default 14 GB, so a 16 GB GPU fits). It is chosen from `/api/tags`, so whatever you've pulled (e.g. `gemma4:12b`) is used. Set a model name to force one.
 - `useLlm` - `false` disables Ollama and uses only the keyword heuristics
 - `numCtx`, `timeoutSeconds` - Ollama context size and request timeout
 - `companionName` - default `Nova`
@@ -51,10 +57,13 @@ If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/
 - `companion/CompanionManager.java` - one companion, respawn after death, cross-dimension relocation.
 - `brain/` - Ollama chat, reply parsing, heuristics fallback.
 - `ollama/OllamaClient.java` - model discovery (`/api/tags`) and chat (`/api/chat`).
-- `test/NovaGameTest.java` - Fabric GameTest that spawns Nova, mines a log, and checks the drop reaches the inventory. Run with `gradle runGameTest`.
+- `craft/Recipes.java`, `craft/Planner.java` - the recipe table and a backward planner. Asking for an item expands it into steps: gather raw materials, smelt, craft at a table, place stations.
+- `test/NovaGameTest.java` - Fabric GameTests that run headless: mining a log, crafting at a table, smelting with a placed furnace, wearing armor, mining iron, the full ore-to-iron-pickaxe loop, building a shelter, swimming out of water, and cooking beef instead of eating it raw. Run with `gradle runGameTest`.
 
 ## Known limits
 
-- Pathfinding is local (range 36 blocks) and does not swim, climb ladders, or bridge gaps.
-- Crafting and building are not yet implemented.
+- Pathfinding is local (range 36 blocks). It can swim through water (slowly) but does not climb ladders, bridge gaps, or open doors.
 - Nova is one companion per server.
+- Shelters use cobblestone-like blocks from the bag; they are not sealed against every mob spawn rule.
+- Gametests run on a flat stone floor; real terrain (caves, lava lakes, nights) is only covered by playing with `gradle runClient`.
+- Lost drops are a known issue in dense multi-companion test setups; the full loop test passes with five ores.
