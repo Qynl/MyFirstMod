@@ -563,6 +563,10 @@ public final class Companion {
         return stashPos;
     }
 
+    public void setStashPos(@Nullable BlockPos pos) {
+        stashPos = pos;
+    }
+
     private static int chestCount(net.minecraft.inventory.Inventory chest, String key) {
         int n = 0;
         for (int j = 0; j < chest.size(); j++) {

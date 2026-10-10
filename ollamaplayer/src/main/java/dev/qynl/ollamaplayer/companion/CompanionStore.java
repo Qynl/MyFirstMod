@@ -45,6 +45,7 @@ public final class CompanionStore {
             root.putInt("food", body.getHungerManager().getFoodLevel());
             root.putInt("selected", body.getInventory().selectedSlot);
             if (owner != null) root.putUuid("owner", owner);
+            if (companion.stashPos() != null) root.putLong("stash", companion.stashPos().asLong());
 
             RegistryOps<NbtElement> ops = server.getRegistryManager().getOps(NbtOps.INSTANCE);
             PlayerInventory inv = body.getInventory();

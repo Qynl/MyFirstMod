@@ -60,6 +60,7 @@ public final class CompanionManager {
             body.getHungerManager().setFoodLevel(root.getInt("food"));
             companion = new Companion(body, this::speak);
             companion.setMode(parseMode(root.getString("mode")));
+            if (root.contains("stash")) companion.setStashPos(net.minecraft.util.math.BlockPos.fromLong(root.getLong("stash")));
             if (root.containsUuid("owner")) ownerId = root.getUuid("owner");
             speak("I'm back. Who wants to go mining?");
         } catch (RuntimeException e) {
