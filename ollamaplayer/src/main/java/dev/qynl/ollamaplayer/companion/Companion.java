@@ -646,7 +646,12 @@ public final class Companion {
                     p -> Math.hypot(p.getX() + 0.5 - ip.x, p.getZ() + 0.5 - ip.z)));
             replanTimer = 10;
         }
-        if (nav.tick(player, 0.13) != Navigator.Result.MOVING) {
+        Navigator.Result res = nav.tick(player, 0.13);
+        if (chaseTicks <= 3 || chaseTicks % 25 == 0) {
+            System.out.println("NOVA_DEBUG chase t=" + chaseTicks + " drop=" + target.getPos() + " body=" + player.getPos()
+                    + " res=" + res + " hasPath=" + nav.hasPath() + " mode=" + mode + " mineBlock=" + mineBlock);
+        }
+        if (res != Navigator.Result.MOVING) {
             return false;
         }
         return true;
@@ -784,6 +789,7 @@ public final class Companion {
     /** Gives a freshly dropped stack a few ticks to be picked up before a step needs it. */
     private boolean waitForDrops(ServerWorld world) {
         if (dropGrace >= 60) return false;
+        if (dropGrace % 15 == 0) System.out.println("NOVA_DEBUG waitDrops g=" + dropGrace + " body=" + player.getPos() + " " + nearbyDrops(world));
         Box box = player.getBoundingBox().expand(8.0, 4.0, 8.0);
         for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
             if (!ignoredDrops.contains(e.getUuid())) {
