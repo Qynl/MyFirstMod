@@ -174,6 +174,15 @@ public final class Companion {
         setMode(Mode.MINE);
     }
 
+    /** Developer diagnostics; not shown to players. */
+    public String debugState() {
+        Vec3d v = player.getVelocity();
+        return String.format(Locale.ROOT,
+                "mode=%s pos=(%.2f,%.2f,%.2f) vel=(%.3f,%.3f,%.3f) onGround=%s hasPath=%s mineBlock=%s progress=%.3f mined=%d/%d failures=%d",
+                mode, player.getX(), player.getY(), player.getZ(), v.x, v.y, v.z, player.isOnGround(),
+                nav.hasPath(), mineBlock, mineProgress, mined, mineWanted, mineFailures);
+    }
+
     public String statusLine() {
         String what = switch (mode) {
             case FOLLOW -> "following you";
