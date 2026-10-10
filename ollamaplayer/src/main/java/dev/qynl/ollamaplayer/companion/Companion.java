@@ -520,7 +520,12 @@ public final class Companion {
         if (mineProgress >= 1.0F) {
             String id = blockId(st);
             boolean wasDig = digging;
+            BlockPos brokeAt = mineBlock;
             world.breakBlock(mineBlock, true, player);
+            if (!wasDig) {
+                System.out.println("NOVA_DEBUG broke " + id + " at " + brokeAt + " drops now: " + nearbyDrops(world)
+                        + " raw=" + countInv("raw_iron") + " mined=" + mined);
+            }
             if (!wasDig) mined++;
             digging = false;
             mineBlock = null;
