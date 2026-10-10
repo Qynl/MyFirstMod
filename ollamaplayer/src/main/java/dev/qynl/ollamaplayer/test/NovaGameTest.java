@@ -233,7 +233,8 @@ public class NovaGameTest implements FabricGameTest {
         Vec3d goal = ctx.getAbsolute(new Vec3d(9.5, 1, 5.5));
         companion.walkTo(BlockPos.ofFloored(goal));
 
-        run(ctx, companion, 500, () -> Math.hypot(body.getX() - goal.x, body.getZ() - goal.z) < 1.5,
+        // walkTo counts arrival within about 3 blocks; from x=2.5 that can only be reached by crossing the gap.
+        run(ctx, companion, 500, () -> Math.hypot(body.getX() - goal.x, body.getZ() - goal.z) < 3.5,
                 () -> "Companion did not bridge the gap. rel=" + relative(ctx, body.getPos()) + " goal=" + relative(ctx, goal)
                         + " status=" + companion.statusLine() + " inv=" + count(body, Items.COBBLESTONE));
     }
