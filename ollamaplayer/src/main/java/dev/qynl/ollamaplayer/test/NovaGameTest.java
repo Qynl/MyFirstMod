@@ -239,6 +239,32 @@ public class NovaGameTest implements FabricGameTest {
                         + " status=" + companion.statusLine() + " inv=" + count(body, Items.COBBLESTONE));
     }
 
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 20)
+    public void keepsBagAcrossSave(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaSave");
+        body.getInventory().insertStack(new ItemStack(Items.DIAMOND, 3));
+        body.getInventory().setStack(39, new ItemStack(Items.IRON_HELMET));
+        Companion companion = new Companion(body, msg -> { });
+        java.util.UUID owner = java.util.UUID.randomUUID();
+
+        dev.qynl.ollamaplayer.companion.CompanionStore.save(world.getServer(), companion, owner);
+        net.minecraft.nbt.NbtCompound saved = dev.qynl.ollamaplayer.companion.CompanionStore.read(world.getServer());
+        dev.qynl.ollamaplayer.companion.CompanionStore.delete(world.getServer());
+        if (saved == null) ctx.throwGameTestException("Nova's state was not written.");
+
+        NovaBody fresh = Companion.createPlayer(world, start, "NovaSaveB");
+        dev.qynl.ollamaplayer.companion.CompanionStore.restoreItems(world.getServer(), saved, fresh);
+        if (count(fresh, Items.DIAMOND) != 3) ctx.throwGameTestException("Bag did not come back: diamonds=" + count(fresh, Items.DIAMOND));
+        if (!fresh.getEquippedStack(EquipmentSlot.HEAD).isOf(Items.IRON_HELMET) && !fresh.getInventory().getStack(39).isOf(Items.IRON_HELMET)) {
+            ctx.throwGameTestException("Armor did not come back.");
+        }
+        if (!owner.equals(saved.getUuid("owner"))) ctx.throwGameTestException("Owner was not saved.");
+        ctx.complete();
+    }
+
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
     public void routesRequestsToActions(TestContext ctx) {

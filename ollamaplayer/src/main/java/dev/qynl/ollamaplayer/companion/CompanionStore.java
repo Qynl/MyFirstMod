@@ -52,9 +52,10 @@ public final class CompanionStore {
             for (int i = 0; i < inv.size(); i++) {
                 ItemStack stack = inv.getStack(i);
                 if (stack.isEmpty()) continue;
+                final int slot = i;
                 ItemStack.CODEC.encodeStart(ops, stack).result().ifPresent(el -> {
                     NbtCompound entry = new NbtCompound();
-                    entry.putInt("slot", items.size());
+                    entry.putInt("slot", slot);
                     entry.put("item", el);
                     items.add(entry);
                 });
