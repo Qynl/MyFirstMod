@@ -1,7 +1,7 @@
 # Ollama Player (Nova)
 
 A Fabric 1.21.1 mod that adds **Nova**, a server-side companion driven by a local [Ollama](https://ollama.com) model.
-Nova follows you, talks in chat, mines blocks, fights hostile mobs (and whatever hits you, but never another player), eats and cooks when hungry, picks up drops, crafts and smelts from a recipe planner, gears up, builds a shelter, places torches in caves, backs away from creepers, swims out of water, bridges one-block gaps and pillars straight up with cobblestone or dirt from its bag, shoots skeletons, pillagers, witches and blazes with a carried bow, and respawns after death.
+Nova follows you, talks in chat, mines blocks, fights hostile mobs (and whatever hits you, but never another player), eats and cooks when hungry, picks up drops, stashes bulk blocks in a chest when its bag is nearly full, keeps its best sword and pickaxe in the hotbar, crafts and smelts from a recipe planner, gears up, builds a shelter, places torches in caves, backs away from creepers, swims out of water, bridges one-block gaps and pillars straight up with cobblestone or dirt from its bag, shoots skeletons, pillagers, witches and blazes with a carried bow, and respawns after death.
 Nova's bag, armor, position, mode and owner are saved in the world folder (`ollamaplayer-companion.nbt`) every 30 seconds and when the server stops, so she comes back with her stuff after a restart. `/nova despawn` and death clear the save.
 If it dies, it walks back to where it fell to collect its drops (junk is dumped first to make room), then returns to you empty-handed.
 
