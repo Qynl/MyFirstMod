@@ -66,6 +66,7 @@ If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/
 ## Known limits
 
 - Pathfinding is local (range 36 blocks). It swims through water (slowly), bridges single air gaps at floor level and pillars straight up one block at a time when it carries cobblestone or dirt. It does not climb ladders or open doors, and it can still get stuck at the edge of a ledge it has pillared onto.
+- Nova stashes bulk blocks in chests but never takes them back out yet.
 - Nova is one companion per server. Her chat memory is not saved; only her body and bag are.
 - Shelters use cobblestone-like blocks from the bag; they are not sealed against every mob spawn rule.
 - Gametests run on a flat stone floor; real terrain (caves, lava lakes, nights) is only covered by playing with `gradle runClient`.
