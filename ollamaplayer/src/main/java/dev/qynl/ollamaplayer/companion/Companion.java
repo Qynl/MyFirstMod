@@ -607,7 +607,12 @@ public final class Companion {
                     p -> Math.hypot(p.getX() + 0.5 - ip.x, p.getZ() + 0.5 - ip.z)));
             replanTimer = 10;
         }
-        if (nav.tick(player, 0.13) != Navigator.Result.MOVING) {
+        Navigator.Result res = nav.tick(player, 0.13);
+        if (chaseTicks % 40 == 1) {
+            System.out.println("NOVA_DEBUG chase drop=" + target.getPos() + " body=" + player.getPos()
+                    + " res=" + res + " hasPath=" + nav.hasPath() + " chaseTicks=" + chaseTicks);
+        }
+        if (res != Navigator.Result.MOVING) {
             return false;
         }
         return true;
