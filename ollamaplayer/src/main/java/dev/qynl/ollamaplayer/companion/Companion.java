@@ -783,8 +783,8 @@ public final class Companion {
 
     /** Gives a freshly dropped stack a few ticks to be picked up before a step needs it. */
     private boolean waitForDrops(ServerWorld world) {
-        if (dropGrace >= 20) return false;
-        Box box = player.getBoundingBox().expand(3.0);
+        if (dropGrace >= 60) return false;
+        Box box = player.getBoundingBox().expand(8.0, 4.0, 8.0);
         for (ItemEntity e : world.getEntitiesByClass(ItemEntity.class, box, ItemEntity::isAlive)) {
             if (!ignoredDrops.contains(e.getUuid())) {
                 dropGrace++;
