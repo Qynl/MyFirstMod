@@ -454,7 +454,6 @@ public final class Companion {
         lastEnemyPos = enemy.getPos();
         double d = player.distanceTo(enemy);
         faceTo(enemy.getEyePos());
-        System.out.println("NOVA_DEBUG fight d=" + d + " " + enemy.getType());
         if (d >= 4.0 && tryShoot(enemy, world)) return;
         if (d > 2.6) {
             Vec3d ep = enemy.getPos();
@@ -495,7 +494,6 @@ public final class Companion {
                 || enemy instanceof net.minecraft.entity.mob.WitchEntity
                 || enemy instanceof net.minecraft.entity.mob.BlazeEntity;
         double d = player.distanceTo(enemy);
-        System.out.println("NOVA_DEBUG shoot ranged=" + ranged + " d=" + d + " bow=" + countInv("bow") + " arrows=" + countInv("arrow") + " see=" + player.canSee(enemy) + " hit=" + world.raycast(new net.minecraft.world.RaycastContext(player.getEyePos(), enemy.getEyePos(), net.minecraft.world.RaycastContext.ShapeType.COLLIDER, net.minecraft.world.RaycastContext.FluidHandling.NONE, player)).getBlockPos() + " eye=" + player.getEyePos() + " tgt=" + enemy.getEyePos());
         if (!ranged || d > 15.0 || countInv("bow") < 1 || countInv("arrow") < 1 || !player.canSee(enemy)) {
             return false;
         }

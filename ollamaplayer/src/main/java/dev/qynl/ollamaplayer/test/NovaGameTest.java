@@ -230,8 +230,9 @@ public class NovaGameTest implements FabricGameTest {
         // A pillager rather than a skeleton: skeletons burn in the daylight of the test world.
         net.minecraft.entity.mob.PillagerEntity skeleton = new net.minecraft.entity.mob.PillagerEntity(
                 net.minecraft.entity.EntityType.PILLAGER, world);
-        skeleton.refreshPositionAndAngles(ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).x,
-                ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).y, ctx.getAbsolute(new Vec3d(8.5, 1, 5.5)).z, 0, 0);
+        // Off the line of x=8 (a solid block sits at relative y=2 there), so the arrow has a clear path.
+        Vec3d mob = ctx.getAbsolute(new Vec3d(6.5, 1, 9.5));
+        skeleton.refreshPositionAndAngles(mob.x, mob.y, mob.z, 0, 0);
         skeleton.setAiDisabled(true);
         world.spawnEntity(skeleton);
 
