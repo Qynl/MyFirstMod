@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "ollamaplayer",
+  "version": "${version}",
+  "name": "Ollama Player",
+  "description": "A survival companion player driven by a local Ollama model. Talk to Nova, it follows you, mines, fights and eats.",
+  "authors": ["Qynl"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.qynl.ollamaplayer.OllamaPlayerMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
