@@ -278,12 +278,12 @@ public class NovaGameTest implements FabricGameTest {
             }
         }
         dev.qynl.ollamaplayer.brain.Reply ok = dev.qynl.ollamaplayer.brain.Reply.parse(
-                "{\\"say\\":\\"On it\\",\\"action\\":\\"craft\\",\\"target\\":\\"iron_pickaxe\\",\\"count\\":1}");
+                "{\"say\":\"On it\",\"action\":\"craft\",\"target\":\"iron_pickaxe\",\"count\":1}");
         if (!"craft".equals(ok.action()) || !"iron_pickaxe".equals(ok.target()) || ok.count() != 1) {
             ctx.throwGameTestException("valid JSON reply parsed wrong: " + ok);
         }
         dev.qynl.ollamaplayer.brain.Reply bogus = dev.qynl.ollamaplayer.brain.Reply.parse(
-                "{\\"say\\":\\"hi\\",\\"action\\":\\"fly\\"}");
+                "{\"say\":\"hi\",\"action\":\"fly\"}");
         if (!"none".equals(bogus.action())) ctx.throwGameTestException("unknown action was not rejected: " + bogus);
         dev.qynl.ollamaplayer.brain.Reply plain = dev.qynl.ollamaplayer.brain.Reply.parse("Sure thing, friend.");
         if (!"none".equals(plain.action()) || !plain.say().startsWith("Sure")) {
