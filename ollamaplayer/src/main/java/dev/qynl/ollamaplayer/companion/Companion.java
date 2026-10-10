@@ -20,6 +20,8 @@ import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.raid.RaiderEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
@@ -1405,11 +1407,13 @@ public final class Companion {
         Box box = player.getBoundingBox().expand(range);
         LivingEntity best = null;
         double bestDist = Double.MAX_VALUE;
-        for (HostileEntity h : world.getEntitiesByClass(HostileEntity.class, box, LivingEntity::isAlive)) {
-            double d = player.squaredDistanceTo(h);
+        // Raiders (pillagers, witches, vindicators) are not HostileEntity subclasses, so check both.
+        for (MobEntity m : world.getEntitiesByClass(MobEntity.class, box, LivingEntity::isAlive)) {
+            if (!(m instanceof HostileEntity || m instanceof RaiderEntity)) continue;
+            double d = player.squaredDistanceTo(m);
             if (d < bestDist) {
                 bestDist = d;
-                best = h;
+                best = m;
             }
         }
         return best;
