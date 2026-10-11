@@ -62,7 +62,7 @@ If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/
 - `brain/` - Ollama chat, reply parsing, heuristics fallback.
 - `ollama/OllamaClient.java` - model discovery (`/api/tags`) and chat (`/api/chat`).
 - `craft/Recipes.java`, `craft/Planner.java` - the recipe table and a backward planner. Asking for an item expands it into steps: gather raw materials, smelt, craft at a table, place stations.
-- `test/NovaGameTest.java` - Fabric GameTests that run headless: mining a log, crafting at a table, smelting with a placed furnace, wearing armor, mining iron, the full ore-to-iron-pickaxe loop, building a shelter, swimming out of water, and cooking beef instead of eating it raw. Run with `gradle runGameTest`.
+- `test/NovaGameTest.java` - Fabric GameTests that run headless: mining a log, crafting at a table, smelting with a placed furnace, wearing armor, mining iron, the full ore-to-iron-pickaxe loop, building a shelter, swimming out of water, cooking beef instead of eating it raw, routing chat requests to actions, bridging a one-block gap, pillaring two blocks up in open air, moving a sword into the hotbar, and stashing bulk blocks in a chest and taking them back out. Run with `gradle runGameTest`.
 
 ## Known limits
 
