@@ -19,6 +19,9 @@ public final class Metrics {
     private long llmFailures;
     private double llmLatencyEmaMs = -1;
 
+    private final Deque<Long> visionStarts = new ArrayDeque<>();
+    private long visionTotal;
+
     private double tickEmaMs = -1;
     private double tickMaxMs;
     private double pathEmaMs = -1;
@@ -33,6 +36,17 @@ public final class Metrics {
         if (failed) llmFailures++;
         double ms = durationNanos / 1e6;
         llmLatencyEmaMs = llmLatencyEmaMs < 0 ? ms : llmLatencyEmaMs * 0.8 + ms * 0.2;
+    }
+
+    public synchronized void visionSent(long now) {
+        visionTotal++;
+        visionStarts.addLast(now);
+        while (!visionStarts.isEmpty() && now - visionStarts.peekFirst() > WINDOW_NANOS) visionStarts.pollFirst();
+    }
+
+    public synchronized int visionPerMinute(long now) {
+        while (!visionStarts.isEmpty() && now - visionStarts.peekFirst() > WINDOW_NANOS) visionStarts.pollFirst();
+        return visionStarts.size();
     }
 
     /** Server thread: time spent in one companion tick. */
@@ -56,8 +70,9 @@ public final class Metrics {
     public synchronized String summary(long now) {
         prune(now);
         return String.format(Locale.ROOT,
-                "[Cost: LLM %d/min, %d total, %d failed, avg %.1fs; tick %.2f ms avg, %.2f ms max; path %.2f ms avg]",
+                "[Cost: LLM %d/min, %d total, %d failed, avg %.1fs; vision %d/min, %d total; tick %.2f ms avg, %.2f ms max; path %.2f ms avg]",
                 llmStarts.size(), llmTotal, llmFailures, llmLatencyEmaMs < 0 ? 0 : llmLatencyEmaMs / 1000.0,
+                visionStarts.size(), visionTotal,
                 tickEmaMs < 0 ? 0 : tickEmaMs, tickMaxMs, pathEmaMs < 0 ? 0 : pathEmaMs);
     }
 

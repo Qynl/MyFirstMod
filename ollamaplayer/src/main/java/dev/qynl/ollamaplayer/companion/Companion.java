@@ -177,6 +177,20 @@ public final class Companion {
         }
         // Player relationship: if the owner is badly hurt and Nova is too, restock first rather than
         // blindly following into the fight.
+        // New area: a long move away from where Nova last looked around. Event only, never a timer.
+        if (++areaTimer >= 40) {
+            areaTimer = 0;
+            int cx = player.getBlockX() >> 4;
+            int cz = player.getBlockZ() >> 4;
+            if (areaX == Integer.MIN_VALUE) {
+                areaX = cx;
+                areaZ = cz;
+            } else if (Math.abs(cx - areaX) >= 4 || Math.abs(cz - areaZ) >= 4) {
+                areaX = cx;
+                areaZ = cz;
+                event("NEW_AREA");
+            }
+        }
         if (ownerDangerTimer > 0) ownerDangerTimer--;
         if (owner != null && owner.getHealth() < 8 && player.getHealth() < 8 && ownerDangerTimer == 0) {
             say.accept("I'm too low on health to keep up. I'll restock and catch up.");
@@ -371,6 +385,9 @@ public final class Companion {
     }
 
     private int ownerDangerTimer;
+    private int areaX = Integer.MIN_VALUE;
+    private int areaZ = Integer.MIN_VALUE;
+    private int areaTimer;
 
     /** Events the strategist may want to hear about, drained by the brain. Capped so nothing grows unbounded. */
     private final java.util.ArrayDeque<String> events = new java.util.ArrayDeque<>();

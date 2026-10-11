@@ -440,6 +440,28 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
+    /** Pictures are event-only, opt-in, rate-limited, and the rendered terrain is a real PNG. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void visionIsEventDrivenAndRateLimited(TestContext ctx) {
+        dev.qynl.ollamaplayer.vision.VisionGate g = new dev.qynl.ollamaplayer.vision.VisionGate(60_000_000_000L);
+        if (g.allow("NEW_AREA", false, 0)) ctx.throwGameTestException("vision sent while disabled");
+        if (g.allow("HURT", true, 0)) ctx.throwGameTestException("vision sent for a non-area event");
+        if (!g.allow("NEW_AREA", true, 0)) ctx.throwGameTestException("enabled area event was blocked");
+        if (g.allow("NEW_AREA", true, 30_000_000_000L)) ctx.throwGameTestException("vision was not rate limited");
+        if (!g.allow("NEW_AREA", true, 61_000_000_000L)) ctx.throwGameTestException("vision gap did not reopen");
+
+        try {
+            String b64 = dev.qynl.ollamaplayer.vision.Minimap.renderBase64(ctx.getWorld(), ctx.getAbsolute(new BlockPos(2, 2, 2)));
+            byte[] png = java.util.Base64.getDecoder().decode(b64);
+            if (png.length < 100 || png[1] != 'P' || png[2] != 'N' || png[3] != 'G') {
+                ctx.throwGameTestException("minimap did not render a PNG");
+            }
+        } catch (java.io.IOException e) {
+            ctx.throwGameTestException("minimap failed: " + e.getMessage());
+        }
+        ctx.complete();
+    }
+
     private static void using(TestContext ctx, String label, Dev.Tac t,
                               dev.qynl.ollamaplayer.companion.Tactics.Stance want) {
         dev.qynl.ollamaplayer.companion.Tactics.Stance got = dev.qynl.ollamaplayer.companion.Tactics.decide(t.s());

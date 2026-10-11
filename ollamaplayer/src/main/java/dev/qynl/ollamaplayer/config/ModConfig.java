@@ -23,6 +23,8 @@ public final class ModConfig {
     public String model = "auto";
     public long ollamaMaxModelBytes = 14_000_000_000L;
     public boolean useLlm = true;
+    /** Send a rendered terrain picture to the model when Nova enters a new area. Needs a vision-capable model. */
+    public boolean useVision = false;
     public int numCtx = 4096;
     public int timeoutSeconds = 30;
     public String companionName = "Nova";

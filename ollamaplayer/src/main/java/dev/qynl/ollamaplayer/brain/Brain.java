@@ -36,6 +36,8 @@ public final class Brain {
 
     private final Metrics metrics = Metrics.SHARED;
     private final Strategist strategist = new Strategist(this::strategyPort, 30_000_000_000L, Metrics.SHARED);
+    private final dev.qynl.ollamaplayer.vision.VisionGate visionGate =
+            new dev.qynl.ollamaplayer.vision.VisionGate(60_000_000_000L);
     /** Idle thoughts are never sent closer together than this, whatever the timer says. */
     private static final long IDLE_MIN_GAP_NANOS = 10_000_000_000L;
     private long lastRequestNanos;
@@ -100,7 +102,18 @@ public final class Brain {
         JsonObject usr = new JsonObject();
         usr.addProperty("role", "user");
         usr.addProperty("content", "Event: " + trigger + "\nYour state:\n" + c.describe(owner));
-        strategist.consider(List.of(sys, usr), System.nanoTime());
+        long now = System.nanoTime();
+        if (visionGate.allow(trigger, ModConfig.get().useVision, now)) {
+            try {
+                com.google.gson.JsonArray images = new com.google.gson.JsonArray();
+                images.add(dev.qynl.ollamaplayer.vision.Minimap.renderBase64(c.player().getServerWorld(), c.player().getBlockPos()));
+                usr.add("images", images);
+                metrics.visionSent(now);
+            } catch (java.io.IOException | RuntimeException e) {
+                OllamaPlayerMod.LOGGER.info("Vision picture skipped: {}", e.getMessage());
+            }
+        }
+        strategist.consider(List.of(sys, usr), now);
     }
 
     /** Server thread. Applies finished replies and fires idle chatter. */
