@@ -371,7 +371,7 @@ public class NovaGameTest implements FabricGameTest {
     public void decisionsAndMiningTripsAreValidated(TestContext ctx) {
         dev.qynl.ollamaplayer.brain.Decision d = dev.qynl.ollamaplayer.brain.Decision.parse(
                 "{\"decision\":\"mine\",\"reason\":\"iron nearby\",\"priority\":0.78,\"next_steps\":[\"mine\",\"bogus\"]}");
-        if (!d.name().equals("MINE") || d.priority() != 0.78 || !d.steps().equals(List.of("mine"))
+        if (!d.name().equals("MINE") || d.priority() != 0.78 || !d.steps().isEmpty()
                 || !d.toAction().equals("mine")) {
             ctx.throwGameTestException("valid decision parsed wrong: " + d);
         }
@@ -463,6 +463,123 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
+    /** Multi-step plans run in order, verify each step, and clear themselves on failure. Pure logic. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void stepQueueRunsVerifiesAndFailsCleanly(TestContext ctx) {
+        List<String> ran = new java.util.ArrayList<>();
+        dev.qynl.ollamaplayer.companion.StepQueue q = new dev.qynl.ollamaplayer.companion.StepQueue();
+        q.set(List.of("eat", "stash", "follow"));
+        dev.qynl.ollamaplayer.companion.StepQueue.Executor ok = new dev.qynl.ollamaplayer.companion.StepQueue.Executor() {
+            public dev.qynl.ollamaplayer.companion.StepQueue.Result start(String step) {
+                ran.add(step);
+                return dev.qynl.ollamaplayer.companion.StepQueue.Result.DONE;
+            }
+            public boolean succeeded(String step) { return true; }
+        };
+        int guard = 0;
+        while (q.tick(ok, false) != dev.qynl.ollamaplayer.companion.StepQueue.Result.DONE && guard++ < 10) { }
+        if (!ran.equals(List.of("eat", "stash", "follow")) || q.active()) {
+            ctx.throwGameTestException("steps did not run in order: " + ran);
+        }
+
+        // A long step keeps the queue waiting while the body is busy, then verifies it.
+        ran.clear();
+        q.set(List.of("gear", "stay"));
+        boolean[] busy = {true};
+        boolean[] verified = {false};
+        dev.qynl.ollamaplayer.companion.StepQueue.Executor longStep = new dev.qynl.ollamaplayer.companion.StepQueue.Executor() {
+            public dev.qynl.ollamaplayer.companion.StepQueue.Result start(String step) {
+                ran.add(step);
+                return "gear".equals(step) ? dev.qynl.ollamaplayer.companion.StepQueue.Result.RUNNING
+                        : dev.qynl.ollamaplayer.companion.StepQueue.Result.DONE;
+            }
+            public boolean succeeded(String step) { return verified[0] || !"gear".equals(step); }
+        };
+        q.tick(longStep, busy[0]);
+        q.tick(longStep, busy[0]);
+        if (ran.size() != 1) ctx.throwGameTestException("a busy body must not get the next step: " + ran);
+        busy[0] = false;
+        verified[0] = true;
+        q.tick(longStep, false);
+        if (!ran.equals(List.of("gear", "stay"))) ctx.throwGameTestException("next step did not follow a verified step: " + ran);
+
+        // A step that does not verify clears the rest of the queue, so the caller can replan.
+        q.set(List.of("gear", "stay"));
+        dev.qynl.ollamaplayer.companion.StepQueue.Executor unverified = new dev.qynl.ollamaplayer.companion.StepQueue.Executor() {
+            public dev.qynl.ollamaplayer.companion.StepQueue.Result start(String step) {
+                return dev.qynl.ollamaplayer.companion.StepQueue.Result.RUNNING;
+            }
+            public boolean succeeded(String step) { return false; }
+        };
+        q.tick(unverified, true);
+        if (q.tick(unverified, false) != dev.qynl.ollamaplayer.companion.StepQueue.Result.FAILED || q.active()) {
+            ctx.throwGameTestException("an unverified step did not fail the plan");
+        }
+
+        // A step that cannot start fails at once.
+        q.set(List.of("eat", "stay"));
+        if (q.tick(new dev.qynl.ollamaplayer.companion.StepQueue.Executor() {
+            public dev.qynl.ollamaplayer.companion.StepQueue.Result start(String step) {
+                return dev.qynl.ollamaplayer.companion.StepQueue.Result.FAILED;
+            }
+            public boolean succeeded(String step) { return true; }
+        }, false) != dev.qynl.ollamaplayer.companion.StepQueue.Result.FAILED || q.active()) {
+            ctx.throwGameTestException("a failed start did not clear the plan");
+        }
+        ctx.complete();
+    }
+
+    /** Combat judgement for multiple enemies, ranged enemies, and protecting the owner. Pure logic. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void combatJudgementCoversGroupsRangedAndProtection(TestContext ctx) {
+        dev.qynl.ollamaplayer.companion.Tactics.Situation many = new dev.qynl.ollamaplayer.companion.Tactics.Situation(
+                "zombie", 3, 5, 14, true, 4, false, -1, 0, false, -1);
+        if (dev.qynl.ollamaplayer.companion.Tactics.decide(many) != dev.qynl.ollamaplayer.companion.Tactics.Stance.RETREAT) {
+            ctx.throwGameTestException("five zombies at low health should make Nova retreat");
+        }
+        dev.qynl.ollamaplayer.companion.Tactics.Situation ranged = new dev.qynl.ollamaplayer.companion.Tactics.Situation(
+                "skeleton", 2, 1, 20, false, 0, false, 5, 0, false, -1);
+        if (dev.qynl.ollamaplayer.companion.Tactics.decide(ranged) != dev.qynl.ollamaplayer.companion.Tactics.Stance.AVOID) {
+            ctx.throwGameTestException("a close skeleton with no sword should be avoided, not charged");
+        }
+        dev.qynl.ollamaplayer.companion.Tactics.Situation weakNoProtect = new dev.qynl.ollamaplayer.companion.Tactics.Situation(
+                "zombie", 6, 2, 12, true, 4, false, 6, 0, false, -1);
+        if (dev.qynl.ollamaplayer.companion.Tactics.decide(weakNoProtect) == dev.qynl.ollamaplayer.companion.Tactics.Stance.FIGHT) {
+            ctx.throwGameTestException("two zombies far from a safe owner should not be a fight by default");
+        }
+        dev.qynl.ollamaplayer.companion.Tactics.Situation protect = new dev.qynl.ollamaplayer.companion.Tactics.Situation(
+                "zombie", 6, 2, 12, true, 4, false, 6, 0, true, 2);
+        if (dev.qynl.ollamaplayer.companion.Tactics.decide(protect) != dev.qynl.ollamaplayer.companion.Tactics.Stance.FIGHT) {
+            ctx.throwGameTestException("a threat next to an endangered owner should be fought");
+        }
+        dev.qynl.ollamaplayer.companion.Tactics.Situation protectButLow = new dev.qynl.ollamaplayer.companion.Tactics.Situation(
+                "zombie", 2, 2, 6, true, 4, false, 4, 0, true, 2);
+        if (dev.qynl.ollamaplayer.companion.Tactics.decide(protectButLow) != dev.qynl.ollamaplayer.companion.Tactics.Stance.RETREAT) {
+            ctx.throwGameTestException("at low health Nova must still retreat even to protect the owner");
+        }
+        ctx.complete();
+    }
+
+    /** The compact world state reports risk and stays small however busy the world is. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void worldStateIsCompactAndReportsRisk(TestContext ctx) {
+        dev.qynl.ollamaplayer.companion.WorldState.Facts calm = new dev.qynl.ollamaplayer.companion.WorldState.Facts(
+                20, 18, 4, 0.9, 0.2, 12, false, false, 5, 0, 3, null, "follow");
+        dev.qynl.ollamaplayer.companion.WorldState.Facts hurt = new dev.qynl.ollamaplayer.companion.WorldState.Facts(
+                6, 10, 1, 0.3, 0.5, 2, true, true, 40, 4, 30, "get iron", "mine");
+        if (dev.qynl.ollamaplayer.companion.WorldState.risk(calm) != dev.qynl.ollamaplayer.companion.WorldState.Risk.LOW) {
+            ctx.throwGameTestException("calm state should be low risk");
+        }
+        if (dev.qynl.ollamaplayer.companion.WorldState.risk(hurt) != dev.qynl.ollamaplayer.companion.WorldState.Risk.HIGH) {
+            ctx.throwGameTestException("hurt state with enemies should be high risk");
+        }
+        String text = dev.qynl.ollamaplayer.companion.WorldState.render(hurt);
+        if (!text.contains("Risk: HIGH") || !text.contains("Goal: get iron") || text.length() > 600) {
+            ctx.throwGameTestException("world state missing sections or too long: " + text.length());
+        }
+        ctx.complete();
+    }
+
     private static void using(TestContext ctx, String label, Dev.Tac t,
                               dev.qynl.ollamaplayer.companion.Tactics.Stance want) {
         dev.qynl.ollamaplayer.companion.Tactics.Stance got = dev.qynl.ollamaplayer.companion.Tactics.decide(t.s());
@@ -478,7 +595,7 @@ public class NovaGameTest implements FabricGameTest {
         }
 
         static Tac tac(String type, double dist, int count, float hp, boolean sword, int armor, double ownerDist, int bonus) {
-            return new Tac(new dev.qynl.ollamaplayer.companion.Tactics.Situation(type, dist, count, hp, sword, armor, false, ownerDist, bonus));
+            return new Tac(new dev.qynl.ollamaplayer.companion.Tactics.Situation(type, dist, count, hp, sword, armor, false, ownerDist, bonus, false, -1));
         }
     }
 

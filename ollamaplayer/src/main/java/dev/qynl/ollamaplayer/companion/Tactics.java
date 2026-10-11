@@ -17,7 +17,8 @@ public final class Tactics {
     /** Snapshot of the fight, all plain numbers. */
     public record Situation(String enemyType, double enemyDistance, int enemyCount, float health,
                             boolean hasSword, int armorPieces, boolean hasShield,
-                            double ownerDistance, int retreatBonus) {}
+                            double ownerDistance, int retreatBonus,
+                            boolean ownerInDanger, double enemyOwnerDistance) {}
 
     /** Rough threat of one mob of this type, 0..10. */
     public static double threat(String enemyType) {
@@ -54,6 +55,10 @@ public final class Tactics {
 
         if (s.health() <= retreatHealth(s.retreatBonus())) {
             return Stance.RETREAT;
+        }
+        // Protect the owner: a threat close to a player who is in trouble is fought, not avoided.
+        if (s.ownerInDanger() && s.enemyOwnerDistance() >= 0 && s.enemyOwnerDistance() <= 4.0) {
+            return Stance.FIGHT;
         }
         if (score >= 0) return Stance.FIGHT;
         // Too dangerous to trade; AVOID and RETREAT both fall back to the owner when there is one.

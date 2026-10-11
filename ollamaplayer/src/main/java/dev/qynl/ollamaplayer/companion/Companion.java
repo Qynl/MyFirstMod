@@ -245,6 +245,7 @@ public final class Companion {
             lastEnemyPos = null;
         }
 
+        runSteps();
         if (mode != Mode.STAY && collectDrops(world)) {
             return;
         }
@@ -489,9 +490,7 @@ public final class Companion {
     public String describe(@Nullable ServerPlayerEntity owner) {
         ServerWorld world = player.getServerWorld();
         StringBuilder sb = new StringBuilder();
-        sb.append("- Health ").append(Math.round(player.getHealth())).append("/20, food ")
-                .append(player.getHungerManager().getFoodLevel()).append("/20.\n");
-        sb.append("- Current task: ").append(statusLine()).append('\n');
+        sb.append(WorldState.render(worldFacts(world, owner))).append('\n');
         ItemStack held = player.getMainHandStack();
         sb.append("- Holding: ").append(held.isEmpty() ? "nothing" : held.getName().getString()).append(".\n");
         sb.append("- Inventory: ").append(inventorySummary()).append(".\n");
@@ -500,20 +499,71 @@ public final class Companion {
         if (!lessons.isEmpty()) sb.append("- Lessons learned: ").append(String.join("; ", lessons)).append(".\n");
         sb.append("- Stash chest: ").append(stashPos == null ? "none yet"
                 : "at " + stashPos.toShortString() + ", " + Math.round(Math.sqrt(player.getBlockPos().getSquaredDistance(stashPos))) + " blocks away").append(".\n");
-        LivingEntity enemy = nearestEnemy(world, 16);
-        sb.append("- Hostile mobs nearby: ").append(enemy == null ? "none"
-                : Registries.ENTITY_TYPE.getId(enemy.getType()).getPath() + " about "
-                + Math.round(player.distanceTo(enemy)) + " blocks away").append(".\n");
         sb.append("- Blocks around you: ").append(nearbyBlocks(world)).append(".\n");
-        if (owner == null) {
-            sb.append("- Your owner is not online.\n");
-        } else {
-            sb.append("- Your owner ").append(owner.getName().getString()).append(" is ")
-                    .append(Math.round(player.distanceTo(owner))).append(" blocks away.\n");
+        if (owner == null) sb.append("- Your owner is not online.\n");
+        return sb.toString();
+    }
+
+    /** The plain facts the compact world state is built from. Read on demand, never per tick. */
+    private WorldState.Facts worldFacts(ServerWorld world, @Nullable ServerPlayerEntity owner) {
+        int armor = 0;
+        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST,
+                EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+            if (!player.getEquippedStack(slot).isEmpty()) armor++;
+        }
+        int hostiles = world.getEntitiesByClass(net.minecraft.entity.mob.HostileEntity.class,
+                player.getBoundingBox().expand(16), LivingEntity::isAlive).size();
+        int valuable = 0;
+        BlockPos base = player.getBlockPos();
+        for (BlockPos p : BlockPos.iterate(base.add(-4, -4, -4), base.add(4, 4, 4))) {
+            if (world.getBlockState(p).getBlock().getTranslationKey().endsWith("_ore")) valuable++;
         }
         long t = world.getTimeOfDay() % 24000L;
-        sb.append("- It is ").append(t >= 13000 && t < 23000 ? "night" : "day").append(".\n");
-        return sb.toString();
+        return new WorldState.Facts(player.getHealth(), player.getHungerManager().getFoodLevel(), armor,
+                bestPickaxeFraction(), bagFraction(), countInv("torch"),
+                t >= 13000 && t < 23000, !world.isSkyVisible(base),
+                owner == null ? -1.0 : player.distanceTo(owner), hostiles, valuable,
+                planGoal, mode.name().toLowerCase(java.util.Locale.ROOT));
+    }
+
+    private final StepQueue steps = new StepQueue();
+
+    /** A model decision's short list of steps. Replaces any earlier list that is still running. */
+    public void setSteps(java.util.List<String> list) {
+        steps.set(list);
+    }
+
+    private boolean planBusy() {
+        return !plan.isEmpty() || planMining || planGoal != null;
+    }
+
+    /** Runs queued decision steps one at a time, only while the body is free. A failure asks the strategist. */
+    private void runSteps() {
+        if (!steps.active()) return;
+        StepQueue.Result r = steps.tick(new StepQueue.Executor() {
+            @Override
+            public StepQueue.Result start(String step) {
+                return switch (step) {
+                    case "eat" -> eatFood() ? StepQueue.Result.DONE : StepQueue.Result.FAILED;
+                    case "stash", "follow", "stay" -> {
+                        command(step, null, 0);
+                        yield StepQueue.Result.DONE;
+                    }
+                    case "gear" -> {
+                        command("gear", null, 0);
+                        yield StepQueue.Result.RUNNING;
+                    }
+                    default -> StepQueue.Result.FAILED;
+                };
+            }
+
+            @Override
+            public boolean succeeded(String step) {
+                // Gear is verified by its goal having finished without being abandoned.
+                return !"gear".equals(step) || planGoal == null;
+            }
+        }, planBusy());
+        if (r == StepQueue.Result.FAILED) event("STEP_FAILED");
     }
 
     // ------------------------------------------------------------------ behaviours
@@ -566,11 +616,13 @@ public final class Companion {
         ItemStack hand = player.getMainHandStack();
         boolean sword = hand.getItem() instanceof net.minecraft.item.SwordItem || hand.getItem() instanceof net.minecraft.item.AxeItem;
         int retreatBonus = Math.min(3, experience.count(Experience.RETREAT_EARLY));
+        boolean ownerInDanger = owner != null && owner.getHealth() < 10 && owner.age - owner.getLastAttackedTime() < 100;
         return new Tactics.Situation(
                 Registries.ENTITY_TYPE.getId(enemy.getType()).getPath(),
                 player.distanceTo(enemy), Math.max(1, enemies), player.getHealth(),
                 sword, armor, player.getOffHandStack().getItem() instanceof ShieldItem,
-                owner == null ? -1.0 : player.distanceTo(owner), retreatBonus);
+                owner == null ? -1.0 : player.distanceTo(owner), retreatBonus,
+                ownerInDanger, owner == null ? -1.0 : enemy.distanceTo(owner));
     }
 
     private void fight(LivingEntity enemy, ServerWorld world) {

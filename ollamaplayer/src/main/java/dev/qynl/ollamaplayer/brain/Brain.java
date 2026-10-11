@@ -123,9 +123,15 @@ public final class Brain {
             while ((ev = c.pollEvent()) != null) onEvent(ev, c, owner);
             Decision d = strategist.takeLatest();
             // Only confident, body-safe decisions are applied. Mining needs a target, so it is not auto-applied.
-            if (d != null && d.priority() >= 0.7 && !"none".equals(d.toAction()) && !"mine".equals(d.toAction())) {
-                String note = c.command(d.toAction(), null, 0);
-                if (note != null) manager.speak(note);
+            if (d != null && d.priority() >= 0.7) {
+                if (!d.steps().isEmpty()) {
+                    // A short plan: run the steps in order, each verified before the next starts.
+                    c.setSteps(d.steps());
+                    if (!d.reason().isBlank()) manager.speak(d.reason());
+                } else if (!"none".equals(d.toAction()) && !"mine".equals(d.toAction())) {
+                    String note = c.command(d.toAction(), null, 0);
+                    if (note != null) manager.speak(note);
+                }
             }
         }
 

@@ -18,7 +18,7 @@ import java.util.Set;
 public record Decision(String name, String reason, double priority, List<String> steps) {
     public static final Set<String> NAMES = Set.of("NONE", "FOLLOW", "HOLD", "MINE", "RESTOCK", "FIGHT",
             "RETREAT", "CRAFT_GEAR", "EXPLORE_CAVE", "RETURN_HOME");
-    public static final Set<String> STEPS = Set.of("eat", "stash", "craft", "mine", "follow", "stay", "gear");
+    public static final Set<String> STEPS = Set.of("eat", "stash", "follow", "stay", "gear");
     public static final Decision SAFE = new Decision("NONE", "", 0.0, List.of());
 
     public static Decision parse(String content) {
