@@ -118,6 +118,10 @@ Everything the mod does is scriptable - all commands are under `/race`:
 /race drift                   current drift score and boost charge
 ```
 
+The building commands (`/race wand`, `/race place`, `/race remove`) need
+creative mode or operator rights because they place blocks; everything else
+works for every player.
+
 ---
 
 ## Making a circuit in 30 seconds

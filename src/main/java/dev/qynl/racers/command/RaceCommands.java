@@ -86,8 +86,10 @@ public final class RaceCommands {
                         // --- tracks -------------------------------------------
                         .then(CommandManager.literal("tracks").executes(context -> listTracks(context.getSource())))
                         .then(CommandManager.literal("wand")
+                                .requires(RaceCommands::canBuild)
                                 .executes(context -> giveWand(context.getSource())))
                         .then(CommandManager.literal("place")
+                                .requires(RaceCommands::canBuild)
                                 .then(CommandManager.argument("track", StringArgumentType.word())
                                         .suggests(TRACKS)
                                         .executes(context -> place(context.getSource(),
@@ -97,6 +99,7 @@ public final class RaceCommands {
                                                         StringArgumentType.getString(context, "track"),
                                                         IntegerArgumentType.getInteger(context, "rotation"))))))
                         .then(CommandManager.literal("remove")
+                                .requires(RaceCommands::canBuild)
                                 .executes(context -> remove(context.getSource())))
                         .then(CommandManager.literal("record")
                                 .executes(context -> record(context.getSource(), 7, true))
@@ -208,6 +211,12 @@ public final class RaceCommands {
         source.sendFeedback(() -> Text.translatable("message.fabricracers.car_given",
                 carType.displayName).formatted(Formatting.GREEN), false);
         return 1;
+    }
+
+    /** Building circuits edits the world, so it needs creative mode or operator rights. */
+    private static boolean canBuild(ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        return source.hasPermissionLevel(2) || (player != null && player.isCreative());
     }
 
     private static int giveWand(ServerCommandSource source) {
