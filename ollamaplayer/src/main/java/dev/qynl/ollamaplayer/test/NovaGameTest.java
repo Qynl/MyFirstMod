@@ -451,7 +451,8 @@ public class NovaGameTest implements FabricGameTest {
         if (!g.allow("NEW_AREA", true, 61_000_000_000L)) ctx.throwGameTestException("vision gap did not reopen");
 
         try {
-            String b64 = dev.qynl.ollamaplayer.vision.Minimap.renderBase64(ctx.getWorld(), ctx.getAbsolute(new BlockPos(2, 2, 2)));
+            String b64 = dev.qynl.ollamaplayer.vision.Minimap.renderBase64(ctx.getWorld(),
+                    BlockPos.ofFloored(ctx.getAbsolute(Vec3d.ofCenter(new BlockPos(2, 2, 2)))));
             byte[] png = java.util.Base64.getDecoder().decode(b64);
             if (png.length < 100 || png[1] != 'P' || png[2] != 'N' || png[3] != 'G') {
                 ctx.throwGameTestException("minimap did not render a PNG");
