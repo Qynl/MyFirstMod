@@ -463,6 +463,37 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
+    /** A model decision's steps reach the real body, and a failed step raises the event the strategist hears. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 400)
+    public void decisionStepsRunThroughTheBody(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaSteps");
+        Companion companion = new Companion(body, msg -> {});
+        companion.setSteps(List.of("stay"));
+        run(ctx, companion, 300, () -> companion.mode() == Companion.Mode.STAY,
+                () -> "decision step did not reach the body, mode=" + companion.mode());
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 400)
+    public void failedDecisionStepRaisesAnEvent(TestContext ctx) {
+        ServerWorld world = ctx.getWorld();
+        floor(ctx);
+        Vec3d start = ctx.getAbsolute(Vec3d.ofBottomCenter(new BlockPos(2, 1, 5)));
+        NovaBody body = Companion.createPlayer(world, start, "NovaFail");
+        Companion companion = new Companion(body, msg -> {});
+        companion.setSteps(List.of("eat", "stay"));   // nothing edible in the bag: the step must fail
+        AtomicBoolean sawFailure = new AtomicBoolean();
+        run(ctx, companion, 300, () -> {
+            String ev;
+            while ((ev = companion.pollEvent()) != null) {
+                if (ev.equals("STEP_FAILED")) sawFailure.set(true);
+            }
+            return sawFailure.get();
+        }, () -> "a failed decision step did not raise STEP_FAILED");
+    }
+
     /** Multi-step plans run in order, verify each step, and clear themselves on failure. Pure logic. */
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
     public void stepQueueRunsVerifiesAndFailsCleanly(TestContext ctx) {
