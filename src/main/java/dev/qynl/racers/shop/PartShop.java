@@ -27,6 +27,7 @@ public final class PartShop {
     }
 
     public static void init() {
+        dev.qynl.racers.FabricRacers.LOGGER.info("Registering racing villager trades");
         // --- tier 1: starter parts and building blocks -------------------
         TradeOfferHelper.registerVillagerOffers(VillagerProfession.TOOLSMITH, 1, factories -> {
             factories.add(buy(ModItems.partItem(Tune.TIRES), 2, 9, 8));
@@ -66,6 +67,8 @@ public final class PartShop {
             factories.add(buy(ModItems.BLOCK_BOOST_PAD_ITEM, 4, 22, 5));
             factories.add(PartShop::carOffer);
         });
+        dev.qynl.racers.FabricRacers.LOGGER.info("Racing trades hooked: {} part systems, {} stock cars",
+                Tune.values().length, CarType.stock().size());
     }
 
     /** A plain "give emeralds, get item" trade. */

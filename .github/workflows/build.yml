@@ -156,6 +156,9 @@ jobs:
               'summon fabricracers:player_car 6 6 0 {CarData:{type:"f1",levels:[I;1,1,0,0,0,0,0]}}',
               'data get entity @e[type=fabricracers:player_car,limit=1] CarData',
               'kill @e[type=fabricracers:player_car]',
+              'summon minecraft:villager 8 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:1}}',
+              'data get entity @e[type=minecraft:villager,limit=1] Offers',
+              'kill @e[type=minecraft:villager]',
               'summon minecraft:villager 8 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:3}}',
               'data get entity @e[type=minecraft:villager,limit=1] Offers',
               'kill @e[type=minecraft:villager]',
@@ -191,12 +194,12 @@ jobs:
               'car NBT applied on spawn': bool(summon_line) and 'Sport' not in summon_line,
               'entity data read': 'CarData' in transcript and 'type: "f1"' in transcript,
               'tuning levels round-trip': 'levels: [I; 1, 1' in transcript,
-              'toolsmith sells parts': 'fabricracers:' in transcript and 'Offers' in transcript,
+              'toolsmith sells parts': 'fabricracers:engine_turbo' in transcript,
           }
           failed = [name for name, good in checks.items() if not good]
           head = 'server started' if started else "SERVER NEVER REACHED 'Done'"
           lines = [f"{'ok  ' if good else 'FAIL'} {name}" for name, good in checks.items()]
-          body = head + '\n' + '\n'.join(lines) + '\n--- transcript ---\n' + transcript[-2500:]
+          body = head + '\n' + '\n'.join(lines) + '\n--- transcript ---\n' + transcript[-7000:]
           esc = body.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
           print(f"::{'notice' if started and not failed else 'error'} title=Server smoke test::{esc}")
           if not started or failed:
