@@ -189,7 +189,7 @@ public final class RacerBlocks {
 
     public static Settings barrier() {
         return Block.Settings.create().strength(2.5F, 12.0F).requiresTool()
-                .sounds(BlockSoundGroup.IRON);
+                .sounds(BlockSoundGroup.METAL);
     }
 
     public static Settings decor() {

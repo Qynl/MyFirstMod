@@ -155,10 +155,18 @@ public final class ServerActions {
         manager.placeTrack(player, track, anchor, rotation);
     }
 
-    private static void removeTrack(ServerPlayerEntity player, int x, int y, int z, String text) {
+    private static void removeTrack(ServerPlayerEntity player, int x, int z, String text) {
         TrackManager manager = TrackManager.get(player.server);
-        BlockPos pos = new BlockPos(x, y, z);
-        TrackPlacement placement = manager.placementAt(pos);
+        TrackPlacement placement = null;
+        for (TrackPlacement candidate : manager.placements()) {
+            if (candidate.anchor.getX() == x && candidate.anchor.getZ() == z) {
+                placement = candidate;
+                break;
+            }
+        }
+        if (placement == null) {
+            placement = manager.placementAt(new BlockPos(x, player.getBlockPos().getY(), z));
+        }
         if (placement == null) {
             placement = manager.placementNear(player.getPos(), 200.0);
         }

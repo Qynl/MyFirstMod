@@ -42,22 +42,31 @@ jobs:
           python3 - <<'PY'
           import re, pathlib
           log = pathlib.Path('gradle.log').read_text(errors='replace')
-          pat = re.compile(
-              r"(error:|Could not resolve|Could not find|Could not download|Could not get resource"
-              r"|What went wrong|Caused by:|FAILURE:|A problem occurred|BUILD FAILED)"
-          )
-          seen, out = set(), []
-          for line in log.splitlines():
-              if not pat.search(line):
+          lines = log.splitlines()
+          pat = re.compile(r"^(\S+\.java):(\d+): (error|warning): (.*)$")
+          blocks, i = [], 0
+          while i < len(lines):
+              if not pat.match(lines[i]):
+                  i += 1
                   continue
-              line = line.rstrip()
-              if line in seen:
-                  continue
-              seen.add(line)
-              out.append(line)
-          msg = "\n".join(out[:200]) or log[-3000:]
-          msg = msg.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-          print(f"::error title=Gradle build errors::{msg}")
+              block = [lines[i]]
+              j = i + 1
+              while j < len(lines) and len(block) < 8 and lines[j].startswith('  '):
+                  block.append(lines[j])
+                  j += 1
+              blocks.append("\n".join(block))
+              i = j
+          seen, uniq = set(), []
+          for b in blocks:
+              if b not in seen:
+                  seen.add(b)
+                  uniq.append(b)
+          text = "\n".join(uniq)
+          chunks = [text[k:k + 3500] for k in range(0, len(text), 3500)][:8]
+          for n, chunk in enumerate(chunks, 1):
+              esc = chunk.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f"::error title=Gradle errors {n}/{len(chunks)}::{esc}")
+          print(f"::warning title=Gradle summary::{len(uniq)} diagnostics in {len(lines)} log lines")
           PY
 
       - name: Upload Gradle log
