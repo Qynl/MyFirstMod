@@ -1,9 +1,20 @@
 plugins {
     id 'fabric-loom' version '1.9.2'
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
 }
 
 repositories {
-    maven { name = "Fabric"; url = "https://maven.fabricmc.net/" }
+    maven {
+        name = "Fabric"
+        url = "https://maven.fabricmc.net/"
+    }
     mavenCentral()
 }
 
@@ -11,7 +22,7 @@ loom {
     splitEnvironmentSourceSets()
 
     mods {
-        "myfirstmod" {
+        "fabricracers" {
             sourceSet sourceSets.main
             sourceSet sourceSets.client
         }
@@ -19,25 +30,46 @@ loom {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 processResources {
-    inputs.property "version", project.mod_version
+    inputs.property "version", project.version
+
     filesMatching("fabric.mod.json") {
-        expand "version": project.mod_version
+        expand "version": project.version
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
+    it.options.encoding = "UTF-8"
 }
 
 java {
+    withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
-    withSourcesJar()
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+// Sanity checks that run during `gradle build` - catches broken JSON, missing
+// translations, dangling asset references and broken track structures long
+// before the game does.
+tasks.register('validateAssets', Exec) {
+    group = 'verification'
+    description = 'Validates all JSON assets, textures, track structures and translations.'
+    commandLine 'python3', 'tools/validate_assets.py'
+}
+
+tasks.named('check') {
+    dependsOn 'validateAssets'
 }

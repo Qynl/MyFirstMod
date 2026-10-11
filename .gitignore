@@ -1,0 +1,31 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# Fabric / Minecraft run directories
+run/
+remappedSrc/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Local scratch
+/tmp/
+*.log

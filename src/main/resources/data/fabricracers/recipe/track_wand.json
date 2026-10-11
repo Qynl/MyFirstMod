@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  g",
+    " s ",
+    "s  "
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:gold_ingot"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "fabricracers:track_wand",
+    "count": 1
+  }
+}

@@ -1,27 +1,34 @@
 {
   "schemaVersion": 1,
-  "id": "myfirstmod",
+  "id": "fabricracers",
   "version": "${version}",
-  "name": "The Null Warden",
-  "description": "A handcrafted Ancient City boss encounter built around the Null Warden, its realm, and the Nullblade.",
+  "name": "FabricRacers",
+  "description": "Build full race circuits in seconds and race them solo, against AI drivers, or against your friends. Cars you can tune, drift, boost, wreck and paint - with a complete race engine (grids, countdown, laps, checkpoints, pit lane, standings, prizes) and AI drivers that race with skill levels, rubber-banding, overtaking and real mistakes.",
   "authors": ["Qynl"],
   "contact": {
-    "sources": "https://github.com/Qynl/MyFirstMod"
+    "homepage": "https://github.com/Qynl/MyFirstMod",
+    "sources": "https://github.com/Qynl/MyFirstMod",
+    "issues": "https://github.com/Qynl/MyFirstMod/issues"
   },
   "license": "MIT",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "dev.qynl.myfirstmod.MyFirstMod"
-    ],
-    "client": [
-      "dev.qynl.myfirstmod.MyFirstModClient"
-    ]
+    "main": ["dev.qynl.racers.FabricRacers"],
+    "client": ["dev.qynl.racers.client.FabricRacersClient"]
   },
   "depends": {
-    "fabricloader": ">=0.16.10",
+    "fabricloader": ">=0.16.0",
     "minecraft": "~1.21.1",
     "java": ">=21",
     "fabric-api": "*"
+  },
+  "suggests": {},
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://github.com/Qynl/MyFirstMod"
+      }
+    }
   }
 }

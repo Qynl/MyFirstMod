@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:redstone"
+    },
+    {
+      "item": "minecraft:glass"
+    }
+  ],
+  "result": {
+    "id": "fabricracers:stopwatch",
+    "count": 1
+  }
+}

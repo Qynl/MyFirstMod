@@ -2,7 +2,8 @@ name: Build Mod
 
 on:
   push:
-    branches: ["main"]
+    branches-ignore: []
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -19,16 +20,204 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "9.5.1"
+      - name: Validate assets
+        run: python3 tools/validate_assets.py
 
+      # `set -o pipefail` matters: without it `| tee` would swallow Gradle's
+      # exit code and a broken build would look green.
       - name: Build
-        run: gradle build
+        run: |
+          set -o pipefail
+          ./gradlew build --no-daemon --stacktrace --console=plain 2>&1 | tee gradle.log
 
-      - name: Upload JAR
+      # Compiler errors are packed into a single escaped annotation (plus the
+      # log tail) so a failure is readable straight through the checks API.
+      - name: Report build failure
+        if: failure()
+        run: |
+          echo "=== gradle.log (tail) ==="
+          tail -n 120 gradle.log
+          echo "=== jars produced ==="
+          find build -name '*.jar' 2>/dev/null | head -20 || true
+          python3 - <<'PY'
+          import re, pathlib
+          log = pathlib.Path('gradle.log').read_text(errors='replace')
+          lines = log.splitlines()
+          pat = re.compile(r"^(\S+\.java):(\d+): (error|warning): (.*)$")
+          blocks, i = [], 0
+          while i < len(lines):
+              if not pat.match(lines[i]):
+                  i += 1
+                  continue
+              block = [lines[i]]
+              j = i + 1
+              while j < len(lines) and len(block) < 8 and lines[j].startswith('  '):
+                  block.append(lines[j])
+                  j += 1
+              blocks.append("\n".join(block))
+              i = j
+          seen, uniq = set(), []
+          for b in blocks:
+              if b not in seen:
+                  seen.add(b)
+                  uniq.append(b)
+          text = "\n".join(uniq)
+          chunks = [text[k:k + 3500] for k in range(0, len(text), 3500)][:8]
+          for n, chunk in enumerate(chunks, 1):
+              esc = chunk.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f"::error title=Gradle errors {n}/{len(chunks)}::{esc}")
+          print(f"::warning title=Gradle summary::{len(uniq)} diagnostics in {len(lines)} log lines")
+          PY
+
+      - name: Upload Gradle log
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: MyFirstMod
+          name: gradle-log
+          path: gradle.log
+          if-no-files-found: warn
+
+      - name: Upload Mod JAR
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fabricracers
           path: build/libs/*.jar
+          if-no-files-found: error
+
+      # Actually boots a dedicated server with the mod installed, then drives it
+      # over RCON: this loads the datapack (recipes, tags, structures) and the
+      # registries, and proves the blocks, the car entity and the track catalogue
+      # all work at runtime - none of which static checks can show.
+      - name: Server smoke test
+        run: |
+          mkdir -p run
+          echo "eula=true" > run/eula.txt
+          cat > run/server.properties <<'PROPS'
+          online-mode=false
+          view-distance=4
+          simulation-distance=4
+          spawn-protection=0
+          max-players=2
+          enable-rcon=true
+          rcon.password=fabricracers
+          rcon.port=25575
+          broadcast-rcon-to-ops=false
+          motd=FabricRacers smoke test
+          PROPS
+          timeout 480 ./gradlew runServer --no-daemon --console=plain > server.log 2>&1 &
+          GRADLE_PID=$!
+          python3 - <<'PY' > rcon_out.txt 2>&1 || true
+          import socket, struct, time
+
+          def packet(request_id, kind, body):
+              data = struct.pack('<ii', request_id, kind) + body.encode('utf8') + b'\x00\x00'
+              return struct.pack('<i', len(data)) + data
+
+          def read_packet(sock):
+              head = sock.recv(4)
+              if len(head) < 4:
+                  return None
+              (length,) = struct.unpack('<i', head)
+              data = b''
+              while len(data) < length:
+                  chunk = sock.recv(length - len(data))
+                  if not chunk:
+                      break
+                  data += chunk
+              rid, _kind = struct.unpack('<ii', data[:8])
+              return rid, data[8:-2].decode('utf8', 'replace')
+
+          sock = None
+          deadline = time.time() + 300
+          while time.time() < deadline and sock is None:
+              try:
+                  candidate = socket.create_connection(('127.0.0.1', 25575), timeout=3)
+                  candidate.sendall(packet(1, 3, 'fabricracers'))
+                  reply = read_packet(candidate)
+                  if reply and reply[0] == 1:
+                      print('rcon: authenticated')
+                      sock = candidate
+                  else:
+                      candidate.close()
+              except OSError:
+                  time.sleep(4)
+          if sock is None:
+              print('rcon: server never came up')
+              raise SystemExit(1)
+          time.sleep(8)  # let the world finish loading
+
+          commands = [
+              'race tracks',
+              'forceload add -16 -16 16 16',
+              # the world seed changes every run, so build a known floor first
+              'fill -8 4 -8 20 4 8 minecraft:stone',
+              'fill -8 5 -8 20 5 8 minecraft:air',
+              'setblock 0 5 0 fabricracers:asphalt',
+              'setblock 2 5 0 fabricracers:boost_pad',
+              'setblock 4 5 0 fabricracers:checkpoint_marker',
+              'summon fabricracers:player_car 6 5 0 {CarData:{type:"f1",levels:[I;1,1,0,0,0,0,0]}}',
+              'data get entity @e[type=fabricracers:player_car,limit=1] CarData',
+              'kill @e[type=fabricracers:player_car]',
+              'summon minecraft:villager 8 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:1}}',
+              'summon minecraft:villager 9 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:2}}',
+              'summon minecraft:villager 10 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:3}}',
+              'summon minecraft:villager 11 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:1}}',
+              'summon minecraft:villager 12 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:2}}',
+              'summon minecraft:villager 13 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:3}}',
+              'summon minecraft:villager 14 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:weaponsmith",level:3}}',
+              'summon minecraft:villager 15 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:weaponsmith",level:2}}',
+              'summon minecraft:villager 16 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:mason",level:1}}',
+              'summon minecraft:villager 17 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:cleric",level:2}}',
+              'execute as @e[type=minecraft:villager] run data get entity @s Offers',
+              'kill @e[type=minecraft:villager]',
+              'summon minecraft:wandering_trader 18 5 0',
+              'execute as @e[type=minecraft:wandering_trader] run data get entity @s Offers',
+              'kill @e[type=minecraft:wandering_trader]',
+          ]
+          for index, command in enumerate(commands, start=10):
+              if 'data get' in command:
+                  time.sleep(1.0)  # let the entity settle before reading it back
+              sock.sendall(packet(index, 2, command))
+              reply = read_packet(sock)
+              print(f'> {command}')
+              print(reply[1] if reply else '<no reply>')
+          sock.sendall(packet(99, 2, 'stop'))
+          read_packet(sock)
+          sock.close()
+          PY
+          wait $GRADLE_PID || true
+          echo "=== rcon transcript ==="
+          cat rcon_out.txt || true
+          echo "=== server.log tail ==="
+          tail -n 40 server.log
+          python3 - <<'PY'
+          import pathlib, re
+          transcript = pathlib.Path('rcon_out.txt').read_text(errors='replace') \
+              if pathlib.Path('rcon_out.txt').exists() else ''
+          log = pathlib.Path('server.log').read_text(errors='replace') if pathlib.Path('server.log').exists() else ''
+          started = 'Done (' in log
+          trade = re.search('sell.{0,40}fabricracers:([a-z_]+)', transcript)
+          summon_line = next((l for l in transcript.splitlines() if l.startswith('Summoned new')), '')
+          checks = {
+              'track catalogue': 'Circuits (' in transcript,
+              'block placement': 'Changed the block at' in transcript,
+              'car entity spawn': 'Summoned new' in transcript,
+              'car NBT applied on spawn': bool(summon_line) and 'Sport' not in summon_line,
+              'entity data read': 'CarData' in transcript and 'type: "f1"' in transcript,
+              'tuning levels round-trip': 'levels: [I; 1, 1' in transcript,
+              # trades are rolled randomly from a mixed pool, so accept the mod
+              # turning up in any sell slot anywhere in the transcript
+              'villagers sell mod parts': trade is not None,
+          }
+          failed = [name for name, good in checks.items() if not good]
+          head = 'server started' if started else "SERVER NEVER REACHED 'Done'"
+          lines = [f"{'ok  ' if good else 'FAIL'} {name}" for name, good in checks.items()]
+          if trade:
+              lines.append('       rolled trade: ' + trade.group(1))
+          body = head + '\n' + '\n'.join(lines) + '\n--- transcript ---\n' + transcript[-7000:]
+          esc = body.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print(f"::{'notice' if started and not failed else 'error'} title=Server smoke test::{esc}")
+          if not started or failed:
+              raise SystemExit(1)
+          PY

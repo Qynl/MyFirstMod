@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "g",
+    "s"
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:gold_nugget"
+    },
+    "s": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "id": "fabricracers:carrot_key",
+    "count": 1
+  }
+}

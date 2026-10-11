@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "fabricracers:block/fake_slime"
+  },
+  "render_type": "translucent"
+}
