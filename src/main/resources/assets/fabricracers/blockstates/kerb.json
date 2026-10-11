@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "color=red": {
+      "model": "fabricracers:block/kerb_red"
+    },
+    "color=white": {
+      "model": "fabricracers:block/kerb_white"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "fabricracers:paint_white",
+    "fabricracers:paint_black",
+    "fabricracers:paint_red",
+    "fabricracers:paint_orange",
+    "fabricracers:paint_yellow",
+    "fabricracers:paint_green",
+    "fabricracers:paint_blue",
+    "fabricracers:paint_purple"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "fabricracers:asphalt",
+    "fabricracers:asphalt_cracked",
+    "fabricracers:road_block",
+    "fabricracers:finish_line",
+    "fabricracers:pit_lane",
+    "fabricracers:kerb",
+    "fabricracers:safety_barrier",
+    "fabricracers:start_gate",
+    "fabricracers:checkpoint_marker",
+    "fabricracers:station",
+    "fabricracers:boost_pad",
+    "fabricracers:fake_ice",
+    "fabricracers:fake_slime"
+  ]
+}

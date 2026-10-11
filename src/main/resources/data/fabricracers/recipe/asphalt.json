@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gs",
+    "sg"
+  ],
+  "key": {
+    "g": {
+      "item": "minecraft:gravel"
+    },
+    "s": {
+      "item": "minecraft:stone"
+    }
+  },
+  "result": {
+    "id": "fabricracers:asphalt",
+    "count": 4
+  }
+}
