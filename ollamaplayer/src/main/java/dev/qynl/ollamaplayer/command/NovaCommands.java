@@ -37,6 +37,7 @@ public final class NovaCommands {
                 .then(literal("gear").executes(ctx -> act(ctx.getSource(), "gear", null, 0)))
                 .then(literal("shelter").executes(ctx -> act(ctx.getSource(), "shelter", null, 0)))
                 .then(literal("give").executes(ctx -> act(ctx.getSource(), "give", null, 0)))
+                .then(literal("stash").executes(ctx -> act(ctx.getSource(), "stash", null, 0)))
                 .then(literal("craft")
                         .then(argument("what", StringArgumentType.word())
                                 .executes(ctx -> act(ctx.getSource(), "craft", StringArgumentType.getString(ctx, "what"), 1))

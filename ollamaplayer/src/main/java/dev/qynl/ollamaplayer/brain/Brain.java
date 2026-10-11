@@ -153,6 +153,7 @@ public final class Brain {
                 + "- gear: work toward a full iron kit (iron pickaxe, sword, shield, helmet, chestplate, leggings, boots).\n"
                 + "- craft with target 'diamond_gear': work toward a full diamond kit.\n"
                 + "- shelter: wall yourself into a small hut from blocks in your inventory and hold there.\n"
+                + "- stash: put your spare blocks into your stash chest.\n"
                 + "- give: hand everything in your bag to the owner (use when asked to give or share items).\n"
                 + "- eat: eat food from your inventory.\n"
                 + "- status: report what you are doing.\n"

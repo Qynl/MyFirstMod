@@ -329,6 +329,7 @@ public class NovaGameTest implements FabricGameTest {
                 {"build a shelter", "shelter", null},
                 {"gear up", "gear", null},
                 {"give me everything", "give", null},
+                {"store your spare blocks", "stash", null},
                 {"get me 8 cobblestone", "mine", "cobblestone"},
                 {"give me 5 iron", "mine", "iron_ore"},
                 {"follow me", "follow", null},

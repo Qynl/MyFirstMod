@@ -304,6 +304,10 @@ public final class Companion {
             case "give" -> {
                 return giveToOwner();
             }
+            case "stash" -> {
+                String msg = doStash(player.getServerWorld());
+                return msg != null ? msg : "I have nothing spare to stash.";
+            }
             case "diamond_gear" -> {
                 return craftGoal("diamond_gear", 1);
             }
@@ -521,20 +525,37 @@ public final class Companion {
         if (used < 30) return;
         stashCooldown = 200;
 
+        String msg = doStash(world);
+        if (msg != null) say.accept(msg);
+    }
+
+    /**
+     * Puts the spare blocks into Nova's stash chest, placing one first if needed. Returns the message
+     * to say, or null when there was nothing to stash.
+     */
+    @Nullable
+    public String doStash(ServerWorld world) {
+        PlayerInventory inv = player.getInventory();
         int bulk = 0;
         for (int i = 0; i < 36; i++) bulk += stashable(inv.getStack(i));
-        if (bulk == 0) return;
+        if (bulk == 0) return null;
 
-        BlockPos spot = findChestSpot(world);
-        if (spot == null) {
-            say.accept("My bag is nearly full and there is no room for a chest.");
-            return;
-        }
-        world.setBlockState(spot, Blocks.CHEST.getDefaultState());
-        if (!(world.getBlockEntity(spot) instanceof net.minecraft.inventory.Inventory chest)) {
-            world.removeBlock(spot, false);
-            say.accept("My chest would not open here.");
-            return;
+        BlockPos spot = null;
+        net.minecraft.inventory.Inventory chest = null;
+        if (stashPos != null && world.getBlockState(stashPos).isOf(Blocks.CHEST)
+                && player.getBlockPos().getSquaredDistance(stashPos) <= 36.0
+                && world.getBlockEntity(stashPos) instanceof net.minecraft.inventory.Inventory existing) {
+            spot = stashPos;
+            chest = existing;
+        } else {
+            spot = findChestSpot(world);
+            if (spot == null) return "My bag is nearly full and there is no room for a chest.";
+            world.setBlockState(spot, Blocks.CHEST.getDefaultState());
+            if (!(world.getBlockEntity(spot) instanceof net.minecraft.inventory.Inventory placed)) {
+                world.removeBlock(spot, false);
+                return "My chest would not open here.";
+            }
+            chest = placed;
         }
         int moved = 0;
         for (int i = 0; i < 36; i++) {
@@ -548,10 +569,9 @@ public final class Companion {
             moved += stored;
         }
         chest.markDirty();
-        if (moved > 0) {
-            stashPos = spot;
-            say.accept("Stashed " + moved + " blocks in a chest at " + spot.toShortString() + ".");
-        }
+        stashPos = spot;
+        if (moved == 0) return "My stash chest is full.";
+        return "Stashed " + moved + " blocks in a chest at " + spot.toShortString() + ".";
     }
 
     /** The one chest Nova placed itself. Village chests are never touched. */

@@ -38,6 +38,9 @@ public final class Heuristics {
                 && (t.contains("me") || t.contains("all") || t.contains("everything") || t.contains("your stuff"))) {
             return new Reply("Here you go.", "give", null, 0);
         }
+        if ((t.contains("stash") || t.contains("store")) && !t.contains("get") && !t.contains("take") && !t.contains("fetch")) {
+            return new Reply("Stashing my spare blocks.", "stash", null, 0);
+        }
         if (t.contains("shelter") || t.contains("house") || t.contains("hide") || t.contains("hut")) {
             return new Reply("Building a shelter.", "shelter", null, 0);
         }
