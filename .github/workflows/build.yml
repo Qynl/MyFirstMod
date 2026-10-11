@@ -23,30 +23,34 @@ jobs:
       - name: Validate assets
         run: python3 tools/validate_assets.py
 
+      # tee keeps the full compiler output; GitHub's default shell is
+      # `bash -eo pipefail`, so a broken build still fails this step.
       - name: Build
-        id: build
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          ./gradlew build --no-daemon --stacktrace --console=plain > gradle.log 2>&1 || true
-          tail -n 3 gradle.log
+        run: ./gradlew build --no-daemon --stacktrace --console=plain 2>&1 | tee gradle.log
 
       # Compiler errors are surfaced as annotations so a build failure is
       # readable straight from the run summary.
-      - name: Report build result
-        if: steps.build.outcome == 'failure'
+      - name: Report build failure
+        if: failure()
         run: |
           echo "=== gradle.log (tail) ==="
-          tail -n 80 gradle.log
+          tail -n 100 gradle.log
           echo "=== annotations ==="
-          grep -aE "error:|Could not resolve|Could not find|Could not download|What went wrong|Caused by:|FAILURE:|A problem occurred" gradle.log \
-            | head -40 | while IFS= read -r line; do
+          grep -aE "error:|Could not resolve|Could not find|Could not download|Could not get resource|What went wrong|Caused by:|FAILURE:" gradle.log \
+            | head -50 | while IFS= read -r line; do
               echo "::error title=Gradle::${line}"
             done
-          exit 1
+
+      - name: Upload Gradle log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-log
+          path: gradle.log
+          if-no-files-found: warn
 
       - name: Upload Mod JAR
-        if: steps.build.outcome == 'success'
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: fabricracers
