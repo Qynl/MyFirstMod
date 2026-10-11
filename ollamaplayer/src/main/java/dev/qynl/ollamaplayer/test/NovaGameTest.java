@@ -560,6 +560,23 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
+    /** Low supplies and a worthwhile resource raise the right events; healthy idle states raise none. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void needsAndOpportunitiesAreDetected(TestContext ctx) {
+        if (dev.qynl.ollamaplayer.companion.Needs.restockReasons(18, 10, 0.9, 0.3).size() != 0) {
+            ctx.throwGameTestException("a supplied Nova should not ask to restock");
+        }
+        if (dev.qynl.ollamaplayer.companion.Needs.restockReasons(5, 1, 0.1, 0.95).size() != 4) {
+            ctx.throwGameTestException("all four low-supply reasons should be detected");
+        }
+        if (!dev.qynl.ollamaplayer.companion.Needs.worthInvestigating(8, dev.qynl.ollamaplayer.companion.WorldState.Risk.LOW)
+                || dev.qynl.ollamaplayer.companion.Needs.worthInvestigating(8, dev.qynl.ollamaplayer.companion.WorldState.Risk.HIGH)
+                || dev.qynl.ollamaplayer.companion.Needs.worthInvestigating(2, dev.qynl.ollamaplayer.companion.WorldState.Risk.LOW)) {
+            ctx.throwGameTestException("resource investigation rule is wrong");
+        }
+        ctx.complete();
+    }
+
     /** Level 0 reflexes are deterministic: burning goes for water, low air means surface. */
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
     public void reflexesAreInstantAndDeterministic(TestContext ctx) {

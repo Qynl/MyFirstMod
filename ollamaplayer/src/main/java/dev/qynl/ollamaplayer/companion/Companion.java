@@ -198,6 +198,17 @@ public final class Companion {
             eatFood();
         }
 
+        // Needs and opportunities are checked every few seconds, only while idle and with an owner around.
+        if (owner != null && enemy == null && ++needsTimer >= 200) {
+            needsTimer = 0;
+            WorldState.Facts f = worldFacts(world, owner);
+            if (!Needs.restockReasons(f.food(), f.torches(), f.pickaxeFraction(), f.bagFraction()).isEmpty()) {
+                event("LOW_SUPPLIES");
+            } else if (Needs.worthInvestigating(f.valuableNearby(), WorldState.risk(f))) {
+                event("RESOURCE_SEEN");
+            }
+        }
+
         // Level 0: instant reactions, no model involved.
         Reflex.Action reflex = Reflex.decide(player.isOnFire(), player.isTouchingWater(), player.getAir());
         if (reflex == Reflex.Action.SURFACE) {
@@ -403,6 +414,7 @@ public final class Companion {
     private int areaX = Integer.MIN_VALUE;
     private int areaZ = Integer.MIN_VALUE;
     private int areaTimer;
+    private int needsTimer;
 
     /** Events the strategist may want to hear about, drained by the brain. Capped so nothing grows unbounded. */
     private final java.util.ArrayDeque<String> events = new java.util.ArrayDeque<>();
