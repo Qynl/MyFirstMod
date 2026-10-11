@@ -72,5 +72,10 @@ If Ollama is unreachable or slow, Nova falls back to keyword heuristics (`brain/
 - Shelters use cobblestone-like blocks from the bag; they are not sealed against every mob spawn rule.
 - Gametests run on a flat stone floor; real terrain (caves, lava lakes, nights) is only covered by playing with `gradle runClient`.
 - The bow is not covered by a gametest: the test world is peaceful, which removes hostile mobs, and switching difficulty disturbs the other parallel tests. Check it in `gradle runClient`.
+- Combat is a deterministic judgement (`companion/Tactics.java`): Nova scores her strength (health, weapon, armor, shield) against the threat of nearby mobs and chooses fight, keep the position with a bow, or retreat to her owner. Retreat happens at 7 HP, or 8–10 HP after she has learned from being badly hurt in a fight.
+- Lessons (`companion/Experience.java`) are short confirmed rules, not chat logs: at most 40, saved with her, and the top three are shown to the model. Two are learned today: retreat earlier when hurt in a fight, and stash before the bag fills.
+- The model is called only for chat and occasional idle thoughts, one request at a time, at least 10 seconds apart for idle thoughts. Everything else runs deterministically on the server thread.
+- Vision is not implemented. The mod has no screenshot pipeline and the server has no renderer, so the model only sees structured text.
+- `/nova status` prints cost counters: LLM requests per minute, latency, failures, and tick and path timing (`brain/Metrics.java`).
 - Creeper handling is simple: Nova backs away from a creeper within about 2.5 blocks, which helps more than trading hits but does not outrun it.
 - Lost drops are a known issue in dense multi-companion test setups; the full loop test passes with five ores.
