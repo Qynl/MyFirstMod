@@ -84,3 +84,38 @@ jobs:
           name: fabricracers
           path: build/libs/*.jar
           if-no-files-found: error
+
+      # Actually boots a dedicated server with the mod installed: this loads the
+      # datapack (recipes, tags, structures), the registries and the networking
+      # wiring, which no amount of static checking can prove.
+      - name: Server smoke test
+        run: |
+          mkdir -p run
+          echo "eula=true" > run/eula.txt
+          cat > run/server.properties <<'PROPS'
+          level-type=minecraft\:flat
+          online-mode=false
+          view-distance=4
+          simulation-distance=4
+          spawn-protection=0
+          max-players=2
+          motd=FabricRacers smoke test
+          PROPS
+          (sleep 150; echo "stop") | timeout 480 ./gradlew runServer --no-daemon --console=plain > server.log 2>&1 || true
+          echo "=== server.log tail ==="
+          tail -n 60 server.log
+          python3 - <<'PY'
+          import re, pathlib
+          log = pathlib.Path('server.log').read_text(errors='replace')
+          ok = re.search(r'Done \([0-9.]+s\)! For help', log) is not None
+          bad = [l for l in re.findall(r'^.*(?:ERROR|SEVERE|Exception|Caused by:|Failed to|Could not|Unknown recipe).*$',
+                                       log, re.M) if 'Ignoring' not in l][:60]
+          head = "server reached Done" if ok else "SERVER NEVER REACHED 'Done'"
+          body = (head + "\n" + "\n".join(bad))
+          esc = body.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          if ok:
+              print(f"::notice title=Server smoke test::{esc}")
+          else:
+              print(f"::error title=Server smoke test::{esc}")
+          PY
+          grep -aqE "Done \([0-9.]+s\)! For help" server.log
