@@ -150,10 +150,13 @@ jobs:
           commands = [
               'race tracks',
               'forceload add -16 -16 16 16',
+              # the world seed changes every run, so build a known floor first
+              'fill -8 4 -8 20 4 8 minecraft:stone',
+              'fill -8 5 -8 20 5 8 minecraft:air',
               'setblock 0 5 0 fabricracers:asphalt',
               'setblock 2 5 0 fabricracers:boost_pad',
               'setblock 4 5 0 fabricracers:checkpoint_marker',
-              'summon fabricracers:player_car 6 6 0 {CarData:{type:"f1",levels:[I;1,1,0,0,0,0,0]}}',
+              'summon fabricracers:player_car 6 5 0 {CarData:{type:"f1",levels:[I;1,1,0,0,0,0,0]}}',
               'data get entity @e[type=fabricracers:player_car,limit=1] CarData',
               'kill @e[type=fabricracers:player_car]',
               'summon minecraft:villager 8 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:1}}',
@@ -173,6 +176,8 @@ jobs:
               'kill @e[type=minecraft:wandering_trader]',
           ]
           for index, command in enumerate(commands, start=10):
+              if 'data get' in command:
+                  time.sleep(1.0)  # let the entity settle before reading it back
               sock.sendall(packet(index, 2, command))
               reply = read_packet(sock)
               print(f'> {command}')
