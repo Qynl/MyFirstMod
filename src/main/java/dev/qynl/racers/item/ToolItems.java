@@ -241,9 +241,8 @@ public final class ToolItems {
                 return ActionResult.PASS;
             }
             TrackManager manager = TrackManager.get(player.server);
-            if (!player.isCreativeLevelTwoOp() && !manager.placements().isEmpty()
-                    && player.getVehicle() == null) {
-                // anyone may build in creative, otherwise it is an op tool
+            if (!player.isCreative() && !player.isCreativeLevelTwoOp()) {
+                // anyone may build tracks in creative, otherwise it is an op tool
                 player.sendMessage(Text.translatable("message.fabricracers.wand_needs_op")
                         .formatted(Formatting.RED), true);
                 return ActionResult.FAIL;

@@ -10,6 +10,8 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -38,10 +40,15 @@ public final class RaceCommands {
     private RaceCommands() {
     }
 
-    private static final SuggestionProvider<ServerCommandSource> TRACKS = (context, builder) ->
-            CommandSource.suggestMatching(
-                    TrackManager.get(context.getSource().getServer()).all().stream()
-                            .map(track -> track.id).toList(), builder);
+    private static final SuggestionProvider<ServerCommandSource> TRACKS = (context, builder) -> {
+        MinecraftServer server = context.getSource().getServer();
+        if (server == null) {
+            // tab completion can run without a server behind the source
+            return builder.buildFuture();
+        }
+        return CommandSource.suggestMatching(
+                TrackManager.get(server).all().stream().map(track -> track.id).toList(), builder);
+    };
 
     private static final SuggestionProvider<ServerCommandSource> CAR_TYPES = (context, builder) ->
             CommandSource.suggestMatching(
@@ -221,13 +228,16 @@ public final class RaceCommands {
             return 0;
         }
         player.stopRiding();
-        player.getInventory().insertStack(parkStack(car));
+        ItemStack parked = parkStack(car);
+        if (!player.getInventory().insertStack(parked)) {
+            player.dropItem(parked, false);
+        }
         car.discard();
         return 1;
     }
 
-    private static net.minecraft.item.ItemStack parkStack(CarEntity car) {
-        var stack = new net.minecraft.item.ItemStack(dev.qynl.racers.registry.ModItems.carItem(car.carType()));
+    private static ItemStack parkStack(CarEntity car) {
+        ItemStack stack = new ItemStack(dev.qynl.racers.registry.ModItems.carItem(car.carType()));
         CarData.apply(stack, car.data().withHealth(car.engineHealth(), car.tyreHealth()));
         return stack;
     }

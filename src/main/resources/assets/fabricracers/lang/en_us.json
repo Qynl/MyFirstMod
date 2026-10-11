@@ -94,7 +94,7 @@
   "message.fabricracers.no_room": "Your inventory is full.",
   "message.fabricracers.repaired": "Car repaired.",
   "message.fabricracers.recovered": "That could have been a long walk - car recovered.",
-  "message.fabricracers.wand_needs_op": "Only operators may place circuits here.",
+  "message.fabricracers.wand_needs_op": "Only operators or creative players may place circuits here.",
   "message.fabricracers.track_placed": "Built %s (%s blocks, footprint %s).",
   "message.fabricracers.track_placed_tip": "Sit in a car on the start line and run /race start, or press T.",
   "message.fabricracers.track_removed": "Removed %s (%s blocks cleared).",

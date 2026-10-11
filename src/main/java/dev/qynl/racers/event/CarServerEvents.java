@@ -2,12 +2,9 @@ package dev.qynl.racers.event;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 
 import dev.qynl.racers.car.CarEntity;
@@ -24,24 +21,6 @@ public final class CarServerEvents {
     }
 
     public static void init() {
-        // Prevent friendly fire on cars: a punch nudges the car instead of hurting the driver
-        AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-            if (entity instanceof CarEntity) {
-                return ActionResult.PASS;
-            }
-            return ActionResult.PASS;
-        });
-
-        UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-            if (world.isClient || !(entity instanceof CarEntity car)) {
-                return ActionResult.PASS;
-            }
-            if (player.isSneaking()) {
-                return ActionResult.PASS;
-            }
-            return ActionResult.PASS;
-        });
-
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
             var session = RaceManager.get(player.server).sessionFor(player);
             if (session != null) {
