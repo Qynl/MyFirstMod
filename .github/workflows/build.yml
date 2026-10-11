@@ -157,13 +157,15 @@ jobs:
               'data get entity @e[type=fabricracers:player_car,limit=1] CarData',
               'kill @e[type=fabricracers:player_car]',
               'summon minecraft:villager 8 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:1}}',
-              'data get entity @e[type=minecraft:villager,limit=1] Offers',
+              'summon minecraft:villager 9 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:2}}',
+              'summon minecraft:villager 10 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:3}}',
+              'summon minecraft:villager 11 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:weaponsmith",level:3}}',
+              'summon minecraft:villager 12 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:mason",level:1}}',
+              'summon minecraft:villager 13 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:cleric",level:2}}',
+              'execute as @e[type=minecraft:villager] run data get entity @s Offers',
               'kill @e[type=minecraft:villager]',
-              'summon minecraft:villager 8 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:3}}',
-              'data get entity @e[type=minecraft:villager,limit=1] Offers',
-              'kill @e[type=minecraft:villager]',
-              'summon minecraft:wandering_trader 10 5 0',
-              'data get entity @e[type=minecraft:wandering_trader,limit=1] Offers',
+              'summon minecraft:wandering_trader 14 5 0',
+              'execute as @e[type=minecraft:wandering_trader] run data get entity @s Offers',
               'kill @e[type=minecraft:wandering_trader]',
           ]
           for index, command in enumerate(commands, start=10):
@@ -194,7 +196,11 @@ jobs:
               'car NBT applied on spawn': bool(summon_line) and 'Sport' not in summon_line,
               'entity data read': 'CarData' in transcript and 'type: "f1"' in transcript,
               'tuning levels round-trip': 'levels: [I; 1, 1' in transcript,
-              'toolsmith sells parts': 'fabricracers:engine_turbo' in transcript,
+              # villagers roll 2 trades per level out of a mixed pool, so check
+              # that any of the six rolled at least one of the mod's trades
+              'villagers sell mod parts': 'fabricracers:' in transcript.split('Offers')[-1]
+                  or 'fabricracers:tires_street' in transcript
+                  or 'fabricracers:aero_wing' in transcript,
           }
           failed = [name for name, good in checks.items() if not good]
           head = 'server started' if started else "SERVER NEVER REACHED 'Done'"
