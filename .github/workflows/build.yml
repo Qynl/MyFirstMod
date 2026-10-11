@@ -23,23 +23,42 @@ jobs:
       - name: Validate assets
         run: python3 tools/validate_assets.py
 
-      # tee keeps the full compiler output; GitHub's default shell is
-      # `bash -eo pipefail`, so a broken build still fails this step.
+      # `set -o pipefail` matters: without it `| tee` would swallow Gradle's
+      # exit code and a broken build would look green.
       - name: Build
-        run: ./gradlew build --no-daemon --stacktrace --console=plain 2>&1 | tee gradle.log
+        run: |
+          set -o pipefail
+          ./gradlew build --no-daemon --stacktrace --console=plain 2>&1 | tee gradle.log
 
-      # Compiler errors are surfaced as annotations so a build failure is
-      # readable straight from the run summary.
+      # Compiler errors are packed into a single escaped annotation (plus the
+      # log tail) so a failure is readable straight through the checks API.
       - name: Report build failure
         if: failure()
         run: |
           echo "=== gradle.log (tail) ==="
-          tail -n 100 gradle.log
-          echo "=== annotations ==="
-          grep -aE "error:|Could not resolve|Could not find|Could not download|Could not get resource|What went wrong|Caused by:|FAILURE:" gradle.log \
-            | head -50 | while IFS= read -r line; do
-              echo "::error title=Gradle::${line}"
-            done
+          tail -n 120 gradle.log
+          echo "=== jars produced ==="
+          find build -name '*.jar' 2>/dev/null | head -20 || true
+          python3 - <<'PY'
+          import re, pathlib
+          log = pathlib.Path('gradle.log').read_text(errors='replace')
+          pat = re.compile(
+              r"(error:|Could not resolve|Could not find|Could not download|Could not get resource"
+              r"|What went wrong|Caused by:|FAILURE:|A problem occurred|BUILD FAILED)"
+          )
+          seen, out = set(), []
+          for line in log.splitlines():
+              if not pat.search(line):
+                  continue
+              line = line.rstrip()
+              if line in seen:
+                  continue
+              seen.add(line)
+              out.append(line)
+          msg = "\n".join(out[:200]) or log[-3000:]
+          msg = msg.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print(f"::error title=Gradle build errors::{msg}")
+          PY
 
       - name: Upload Gradle log
         if: failure()
