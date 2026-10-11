@@ -159,12 +159,16 @@ jobs:
               'summon minecraft:villager 8 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:1}}',
               'summon minecraft:villager 9 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:2}}',
               'summon minecraft:villager 10 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:3}}',
-              'summon minecraft:villager 11 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:weaponsmith",level:3}}',
-              'summon minecraft:villager 12 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:mason",level:1}}',
-              'summon minecraft:villager 13 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:cleric",level:2}}',
+              'summon minecraft:villager 11 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:1}}',
+              'summon minecraft:villager 12 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:2}}',
+              'summon minecraft:villager 13 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:toolsmith",level:3}}',
+              'summon minecraft:villager 14 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:weaponsmith",level:3}}',
+              'summon minecraft:villager 15 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:weaponsmith",level:2}}',
+              'summon minecraft:villager 16 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:mason",level:1}}',
+              'summon minecraft:villager 17 5 0 {VillagerData:{type:"minecraft:plains",profession:"minecraft:cleric",level:2}}',
               'execute as @e[type=minecraft:villager] run data get entity @s Offers',
               'kill @e[type=minecraft:villager]',
-              'summon minecraft:wandering_trader 14 5 0',
+              'summon minecraft:wandering_trader 18 5 0',
               'execute as @e[type=minecraft:wandering_trader] run data get entity @s Offers',
               'kill @e[type=minecraft:wandering_trader]',
           ]
@@ -183,11 +187,12 @@ jobs:
           echo "=== server.log tail ==="
           tail -n 40 server.log
           python3 - <<'PY'
-          import pathlib
+          import pathlib, re
           transcript = pathlib.Path('rcon_out.txt').read_text(errors='replace') \
               if pathlib.Path('rcon_out.txt').exists() else ''
           log = pathlib.Path('server.log').read_text(errors='replace') if pathlib.Path('server.log').exists() else ''
           started = 'Done (' in log
+          trade = re.search(r'sell: \{[^}]*"id": "(fabricracers:[a-z_]+)"', transcript)
           summon_line = next((l for l in transcript.splitlines() if l.startswith('Summoned new')), '')
           checks = {
               'track catalogue': 'Circuits (' in transcript,
@@ -196,15 +201,15 @@ jobs:
               'car NBT applied on spawn': bool(summon_line) and 'Sport' not in summon_line,
               'entity data read': 'CarData' in transcript and 'type: "f1"' in transcript,
               'tuning levels round-trip': 'levels: [I; 1, 1' in transcript,
-              # villagers roll 2 trades per level out of a mixed pool, so check
-              # that any of the six rolled at least one of the mod's trades
-              'villagers sell mod parts': 'fabricracers:' in transcript.split('Offers')[-1]
-                  or 'fabricracers:tires_street' in transcript
-                  or 'fabricracers:aero_wing' in transcript,
+              # trades are rolled randomly from a mixed pool, so accept the mod
+              # turning up in any sell slot anywhere in the transcript
+              'villagers sell mod parts': trade is not None,
           }
           failed = [name for name, good in checks.items() if not good]
           head = 'server started' if started else "SERVER NEVER REACHED 'Done'"
           lines = [f"{'ok  ' if good else 'FAIL'} {name}" for name, good in checks.items()]
+          if trade:
+              lines.append('       rolled trade: ' + trade.group(1))
           body = head + '\n' + '\n'.join(lines) + '\n--- transcript ---\n' + transcript[-7000:]
           esc = body.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
           print(f"::{'notice' if started and not failed else 'error'} title=Server smoke test::{esc}")
