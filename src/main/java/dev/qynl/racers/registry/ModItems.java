@@ -178,7 +178,8 @@ public final class ModItems {
         return CAR_ITEMS.get(type);
     }
 
-    public static Item part(Tune tune) {
+    /** The upgrade part item for a tuning system. */
+    public static Item partItem(Tune tune) {
         return TUNE_PARTS.get(tune);
     }
 
@@ -198,8 +199,11 @@ public final class ModItems {
     }
 
     public static void init() {
-        // the group is registered at class load; also mirror the tools into vanilla tabs
-        ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.TRANSPORTATION)
+        // The mod has its own creative tab; also mirror the headline items into
+        // the vanilla tools tab (ItemGroups' keys are private in this version).
+        ItemGroupEvents.modifyEntriesEvent(net.minecraft.registry.RegistryKey.of(
+                        net.minecraft.registry.RegistryKeys.ITEM_GROUP,
+                        net.minecraft.util.Identifier.ofVanilla("tools")))
                 .register(entries -> {
                     entries.add(CAR_SPORT);
                     entries.add(WRENCH);

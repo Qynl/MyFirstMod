@@ -2,13 +2,12 @@ package dev.qynl.racers.net;
 
 import java.util.List;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -65,10 +64,12 @@ public final class ModNetworking {
     /** Driver input, sent every tick while a player is behind the wheel. */
     public record CarControl(int entityId, int mask) implements net.minecraft.network.packet.CustomPayload {
         public static final Id<CarControl> ID = new Id<>(FabricRacers.id("car_control"));
-        public static final Codec<CarControl> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.INT.fieldOf("entity").forGetter(CarControl::entityId),
-                Codec.INT.fieldOf("mask").forGetter(CarControl::mask)
-        ).apply(instance, CarControl::new));
+        public static final PacketCodec<RegistryByteBuf, CarControl> CODEC = PacketCodec.of(
+                (value, buf) -> {
+                    buf.writeVarInt(value.entityId);
+                    buf.writeVarInt(value.mask);
+                },
+                buf -> new CarControl(buf.readVarInt(), buf.readVarInt()));
 
         @Override
         public Id<? extends net.minecraft.network.packet.CustomPayload> getId() {
@@ -80,13 +81,16 @@ public final class ModNetworking {
     public record ClientAction(int action, int entityId, int a, int b, String text)
             implements net.minecraft.network.packet.CustomPayload {
         public static final Id<ClientAction> ID = new Id<>(FabricRacers.id("client_action"));
-        public static final Codec<ClientAction> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.INT.fieldOf("action").forGetter(ClientAction::action),
-                Codec.INT.fieldOf("entity").forGetter(ClientAction::entityId),
-                Codec.INT.fieldOf("a").forGetter(ClientAction::a),
-                Codec.INT.fieldOf("b").forGetter(ClientAction::b),
-                Codec.STRING.fieldOf("text").forGetter(ClientAction::text)
-        ).apply(instance, ClientAction::new));
+        public static final PacketCodec<RegistryByteBuf, ClientAction> CODEC = PacketCodec.of(
+                (value, buf) -> {
+                    buf.writeVarInt(value.action);
+                    buf.writeVarInt(value.entityId);
+                    buf.writeInt(value.a);
+                    buf.writeInt(value.b);
+                    buf.writeString(value.text);
+                },
+                buf -> new ClientAction(buf.readVarInt(), buf.readVarInt(), buf.readInt(), buf.readInt(),
+                        buf.readString()));
 
         @Override
         public Id<? extends net.minecraft.network.packet.CustomPayload> getId() {
@@ -103,15 +107,27 @@ public final class ModNetworking {
                                NbtCompound data)
             implements net.minecraft.network.packet.CustomPayload {
         public static final Id<ServerAction> ID = new Id<>(FabricRacers.id("server_action"));
-        public static final Codec<ServerAction> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.INT.fieldOf("action").forGetter(ServerAction::action),
-                Codec.INT.fieldOf("entity").forGetter(ServerAction::entityId),
-                Codec.INT.fieldOf("a").forGetter(ServerAction::a),
-                Codec.INT.fieldOf("b").forGetter(ServerAction::b),
-                Codec.FLOAT.fieldOf("f").forGetter(ServerAction::f),
-                Codec.STRING.fieldOf("text").forGetter(ServerAction::text),
-                NbtCompound.CODEC.fieldOf("data").forGetter(ServerAction::data)
-        ).apply(instance, ServerAction::new));
+        public static final PacketCodec<RegistryByteBuf, ServerAction> CODEC = PacketCodec.of(
+                (value, buf) -> {
+                    buf.writeVarInt(value.action);
+                    buf.writeVarInt(value.entityId);
+                    buf.writeInt(value.a);
+                    buf.writeInt(value.b);
+                    buf.writeFloat(value.f);
+                    buf.writeString(value.text);
+                    buf.writeNbt(value.data);
+                },
+                buf -> {
+                    int action = buf.readVarInt();
+                    int entityId = buf.readVarInt();
+                    int a = buf.readInt();
+                    int b = buf.readInt();
+                    float f = buf.readFloat();
+                    String text = buf.readString();
+                    NbtCompound data = buf.readNbt();
+                    return new ServerAction(action, entityId, a, b, f, text,
+                            data == null ? new NbtCompound() : data);
+                });
 
         @Override
         public Id<? extends net.minecraft.network.packet.CustomPayload> getId() {
@@ -130,27 +146,33 @@ public final class ModNetworking {
                       String trackName, String message, String standings, String carName)
             implements net.minecraft.network.packet.CustomPayload {
         public static final Id<Hud> ID = new Id<>(FabricRacers.id("hud"));
-        public static final Codec<Hud> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.INT.fieldOf("state").forGetter(Hud::state),
-                Codec.INT.fieldOf("countdown").forGetter(Hud::countdown),
-                Codec.INT.fieldOf("lap").forGetter(Hud::lap),
-                Codec.INT.fieldOf("laps").forGetter(Hud::laps),
-                Codec.INT.fieldOf("position").forGetter(Hud::position),
-                Codec.INT.fieldOf("total").forGetter(Hud::total),
-                Codec.INT.fieldOf("timeMs").forGetter(Hud::timeMs),
-                Codec.INT.fieldOf("lapTimeMs").forGetter(Hud::lapTimeMs),
-                Codec.INT.fieldOf("bestLapMs").forGetter(Hud::bestLapMs),
-                Codec.INT.fieldOf("speed").forGetter(Hud::speedKmh),
-                Codec.DOUBLE.fieldOf("boost").forGetter(Hud::boost),
-                Codec.INT.fieldOf("drift").forGetter(Hud::driftScore),
-                Codec.INT.fieldOf("gapAhead").forGetter(Hud::gapAheadMs),
-                Codec.INT.fieldOf("gapBehind").forGetter(Hud::gapBehindMs),
-                Codec.INT.fieldOf("flags").forGetter(Hud::flags),
-                Codec.STRING.fieldOf("track").forGetter(Hud::trackName),
-                Codec.STRING.fieldOf("message").forGetter(Hud::message),
-                Codec.STRING.fieldOf("standings").forGetter(Hud::standings),
-                Codec.STRING.fieldOf("car").forGetter(Hud::carName)
-        ).apply(instance, Hud::new));
+        public static final PacketCodec<RegistryByteBuf, Hud> CODEC = PacketCodec.of(
+                (value, buf) -> {
+                    buf.writeVarInt(value.state);
+                    buf.writeVarInt(value.countdown);
+                    buf.writeVarInt(value.lap);
+                    buf.writeVarInt(value.laps);
+                    buf.writeVarInt(value.position);
+                    buf.writeVarInt(value.total);
+                    buf.writeVarInt(value.timeMs);
+                    buf.writeVarInt(value.lapTimeMs);
+                    buf.writeVarInt(value.bestLapMs);
+                    buf.writeVarInt(value.speedKmh);
+                    buf.writeDouble(value.boost);
+                    buf.writeVarInt(value.driftScore);
+                    buf.writeInt(value.gapAheadMs);
+                    buf.writeInt(value.gapBehindMs);
+                    buf.writeVarInt(value.flags);
+                    buf.writeString(value.trackName);
+                    buf.writeString(value.message);
+                    buf.writeString(value.standings);
+                    buf.writeString(value.carName);
+                },
+                buf -> new Hud(buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
+                        buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
+                        buf.readVarInt(), buf.readVarInt(), buf.readDouble(), buf.readVarInt(),
+                        buf.readInt(), buf.readInt(), buf.readVarInt(), buf.readString(),
+                        buf.readString(), buf.readString(), buf.readString()));
 
         @Override
         public Id<? extends net.minecraft.network.packet.CustomPayload> getId() {

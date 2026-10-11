@@ -20,6 +20,7 @@ import dev.qynl.racers.stats.StatsManager;
 import dev.qynl.racers.track.Track;
 import dev.qynl.racers.track.TrackManager;
 import dev.qynl.racers.track.TrackPlacement;
+import dev.qynl.racers.track.TrackRecorder;
 import dev.qynl.racers.util.Cars;
 
 /** Handles every button press and menu action coming from a client. */
@@ -67,7 +68,7 @@ public final class ServerActions {
         for (Tune tune : Tune.values()) {
             extra.putInt(tune.id, PartShop.costFor(tune, car.data().level(tune) + 1));
             extra.putInt(tune.id + "_owned", countParts(player,
-                    dev.qynl.racers.registry.ModItems.part(tune)));
+                    dev.qynl.racers.registry.ModItems.partItem(tune)));
         }
         ModNetworking.sendGarage(player, car, extra);
     }
@@ -88,9 +89,9 @@ public final class ServerActions {
             return;
         }
         int cost = PartShop.costFor(tune, level + 1);
-        if (player.isCreative() || countParts(player, dev.qynl.racers.registry.ModItems.part(tune)) >= cost) {
+        if (player.isCreative() || countParts(player, dev.qynl.racers.registry.ModItems.partItem(tune)) >= cost) {
             if (!player.isCreative()) {
-                consumeParts(player, dev.qynl.racers.registry.ModItems.part(tune), cost);
+                consumeParts(player, dev.qynl.racers.registry.ModItems.partItem(tune), cost);
             }
             int[] levels = car.levels();
             levels[tune.ordinal()] = level + 1;
@@ -102,7 +103,7 @@ public final class ServerActions {
         } else {
             ModNetworking.notify(player, "You need " + cost + "x " + tune.displayName
                     + " part (you have " + countParts(player,
-                    dev.qynl.racers.registry.ModItems.part(tune)) + ").");
+                    dev.qynl.racers.registry.ModItems.partItem(tune)) + ").");
         }
     }
 
@@ -151,7 +152,7 @@ public final class ServerActions {
         if (mode == 1) {
             anchor = anchor.offset(player.getHorizontalFacing());
         }
-            manager.placeTrack(player, track, anchor, rotation);
+        manager.placeTrack(player, track, anchor, rotation);
     }
 
     private static void removeTrack(ServerPlayerEntity player, int x, int y, int z, String text) {

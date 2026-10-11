@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -39,6 +40,17 @@ public final class ToolItems {
         return near;
     }
 
+    /** Turns a plain action result from a helper into an item-use result. */
+    static TypedActionResult<ItemStack> wrap(ActionResult result, ItemStack stack) {
+        if (result == ActionResult.FAIL) {
+            return TypedActionResult.fail(stack);
+        }
+        if (result == ActionResult.PASS) {
+            return TypedActionResult.pass(stack);
+        }
+        return TypedActionResult.success(stack);
+    }
+
     /** Repairs a car, picks it back up, or opens the tuning sheet. */
     public static class Wrench extends Item {
         public Wrench(Settings settings) {
@@ -58,17 +70,18 @@ public final class ToolItems {
         }
 
         @Override
-        public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+            ItemStack stack = user.getStackInHand(hand);
             if (world.isClient) {
-                return ActionResult.SUCCESS;
+                return TypedActionResult.success(stack);
             }
             CarEntity car = carAt(world, user);
             if (car == null) {
                 user.sendMessage(Text.translatable("message.fabricracers.wrench_none")
                         .formatted(Formatting.GRAY), true);
-                return ActionResult.PASS;
+                return TypedActionResult.pass(stack);
             }
-            return interact(car, user, user.getStackInHand(hand), user.isSneaking());
+            return wrap(interact(car, user, stack, user.isSneaking()), stack);
         }
 
         private ActionResult interact(CarEntity car, PlayerEntity player, ItemStack wrench, boolean sneaking) {
@@ -122,25 +135,26 @@ public final class ToolItems {
         }
 
         @Override
-        public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+            ItemStack stack = user.getStackInHand(hand);
             if (world.isClient) {
-                return ActionResult.SUCCESS;
+                return TypedActionResult.success(stack);
             }
             CarEntity car = carAt(world, user);
             if (car == null) {
                 user.sendMessage(Text.translatable("message.fabricracers.wrench_none")
                         .formatted(Formatting.GRAY), true);
-                return ActionResult.PASS;
+                return TypedActionResult.pass(stack);
             }
             if (car.ownerName().isEmpty() || car.owner() == null) {
                 car.setOwner(user.getUuid(), user.getName().getString());
                 user.sendMessage(Text.translatable("message.fabricracers.claimed",
                         car.carType().displayName).formatted(Formatting.GREEN), true);
-                return ActionResult.CONSUME;
+                return TypedActionResult.success(stack);
             }
             user.sendMessage(Text.translatable("message.fabricracers.key_owner",
                     Text.literal(car.ownerName())).formatted(Formatting.YELLOW), true);
-            return ActionResult.CONSUME;
+            return TypedActionResult.success(stack);
         }
 
         @Override
@@ -168,11 +182,12 @@ public final class ToolItems {
         }
 
         @Override
-        public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+            ItemStack stack = user.getStackInHand(hand);
             if (world.isClient) {
-                return ActionResult.SUCCESS;
+                return TypedActionResult.success(stack);
             }
-            return paint(carAt(world, user), user, user.getStackInHand(hand));
+            return wrap(paint(carAt(world, user), user, stack), stack);
         }
 
         private ActionResult paint(CarEntity car, PlayerEntity player, ItemStack stack) {
@@ -212,9 +227,10 @@ public final class ToolItems {
         }
 
         @Override
-        public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+            ItemStack stack = user.getStackInHand(hand);
             BlockPos pos = user == null ? BlockPos.ORIGIN : user.getBlockPos();
-            return use(world, user, hand, pos);
+            return wrap(use(world, user, hand, pos), stack);
         }
 
         private ActionResult use(World world, PlayerEntity user, Hand hand, BlockPos pos) {
@@ -253,12 +269,13 @@ public final class ToolItems {
         }
 
         @Override
-        public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+            ItemStack stack = user.getStackInHand(hand);
             if (world.isClient) {
-                Stopwatch.items().toggle();
-                return ActionResult.SUCCESS;
+                dev.qynl.racers.util.Stopwatch.items().toggle();
+                return TypedActionResult.success(stack);
             }
-            return ActionResult.CONSUME;
+            return TypedActionResult.success(stack);
         }
 
         @Override
@@ -277,14 +294,15 @@ public final class ToolItems {
         }
 
         @Override
-        public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+            ItemStack stack = user.getStackInHand(hand);
             if (world.isClient) {
-                return ActionResult.SUCCESS;
+                return TypedActionResult.success(stack);
             }
             if (user instanceof ServerPlayerEntity player) {
                 StatsManager.get(player.server).sendRecord(player);
             }
-            return ActionResult.CONSUME;
+            return TypedActionResult.success(stack);
         }
 
         @Override
@@ -323,9 +341,10 @@ public final class ToolItems {
         }
 
         @Override
-        public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+            ItemStack stack = user.getStackInHand(hand);
             if (world.isClient) {
-                return ActionResult.SUCCESS;
+                return TypedActionResult.success(stack);
             }
             if (user instanceof ServerPlayerEntity player) {
                 var session = dev.qynl.racers.race.RaceManager.get(player.server).sessionFor(player);
@@ -337,7 +356,7 @@ public final class ToolItems {
                             false);
                 }
             }
-            return ActionResult.CONSUME;
+            return TypedActionResult.success(stack);
         }
 
         @Override

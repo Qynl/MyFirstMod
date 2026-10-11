@@ -10,6 +10,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
+import net.minecraft.village.TradedItem;
 import net.minecraft.village.VillagerProfession;
 
 import dev.qynl.racers.car.CarType;
@@ -28,8 +29,8 @@ public final class PartShop {
     public static void init() {
         // --- tier 1: starter parts and building blocks -------------------
         TradeOfferHelper.registerVillagerOffers(VillagerProfession.TOOLSMITH, 1, factories -> {
-            factories.add(buy(ModItems.part(Tune.TIRES), 2, 9, 8));
-            factories.add(buy(ModItems.part(Tune.BRAKES), 1, 8, 8));
+            factories.add(buy(ModItems.partItem(Tune.TIRES), 2, 9, 8));
+            factories.add(buy(ModItems.partItem(Tune.BRAKES), 1, 8, 8));
         });
         TradeOfferHelper.registerVillagerOffers(VillagerProfession.MASON, 1, factories -> {
             factories.add(buy(ModItems.BLOCK_ASPHALT_ITEM, 16, 7, 6));
@@ -38,15 +39,15 @@ public final class PartShop {
 
         // --- tier 2: real tuning ----------------------------------------
         TradeOfferHelper.registerVillagerOffers(VillagerProfession.TOOLSMITH, 2, factories -> {
-            factories.add(buy(ModItems.part(Tune.ENGINE), 1, 18, 6));
-            factories.add(buy(ModItems.part(Tune.GEARBOX), 1, 16, 6));
-            factories.add(buy(ModItems.part(Tune.CHASSIS), 1, 14, 6));
+            factories.add(buy(ModItems.partItem(Tune.ENGINE), 1, 18, 6));
+            factories.add(buy(ModItems.partItem(Tune.GEARBOX), 1, 16, 6));
+            factories.add(buy(ModItems.partItem(Tune.CHASSIS), 1, 14, 6));
         });
 
         // --- tier 3: aero, boost and the cars themselves -----------------
         TradeOfferHelper.registerVillagerOffers(VillagerProfession.TOOLSMITH, 3, factories -> {
-            factories.add(buy(ModItems.part(Tune.AERO), 1, 26, 5));
-            factories.add(buy(ModItems.part(Tune.BOOST), 1, 24, 5));
+            factories.add(buy(ModItems.partItem(Tune.AERO), 1, 26, 5));
+            factories.add(buy(ModItems.partItem(Tune.BOOST), 1, 24, 5));
             factories.add(PartShop::carOffer);
         });
         TradeOfferHelper.registerVillagerOffers(VillagerProfession.WEAPONSMITH, 3,
@@ -69,7 +70,7 @@ public final class PartShop {
 
     /** A plain "give emeralds, get item" trade. */
     private static TradeOffers.Factory buy(Item item, int amount, int price, int maxUses) {
-        return (entity, random) -> new TradeOffer(new ItemStack(Items.EMERALD, price),
+        return (entity, random) -> new TradeOffer(new TradedItem(Items.EMERALD, price),
                 new ItemStack(item, amount), maxUses, 5, 0.05F);
     }
 
@@ -77,7 +78,7 @@ public final class PartShop {
     private static TradeOffer carOffer(net.minecraft.entity.Entity entity, Random random) {
         List<CarType> sellable = new ArrayList<>(CarType.stock());
         CarType type = sellable.get(random.nextInt(sellable.size()));
-        return new TradeOffer(new ItemStack(Items.EMERALD, Math.max(4, type.price() * 3)),
+        return new TradeOffer(new TradedItem(Items.EMERALD, Math.max(4, type.price() * 3)),
                 ModItems.carStack(type, null), 2, 12, 0.1F);
     }
 

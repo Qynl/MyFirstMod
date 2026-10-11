@@ -2,6 +2,7 @@ package dev.qynl.racers.block;
 
 import java.util.Locale;
 
+import net.minecraft.block.AbstractBlock.Settings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.NoteBlockInstrument;

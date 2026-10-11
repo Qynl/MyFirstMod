@@ -2,8 +2,6 @@ package dev.qynl.racers.car;
 
 import java.util.UUID;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -158,7 +156,5 @@ public final class CarData {
 
     public static void apply(ItemStack stack, CarData data) {
         ModComponents.setCarData(stack, data.toNbt());
-        stack.set(DataComponentTypes.CUSTOM_MODEL_DATA, new CustomModelDataComponent(
-                java.util.List.of(), java.util.List.of(), java.util.List.of(), java.util.List.of()));
     }
 }
