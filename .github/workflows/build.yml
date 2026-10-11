@@ -197,7 +197,7 @@ jobs:
               if pathlib.Path('rcon_out.txt').exists() else ''
           log = pathlib.Path('server.log').read_text(errors='replace') if pathlib.Path('server.log').exists() else ''
           started = 'Done (' in log
-          trade = re.search(r'sell: \{[^}]*"id": "(fabricracers:[a-z_]+)"', transcript)
+          trade = re.search('sell.{0,40}fabricracers:([a-z_]+)', transcript)
           summon_line = next((l for l in transcript.splitlines() if l.startswith('Summoned new')), '')
           checks = {
               'track catalogue': 'Circuits (' in transcript,
