@@ -70,10 +70,11 @@ public final class Metrics {
     public synchronized String summary(long now) {
         prune(now);
         return String.format(Locale.ROOT,
-                "[Cost: LLM %d/min, %d total, %d failed, avg %.1fs; vision %d/min, %d total; tick %.2f ms avg, %.2f ms max; path %.2f ms avg]",
+                "[Cost: LLM %d/min, %d total, %d failed, avg %.1fs; vision %d/min, %d total; tick %.2f ms avg, %.2f ms max; path %.2f ms avg; heap %d MB]",
                 llmStarts.size(), llmTotal, llmFailures, llmLatencyEmaMs < 0 ? 0 : llmLatencyEmaMs / 1000.0,
                 visionStarts.size(), visionTotal,
-                tickEmaMs < 0 ? 0 : tickEmaMs, tickMaxMs, pathEmaMs < 0 ? 0 : pathEmaMs);
+                tickEmaMs < 0 ? 0 : tickEmaMs, tickMaxMs, pathEmaMs < 0 ? 0 : pathEmaMs,
+                (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024));
     }
 
     public synchronized int llmPerMinute(long now) {
