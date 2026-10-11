@@ -12,6 +12,7 @@ import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
+import java.util.List;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -319,6 +320,69 @@ public class NovaGameTest implements FabricGameTest {
             }
             return true;
         }, () -> "Companion did not stash bulk blocks. diorite=" + count(body, Items.DIORITE));
+    }
+
+    /** Combat judgement, bounded lessons and metrics windows: plain logic, no world needed. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void tacticsExperienceAndMetricsLogic(TestContext ctx) {
+        using(ctx, "zombie, full health, sword, owner near", Dev.tac("zombie", 3, 1, 20, true, 4, -1),
+                dev.qynl.ollamaplayer.companion.Tactics.Stance.FIGHT);
+        using(ctx, "three creepers, health 6", Dev.tac("creeper", 2, 3, 6, true, 4, 4),
+                dev.qynl.ollamaplayer.companion.Tactics.Stance.RETREAT);
+        using(ctx, "warden with no sword", Dev.tac("warden", 5, 1, 20, false, 0, 4),
+                dev.qynl.ollamaplayer.companion.Tactics.Stance.RETREAT);
+        using(ctx, "skeleton at range, sword", Dev.tac("skeleton", 10, 1, 20, true, 4, 4),
+                dev.qynl.ollamaplayer.companion.Tactics.Stance.FIGHT);
+        using(ctx, "health 8, no lesson yet", Dev.tac("zombie", 3, 1, 8, true, 4, 4),
+                dev.qynl.ollamaplayer.companion.Tactics.Stance.AVOID);
+        using(ctx, "health 8 with the lesson learned", Dev.tac("zombie", 3, 1, 8, true, 4, 4, 1),
+                dev.qynl.ollamaplayer.companion.Tactics.Stance.RETREAT);
+
+        dev.qynl.ollamaplayer.companion.Experience xp = new dev.qynl.ollamaplayer.companion.Experience();
+        for (int i = 0; i < 100; i++) xp.record("situation " + i, "lesson " + i);
+        if (xp.size() > dev.qynl.ollamaplayer.companion.Experience.MAX) {
+            ctx.throwGameTestException("experience grew past its bound: " + xp.size());
+        }
+        xp.record("again", "lesson 99");
+        xp.record("again", "lesson 99");
+        if (xp.count("lesson 99") != 3) {
+            ctx.throwGameTestException("repeat lesson was not counted: " + xp.count("lesson 99"));
+        }
+        if (!xp.top(1).equals(List.of("lesson 99"))) {
+            ctx.throwGameTestException("most confirmed lesson not first: " + xp.top(1));
+        }
+        dev.qynl.ollamaplayer.companion.Experience copy = new dev.qynl.ollamaplayer.companion.Experience();
+        copy.load(xp.toNbt());
+        if (copy.size() != xp.size() || copy.count("lesson 99") != xp.count("lesson 99")) {
+            ctx.throwGameTestException("experience did not survive NBT round trip");
+        }
+
+        dev.qynl.ollamaplayer.brain.Metrics m = new dev.qynl.ollamaplayer.brain.Metrics();
+        long t0 = 1_000_000_000L;
+        m.llmStarted(t0);
+        m.llmStarted(t0 + 1);
+        if (m.llmPerMinute(t0 + 2) != 2) ctx.throwGameTestException("LLM window should count 2 requests");
+        if (m.llmPerMinute(t0 + 61_000_000_000L) != 0) ctx.throwGameTestException("LLM window should expire after a minute");
+        ctx.complete();
+    }
+
+    private static void using(TestContext ctx, String label, Dev.Tac t,
+                              dev.qynl.ollamaplayer.companion.Tactics.Stance want) {
+        dev.qynl.ollamaplayer.companion.Tactics.Stance got = dev.qynl.ollamaplayer.companion.Tactics.decide(t.s());
+        if (got != want) ctx.throwGameTestException("tactics: " + label + " expected " + want + " got " + got);
+    }
+
+    /** Builds a Tactics situation for the logic tests above. */
+    private static final class Dev {
+        record Tac(dev.qynl.ollamaplayer.companion.Tactics.Situation s) {}
+
+        static Tac tac(String type, double dist, int count, float hp, boolean sword, int armor, double ownerDist) {
+            return tac(type, dist, count, hp, sword, armor, ownerDist, 0);
+        }
+
+        static Tac tac(String type, double dist, int count, float hp, boolean sword, int armor, double ownerDist, int bonus) {
+            return new Tac(new dev.qynl.ollamaplayer.companion.Tactics.Situation(type, dist, count, hp, sword, armor, false, ownerDist, bonus));
+        }
     }
 
     /** Pure logic checks: the keyword fallback and the model-reply parser route requests to the right action. */
