@@ -386,7 +386,7 @@ public class NovaGameTest implements FabricGameTest {
             ctx.throwGameTestException("malformed decision did not fall back to SAFE");
         }
         StringBuilder many = new StringBuilder("{\"decision\":\"MINE\",\"next_steps\":[");
-        for (int i = 0; i < 10; i++) many.append(i == 0 ? "" : ",").append("\"mine\"");
+        for (int i = 0; i < 10; i++) many.append(i == 0 ? "" : ",").append("\"eat\"");
         many.append("]}");
         if (dev.qynl.ollamaplayer.brain.Decision.parse(many.toString()).steps().size() != 5) {
             ctx.throwGameTestException("steps were not capped at 5");
