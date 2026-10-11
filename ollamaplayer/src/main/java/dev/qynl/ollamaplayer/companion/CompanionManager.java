@@ -1,5 +1,6 @@
 package dev.qynl.ollamaplayer.companion;
 
+import net.minecraft.nbt.NbtElement;
 import dev.qynl.ollamaplayer.OllamaPlayerMod;
 import dev.qynl.ollamaplayer.brain.Brain;
 import dev.qynl.ollamaplayer.config.ModConfig;
@@ -60,6 +61,7 @@ public final class CompanionManager {
             body.getHungerManager().setFoodLevel(root.getInt("food"));
             companion = new Companion(body, this::speak);
             companion.setMode(parseMode(root.getString("mode")));
+            if (root.contains("lessons")) companion.experience().load(root.getList("lessons", NbtElement.COMPOUND_TYPE));
             if (root.contains("stash")) companion.setStashPos(net.minecraft.util.math.BlockPos.fromLong(root.getLong("stash")));
             if (root.containsUuid("owner")) ownerId = root.getUuid("owner");
             speak("I'm back. Who wants to go mining?");
@@ -149,7 +151,9 @@ public final class CompanionManager {
                 }
                 if (companion != null) {
                     try {
+                        long t0 = System.nanoTime();
                         companion.tick(owner);
+                        brain.metrics().tick(System.nanoTime() - t0);
                         errorStreak = 0;
                     } catch (RuntimeException e) {
                         // Never let a bug in the companion take the whole server down.
@@ -184,7 +188,8 @@ public final class CompanionManager {
     public String status() {
         if (companion == null) return "Not spawned. Use /nova spawn.";
         String stash = companion.stashPos() == null ? "" : " Stash chest at " + companion.stashPos().toShortString() + ".";
-        return companion.statusLine() + stash + " Model: " + brain.llm().status();
+        return companion.statusLine() + stash + " Model: " + brain.llm().status() + " "
+                + brain.metrics().summary(System.nanoTime());
     }
 
     private void handleDeath(NovaBody body) {

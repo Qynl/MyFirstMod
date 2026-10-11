@@ -33,6 +33,11 @@ public final class Brain {
     private final Random random = new Random();
     private final JsonObject responseFormat = buildResponseFormat();
 
+    private final Metrics metrics = Metrics.SHARED;
+    /** Idle thoughts are never sent closer together than this, whatever the timer says. */
+    private static final long IDLE_MIN_GAP_NANOS = 10_000_000_000L;
+    private long lastRequestNanos;
+
     private volatile boolean inFlight;
     private String pendingText;
     private String pendingWho;
@@ -45,6 +50,10 @@ public final class Brain {
 
     public OllamaClient llm() {
         return llm;
+    }
+
+    public Metrics metrics() {
+        return metrics;
     }
 
     public synchronized void remember(String line) {
@@ -121,11 +130,16 @@ public final class Brain {
             return;
         }
 
+        long started = System.nanoTime();
+        if (!player && started - lastRequestNanos < IDLE_MIN_GAP_NANOS) return;
+        lastRequestNanos = started;
         inFlight = true;
+        metrics.llmStarted(started);
         List<JsonObject> messages = buildMessages(trigger, who, text);
         llm.chat(messages, responseFormat).whenComplete((content, err) -> {
             inFlight = false;
             boolean idle = !player;
+            metrics.llmFinished(System.nanoTime() - started, err != null);
             if (err != null) {
                 OllamaPlayerMod.LOGGER.info("Brain request failed: {}", err.getMessage());
                 if (player) replies.add(new Queued(false, Heuristics.reply(text)));

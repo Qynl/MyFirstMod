@@ -133,6 +133,12 @@ public final class Companion {
         return mode;
     }
 
+    private final Experience experience = new Experience();
+
+    public Experience experience() {
+        return experience;
+    }
+
     public void setMode(Mode m) {
         mode = m;
         nav.clear();
@@ -158,6 +164,10 @@ public final class Companion {
         if (hp < 7 && lastHealth >= 7 && hurtCooldown == 0) {
             say.accept("I'm badly hurt!");
             hurtCooldown = 200;
+            // Learn from it: if this happened in a fight, the lesson is to leave earlier.
+            if (nearestEnemy(world, 16) != null) {
+                experience.record("badly hurt in a fight", Experience.RETREAT_EARLY);
+            }
         }
         lastHealth = hp;
 
@@ -192,10 +202,13 @@ public final class Companion {
             if (hp <= 10 && eatCooldown == 0 && eatFood()) {
                 return;
             }
-            if (hp <= 7 && owner != null) {
-                // Too hurt to trade hits: retreat toward the owner.
+            // Deterministic judgement: fight, keep the position, or retreat to the owner.
+            Tactics.Stance stance = Tactics.decide(situationFor(enemy, owner, world));
+            if (stance == Tactics.Stance.RETREAT && owner != null) {
                 planTo(world, ownerGoal(owner));
                 nav.tick(player, 0.18);
+            } else if (stance == Tactics.Stance.AVOID && player.distanceTo(enemy) >= 4.0 && tryShoot(enemy, world)) {
+                // Keeping the range advantage with the bow.
             } else {
                 fight(enemy, world);
             }
@@ -417,6 +430,8 @@ public final class Companion {
         sb.append("- Holding: ").append(held.isEmpty() ? "nothing" : held.getName().getString()).append(".\n");
         sb.append("- Inventory: ").append(inventorySummary()).append(".\n");
         sb.append("- Wearing: ").append(wornSummary()).append(".\n");
+        java.util.List<String> lessons = experience.top(3);
+        if (!lessons.isEmpty()) sb.append("- Lessons learned: ").append(String.join("; ", lessons)).append(".\n");
         sb.append("- Stash chest: ").append(stashPos == null ? "none yet"
                 : "at " + stashPos.toShortString() + ", " + Math.round(Math.sqrt(player.getBlockPos().getSquaredDistance(stashPos))) + " blocks away").append(".\n");
         LivingEntity enemy = nearestEnemy(world, 16);
@@ -471,6 +486,25 @@ public final class Companion {
         return new Pathfinder.Goal(
                 p -> Math.hypot(p.getX() + 0.5 - op.x, p.getZ() + 0.5 - op.z) <= 2.5 && Math.abs(p.getY() - op.y) <= 2,
                 p -> Math.hypot(p.getX() + 0.5 - op.x, p.getZ() + 0.5 - op.z));
+    }
+
+    /** The numbers the combat judgement needs, read from the body and the world. */
+    private Tactics.Situation situationFor(LivingEntity enemy, @Nullable ServerPlayerEntity owner, ServerWorld world) {
+        int enemies = world.getEntitiesByClass(net.minecraft.entity.mob.HostileEntity.class,
+                player.getBoundingBox().expand(12), LivingEntity::isAlive).size();
+        int armor = 0;
+        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST,
+                EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+            if (!player.getEquippedStack(slot).isEmpty()) armor++;
+        }
+        ItemStack hand = player.getMainHandStack();
+        boolean sword = hand.getItem() instanceof net.minecraft.item.SwordItem || hand.getItem() instanceof net.minecraft.item.AxeItem;
+        int retreatBonus = Math.min(3, experience.count(Experience.RETREAT_EARLY));
+        return new Tactics.Situation(
+                Registries.ENTITY_TYPE.getId(enemy.getType()).getPath(),
+                player.distanceTo(enemy), Math.max(1, enemies), player.getHealth(),
+                sword, armor, player.getOffHandStack().getItem() instanceof ShieldItem,
+                owner == null ? -1.0 : player.distanceTo(owner), retreatBonus);
     }
 
     private void fight(LivingEntity enemy, ServerWorld world) {
@@ -573,6 +607,7 @@ public final class Companion {
         }
         chest.markDirty();
         stashPos = spot;
+        if (moved > 0) experience.record("bag nearly full", Experience.STASH_FIRST);
         if (moved == 0) return "My stash chest is full.";
         return "Stashed " + moved + " blocks in a chest at " + spot.toShortString() + ".";
     }
@@ -1551,7 +1586,9 @@ public final class Companion {
 
     private boolean planTo(ServerWorld world, Pathfinder.Goal goal) {
         boolean canBridge = countInv("cobblestone") + countInv("dirt") > 0;
+        long t0 = System.nanoTime();
         List<BlockPos> path = Pathfinder.find(world, player.getBlockPos(), goal, canBridge);
+        dev.qynl.ollamaplayer.brain.Metrics.SHARED.path(System.nanoTime() - t0);
         if (path == null) {
             nav.clear();
             return false;
