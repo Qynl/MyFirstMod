@@ -5,6 +5,8 @@ import java.util.UUID;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -101,14 +103,26 @@ public final class CarData {
         return nbt;
     }
 
+    /**
+     * Tuning levels are written as an int array, but hand written NBT (or SNBT
+     * from a command) usually uses a plain int list - accept both.
+     */
+    private static int[] readLevels(NbtCompound nbt) {
+        int[] levels = new int[Tune.values().length];
+        int[] packed = nbt.getIntArray("levels");
+        for (int i = 0; i < Math.min(packed.length, levels.length); i++) {
+            levels[i] = packed[i];
+        }
+        NbtList list = nbt.getList("levels", NbtElement.INT_TYPE);
+        for (int i = 0; i < Math.min(list.size(), levels.length); i++) {
+            levels[i] = list.getInt(i);
+        }
+        return levels;
+    }
+
     public static CarData fromNbt(NbtCompound nbt) {
         CarType type = CarType.byId(nbt.getString("type"));
-        int[] levels = nbt.getIntArray("levels");
-        if (levels.length != Tune.values().length) {
-            int[] fixed = new int[Tune.values().length];
-            System.arraycopy(levels, 0, fixed, 0, Math.min(levels.length, fixed.length));
-            levels = fixed;
-        }
+        int[] levels = readLevels(nbt);
         UUID owner = null;
         String raw = nbt.getString("owner");
         if (!raw.isEmpty()) {

@@ -153,7 +153,7 @@ jobs:
               'setblock 0 5 0 fabricracers:asphalt',
               'setblock 2 5 0 fabricracers:boost_pad',
               'setblock 4 5 0 fabricracers:checkpoint_marker',
-              'summon fabricracers:player_car 6 6 0 {CarData:{type:"f1",levels:[1,1,0,0,0,0,0]}}',
+              'summon fabricracers:player_car 6 6 0 {CarData:{type:"f1",levels:[I;1,1,0,0,0,0,0]}}',
               'data get entity @e[type=fabricracers:player_car,limit=1] CarData',
               'kill @e[type=fabricracers:player_car]',
           ]
@@ -177,12 +177,14 @@ jobs:
               if pathlib.Path('rcon_out.txt').exists() else ''
           log = pathlib.Path('server.log').read_text(errors='replace') if pathlib.Path('server.log').exists() else ''
           started = 'Done (' in log
+          summon_line = next((l for l in transcript.splitlines() if l.startswith('Summoned new')), '')
           checks = {
               'track catalogue': 'Circuits (' in transcript,
               'block placement': 'Changed the block at' in transcript,
               'car entity spawn': 'Summoned new' in transcript,
-              'car NBT -> type': 'Circuit Formula' in transcript,
-              'entity data read': 'CarData' in transcript and 'f1' in transcript,
+              'car NBT applied on spawn': bool(summon_line) and 'Sport' not in summon_line,
+              'entity data read': 'CarData' in transcript and 'type: "f1"' in transcript,
+              'tuning levels round-trip': 'levels: [I; 1, 1' in transcript,
           }
           failed = [name for name, good in checks.items() if not good]
           head = 'server started' if started else "SERVER NEVER REACHED 'Done'"
