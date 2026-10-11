@@ -525,9 +525,10 @@ public final class Companion {
             if (!inv.getStack(i).isEmpty()) used++;
         }
         if (used < 30) return;
-        stashCooldown = 200;
-
         String msg = doStash(world);
+        // A failed attempt (no room, full chest) is reported, then retried much less often.
+        boolean failed = msg == null || msg.startsWith("My ");
+        stashCooldown = failed ? 1200 : 200;
         if (msg != null) say.accept(msg);
     }
 
