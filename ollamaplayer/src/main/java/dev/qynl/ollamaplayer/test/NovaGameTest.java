@@ -366,6 +366,43 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
+    /** Structured decisions are validated, and the mining go/no-go check is deterministic. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void decisionsAndMiningTripsAreValidated(TestContext ctx) {
+        dev.qynl.ollamaplayer.brain.Decision d = dev.qynl.ollamaplayer.brain.Decision.parse(
+                "{\"decision\":\"mine\",\"reason\":\"iron nearby\",\"priority\":0.78,\"next_steps\":[\"mine\",\"bogus\"]}");
+        if (!d.name().equals("MINE") || d.priority() != 0.78 || !d.steps().equals(List.of("mine"))
+                || !d.toAction().equals("mine")) {
+            ctx.throwGameTestException("valid decision parsed wrong: " + d);
+        }
+        if (!dev.qynl.ollamaplayer.brain.Decision.parse("{\"decision\":\"FLY\"}").name().equals("NONE")) {
+            ctx.throwGameTestException("unknown decision name was not replaced");
+        }
+        if (dev.qynl.ollamaplayer.brain.Decision.parse("{\"decision\":\"MINE\",\"priority\":5}").priority() != 1.0) {
+            ctx.throwGameTestException("priority was not clamped");
+        }
+        if (dev.qynl.ollamaplayer.brain.Decision.parse("not json at all") != dev.qynl.ollamaplayer.brain.Decision.SAFE
+                || dev.qynl.ollamaplayer.brain.Decision.parse("[1,2]") != dev.qynl.ollamaplayer.brain.Decision.SAFE) {
+            ctx.throwGameTestException("malformed decision did not fall back to SAFE");
+        }
+        StringBuilder many = new StringBuilder("{\"decision\":\"MINE\",\"next_steps\":[");
+        for (int i = 0; i < 10; i++) many.append(i == 0 ? "" : ",").append("\"mine\"");
+        many.append("]}");
+        if (dev.qynl.ollamaplayer.brain.Decision.parse(many.toString()).steps().size() != 5) {
+            ctx.throwGameTestException("steps were not capped at 5");
+        }
+        if (dev.qynl.ollamaplayer.companion.MiningTrip.postponeReason(8, 20, 1, 0) == null
+                || dev.qynl.ollamaplayer.companion.MiningTrip.postponeReason(15, 8, 1, 0) == null
+                || dev.qynl.ollamaplayer.companion.MiningTrip.postponeReason(15, 20, 0.1, 0) == null
+                || dev.qynl.ollamaplayer.companion.MiningTrip.postponeReason(15, 20, 1, 0.95) == null) {
+            ctx.throwGameTestException("a risky mining trip was not postponed");
+        }
+        if (dev.qynl.ollamaplayer.companion.MiningTrip.postponeReason(15, 20, 0.5, 0.5) != null) {
+            ctx.throwGameTestException("a healthy mining trip was postponed");
+        }
+        ctx.complete();
+    }
+
     private static void using(TestContext ctx, String label, Dev.Tac t,
                               dev.qynl.ollamaplayer.companion.Tactics.Stance want) {
         dev.qynl.ollamaplayer.companion.Tactics.Stance got = dev.qynl.ollamaplayer.companion.Tactics.decide(t.s());

@@ -174,6 +174,14 @@ public final class Companion {
         if (player.getHungerManager().getFoodLevel() <= 14 && eatCooldown == 0) {
             eatFood();
         }
+        // Player relationship: if the owner is badly hurt and Nova is too, restock first rather than
+        // blindly following into the fight.
+        if (ownerDangerTimer > 0) ownerDangerTimer--;
+        if (owner != null && owner.getHealth() < 8 && player.getHealth() < 8 && ownerDangerTimer == 0) {
+            say.accept("I'm too low on health to keep up. I'll restock and catch up.");
+            ownerDangerTimer = 600;
+            eatFood();
+        }
 
         LivingEntity enemy = nearestEnemy(world, 16);
         // Defend the owner: whatever just hit them, unless it is another player, becomes the target.
@@ -302,6 +310,13 @@ public final class Companion {
             }
             case "mine" -> {
                 if (target == null || target.isBlank()) return "Mine what, exactly?";
+                String why = MiningTrip.postponeReason(player.getHealth(), player.getHungerManager().getFoodLevel(),
+                        bestPickaxeFraction(), bagFraction());
+                if (why != null && why.startsWith("I need to eat") && eatFood()) {
+                    why = MiningTrip.postponeReason(player.getHealth(), player.getHungerManager().getFoodLevel(),
+                            bestPickaxeFraction(), bagFraction());
+                }
+                if (why != null) return "Not yet: " + why + ". I'll go once that's sorted.";
                 startMining(target, count);
             }
             case "craft" -> {
@@ -334,6 +349,26 @@ public final class Companion {
         }
         return null;
     }
+
+    /** Durability left on the best pickaxe in the bag, 0..1. 1 when there is no pickaxe to judge. */
+    private double bestPickaxeFraction() {
+        double best = -1;
+        for (int i = 0; i < player.getInventory().size(); i++) {
+            ItemStack st = player.getInventory().getStack(i);
+            if (!(st.getItem() instanceof net.minecraft.item.PickaxeItem) || st.getMaxDamage() <= 0) continue;
+            best = Math.max(best, (double) (st.getMaxDamage() - st.getDamage()) / st.getMaxDamage());
+        }
+        return best < 0 ? 1.0 : best;
+    }
+
+    /** Share of the 36 main inventory slots in use, 0..1. */
+    private double bagFraction() {
+        int used = 0;
+        for (int i = 0; i < 36; i++) if (!player.getInventory().getStack(i).isEmpty()) used++;
+        return used / 36.0;
+    }
+
+    private int ownerDangerTimer;
 
     public void startMining(String target, int count) {
         cancelPlan();
