@@ -403,6 +403,43 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
+    /** The strategist asks only on events, never twice at once, respects its cooldown, and survives failures. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void strategistIsEventDrivenAndSafe(TestContext ctx) {
+        List<java.util.concurrent.CompletableFuture<String>> sent = new java.util.ArrayList<>();
+        dev.qynl.ollamaplayer.brain.Strategist s = new dev.qynl.ollamaplayer.brain.Strategist(msgs -> {
+            java.util.concurrent.CompletableFuture<String> f = new java.util.concurrent.CompletableFuture<>();
+            sent.add(f);
+            return f;
+        }, 1_000_000_000L, new dev.qynl.ollamaplayer.brain.Metrics());
+        List<com.google.gson.JsonObject> none = List.of();
+        if (s.consider(none, 0) != dev.qynl.ollamaplayer.brain.Strategist.Outcome.SENT) ctx.throwGameTestException("first event should be sent");
+        if (s.consider(none, 0) != dev.qynl.ollamaplayer.brain.Strategist.Outcome.SKIPPED_IN_FLIGHT) ctx.throwGameTestException("second event must not overlap");
+        sent.get(0).complete("{\"decision\":\"RETREAT\",\"priority\":0.9}");
+        if (!s.takeLatest().name().equals("RETREAT")) ctx.throwGameTestException("valid decision was lost");
+        if (s.takeLatest() != null) ctx.throwGameTestException("a decision must be handed out once");
+        if (s.consider(none, 500_000_000L) != dev.qynl.ollamaplayer.brain.Strategist.Outcome.SKIPPED_COOLDOWN) ctx.throwGameTestException("cooldown was ignored");
+        if (s.consider(none, 2_000_000_000L) != dev.qynl.ollamaplayer.brain.Strategist.Outcome.SENT) ctx.throwGameTestException("event after cooldown not sent");
+        sent.get(1).completeExceptionally(new java.util.concurrent.TimeoutException("slow model"));
+        if (!s.takeLatest().name().equals("NONE")) ctx.throwGameTestException("timeout did not fall back to SAFE");
+        if (s.consider(none, 4_000_000_000L) != dev.qynl.ollamaplayer.brain.Strategist.Outcome.SENT) ctx.throwGameTestException("should send again");
+        sent.get(2).complete("this is not json");
+        if (!s.takeLatest().name().equals("NONE")) ctx.throwGameTestException("malformed output did not fall back to SAFE");
+        if (s.consider(none, 6_000_000_000L) != dev.qynl.ollamaplayer.brain.Strategist.Outcome.SENT) ctx.throwGameTestException("should send again");
+        // A slow model never blocks: the call returns immediately and later events are simply skipped.
+        if (s.consider(none, 9_000_000_000L) != dev.qynl.ollamaplayer.brain.Strategist.Outcome.SKIPPED_IN_FLIGHT) ctx.throwGameTestException("slow response must not allow an overlap");
+        if (sent.size() != 4) ctx.throwGameTestException("expected exactly 4 model calls, got " + sent.size());
+
+        dev.qynl.ollamaplayer.brain.Strategist thrower = new dev.qynl.ollamaplayer.brain.Strategist(msgs -> {
+            throw new IllegalStateException("port exploded");
+        }, 1_000_000_000L, new dev.qynl.ollamaplayer.brain.Metrics());
+        thrower.consider(none, 0);
+        if (!thrower.takeLatest().name().equals("NONE") || thrower.inFlight()) {
+            ctx.throwGameTestException("a throwing model port was not contained");
+        }
+        ctx.complete();
+    }
+
     private static void using(TestContext ctx, String label, Dev.Tac t,
                               dev.qynl.ollamaplayer.companion.Tactics.Stance want) {
         dev.qynl.ollamaplayer.companion.Tactics.Stance got = dev.qynl.ollamaplayer.companion.Tactics.decide(t.s());

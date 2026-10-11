@@ -164,6 +164,7 @@ public final class Companion {
         if (hp < 7 && lastHealth >= 7 && hurtCooldown == 0) {
             say.accept("I'm badly hurt!");
             hurtCooldown = 200;
+            event("HURT");
             // Learn from it: if this happened in a fight, the lesson is to leave earlier.
             if (nearestEnemy(world, 16) != null) {
                 experience.record("badly hurt in a fight", Experience.RETREAT_EARLY);
@@ -193,6 +194,7 @@ public final class Companion {
             }
         }
         if (enemy != null && !sawEnemy && player.distanceTo(enemy) < 10) {
+            event("ENEMY_APPEARED");
             say.accept("Heads up, " + Registries.ENTITY_TYPE.getId(enemy.getType()).getPath().replace('_', ' ') + "!");
         }
         sawEnemy = enemy != null;
@@ -369,6 +371,18 @@ public final class Companion {
     }
 
     private int ownerDangerTimer;
+
+    /** Events the strategist may want to hear about, drained by the brain. Capped so nothing grows unbounded. */
+    private final java.util.ArrayDeque<String> events = new java.util.ArrayDeque<>();
+
+    private void event(String e) {
+        if (events.size() < 8) events.addLast(e);
+    }
+
+    @Nullable
+    public String pollEvent() {
+        return events.pollFirst();
+    }
 
     public void startMining(String target, int count) {
         cancelPlan();

@@ -2,6 +2,7 @@ package dev.qynl.ollamaplayer.brain;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import java.util.concurrent.CompletableFuture;
 import dev.qynl.ollamaplayer.OllamaPlayerMod;
 import dev.qynl.ollamaplayer.companion.Companion;
 import dev.qynl.ollamaplayer.companion.CompanionManager;
@@ -34,6 +35,7 @@ public final class Brain {
     private final JsonObject responseFormat = buildResponseFormat();
 
     private final Metrics metrics = Metrics.SHARED;
+    private final Strategist strategist = new Strategist(this::strategyPort, 30_000_000_000L, Metrics.SHARED);
     /** Idle thoughts are never sent closer together than this, whatever the timer says. */
     private static final long IDLE_MIN_GAP_NANOS = 10_000_000_000L;
     private long lastRequestNanos;
@@ -77,8 +79,43 @@ public final class Brain {
         request("player", who, cleaned);
     }
 
+    public Strategist strategist() {
+        return strategist;
+    }
+
+    private CompletableFuture<String> strategyPort(List<JsonObject> messages) {
+        if (!ModConfig.get().useLlm || !llm.isReady()) {
+            return CompletableFuture.failedFuture(new IllegalStateException("model not ready"));
+        }
+        return llm.chat(messages, null);
+    }
+
+    /** Server thread. Asks the strategist about one event, if the model is free and the cooldown has passed. */
+    private void onEvent(String trigger, Companion c, @Nullable ServerPlayerEntity owner) {
+        JsonObject sys = new JsonObject();
+        sys.addProperty("role", "system");
+        sys.addProperty("content", "You decide Nova's next strategic step. Reply ONLY with JSON: "
+                + "{\"decision\": one of NONE, FOLLOW, HOLD, MINE, RESTOCK, FIGHT, RETREAT, CRAFT_GEAR, EXPLORE_CAVE, RETURN_HOME, "
+                + "\"reason\": short text, \"priority\": 0 to 1, \"next_steps\": list of up to 5 of eat, stash, craft, mine, follow, stay, gear}.");
+        JsonObject usr = new JsonObject();
+        usr.addProperty("role", "user");
+        usr.addProperty("content", "Event: " + trigger + "\nYour state:\n" + c.describe(owner));
+        strategist.consider(List.of(sys, usr), System.nanoTime());
+    }
+
     /** Server thread. Applies finished replies and fires idle chatter. */
     public void tick(@Nullable Companion c, @Nullable ServerPlayerEntity owner) {
+        if (c != null) {
+            String ev;
+            while ((ev = c.pollEvent()) != null) onEvent(ev, c, owner);
+            Decision d = strategist.takeLatest();
+            // Only confident, body-safe decisions are applied. Mining needs a target, so it is not auto-applied.
+            if (d != null && d.priority() >= 0.7 && !"none".equals(d.toAction()) && !"mine".equals(d.toAction())) {
+                String note = c.command(d.toAction(), null, 0);
+                if (note != null) manager.speak(note);
+            }
+        }
+
         Queued q;
         while ((q = replies.poll()) != null) {
             apply(q, c);
