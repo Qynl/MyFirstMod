@@ -417,6 +417,8 @@ public final class Companion {
         sb.append("- Holding: ").append(held.isEmpty() ? "nothing" : held.getName().getString()).append(".\n");
         sb.append("- Inventory: ").append(inventorySummary()).append(".\n");
         sb.append("- Wearing: ").append(wornSummary()).append(".\n");
+        sb.append("- Stash chest: ").append(stashPos == null ? "none yet"
+                : "at " + stashPos.toShortString() + ", " + Math.round(Math.sqrt(player.getBlockPos().getSquaredDistance(stashPos))) + " blocks away").append(".\n");
         LivingEntity enemy = nearestEnemy(world, 16);
         sb.append("- Hostile mobs nearby: ").append(enemy == null ? "none"
                 : Registries.ENTITY_TYPE.getId(enemy.getType()).getPath() + " about "
