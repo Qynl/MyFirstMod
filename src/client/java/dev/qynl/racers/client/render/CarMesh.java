@@ -141,10 +141,10 @@ public final class CarMesh {
             float ny = (sy[i] + sy[j]) / (2.0F * radius);
             float nz = (sz[i] + sz[j]) / (2.0F * radius);
             // tread band
-            vertex(vc, matrix, x - half, y + sy[i], z + sz[i], uA, tv1, 1, 1, 1, 1, light, ny, nz);
-            vertex(vc, matrix, x + half, y + sy[i], z + sz[i], uA, tv0, 1, 1, 1, 1, light, ny, nz);
-            vertex(vc, matrix, x + half, y + sy[j], z + sz[j], uB, tv0, 1, 1, 1, 1, light, ny, nz);
-            vertex(vc, matrix, x - half, y + sy[j], z + sz[j], uB, tv1, 1, 1, 1, 1, light, ny, nz);
+            vertex(vc, matrix, x - half, y + sy[i], z + sz[i], uA, tv1, 1, 1, 1, 1, light, 0.0F, ny, nz);
+            vertex(vc, matrix, x + half, y + sy[i], z + sz[i], uA, tv0, 1, 1, 1, 1, light, 0.0F, ny, nz);
+            vertex(vc, matrix, x + half, y + sy[j], z + sz[j], uB, tv0, 1, 1, 1, 1, light, 0.0F, ny, nz);
+            vertex(vc, matrix, x - half, y + sy[j], z + sz[j], uB, tv1, 1, 1, 1, 1, light, 0.0F, ny, nz);
 
             float sideU = 0.5F, sideV = 0.5F;
             float edgeU = 0.5F + 0.5F * (sz[i] / radius);

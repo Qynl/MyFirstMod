@@ -53,11 +53,11 @@ public class GarageScreen extends Screen {
 
         addDrawableChild(ButtonWidget.builder(Text.translatable("screen.fabricracers.paint_primary"),
                 button -> ClientRaceState.send(ModNetworking.REQ_PAINT,
-                        ClientRaceState.garageEntityId, 0, PaintColors.next(data.primaryColor(), 1), ""))
+                        ClientRaceState.garageEntityId, 0, PaintColors.next(data.primaryColor, 1), ""))
                 .dimensions(x, y + 168, 116, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.translatable("screen.fabricracers.paint_secondary"),
                 button -> ClientRaceState.send(ModNetworking.REQ_PAINT,
-                        ClientRaceState.garageEntityId, 1, PaintColors.next(data.secondaryColor(), 1), ""))
+                        ClientRaceState.garageEntityId, 1, PaintColors.next(data.secondaryColor, 1), ""))
                 .dimensions(x + 124, y + 168, 116, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.translatable("screen.fabricracers.repair"),
                         button -> ClientRaceState.send(ModNetworking.REQ_REPAIR,
