@@ -198,6 +198,20 @@ public final class Companion {
             eatFood();
         }
 
+        // Level 0: instant reactions, no model involved.
+        Reflex.Action reflex = Reflex.decide(player.isOnFire(), player.isTouchingWater(), player.getAir());
+        if (reflex == Reflex.Action.SURFACE) {
+            player.setVelocity(player.getVelocity().x, 0.25, player.getVelocity().z);
+        } else if (reflex == Reflex.Action.LEAVE_FIRE) {
+            BlockPos water = findNearby(world, Blocks.WATER, 4);
+            if (water != null) {
+                nav.clear();
+                planTo(world, new Pathfinder.Goal(p -> p.getSquaredDistance(water) <= 1.0,
+                        p -> p.getSquaredDistance(water)));
+                nav.tick(player, 0.16);
+            }
+        }
+
         LivingEntity enemy = nearestEnemy(world, 16);
         // Defend the owner: whatever just hit them, unless it is another player, becomes the target.
         if (owner != null) {

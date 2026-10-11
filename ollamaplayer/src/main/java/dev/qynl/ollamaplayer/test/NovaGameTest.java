@@ -560,6 +560,21 @@ public class NovaGameTest implements FabricGameTest {
         ctx.complete();
     }
 
+    /** Level 0 reflexes are deterministic: burning goes for water, low air means surface. */
+    @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
+    public void reflexesAreInstantAndDeterministic(TestContext ctx) {
+        if (dev.qynl.ollamaplayer.companion.Reflex.decide(true, false, 300) != dev.qynl.ollamaplayer.companion.Reflex.Action.LEAVE_FIRE) {
+            ctx.throwGameTestException("burning on land should leave the fire");
+        }
+        if (dev.qynl.ollamaplayer.companion.Reflex.decide(false, true, 40) != dev.qynl.ollamaplayer.companion.Reflex.Action.SURFACE) {
+            ctx.throwGameTestException("low air underwater should surface");
+        }
+        if (dev.qynl.ollamaplayer.companion.Reflex.decide(false, true, 300) != dev.qynl.ollamaplayer.companion.Reflex.Action.NONE) {
+            ctx.throwGameTestException("healthy swimming needs no reflex");
+        }
+        ctx.complete();
+    }
+
     /** Combat judgement for multiple enemies, ranged enemies, and protecting the owner. Pure logic. */
     @GameTest(templateName = EMPTY_STRUCTURE, tickLimit = 5)
     public void combatJudgementCoversGroupsRangedAndProtection(TestContext ctx) {
