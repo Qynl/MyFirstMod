@@ -183,7 +183,8 @@ public final class CompanionManager {
 
     public String status() {
         if (companion == null) return "Not spawned. Use /nova spawn.";
-        return companion.statusLine() + " Model: " + brain.llm().status();
+        String stash = companion.stashPos() == null ? "" : " Stash chest at " + companion.stashPos().toShortString() + ".";
+        return companion.statusLine() + stash + " Model: " + brain.llm().status();
     }
 
     private void handleDeath(NovaBody body) {
