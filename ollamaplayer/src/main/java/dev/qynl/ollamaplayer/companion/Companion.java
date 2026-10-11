@@ -199,7 +199,7 @@ public final class Companion {
         }
 
         // Needs and opportunities are checked every few seconds, only while idle and with an owner around.
-        if (owner != null && enemy == null && ++needsTimer >= 200) {
+        if (owner != null && ++needsTimer >= 200 && nearestEnemy(world, 16) == null) {
             needsTimer = 0;
             WorldState.Facts f = worldFacts(world, owner);
             if (!Needs.restockReasons(f.food(), f.torches(), f.pickaxeFraction(), f.bagFraction()).isEmpty()) {
