@@ -149,11 +149,12 @@ jobs:
 
           commands = [
               'race tracks',
+              'forceload add -16 -16 16 16',
               'setblock 0 5 0 fabricracers:asphalt',
               'setblock 2 5 0 fabricracers:boost_pad',
               'setblock 4 5 0 fabricracers:checkpoint_marker',
-              'summon fabricracers:player_car 6 6 0',
-              'data get entity @e[type=fabricracers:player_car,limit=1]',
+              'summon fabricracers:player_car 6 6 0 {CarData:{type:"f1",levels:[1,1,0,0,0,0,0]}}',
+              'data get entity @e[type=fabricracers:player_car,limit=1] CarData',
               'kill @e[type=fabricracers:player_car]',
           ]
           for index, command in enumerate(commands, start=10):
@@ -180,7 +181,8 @@ jobs:
               'track catalogue': 'Circuits (' in transcript,
               'block placement': 'Changed the block at' in transcript,
               'car entity spawn': 'Summoned new' in transcript,
-              'entity data read': 'has the following entity data' in transcript,
+              'car NBT -> type': 'Circuit Formula' in transcript,
+              'entity data read': 'CarData' in transcript and 'f1' in transcript,
           }
           failed = [name for name, good in checks.items() if not good]
           head = 'server started' if started else "SERVER NEVER REACHED 'Done'"
