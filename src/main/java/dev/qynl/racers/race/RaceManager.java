@@ -123,7 +123,7 @@ public final class RaceManager {
                 break;
             }
             float yaw = placement.startYaw();
-            Vec3d pos = placement.gridPos(cars.size() + spawned);
+            Vec3d pos = placement.gridPos(cars.size());
             ai.teleportCleanly(pos.x, pos.y, pos.z, yaw);
             cars.add(ai);
             spawned++;

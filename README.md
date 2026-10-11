@@ -138,8 +138,10 @@ as many copies of it as you like.
 ## Building from source
 
 ```bash
-./gradlew build          # also runs the asset validator
-python3 tools/gen_textures.py   # regenerate every PNG (no art files in git)
+./gradlew build           # compiles the mod and runs the asset validator
+./gradlew runClient       # launch the game with the mod
+./gradlew runServer       # launch a test server
+python3 tools/gen_textures.py   # regenerate every PNG (all 71 are committed)
 python3 tools/gen_tracks.py     # regenerate the five stock circuits
 python3 tools/validate_assets.py
 ```
@@ -158,6 +160,21 @@ python3 tools/validate_assets.py
 The client car model is hand-rolled geometry (`client/render/CarMesh.java`)
 mapped onto a 64×64 atlas per car, so all nine cars share one renderer and one
 mesh - see the layout table at the top of `tools/gen_textures.py`.
+
+## Status
+
+Every push is checked by CI:
+
+1. `tools/validate_assets.py` - JSON, models, textures, structures, translations.
+2. `./gradlew build` - compiles both source sets and produces the jar.
+3. a **dedicated server is booted with the mod** and then driven over RCON:
+   the circuit catalogue is listed (which reads the generated `.nbt`
+   structures), modded blocks are placed, a car entity is summoned, and its
+   synched entity data is read back.
+
+So the build, the data pack and the runtime registries are all verified. Live
+gameplay balance (lap times, AI difficulty spread, prize economy) is tuned by
+simulation and will still benefit from real play-testing.
 
 ## Layout
 
