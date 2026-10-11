@@ -377,7 +377,7 @@ def write_index(designs):
     path = os.path.join(TRACK_DIR if "TRACK_DIR" in globals() else
                         os.path.join("src", "main", "resources", "data",
                                      "fabricracers", "tracks"), "_index.json")
-    payload = {"tracks": [design.key for design in designs]}
+    payload = {"tracks": sorted(design.key for design in designs)}
     with open(path, "w") as fh:
         json.dump(payload, fh, indent=2)
         fh.write("\n")

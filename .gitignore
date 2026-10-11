@@ -22,6 +22,10 @@ bin/
 .DS_Store
 Thumbs.db
 
+# Python bytecode
+__pycache__/
+*.pyc
+
 # Local scratch
 /tmp/
 *.log

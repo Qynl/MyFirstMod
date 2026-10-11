@@ -130,7 +130,8 @@ def _write_file(path, root_compound, gzipped=True):
     data = struct.pack(">b", TAG_COMPOUND) + _nbt_string("", "") + _tag_payload(TAG_COMPOUND, root_compound)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     if gzipped:
-        with gzip.open(path, "wb", compresslevel=9) as fh:
+        # mtime=0 keeps generated structures byte-identical between runs
+        with gzip.GzipFile(filename=path, mode="wb", compresslevel=9, mtime=0) as fh:
             fh.write(data)
     else:
         with open(path, "wb") as fh:
@@ -581,7 +582,7 @@ class Design:
         return data
 
     # -- preview ---------------------------------------------------------
-    def render_preview(self, scale=3):
+    def render_preview(self, scale=5):
         (mn, mx) = self.bbox()
         w, h = mx[0] - mn[0] + 2, mx[2] - mn[2] + 2
         img = [[(26, 26, 30) for _ in range(w)] for _ in range(h)]
